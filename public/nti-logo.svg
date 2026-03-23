@@ -1,0 +1,15 @@
+<svg width="220" height="64" viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon -->
+  <rect x="0" y="8" width="48" height="48" rx="10" fill="#0D5FBF"></rect>
+  <text x="24" y="40" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="600" fill="#FFFFFF">
+    NTI
+  </text>
+
+  <!-- Text -->
+  <text x="60" y="32" font-family="Inter, sans-serif" font-size="24" font-weight="600" fill="#FFFFFF">
+    Nitriansky
+  </text>
+  <text x="60" y="52" font-family="Inter, sans-serif" font-size="13" font-weight="400" fill="#3EC6FF" letter-spacing="3">
+    TECH INKUBÁTOR
+  </text>
+</svg>
