@@ -27,6 +27,5 @@
   </footer>
 </template>
 <script setup>
-import { Facebook, Twitter, Linkedin } from 'lucide-vue-next'
 const logo = '/nti-logo.svg'
 </script>

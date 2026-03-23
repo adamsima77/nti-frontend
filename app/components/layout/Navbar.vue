@@ -53,7 +53,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Menu, X, UserCircle } from 'lucide-vue-next'
 
 const open = ref(false)
 const logo = '/nti-logo.svg'

@@ -25,7 +25,6 @@
 </template>
 
 <script setup>
-import { UserCircle, X } from 'lucide-vue-next'
 const logo = '/nti-logo.svg'
 const props = defineProps({
   isOpen: {
