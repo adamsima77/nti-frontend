@@ -1,101 +1,100 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;500&display=swap');
 @import "tailwindcss";
 
+@theme {
+  /* Primary */
+  --color-navy: #0A1628;
+  --color-navy-light: #1E293B;
 
-:root {
-  --color-navy: #0A1628;          /* Hlavné pozadie, nadpisy */
-  --color-navy-light: #1E293B;    /* Svetlejší odtieň pre hover alebo sekundárny text */
+  --color-blue-50: #E8F1FA;
+  --color-blue-100: #C5DAFA;
+  --color-blue-500: #3B8BD4;
+  --color-blue-600: #0D5FBF;
+  --color-blue-700: #0A4E9E;
 
-  --color-blue-50: #E8F1FA;       /* Svetlé pozadie / hover */
-  --color-blue-100: #C5DAFA;      /* Jemný odtieň modrej */
-  --color-blue-500: #3B8BD4;      /* Sekundárny akcent / hover stavy */
-  --color-blue-600: #0D5FBF;      /* Primárna akcia / CTA */
-  --color-blue-700: #0A4E9E;      /* Tmavší odtieň modrej */
+  /* Semantic */
+  --color-success-50: #F0FDF4;
+  --color-success-500: #16803C;
+  --color-success-700: #15803D;
 
-  --color-success-50: #F0FDF4;    /* Pozadie stavov "schválené" */
-  --color-success-500: #16803C;   /* Text / CTA úspech */
-  --color-success-700: #15803D;   /* Tmavší úspech / hover */
+  --color-warning-50: #FEF3C7;
+  --color-warning-500: #D97706;
+  --color-warning-700: #92400E;
 
-  --color-warning-50: #FEF3C7;    /* Pozadie stavov "varovanie" */
-  --color-warning-500: #D97706;   /* Text / ikona varovanie */
-  --color-warning-700: #92400E;   /* Tmavší varovanie / hover */
+  --color-danger-50: #FEF2F2;
+  --color-danger-500: #DC2626;
+  --color-danger-700: #B91C1C;
 
-  --color-danger-50: #FEF2F2;     /* Pozadie stavov "chyba" */
-  --color-danger-500: #DC2626;    /* Text / ikona chyba */
-  --color-danger-700: #B91C1C;    /* Tmavší odtieň pre hover */
+  --color-purple-50: #F3E8FF;
+  --color-purple-500: #7C3AED;
+  --color-purple-700: #6D28D9;
 
-  --color-purple-50: #F3E8FF;     /* Pozadie pre mentor / hodnotenie */
-  --color-purple-500: #7C3AED;    /* Text / akcent purple */
-  --color-purple-700: #6D28D9;    /* Tmavší odtieň purple */
+  /* Neutral */
+  --color-white: #FFFFFF;
+  --color-gray-50: #F8FAFC;
+  --color-gray-100: #F1F5F9;
+  --color-gray-200: #E2E8F0;
+  --color-gray-500: #64748B;
+  --color-gray-800: #1E293B;
 
+  /* BACKGROUND */
+  --color-background-primary: #FFFFFF;
+  --color-background-secondary: #F8FAFC;
 
-  --color-gray-50: #F8FAFC;       /* Pozadie karty / svetlý text */
-  --color-gray-100: #F1F5F9;      /* Jemné pozadie */
-  --color-gray-200: #E2E8F0;      /* Border / oddelenie sekcií */
-  --color-gray-500: #64748B;      /* Text sekundárny / caption */
-  --color-gray-800: #1E293B;      /* Hlavný text / nadpisy na svetlom pozadí */
-  
+  /*TEXT */
+  --color-text-primary: #0A1628;
+  --color-text-secondary: #64748B;
+  --color-text-tertiary: #94A3B8;
 
-  --radius-sm: 4px;       /* Menšie prvky, inputy, badge */
-  --radius: 8px;          /* Štandardné, tlačidlá, karty */
-  --radius-lg: 12px;      /* Veľké karty */
-  --radius-full: 9999px;  /* Pill / avatar */
+  /*BORDER */
+  --color-border-primary: #E2E8F0;
+  --color-border-secondary: #CBD5F5;
+  --color-border-tertiary: #E5E7EB;
 
-    /* Body */
-  --font-body-family: 'Inter', system-ui, sans-serif;
-  --font-body-weight: 400;
-  --font-body-size: 15px;
-  --font-body-line: 1.7;
+  /*FONTS */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
-  /* Heading 1 */
-  --font-h1-family: 'Inter', system-ui, sans-serif;
-  --font-h1-weight: 600;
-  --font-h1-size: 32px;
-  --font-h1-line: 1.2;
+  /*RADIUS */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
 
-  /* Heading 2 */
-  --font-h2-family: 'Inter', system-ui, sans-serif;
-  --font-h2-weight: 600;
-  --font-h2-size: 24px;
-  --font-h2-line: 1.3;
-
-  /* Heading 3 */
-  --font-h3-family: 'Inter', system-ui, sans-serif;
-  --font-h3-weight: 500;
-  --font-h3-size: 18px;
-  --font-h3-line: 1.4;
+  /*SPACING*/
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
 }
 
-/*Default fonts*/
 @layer base {
-    body {
-    font-family: var(--font-body-family);
-    font-weight: var(--font-body-weight);
-    font-size: var(--font-body-size);
-    line-height: var(--font-body-line);
-    color: var(--color-gray-800);
-    background-color: var(--color-gray-100);
+
+  body {
+    font-family: var(--font-sans);
   }
 
-  h1 {
-    font-family: var(--font-h1-family);
-    font-weight: var(--font-h1-weight);
-    font-size: var(--font-h1-size);
-    line-height: var(--font-h1-line);
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
   }
 
-  h2 {
-    font-family: var(--font-h2-family);
-    font-weight: var(--font-h2-weight);
-    font-size: var(--font-h2-size);
-    line-height: var(--font-h2-line);
+
+  a {
+    font-family: var(--font-sans);
   }
 
-  h3 {
-    font-family: var(--font-h3-family);
-    font-weight: var(--font-h3-weight);
-    font-size: var(--font-h3-size);
-    line-height: var(--font-h3-line);
+  
+  p, span, li {
+    font-family: var(--font-sans);
+  }
+
+ 
+  code, pre {
+    font-family: var(--font-mono);
   }
 }
-

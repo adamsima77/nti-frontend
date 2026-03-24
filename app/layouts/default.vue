@@ -1,6 +1,9 @@
 <template>
   <div>
-    <LayoutNavbar @open-sidebar="sidebarOpen = true"  :isSidebarOpen="sidebarOpen" />
+    <LayoutNavbar
+      @open-sidebar="sidebarOpen = true"
+      :isSidebarOpen="sidebarOpen"
+    />
 
     <LayoutSidebar
       :isOpen="sidebarOpen"
@@ -10,6 +13,7 @@
     <main>
       <slot />
     </main>
+
     <LayoutFooter />
   </div>
 </template>

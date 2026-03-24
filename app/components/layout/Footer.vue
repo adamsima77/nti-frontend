@@ -1,30 +1,48 @@
 <template>
-  <footer class="bg-[var(--color-navy)] text-white p-4 shadow-2xl">
-    <div class="flex flex-col justify-between items-center md:flex-row gap-8">
+  <footer class="bg-navy text-white p-4 md:p-5 shadow-2xl">
 
-        <div class = "">
-            <NuxtLink to = "/" class = ""><img class = "" :src="logo" alt="Nitriansky technický inkubátor"></NuxtLink>
-        </div>
-
-      <div class="flex items-center gap-3 whitespace-nowrap">
-          <NuxtLink to="/" class="hover:text-[var(--color-blue-500)] transition-colors">O NTI</NuxtLink>
-          <hr class="w-px h-5 bg-gray-400 border-0">
-          <NuxtLink to="/" class = "hover:text-[var(--color-blue-500)] transition-colors">Kontakt</NuxtLink>
-      </div>
-        
-        <div class="flex gap-3 items-center">
-          <a href="#" target="_blank" class="hover:text-[var(--color-blue-500)] transition-colors">
-            <Facebook class="w-6 h-6" />
-          </a>
-          <a href="#" target="_blank" class="hover:text-[var(--color-blue-500)] transition-colors">
-            <Twitter class="w-6 h-6" />
-          </a>
-          <a href="#" target="_blank" class="hover:text-[var(--color-blue-500)] transition-colors">
-            <Linkedin class="w-6 h-6" />
-          </a>
-        </div>
+  <div class="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
+    <div>
+      <NuxtLink to="/">
+        <img :src="logo" class="h-10 md:h-12 lg:h-15 w-auto" />
+      </NuxtLink>
     </div>
-  </footer>
+
+   
+    <div class="flex items-center gap-3 whitespace-nowrap
+                text-sm md:text-base lg:text-lg text-blue-50">
+
+      <NuxtLink to="/" class="hover:text-blue-500 transition-colors duration-300">
+        O NTI
+      </NuxtLink>
+
+      <hr class="w-px h-5 bg-gray-500 border-0">
+
+      <NuxtLink to="/" class="hover:text-blue-500 transition-colors duration-300">
+        Kontakt
+      </NuxtLink>
+
+    </div>
+
+   
+    <div class="flex gap-3 items-center">
+
+      <a href="#" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">
+        <Facebook class="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
+      </a>
+
+      <a href="#" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">
+        <Twitter class="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
+      </a>
+
+      <a href="#" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">
+        <Linkedin class="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
+      </a>
+
+    </div>
+
+  </div>
+</footer>
 </template>
 <script setup>
 const logo = '/nti-logo.svg'

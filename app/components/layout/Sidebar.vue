@@ -1,35 +1,58 @@
 <template>
-<div
-  class="fixed top-0 left-0 h-screen w-85 bg-[var(--color-navy)] text-white p-5 shadow-2xl
-         transform transition-transform duration-500 ease-out flex flex-col gap-5"
-  :class="props.isOpen ? 'translate-x-0' : '-translate-x-full'">
-        <div class = "shrink-0 flex flex-row justify-between">
-            <NuxtLink to = "/"><img :src="logo" class = "" alt="Nitriansky technický inkubátor"></NuxtLink>
-            <button @click="toggleSidebar" class="md:hidden">
-             <X @click = "$emit('close-sidebar')" class="w-6 h-6 text-white hover:opacity-80 transition-opacity duration-300 cursor-pointer" />
-            </button>
-        </div>
-        <div class = "flex items-center">
-            <NuxtLink to="/" class="inline-block">
-            <UserCircle class="w-6 h-6 hover:text-[var(--color-blue-500)] transition-colors"/></NuxtLink>
-        </div>
+  <div> 
+    <div
+      v-if="isOpen"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300"
+      @click="$emit('close-sidebar')"
+    />
 
-         <ul class = "gap-4 flex flex-col">
-            <NuxtLink to = "" class = "text-[var(--color-blue-50)] hover:text-[var(--color-blue-500)] cursor-pointer transition text-color duration-300 ease-in-out"><li>Novinky</li></NuxtLink>
-            <NuxtLink to = "" class = "text-[var(--color-blue-50)] hover:text-[var(--color-blue-500)] cursor-pointer transition text-color duration-300 ease-in-out"> <li>Program A</li></NuxtLink>
-            <NuxtLink to = "" class = "text-[var(--color-blue-50)] hover:text-[var(--color-blue-500)] cursor-pointer transition text-color duration-300 ease-in-out"> <li>Program B</li></NuxtLink>
-             <NuxtLink to = "" class = "text-[var(--color-blue-50)] hover:text-[var(--color-blue-500)] cursor-pointer transition text-color duration-300 ease-in-out"><li>Partneri</li></NuxtLink>
-             <NuxtLink to = "" class = "text-[var(--color-blue-50)] hover:text-[var(--color-blue-500)] cursor-pointer transition text-color duration-300 ease-in-out"><li>Výzvy a termíny</li></NuxtLink>
-        </ul>
+   
+    <div
+      class="fixed top-0 left-0 h-screen w-80 bg-navy text-white p-5 shadow-2xl
+             transform transition-transform duration-500 ease-out flex flex-col gap-6 z-50"
+      :class="isOpen ? 'translate-x-0' : '-translate-x-full'"
+    >
+
+      
+      <div class="flex justify-between items-center">
+        <NuxtLink to="/">
+          <img :src="logo" alt="Nitriansky technický inkubátor" />
+        </NuxtLink>
+
+        <button @click="$emit('close-sidebar')">
+          <X class="w-6 h-6 hover:opacity-80 transition-opacity duration-300 cursor-pointer" />
+        </button>
+      </div>
+
+      
+      <div class="flex items-center">
+        <NuxtLink to="/">
+          <UserCircle class="w-6 h-6 text-blue-50 hover:text-blue-500 transition-colors duration-300" />
+        </NuxtLink>
+      </div>
+
+     
+      <ul class="flex flex-col gap-4
+           text-base md:text-lg lg:text-xl">
+           <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Novinky</NuxtLink></li>
+           <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Program A</NuxtLink></li>
+           <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Program B</NuxtLink></li>
+           <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Partneri</NuxtLink></li>
+           <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Výzvy a termíny</NuxtLink></li>
+      </ul>
     </div>
+  </div>
 </template>
 
 <script setup>
 const logo = '/nti-logo.svg'
-const props = defineProps({
+
+defineProps({
   isOpen: {
     type: Boolean,
     default: false
   }
 })
+
+defineEmits(['close-sidebar'])
 </script>

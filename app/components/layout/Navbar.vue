@@ -1,54 +1,43 @@
 <template>
-  <nav class="flex flex-row p-5 bg-[var(--color-navy)] text-white justify-between shadow-2xl">
-    <div class="shrink-0">
-      <NuxtLink to="/">
-        <img :src="logo" alt="Nitriansky technický inkubátor" />
-      </NuxtLink>
-    </div>
+ <nav class="flex flex-row p-4 md:p-5 bg-navy text-white justify-between shadow-2xl">
+  <div class="shrink-0">
+    <NuxtLink to="/">
+      <img
+        :src="logo"
+        class="h-10 md:h-12 lg:h-15 w-auto"
+        alt="Nitriansky technický inkubátor"
+      />
+    </NuxtLink>
+  </div>
 
-    <ul class="hidden md:flex md:flex-row items-center gap-3 whitespace-nowrap">
-      <NuxtLink
-        to="/"
-        class="text-[var(--color-blue-50)] hover:text-[var(--color-blue-500)] cursor-pointer transition-colors duration-300 ease-in-out"
-      >
-        <li>Novinky</li>
-      </NuxtLink>
-      <NuxtLink
-        to="/"
-        class="text-[var(--color-blue-50)] hover:text-[var(--color-blue-500)] cursor-pointer transition-colors duration-300 ease-in-out"
-      >
-        <li>Program A</li>
-      </NuxtLink>
-      <NuxtLink
-        to="/"
-        class="text-[var(--color-blue-50)] hover:text-[var(--color-blue-500)] cursor-pointer transition-colors duration-300 ease-in-out"
-      >
-        <li>Program B</li>
-      </NuxtLink>
-      <NuxtLink
-        to="/"
-        class="text-[var(--color-blue-50)] hover:text-[var(--color-blue-500)] cursor-pointer transition-colors duration-300 ease-in-out"
-      >
-        <li>Partneri</li>
-      </NuxtLink>
-      <NuxtLink
-        to="/"
-        class="text-[var(--color-blue-50)] hover:text-[var(--color-blue-500)] cursor-pointer transition-colors duration-300 ease-in-out"
-      >
-        <li>Výzvy a termíny</li>
-      </NuxtLink>
-    </ul>
+  
+  <ul class="hidden md:flex items-center gap-4 lg:gap-6 whitespace-nowrap
+             text-sm md:text-base lg:text-lg">
 
-    <div class="flex items-center gap-3">  
-      <NuxtLink to="/" class="hidden md:inline-block">
-        <UserCircle class="w-6 h-6 hover:text-[var(--color-blue-500)] transition-colors duration-300" />
-      </NuxtLink>
+    <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Novinky</NuxtLink></li>
+    <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Program A</NuxtLink></li>
+    <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Program B</NuxtLink></li>
+    <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Partneri</NuxtLink></li>
+    <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Výzvy a termíny</NuxtLink></li>
 
-      <button @click="toggleSidebar" class="md:hidden">
-        <Menu v-if = "!isSidebarOpen" class="w-6 h-6 text-white hover:opacity-80 transition-opacity duration-300 cursor-pointer" />
-      </button>
-    </div>
-  </nav>
+  </ul>
+
+  
+  <div class="flex items-center gap-3">
+
+    <NuxtLink to="/" class="hidden md:inline-block">
+      <UserCircle class="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 hover:text-blue-500 transition-colors duration-300" />
+    </NuxtLink>
+
+    <button @click="toggleSidebar" class="md:hidden">
+      <Menu
+        v-if="!isSidebarOpen"
+        class="w-6 h-6 cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-in-out"
+      />
+    </button>
+
+  </div>
+</nav>
 </template>
 
 <script setup>
