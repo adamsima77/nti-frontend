@@ -1,5 +1,5 @@
 <template>
- <nav class="flex flex-row p-4 md:p-5 bg-navy text-white justify-between shadow-2xl">
+<nav class="flex flex-row p-4 md:p-5 bg-navy text-white justify-between shadow-2xl fixed z-100 w-full">
   <div class="shrink-0">
     <NuxtLink to="/">
       <img

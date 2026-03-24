@@ -9,7 +9,7 @@
    
     <div
       class="fixed top-0 left-0 h-screen w-80 bg-navy text-white p-5 shadow-2xl
-             transform transition-transform duration-500 ease-out flex flex-col gap-6 z-50"
+             transform transition-transform duration-500 ease-out flex flex-col gap-6 z-900"
       :class="isOpen ? 'translate-x-0' : '-translate-x-full'"
     >
 

@@ -10,7 +10,7 @@
       @close-sidebar="sidebarOpen = false"
     />
 
-    <main>
+    <main class = "p-5 md:p-15">
       <slot />
     </main>
 
