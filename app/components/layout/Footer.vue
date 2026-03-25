@@ -18,7 +18,7 @@
 
       <hr class="w-px h-5 bg-gray-500 border-0">
 
-      <NuxtLink to="/" class="hover:text-blue-500 transition-colors duration-300">
+      <NuxtLink to="/kontakt" class="hover:text-blue-500 transition-colors duration-300">
         Kontakt
       </NuxtLink>
 
