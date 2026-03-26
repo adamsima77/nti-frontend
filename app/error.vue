@@ -13,7 +13,7 @@
 
       <NuxtLink
         to="/"
-        class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md transition shadow-md hover:scale-105 text-sm sm:text-base"
+        class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md transition all duration-300 ease-in-out shadow-md text-sm sm:text-base"
       >
         Späť na domov
       </NuxtLink>
@@ -22,7 +22,7 @@
         Ak si myslíš, že ide o chybu, 
         <NuxtLink 
           to="/kontakt" 
-          class="text-blue-500 hover:text-blue-600 underline underline-offset-4 transition font-medium"
+          class="text-blue-500 hover:text-blue-600 underline underline-offset-4 transition all duration-300 ease-in-out font-medium"
         >
           kontaktuj nás
         </NuxtLink>

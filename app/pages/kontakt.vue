@@ -76,19 +76,6 @@
         </form>
       </div>
     </div>
-
-    <div class="mt-16 text-center bg-navy text-white p-8 rounded-lg">
-      <h3 class="text-xl sm:text-2xl md:text-3xl font-bold mb-3">
-        Chcete sa zapojiť do programu?
-      </h3>
-      <p class="text-sm sm:text-base md:text-lg text-gray-300 mb-6">
-        Registrujte sa a začnite svoju cestu v NTI.
-      </p>
-      <button class="bg-blue-500 cursor-pointer hover:bg-blue-600 text-sm sm:text-base md:text-lg px-6 py-3 rounded-md transition">
-        Registrovať sa
-      </button>
-    </div>
-
   </div>
 </section>
 </template>

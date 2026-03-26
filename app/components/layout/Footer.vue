@@ -12,7 +12,7 @@
     <div class="flex items-center gap-3 whitespace-nowrap
                 text-sm md:text-base lg:text-lg text-blue-50">
 
-      <NuxtLink to="/" class="hover:text-blue-500 transition-colors duration-300">
+      <NuxtLink to="/o-nas" class="hover:text-blue-500 transition-colors duration-300">
         O NTI
       </NuxtLink>
 

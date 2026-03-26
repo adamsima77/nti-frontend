@@ -45,6 +45,8 @@
 </template>
 
 <script setup>
+import { watch } from 'vue';
+import { useRoute } from 'vue-router'
 const logo = '/nti-logo.svg'
 
 defineProps({
@@ -54,5 +56,9 @@ defineProps({
   }
 })
 
-defineEmits(['close-sidebar'])
+const emit = defineEmits(['close-sidebar']);
+const route = useRoute();
+watch(() => route.fullPath, (newRoute, oldRoute) => {
+    emit('close-sidebar');
+})
 </script>
