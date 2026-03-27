@@ -18,8 +18,8 @@
     <NuxtLink
       to="/novinky"
       class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
-      active-class="text-blue-500 border-b-2 border-blue-500"
-      exact-active-class="text-blue-500 border-b-2 border-blue-500"
+      active-class="text-blue-500"
+      exact-active-class="text-blue-500"
     >
       Novinky
     </NuxtLink>
@@ -29,8 +29,8 @@
     <NuxtLink
       to="/program-a"
       class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
-      active-class="text-blue-500 border-b-2 border-blue-500"
-      exact-active-class="text-blue-500 border-b-2 border-blue-500"
+      active-class="text-blue-500"
+      exact-active-class="text-blue-500"
     >
       Program A
     </NuxtLink>
@@ -40,8 +40,8 @@
     <NuxtLink
       to="/program-b"
       class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
-      active-class="text-blue-500 border-b-2 border-blue-500"
-      exact-active-class="text-blue-500 border-b-2 border-blue-500"
+      active-class="text-blue-500"
+      exact-active-class="text-blue-500"
     >
       Program B
     </NuxtLink>
@@ -51,8 +51,8 @@
     <NuxtLink
       to="/partneri"
       class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
-      active-class="text-blue-500 border-b-2 border-blue-500"
-      exact-active-class="text-blue-500 border-b-2 border-blue-500"
+      active-class="text-blue-500"
+      exact-active-class="text-blue-500"
     >
       Partneri
     </NuxtLink>
@@ -62,8 +62,8 @@
     <NuxtLink
       to="/vyzvy"
       class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
-      active-class="text-blue-500 border-b-2 border-blue-500"
-      exact-active-class="text-blue-500 border-b-2 border-blue-500"
+      active-class="text-blue-500"
+      exact-active-class="text-blue-500"
     >
       Výzvy a termíny
     </NuxtLink>

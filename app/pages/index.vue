@@ -54,8 +54,8 @@
 
   <section class="mb-20 mt-10 px-6 md:px-0">
     <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-extrabold text-navy mb-12 text-center md:text-left">Novinky</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col h-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-gray-50 rounded-2xl shadow-[0_-8px_20px_rgba(0,0,0,0.06),0_8px_20px_rgba(0,0,0,0.06)] p-6 sm:p-8 flex flex-col h-full">
         <img src="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg" class="rounded-lg mb-4 sm:mb-5 hover:opacity-90 shadow-lg  transition-opacity duration-300 ease-in-out cursor-pointer" alt="Novinka #1">
         <div class="flex-1 flex flex-col justify-between">
           <NuxtLink to="">
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col h-full">
+      <div class="bg-gray-50 rounded-2xl shadow-[0_-8px_20px_rgba(0,0,0,0.06),0_8px_20px_rgba(0,0,0,0.06)] p-6 sm:p-8 flex flex-col h-full">
         <img src="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg" class="rounded-lg mb-4 sm:mb-5 hover:opacity-90  shadow-lg transition-opacity duration-300 ease-in-out cursor-pointer" alt="Novinka #2">
         <div class="flex-1 flex flex-col justify-between">
           <NuxtLink to="">
@@ -77,7 +77,7 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col h-full">
+      <div class="bg-gray-50 rounded-2xl shadow-[0_-8px_20px_rgba(0,0,0,0.06),0_8px_20px_rgba(0,0,0,0.06)] p-6 sm:p-8 flex flex-col h-full">
         <img src="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg" class="rounded-lg mb-4 sm:mb-5 hover:opacity-90 shadow-lg  transition-opacity duration-300 ease-in-out cursor-pointer" alt="Novinka #3">
         <div class="flex-1 flex flex-col justify-between">
           <NuxtLink to="">
@@ -88,7 +88,7 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col h-full">
+      <div class="bg-gray-50 rounded-2xl shadow-[0_-8px_20px_rgba(0,0,0,0.06),0_8px_20px_rgba(0,0,0,0.06)] p-6 sm:p-8 flex flex-col h-full">
         <img src="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg" class="rounded-lg mb-4 sm:mb-5 hover:opacity-90 shadow-lg transition-opacity duration-300 ease-in-out cursor-pointer" alt="Novinka #4">
         <div class="flex-1 flex flex-col justify-between">
           <NuxtLink to="">
