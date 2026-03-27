@@ -12,15 +12,25 @@
     <div class="flex items-center gap-3 whitespace-nowrap
                 text-sm md:text-base lg:text-lg text-blue-50">
 
-      <NuxtLink to="/o-nas" class="hover:text-blue-500 transition-colors duration-300">
-        O NTI
-      </NuxtLink>
+      <NuxtLink
+  to="/o-nas"
+  class="hover:text-blue-500 transition-colors duration-300"
+  active-class="text-blue-500"
+  exact-active-class="text-blue-500"
+>
+  O NTI
+</NuxtLink>
 
-      <hr class="w-px h-5 bg-gray-500 border-0">
+<hr class="w-px h-5 bg-gray-500 border-0">
 
-      <NuxtLink to="/kontakt" class="hover:text-blue-500 transition-colors duration-300">
-        Kontakt
-      </NuxtLink>
+<NuxtLink
+  to="/kontakt"
+  class="hover:text-blue-500 transition-colors duration-300"
+  active-class="text-blue-500"
+  exact-active-class="text-blue-500"
+>
+  Kontakt
+</NuxtLink>
 
     </div>
 

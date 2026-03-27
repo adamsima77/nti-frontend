@@ -32,14 +32,65 @@
       </div>
 
      
-      <ul class="flex flex-col gap-4
+     <ul class="flex flex-col gap-4
            text-base md:text-lg lg:text-xl">
-           <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Novinky</NuxtLink></li>
-           <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Program A</NuxtLink></li>
-           <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Program B</NuxtLink></li>
-           <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Partneri</NuxtLink></li>
-           <li><NuxtLink to="/" class="text-blue-50 hover:text-blue-500 transition-colors duration-300">Výzvy a termíny</NuxtLink></li>
-      </ul>
+
+  <li>
+    <NuxtLink
+      to="/novinky"
+      class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+      active-class="text-blue-500"
+      exact-active-class="text-blue-500"
+    >
+      Novinky
+    </NuxtLink>
+  </li>
+
+  <li>
+    <NuxtLink
+      to="/program-a"
+      class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+      active-class="text-blue-500"
+      exact-active-class="text-blue-500"
+    >
+      Program A
+    </NuxtLink>
+  </li>
+
+  <li>
+    <NuxtLink
+      to="/program-b"
+      class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+      active-class="text-blue-500"
+      exact-active-class="text-blue-500"
+    >
+      Program B
+    </NuxtLink>
+  </li>
+
+  <li>
+    <NuxtLink
+      to="/partneri"
+      class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+      active-class="text-blue-500"
+      exact-active-class="text-blue-500"
+    >
+      Partneri
+    </NuxtLink>
+  </li>
+
+  <li>
+    <NuxtLink
+      to="/vyzvy"
+      class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+      active-class="text-blue-500"
+      exact-active-class="text-blue-500"
+    >
+      Výzvy a termíny
+    </NuxtLink>
+  </li>
+
+</ul>
     </div>
   </div>
 </template>
