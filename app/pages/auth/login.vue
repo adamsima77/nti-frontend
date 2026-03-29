@@ -1,66 +1,140 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50">
-    <div class="w-full max-w-md md:max-w-lg bg-white rounded-lg shadow-sm border border-gray-200 p-8 md:p-10">
-      
-      <div class="mb-6 text-center">
-        <h1 class="text-xl md:text-2xl font-bold text-navy">
-          Prihlásenie
-        </h1>
+  <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
+    <div class="w-full max-w-md">
+      <!-- Header -->
+      <div class="mb-8 text-center">
+        <NuxtLink to="/" class="inline-block mb-6">
+          <img src="/nti-logo.svg" alt="NTI" class="h-12 w-auto" />
+        </NuxtLink>
+        <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">Prihlásenie</h1>
+        <p class="text-gray-600">Prihlaste sa do svojho účtu</p>
       </div>
 
-      <form class="flex flex-col gap-4">
-        
-        <div class="flex flex-col gap-1">
-          <label class="text-sm text-gray-500 font-bold">
-            Email:
-          </label>
-          <input 
-            type="email"
-            placeholder="Zadajte email..."
-            class="px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
+      <!-- Form -->
+      <form @submit.prevent="handleLogin" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-5">
+        <UiInput
+          v-model="formData.email"
+          type="email"
+          label="Email"
+          placeholder="vas@email.com"
+          required
+          :error="errors.email"
+        />
 
-        <div class="flex flex-col gap-1">
-          <label class="text-sm text-gray-500 font-bold">
-            Heslo:
-          </label>
-          <input 
-            type="password"
-            placeholder="Zadajte heslo..."
-            class="px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
+        <UiInput
+          v-model="formData.password"
+          type="password"
+          label="Heslo"
+          placeholder="••••••••••"
+          required
+          :error="errors.password"
+        />
 
-        <div class="flex justify-start">
-          <NuxtLink 
-            to="" 
-            class="text-sm text-blue-600 hover:underline cursor-pointer"
-          >
-            Zabudli ste heslo ?
+        <!-- Forgotten password link -->
+        <div class="flex justify-end">
+          <NuxtLink to="/auth/forgot-password" class="text-sm text-blue-600 hover:underline">
+            Zabudli ste heslo?
           </NuxtLink>
         </div>
 
-        <button 
+        <!-- Error message -->
+        <div v-if="loginError" class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded text-sm">
+          {{ loginError }}
+        </div>
+
+        <!-- Submit button -->
+        <button
           type="submit"
-          class="mt-2 bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base font-medium py-2.5 rounded-md transition duration-200 cursor-pointer"
+          :disabled="isLoading"
+          class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Prihlásiť sa
+          <span v-if="!isLoading">Prihlásiť sa</span>
+          <span v-else>Prihlasovanie...</span>
         </button>
 
-        <div class="text-center text-sm text-gray-500 mt-3">
+        <!-- Register link -->
+        <p class="text-center text-gray-600 text-sm">
           Nemáte účet?
-          <NuxtLink to="" class="text-blue-600 hover:underline cursor-pointer">
+          <NuxtLink to="/auth/register" class="text-blue-600 hover:underline font-medium">
             Zaregistrujte sa
           </NuxtLink>
-        </div>
-
+        </p>
       </form>
     </div>
   </div>
 </template>
+
 <script setup>
-  definePageMeta({
-      layout: false
-  })
+import { ref, reactive } from 'vue'
+
+definePageMeta({
+  layout: 'default',
+  middleware: 'guest'
+})
+
+useHead({
+  title: 'Prihlásenie | NTI',
+  meta: [
+    {
+      name: 'description',
+      content: 'Prihlaste sa do vášho NTI účtu'
+    }
+  ]
+})
+
+const authStore = useAuthStore()
+const router = useRouter()
+const route = useRoute()
+
+const isLoading = ref(false)
+const loginError = ref(null)
+
+const formData = reactive({
+  email: '',
+  password: ''
+})
+
+const errors = reactive({
+  email: null,
+  password: null
+})
+
+const validateForm = () => {
+  loginError.value = null
+  errors.email = null
+  errors.password = null
+
+  let isValid = true
+
+  if (!formData.email) {
+    errors.email = 'Email je povinný'
+    isValid = false
+  }
+
+  if (!formData.password) {
+    errors.password = 'Heslo je povinné'
+    isValid = false
+  }
+
+  return isValid
+}
+
+const handleLogin = async () => {
+  if (!validateForm()) return
+
+  isLoading.value = true
+  loginError.value = null
+
+  try {
+    await authStore.login(formData.email, formData.password)
+
+    // Presmeruj na dashboard alebo na redirection URL z query
+    const redirectUrl = route.query.redirect || '/dashboard'
+    await router.push(redirectUrl)
+  } catch (error) {
+    loginError.value = error.message || 'Chyba pri prihlasovaní. Skúste neskôr.'
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
