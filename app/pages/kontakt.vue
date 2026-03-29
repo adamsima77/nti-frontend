@@ -56,17 +56,29 @@
 
         <form class="flex flex-col gap-4">
 
-          <input type="text" placeholder="Meno"
-            class="p-3 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500" />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-500 font-bold">Meno:</label>
+            <input type="text" placeholder="Meno"
+              class="p-3 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500" />
+          </div>
 
-          <input type="text" placeholder="Priezvisko"
-            class="p-3 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500" />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-500 font-bold">Priezvisko:</label>
+            <input type="text" placeholder="Priezvisko"
+              class="p-3 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500" />
+          </div>
 
-          <input type="email" placeholder="Email"
-            class="p-3 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500" />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-500 font-bold">Email:</label>
+            <input type="email" placeholder="Email"
+              class="p-3 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500" />
+          </div>
 
-          <textarea placeholder="Správa"
-            class="p-3 h-32 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500"></textarea>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-500 font-bold">Správa:</label>
+            <textarea placeholder="Správa"
+              class="p-3 h-32 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500"></textarea>
+          </div>
 
           <button
             class="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg py-3 rounded-md transition">
@@ -79,6 +91,9 @@
   </div>
 </section>
 </template>
+
+<script setup>
+</script>
 
 <script setup>
 

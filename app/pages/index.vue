@@ -1,5 +1,6 @@
 <template>
-  <UiHero title = "Objav Nitriansky Technický Inkubátor!" description="Interaktívne programy, mentorstvo a komunita, ktorá ťa posunie vpred."></UiHero>
+  <UiHero title = "Objav Nitriansky Technický Inkubátor!" 
+          description="Interaktívne programy, mentorstvo a komunita, ktorá ťa posunie vpred."></UiHero>
 
  <div id="programs" class="mt-20 px-6 md:px-0 flex flex-col">
   <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-extrabold text-navy mb-12 text-center md:text-left">

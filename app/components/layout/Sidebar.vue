@@ -26,7 +26,7 @@
 
       
       <div class="flex items-center">
-        <NuxtLink to="/">
+        <NuxtLink to="/auth/login">
           <UserCircle class="w-6 h-6 text-blue-50 hover:text-blue-500 transition-colors duration-300" />
         </NuxtLink>
       </div>

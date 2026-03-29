@@ -74,7 +74,7 @@
   
   <div class="flex items-center gap-3">
 
-    <NuxtLink to="/" class="hidden md:inline-block">
+    <NuxtLink to="/auth/login" class="hidden md:inline-block">
       <UserCircle class="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 hover:text-blue-500 transition-colors duration-300" />
     </NuxtLink>
 
