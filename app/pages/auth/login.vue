@@ -45,14 +45,6 @@
           </NuxtLink>
         </div>
 
-        <!-- Error message -->
-        <div
-          v-if="loginError"
-          class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded text-sm"
-        >
-          {{ loginError }}
-        </div>
-
         <!-- Submit button -->
         <button
           type="submit"
@@ -100,8 +92,8 @@ const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 
+const { addToast } = useToast()
 const isLoading = ref(false)
-const loginError = ref(null)
 
 const formData = reactive({
   email: '',
@@ -114,7 +106,6 @@ const errors = reactive({
 })
 
 const validateForm = () => {
-  loginError.value = null
   errors.email = null
   errors.password = null
 
@@ -137,7 +128,6 @@ const handleLogin = async () => {
   if (!validateForm()) return
 
   isLoading.value = true
-  loginError.value = null
 
   try {
     await authStore.login(formData.email, formData.password)
@@ -146,7 +136,7 @@ const handleLogin = async () => {
     const redirectUrl = route.query.redirect || '/dashboard'
     await router.push(redirectUrl)
   } catch (error) {
-    loginError.value = error.message || 'Chyba pri prihlasovaní. Skúste neskôr.'
+    addToast({ message: error.message || 'Chyba pri prihlasovaní. Skúste neskôr.', type: 'error' })
   } finally {
     isLoading.value = false
   }

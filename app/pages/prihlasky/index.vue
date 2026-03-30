@@ -74,11 +74,17 @@
     <!-- Empty state -->
     <div
       v-else
-      class="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center"
+      class="bg-white rounded-lg shadow-sm border border-gray-100"
     >
-      <FileText class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-      <p class="text-gray-500 font-medium">Žiadne prihlášky</p>
-      <p class="text-sm text-gray-400 mt-1">Skúste zmeniť filtre alebo vytvorte novú prihlášku</p>
+      <UiEmptyState
+        :icon="FileText"
+        title="Žiadne prihlášky"
+        description="Skúste zmeniť filtre alebo vytvorte novú prihlášku"
+      >
+        <NuxtLink to="/prihlasky/nova">
+          <UiButton size="sm">Nová prihláška</UiButton>
+        </NuxtLink>
+      </UiEmptyState>
     </div>
   </div>
 </template>

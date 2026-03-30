@@ -3,15 +3,6 @@
     <!-- Header -->
     <h1 class="text-2xl font-bold text-navy mb-8">Môj profil</h1>
 
-    <!-- Success alert -->
-    <div
-      v-if="showSuccess"
-      class="mb-6 bg-success-50 border border-green-200 rounded-lg p-4 flex items-center gap-2"
-    >
-      <Check class="w-5 h-5 text-green-600" />
-      <span class="text-sm text-green-700 font-medium">Profil bol úspešne uložený</span>
-    </div>
-
     <!-- Profile header card -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
       <div class="flex items-center gap-6">
@@ -172,7 +163,9 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue'
-import { X, Check, Upload } from 'lucide-vue-next'
+import { X, Upload } from 'lucide-vue-next'
+
+const { addToast } = useToast()
 
 definePageMeta({
   layout: 'portal',
@@ -207,7 +200,6 @@ const form = reactive({
 })
 
 const newSkill = ref('')
-const showSuccess = ref(false)
 
 const universityOptions = [
   { value: 'SPU Nitra', label: 'SPU Nitra' },
@@ -248,9 +240,6 @@ function removeSkill(index: number) {
 }
 
 function saveProfile() {
-  showSuccess.value = true
-  setTimeout(() => {
-    showSuccess.value = false
-  }, 3000)
+  addToast({ message: 'Profil bol úspešne uložený', type: 'success' })
 }
 </script>

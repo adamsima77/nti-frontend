@@ -2,6 +2,7 @@
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <UiToast />
 </template>
 
 <script setup></script>

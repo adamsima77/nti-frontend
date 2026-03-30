@@ -215,14 +215,6 @@
           </div>
         </div>
 
-        <!-- Error message -->
-        <div
-          v-if="submitError"
-          class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded"
-        >
-          {{ submitError }}
-        </div>
-
         <!-- Submit button -->
         <button
           type="submit"
@@ -270,10 +262,10 @@ const authStore = useAuthStore()
 const router = useRouter()
 const api = useApi()
 
+const { addToast } = useToast()
 const step = ref('type-selection')
 const accountType = ref(null)
 const isSubmitting = ref(false)
-const submitError = ref(null)
 
 const formData = reactive({
   firstName: '',
@@ -307,7 +299,6 @@ const validatePassword = (password) => {
 }
 
 const validateForm = () => {
-  submitError.value = null
   Object.keys(errors).forEach((key) => {
     errors[key] = null
   })
@@ -346,7 +337,7 @@ const validateForm = () => {
   }
 
   if (!formData.termsAccepted) {
-    submitError.value = 'Musíte súhlasiť s podmienkami'
+    addToast({ message: 'Musíte súhlasiť s podmienkami', type: 'warning' })
     isValid = false
   }
 
@@ -357,7 +348,6 @@ const submitRegistration = async () => {
   if (!validateForm()) return
 
   isSubmitting.value = true
-  submitError.value = null
 
   try {
     const payload = {
@@ -389,7 +379,7 @@ const submitRegistration = async () => {
       })
     }
   } catch (error) {
-    submitError.value = error.message || 'Chyba pri registrácii. Skúste neskôr.'
+    addToast({ message: error.message || 'Chyba pri registrácii. Skúste neskôr.', type: 'error' })
   } finally {
     isSubmitting.value = false
   }

@@ -3,28 +3,27 @@
     <!-- Not found -->
     <div
       v-if="!team"
-      class="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center"
+      class="bg-white rounded-lg shadow-sm border border-gray-100"
     >
-      <Users class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-      <p class="text-gray-500 font-medium mb-4">Tím nenájdený</p>
-      <NuxtLink
-        to="/timy"
-        class="text-sm font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 justify-center"
+      <UiEmptyState
+        :icon="Users"
+        title="Tím nenájdený"
       >
-        <ArrowLeft class="w-4 h-4" />
-        Späť na tímy
-      </NuxtLink>
+        <NuxtLink
+          to="/timy"
+          class="text-sm font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+        >
+          <ArrowLeft class="w-4 h-4" />
+          Späť na tímy
+        </NuxtLink>
+      </UiEmptyState>
     </div>
 
     <template v-else>
-      <!-- Back link -->
-      <NuxtLink
-        to="/timy"
-        class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors mb-8"
-      >
-        <ArrowLeft class="w-4 h-4" />
-        Späť na tímy
-      </NuxtLink>
+      <!-- Breadcrumbs -->
+      <div class="mb-8">
+        <UiBreadcrumbs :items="[{ label: 'Tímy', to: '/timy' }, { label: team.name }]" />
+      </div>
 
       <!-- Header -->
       <div class="flex items-start justify-between mb-8">
@@ -95,12 +94,10 @@
                 <UiStatusBadge :status="app.status" />
               </NuxtLink>
             </div>
-            <p
+            <UiEmptyState
               v-else
-              class="text-sm text-gray-400"
-            >
-              Tím zatiaľ nemá žiadne prihlášky
-            </p>
+              title="Tím zatiaľ nemá žiadne prihlášky"
+            />
           </div>
         </div>
 

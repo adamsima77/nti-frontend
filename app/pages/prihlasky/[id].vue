@@ -3,28 +3,27 @@
     <!-- Not found -->
     <div
       v-if="!application"
-      class="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center"
+      class="bg-white rounded-lg shadow-sm border border-gray-100"
     >
-      <FileText class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-      <p class="text-gray-500 font-medium mb-4">Prihláška nenájdená</p>
-      <NuxtLink
-        to="/prihlasky"
-        class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1 justify-center"
+      <UiEmptyState
+        :icon="FileText"
+        title="Prihláška nenájdená"
       >
-        <ArrowLeft class="w-4 h-4" />
-        Späť na prihlášky
-      </NuxtLink>
+        <NuxtLink
+          to="/prihlasky"
+          class="text-sm font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+        >
+          <ArrowLeft class="w-4 h-4" />
+          Späť na prihlášky
+        </NuxtLink>
+      </UiEmptyState>
     </div>
 
     <template v-else>
-      <!-- Back link -->
-      <NuxtLink
-        to="/prihlasky"
-        class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 mb-6"
-      >
-        <ArrowLeft class="w-4 h-4" />
-        Späť na prihlášky
-      </NuxtLink>
+      <!-- Breadcrumbs -->
+      <div class="mb-6">
+        <UiBreadcrumbs :items="[{ label: 'Prihlášky', to: '/prihlasky' }, { label: application.title }]" />
+      </div>
 
       <!-- Header -->
       <div class="flex items-start justify-between mb-6">
@@ -72,12 +71,11 @@
                 </div>
               </div>
             </div>
-            <p
+            <UiEmptyState
               v-else
-              class="text-sm text-gray-400"
-            >
-              Žiadne dokumenty
-            </p>
+              :icon="Paperclip"
+              title="Žiadne dokumenty"
+            />
           </div>
 
           <!-- Komentáre -->
@@ -99,12 +97,10 @@
                 <p class="text-sm text-gray-600">{{ comment.text }}</p>
               </div>
             </div>
-            <p
+            <UiEmptyState
               v-else
-              class="text-sm text-gray-400"
-            >
-              Žiadne komentáre
-            </p>
+              title="Žiadne komentáre"
+            />
           </div>
         </div>
 

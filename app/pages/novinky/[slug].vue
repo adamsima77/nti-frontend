@@ -1,12 +1,9 @@
 <template>
   <section class="mt-20 bg-white py-16 sm:py-20 md:py-24 px-6 md:px-20 rounded-2xl shadow-xl">
     <div class="mx-auto flex flex-col">
-      <NuxtLink
-        to="/novinky"
-        class="text-blue-500 font-bold mb-6 inline-block hover:underline"
-      >
-        ← Späť na novinky
-      </NuxtLink>
+      <div class="mb-6">
+        <UiBreadcrumbs :items="[{ label: 'Novinky', to: '/novinky' }, { label: 'Názov článku' }]" />
+      </div>
 
       <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-navy mb-6">Názov článku</h1>
 
