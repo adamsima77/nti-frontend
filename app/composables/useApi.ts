@@ -2,7 +2,7 @@ import { ref, computed } from 'vue'
 
 export const useApi = () => {
   const config = useRuntimeConfig()
-  const apiBaseUrl = config.public.apiBaseUrl || 'http://localhost:8000/api'
+  const apiBaseUrl = config.public.apiBase || 'http://localhost:8000/api'
 
   const isLoading = ref(false)
   const error = ref<string | null>(null)

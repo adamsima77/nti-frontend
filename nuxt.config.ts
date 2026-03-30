@@ -5,10 +5,20 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['./app/assets/main.css'],
   modules: ['@pinia/nuxt'],
-  ssr: true,
+  routeRules: {
+    '/auth/**': { ssr: false },
+    '/dashboard/**': { ssr: false },
+    '/prihlasky/**': { ssr: false },
+    '/timy/**': { ssr: false },
+    '/hodnotenie/**': { ssr: false },
+    '/mentor/**': { ssr: false },
+    '/firma/**': { ssr: false },
+    '/admin/**': { ssr: false },
+  },
   runtimeConfig: {
+    apiBase: process.env.NUXT_API_BASE || 'http://localhost:8000/api',
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api'
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000/api',
     }
   },
   vite: {
