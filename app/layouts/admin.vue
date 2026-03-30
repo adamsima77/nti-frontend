@@ -5,7 +5,7 @@
       @toggle-sidebar="mobileSidebarOpen = !mobileSidebarOpen"
     />
 
-    <LayoutPortalSidebar
+    <LayoutAdminSidebar
       :items="navItems"
       :is-open="mobileSidebarOpen"
       :is-collapsed="sidebarCollapsed"
@@ -27,13 +27,13 @@ const mobileSidebarOpen = ref(false)
 const sidebarCollapsed = ref(false)
 
 const navItems = [
-  { label: 'Dashboard', to: '/admin', icon: LayoutDashboard },
-  { label: 'Používatelia', to: '/admin/pouzivatelia', icon: Users },
-  { label: 'Výzvy', to: '/admin/vyzvy', icon: Megaphone },
-  { label: 'Prihlášky', to: '/admin/prihlasky', icon: FileText },
-  { label: 'CMS', to: '/admin/cms', icon: FileCode },
-  { label: 'Šablóny emailov', to: '/admin/sablony-emailov', icon: Mail },
-  { label: 'Exporty', to: '/admin/exporty', icon: Download },
-  { label: 'Audit log', to: '/admin/audit-log', icon: Shield },
+  { label: 'Dashboard', to: '/admin', icon: LayoutDashboard, section: 'Správa' },
+  { label: 'Používatelia', to: '/admin/pouzivatelia', icon: Users, section: 'Správa' },
+  { label: 'Výzvy', to: '/admin/vyzvy', icon: Megaphone, section: 'Správa' },
+  { label: 'Prihlášky', to: '/admin/prihlasky', icon: FileText, section: 'Správa' },
+  { label: 'CMS', to: '/admin/cms', icon: FileCode, section: 'Obsah' },
+  { label: 'Šablóny emailov', to: '/admin/sablony-emailov', icon: Mail, section: 'Obsah' },
+  { label: 'Exporty', to: '/admin/exporty', icon: Download, section: 'Systém' },
+  { label: 'Audit log', to: '/admin/audit-log', icon: Shield, section: 'Systém' },
 ]
 </script>
