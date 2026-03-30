@@ -1,10 +1,16 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
     <!-- Not found -->
-    <div v-if="!team" class="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center">
+    <div
+      v-if="!team"
+      class="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center"
+    >
       <Users class="w-12 h-12 text-gray-300 mx-auto mb-3" />
       <p class="text-gray-500 font-medium mb-4">Tím nenájdený</p>
-      <NuxtLink to="/timy" class="text-sm font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 justify-center">
+      <NuxtLink
+        to="/timy"
+        class="text-sm font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 justify-center"
+      >
         <ArrowLeft class="w-4 h-4" />
         Späť na tímy
       </NuxtLink>
@@ -12,7 +18,10 @@
 
     <template v-else>
       <!-- Back link -->
-      <NuxtLink to="/timy" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors mb-8">
+      <NuxtLink
+        to="/timy"
+        class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors mb-8"
+      >
         <ArrowLeft class="w-4 h-4" />
         Späť na tímy
       </NuxtLink>
@@ -44,7 +53,9 @@
                 class="flex items-center justify-between py-4 first:pt-0 last:pb-0"
               >
                 <div class="flex items-center gap-4">
-                  <div class="w-10 h-10 rounded-full bg-navy text-white text-sm font-medium flex items-center justify-center flex-shrink-0">
+                  <div
+                    class="w-10 h-10 rounded-full bg-navy text-white text-sm font-medium flex items-center justify-center flex-shrink-0"
+                  >
                     {{ getInitials(member.name) }}
                   </div>
                   <div>
@@ -55,7 +66,7 @@
                 <span
                   :class="[
                     'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium',
-                    member.role === 'Team Lead' ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-600'
+                    member.role === 'Team Lead' ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-600',
                   ]"
                 >
                   {{ member.role }}
@@ -67,7 +78,10 @@
           <!-- Applications -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
             <h2 class="text-xl font-bold text-navy mb-6">Prihlášky tímu</h2>
-            <div v-if="team.applications.length" class="divide-y divide-gray-100">
+            <div
+              v-if="team.applications.length"
+              class="divide-y divide-gray-100"
+            >
               <NuxtLink
                 v-for="app in team.applications"
                 :key="app.id"
@@ -81,7 +95,12 @@
                 <UiStatusBadge :status="app.status" />
               </NuxtLink>
             </div>
-            <p v-else class="text-sm text-gray-400">Tím zatiaľ nemá žiadne prihlášky</p>
+            <p
+              v-else
+              class="text-sm text-gray-400"
+            >
+              Tím zatiaľ nemá žiadne prihlášky
+            </p>
           </div>
         </div>
 
@@ -114,12 +133,21 @@
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
             <h2 class="text-lg font-bold text-navy mb-5">Akcie</h2>
             <div class="space-y-3">
-              <UiButton variant="outline" class="w-full">
+              <UiButton
+                variant="outline"
+                class="w-full"
+              >
                 <UserPlus class="w-4 h-4" />
                 Pozvať člena
               </UiButton>
-              <NuxtLink to="/prihlasky/nova" class="block">
-                <UiButton variant="outline" class="w-full">
+              <NuxtLink
+                to="/prihlasky/nova"
+                class="block"
+              >
+                <UiButton
+                  variant="outline"
+                  class="w-full"
+                >
                   <FileText class="w-4 h-4" />
                   Nová prihláška
                 </UiButton>
@@ -152,7 +180,7 @@ if (!authStore.user) {
     email: 'jan.novak@example.com',
     first_name: 'Ján',
     last_name: 'Novák',
-    role: 'student'
+    role: 'student',
   }
   authStore.token = 'mock-token'
 }
@@ -170,7 +198,13 @@ const mockTeams = [
       { name: 'Eva Tóthová', role: 'Analyst', email: 'eva.tothova@example.com' },
     ],
     applications: [
-      { id: 1, title: 'EcoTrack - Sledovanie uhlíkovej stopy', program: 'Program A', status: 'approved', submittedAt: '2026-02-15' },
+      {
+        id: 1,
+        title: 'EcoTrack - Sledovanie uhlíkovej stopy',
+        program: 'Program A',
+        status: 'approved',
+        submittedAt: '2026-02-15',
+      },
     ],
   },
   {
@@ -184,7 +218,13 @@ const mockTeams = [
       { name: 'Marek Varga', role: 'ML Engineer', email: 'marek.varga@example.com' },
     ],
     applications: [
-      { id: 2, title: 'StudyBuddy - AI asistent pre študentov', program: 'Program A', status: 'evaluating', submittedAt: '2026-03-10' },
+      {
+        id: 2,
+        title: 'StudyBuddy - AI asistent pre študentov',
+        program: 'Program A',
+        status: 'evaluating',
+        submittedAt: '2026-03-10',
+      },
     ],
   },
   {
@@ -200,20 +240,26 @@ const mockTeams = [
       { name: 'Zuzana Krajčíová', role: 'Tester', email: 'zuzana.krajciova@example.com' },
     ],
     applications: [
-      { id: 3, title: 'FitConnect - Fitness platforma', program: 'Program B', status: 'submitted', submittedAt: '2026-03-25' },
+      {
+        id: 3,
+        title: 'FitConnect - Fitness platforma',
+        program: 'Program B',
+        status: 'submitted',
+        submittedAt: '2026-03-25',
+      },
     ],
   },
 ]
 
 const team = computed(() => {
   const id = Number(route.params.id)
-  return mockTeams.find(t => t.id === id) || null
+  return mockTeams.find((t) => t.id === id) || null
 })
 
 function getInitials(name: string): string {
   return name
     .split(' ')
-    .map(n => n[0])
+    .map((n) => n[0])
     .join('')
     .toUpperCase()
     .slice(0, 2)

@@ -1,6 +1,9 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <LayoutPortalNavbar :sidebar-collapsed="sidebarCollapsed" @toggle-sidebar="mobileSidebarOpen = !mobileSidebarOpen" />
+    <LayoutPortalNavbar
+      :sidebar-collapsed="sidebarCollapsed"
+      @toggle-sidebar="mobileSidebarOpen = !mobileSidebarOpen"
+    />
 
     <LayoutPortalSidebar
       :items="navItems"
@@ -10,12 +13,7 @@
       @toggle-collapse="sidebarCollapsed = !sidebarCollapsed"
     />
 
-    <main
-      :class="[
-        'pt-16 min-h-screen transition-all duration-300',
-        sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'
-      ]"
-    >
+    <main :class="['pt-16 min-h-screen transition-all duration-300', sidebarCollapsed ? 'md:ml-20' : 'md:ml-64']">
       <slot />
     </main>
   </div>
@@ -32,7 +30,7 @@ import {
   ClipboardList,
   FolderKanban,
   MessageSquare,
-  CheckSquare
+  CheckSquare,
 } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
@@ -77,8 +75,6 @@ const navItems = computed(() => {
   }
 
   // Fallback
-  return [
-    { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  ]
+  return [{ label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard }]
 })
 </script>

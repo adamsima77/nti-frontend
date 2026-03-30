@@ -3,19 +3,25 @@
     <div class="w-full max-w-md">
       <!-- Header -->
       <div class="mb-8 text-center">
-        <NuxtLink to="/" class="inline-block mb-6">
+        <NuxtLink
+          to="/"
+          class="inline-block mb-6"
+        >
         </NuxtLink>
         <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">Registrácia</h1>
         <p class="text-gray-600">Vytvorte si nový účet v NTI</p>
       </div>
 
       <!-- Výber typu účtu -->
-      <div v-if="step === 'type-selection'" class="space-y-4">
+      <div
+        v-if="step === 'type-selection'"
+        class="space-y-4"
+      >
         <p class="text-center text-gray-700 font-medium mb-6">Vyberte si typ vášho účtu:</p>
 
         <button
-          @click="selectAccountType('student')"
           class="w-full p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left group"
+          @click="selectAccountType('student')"
         >
           <div class="flex items-start gap-4">
             <div
@@ -25,16 +31,14 @@
             </div>
             <div>
               <h3 class="font-bold text-navy mb-1">Študent / Junior developer</h3>
-              <p class="text-sm text-gray-600">
-                Zapájam sa do programu, učím sa a pracujem na projektoch
-              </p>
+              <p class="text-sm text-gray-600">Zapájam sa do programu, učím sa a pracujem na projektoch</p>
             </div>
           </div>
         </button>
 
         <button
-          @click="selectAccountType('organization')"
           class="w-full p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left group"
+          @click="selectAccountType('organization')"
         >
           <div class="flex items-start gap-4">
             <div
@@ -44,27 +48,32 @@
             </div>
             <div>
               <h3 class="font-bold text-navy mb-1">Firma / Organizácia</h3>
-              <p class="text-sm text-gray-600">
-                Chceme zapojiť talentovaných ľudí na riešenie našich výziev
-              </p>
+              <p class="text-sm text-gray-600">Chceme zapojiť talentovaných ľudí na riešenie našich výziev</p>
             </div>
           </div>
         </button>
       </div>
 
       <!-- Registračný formulár - Študent -->
-      <form v-else-if="step === 'register'" @submit.prevent="submitRegistration" class="space-y-4">
+      <form
+        v-else-if="step === 'register'"
+        class="space-y-4"
+        @submit.prevent="submitRegistration"
+      >
         <button
           type="button"
-          @click="step = 'type-selection'"
           class="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6 font-medium"
+          @click="step = 'type-selection'"
         >
           <ChevronLeft class="w-4 h-4" />
           Späť
         </button>
 
         <!-- Študent formulár -->
-        <div v-if="accountType === 'student'" class="space-y-4">
+        <div
+          v-if="accountType === 'student'"
+          class="space-y-4"
+        >
           <UiInput
             v-model="formData.firstName"
             label="Meno"
@@ -111,23 +120,37 @@
 
           <div class="flex items-start gap-2">
             <input
+              id="terms"
               v-model="formData.termsAccepted"
               type="checkbox"
-              id="terms"
               class="mt-1 rounded border-gray-300"
               required
             />
-            <label for="terms" class="text-sm text-gray-700">
+            <label
+              for="terms"
+              class="text-sm text-gray-700"
+            >
               Súhlasím s
-              <NuxtLink to="#" class="text-blue-600 hover:underline">podmienkami používania</NuxtLink>
+              <NuxtLink
+                to="#"
+                class="text-blue-600 hover:underline"
+                >podmienkami používania</NuxtLink
+              >
               a
-              <NuxtLink to="#" class="text-blue-600 hover:underline">ochranu osobných údajov</NuxtLink>
+              <NuxtLink
+                to="#"
+                class="text-blue-600 hover:underline"
+                >ochranu osobných údajov</NuxtLink
+              >
             </label>
           </div>
         </div>
 
         <!-- Firma formulár -->
-        <div v-else-if="accountType === 'organization'" class="space-y-4">
+        <div
+          v-else-if="accountType === 'organization'"
+          class="space-y-4"
+        >
           <UiInput
             v-model="formData.organizationName"
             label="Názov organizácie"
@@ -166,23 +189,37 @@
 
           <div class="flex items-start gap-2">
             <input
+              id="terms-org"
               v-model="formData.termsAccepted"
               type="checkbox"
-              id="terms-org"
               class="mt-1 rounded border-gray-300"
               required
             />
-            <label for="terms-org" class="text-sm text-gray-700">
+            <label
+              for="terms-org"
+              class="text-sm text-gray-700"
+            >
               Súhlasím s
-              <NuxtLink to="#" class="text-blue-600 hover:underline">podmienkami používania</NuxtLink>
+              <NuxtLink
+                to="#"
+                class="text-blue-600 hover:underline"
+                >podmienkami používania</NuxtLink
+              >
               a
-              <NuxtLink to="#" class="text-blue-600 hover:underline">ochranu osobných údajov</NuxtLink>
+              <NuxtLink
+                to="#"
+                class="text-blue-600 hover:underline"
+                >ochranu osobných údajov</NuxtLink
+              >
             </label>
           </div>
         </div>
 
         <!-- Error message -->
-        <div v-if="submitError" class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded">
+        <div
+          v-if="submitError"
+          class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded"
+        >
           {{ submitError }}
         </div>
 
@@ -199,7 +236,10 @@
         <!-- Login link -->
         <p class="text-center text-gray-600">
           Už máte účet?
-          <NuxtLink to="/auth/login" class="text-blue-600 hover:underline font-medium">
+          <NuxtLink
+            to="/auth/login"
+            class="text-blue-600 hover:underline font-medium"
+          >
             Prihláste sa
           </NuxtLink>
         </p>
@@ -213,7 +253,7 @@ import { ref, reactive } from 'vue'
 
 definePageMeta({
   layout: 'default',
-  middleware: 'guest'
+  middleware: 'guest',
 })
 
 useHead({
@@ -221,9 +261,9 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'Zaregistrujte sa v NTI a začnite s nami vašu cestu!'
-    }
-  ]
+      content: 'Zaregistrujte sa v NTI a začnite s nami vašu cestu!',
+    },
+  ],
 })
 
 const authStore = useAuthStore()
@@ -242,7 +282,7 @@ const formData = reactive({
   email: '',
   password: '',
   password_confirmation: '',
-  termsAccepted: false
+  termsAccepted: false,
 })
 
 const errors = reactive({
@@ -251,7 +291,7 @@ const errors = reactive({
   organizationName: null,
   email: null,
   password: null,
-  password_confirmation: null
+  password_confirmation: null,
 })
 
 const selectAccountType = (type) => {
@@ -325,7 +365,7 @@ const submitRegistration = async () => {
       email: formData.email,
       password: formData.password,
       password_confirmation: formData.password_confirmation,
-      terms_accepted: formData.termsAccepted
+      terms_accepted: formData.termsAccepted,
     }
 
     if (accountType.value === 'student') {
@@ -345,7 +385,7 @@ const submitRegistration = async () => {
       // Inak presmeruj na email verification
       await router.push({
         path: '/auth/verify-email',
-        query: { email: formData.email }
+        query: { email: formData.email },
       })
     }
   } catch (error) {

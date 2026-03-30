@@ -15,7 +15,9 @@
     <!-- Profile header card -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
       <div class="flex items-center gap-6">
-        <div class="w-16 h-16 rounded-full bg-navy text-white text-xl font-bold flex items-center justify-center flex-shrink-0">
+        <div
+          class="w-16 h-16 rounded-full bg-navy text-white text-xl font-bold flex items-center justify-center flex-shrink-0"
+        >
           {{ userInitials }}
         </div>
         <div class="flex-1 min-w-0">
@@ -23,7 +25,9 @@
           <p class="text-sm text-gray-500">{{ form.email }}</p>
         </div>
         <div class="flex items-center gap-4 flex-shrink-0">
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
+          <span
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600"
+          >
             Študent
           </span>
           <div class="text-right">
@@ -39,10 +43,28 @@
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
         <h2 class="text-lg font-bold text-navy mb-5">Osobné údaje</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-          <UiInput v-model="form.firstName" label="Meno" required />
-          <UiInput v-model="form.lastName" label="Priezvisko" required />
-          <UiInput v-model="form.email" label="Email" type="email" disabled />
-          <UiInput v-model="form.phone" label="Telefón" type="tel" placeholder="+421..." />
+          <UiInput
+            v-model="form.firstName"
+            label="Meno"
+            required
+          />
+          <UiInput
+            v-model="form.lastName"
+            label="Priezvisko"
+            required
+          />
+          <UiInput
+            v-model="form.email"
+            label="Email"
+            type="email"
+            disabled
+          />
+          <UiInput
+            v-model="form.phone"
+            label="Telefón"
+            type="tel"
+            placeholder="+421..."
+          />
         </div>
       </div>
 
@@ -92,7 +114,9 @@
 
         <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex flex-col">
           <h3 class="text-lg font-bold text-navy mb-4">Životopis</h3>
-          <div class="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-colors cursor-pointer flex-1 flex flex-col items-center justify-center">
+          <div
+            class="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-colors cursor-pointer flex-1 flex flex-col items-center justify-center"
+          >
             <Upload class="w-10 h-10 text-gray-300 mb-3" />
             <p class="text-sm text-gray-500 mb-1">Nahrajte svoj životopis</p>
             <p class="text-xs text-gray-400">.pdf, .docx</p>
@@ -103,7 +127,10 @@
       <!-- Skills -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
         <h2 class="text-lg font-bold text-navy mb-5">Zručnosti</h2>
-        <div v-if="form.skills.length" class="flex flex-wrap gap-2 mb-4">
+        <div
+          v-if="form.skills.length"
+          class="flex flex-wrap gap-2 mb-4"
+        >
           <span
             v-for="(skill, i) in form.skills"
             :key="i"
@@ -126,7 +153,12 @@
             class="flex-1 px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             @keydown.enter.prevent="addSkill"
           />
-          <UiButton size="sm" variant="outline" @click="addSkill">Pridať</UiButton>
+          <UiButton
+            size="sm"
+            variant="outline"
+            @click="addSkill"
+            >Pridať</UiButton
+          >
         </div>
       </div>
 
@@ -156,7 +188,7 @@ if (!authStore.user) {
     email: 'jan.novak@example.com',
     first_name: 'Ján',
     last_name: 'Novák',
-    role: 'student'
+    role: 'student',
   }
   authStore.token = 'mock-token'
 }

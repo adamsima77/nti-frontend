@@ -1,7 +1,13 @@
 <template>
-  <nav class="fixed top-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 z-40 left-0 md:left-64 transition-all duration-300" :class="sidebarCollapsed ? 'md:!left-20' : ''">
+  <nav
+    class="fixed top-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 z-40 left-0 md:left-64 transition-all duration-300"
+    :class="sidebarCollapsed ? 'md:!left-20' : ''"
+  >
     <div class="flex items-center gap-3">
-      <button @click="emit('toggle-sidebar')" class="md:hidden text-gray-600 hover:text-navy transition-colors">
+      <button
+        class="md:hidden text-gray-600 hover:text-navy transition-colors"
+        @click="emit('toggle-sidebar')"
+      >
         <Menu class="w-6 h-6" />
       </button>
 
@@ -18,9 +24,9 @@
       <span class="hidden sm:inline text-sm font-medium text-navy">{{ userName }}</span>
 
       <button
-        @click="handleLogout"
         class="text-gray-500 hover:text-danger-600 transition-colors"
         title="Odhlásiť sa"
+        @click="handleLogout"
       >
         <LogOut class="w-5 h-5" />
       </button>
@@ -35,8 +41,8 @@ import { Menu, Bell, LogOut } from 'lucide-vue-next'
 defineProps({
   sidebarCollapsed: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const emit = defineEmits(['toggle-sidebar'])

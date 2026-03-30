@@ -1,22 +1,21 @@
 <template>
-  <div> 
+  <div>
     <div
       v-if="isOpen"
       class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300"
       @click="$emit('close-sidebar')"
     />
 
-   
     <div
-      class="fixed top-0 left-0 h-screen w-80 bg-navy text-white p-5 shadow-2xl
-             transform transition-transform duration-500 ease-out flex flex-col gap-6 z-900"
+      class="fixed top-0 left-0 h-screen w-80 bg-navy text-white p-5 shadow-2xl transform transition-transform duration-500 ease-out flex flex-col gap-6 z-900"
       :class="isOpen ? 'translate-x-0' : '-translate-x-full'"
     >
-
-      
       <div class="flex justify-between items-center">
         <NuxtLink to="/">
-          <img :src="logo" alt="Nitriansky technický inkubátor" />
+          <img
+            :src="logo"
+            alt="Nitriansky technický inkubátor"
+          />
         </NuxtLink>
 
         <button @click="$emit('close-sidebar')">
@@ -24,92 +23,90 @@
         </button>
       </div>
 
-      
       <div class="flex items-center">
         <NuxtLink to="/auth/login">
           <UserCircle class="w-6 h-6 text-blue-50 hover:text-blue-500 transition-colors duration-300" />
         </NuxtLink>
       </div>
 
-     
-     <ul class="flex flex-col gap-4
-           text-base md:text-lg lg:text-xl">
+      <ul class="flex flex-col gap-4 text-base md:text-lg lg:text-xl">
+        <li>
+          <NuxtLink
+            to="/novinky"
+            class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+            active-class="text-blue-500"
+            exact-active-class="text-blue-500"
+          >
+            Novinky
+          </NuxtLink>
+        </li>
 
-  <li>
-    <NuxtLink
-      to="/novinky"
-      class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
-      active-class="text-blue-500"
-      exact-active-class="text-blue-500"
-    >
-      Novinky
-    </NuxtLink>
-  </li>
+        <li>
+          <NuxtLink
+            to="/program-a"
+            class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+            active-class="text-blue-500"
+            exact-active-class="text-blue-500"
+          >
+            Program A
+          </NuxtLink>
+        </li>
 
-  <li>
-    <NuxtLink
-      to="/program-a"
-      class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
-      active-class="text-blue-500"
-      exact-active-class="text-blue-500"
-    >
-      Program A
-    </NuxtLink>
-  </li>
+        <li>
+          <NuxtLink
+            to="/program-b"
+            class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+            active-class="text-blue-500"
+            exact-active-class="text-blue-500"
+          >
+            Program B
+          </NuxtLink>
+        </li>
 
-  <li>
-    <NuxtLink
-      to="/program-b"
-      class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
-      active-class="text-blue-500"
-      exact-active-class="text-blue-500"
-    >
-      Program B
-    </NuxtLink>
-  </li>
+        <li>
+          <NuxtLink
+            to="/partneri"
+            class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+            active-class="text-blue-500"
+            exact-active-class="text-blue-500"
+          >
+            Partneri
+          </NuxtLink>
+        </li>
 
-  <li>
-    <NuxtLink
-      to="/partneri"
-      class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
-      active-class="text-blue-500"
-      exact-active-class="text-blue-500"
-    >
-      Partneri
-    </NuxtLink>
-  </li>
-
-  <li>
-    <NuxtLink
-      to="/vyzvy"
-      class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
-      active-class="text-blue-500"
-      exact-active-class="text-blue-500"
-    >
-      Výzvy a termíny
-    </NuxtLink>
-  </li>
-
-</ul>
+        <li>
+          <NuxtLink
+            to="/vyzvy"
+            class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+            active-class="text-blue-500"
+            exact-active-class="text-blue-500"
+          >
+            Výzvy a termíny
+          </NuxtLink>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
 
 <script setup>
-import { watch } from 'vue';
+import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 const logo = '/nti-logo.svg'
 
 defineProps({
   isOpen: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
-const emit = defineEmits(['close-sidebar']);
-const route = useRoute();
-watch(() => route.fullPath, (newRoute, oldRoute) => {
-    emit('close-sidebar');
-})
+const emit = defineEmits(['close-sidebar'])
+const route = useRoute()
+watch(
+  () => route.fullPath,
+  (newRoute, oldRoute) => {
+    emit('close-sidebar')
+  },
+)
 </script>

@@ -1,7 +1,10 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        v-if="isOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center"
+      >
         <!-- Backdrop -->
         <div
           class="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -17,9 +20,9 @@
           <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
             <h2 class="text-lg font-bold text-navy">{{ title }}</h2>
             <button
-              @click="closeModal"
               class="p-1 hover:bg-gray-100 rounded-md transition-colors duration-200"
               aria-label="Zatvoriť"
+              @click="closeModal"
             >
               <X class="w-5 h-5 text-gray-500" />
             </button>
@@ -34,8 +37,8 @@
           <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
             <slot name="actions">
               <button
-                @click="closeModal"
                 class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200"
+                @click="closeModal"
               >
                 Zatvoriť
               </button>
@@ -53,20 +56,20 @@ import { ref, watch, onMounted, onUnmounted } from 'vue'
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
+    default: false,
   },
   title: {
     type: String,
-    required: true
+    required: true,
   },
   closeOnBackdrop: {
     type: Boolean,
-    default: true
+    default: true,
   },
   closeOnEscape: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -82,7 +85,7 @@ watch(
     } else {
       document.body.style.overflow = ''
     }
-  }
+  },
 )
 
 const closeModal = () => {

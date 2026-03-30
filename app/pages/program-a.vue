@@ -11,8 +11,8 @@
       <div class="max-w-4xl mx-auto">
         <h2 class="text-4xl font-bold text-navy mb-6">Čo je Program A?</h2>
         <p class="text-lg text-gray-600 leading-relaxed mb-8">
-          Program A je intensívny program určený pre študentov vysokých škôl a začínajúcich odborníkov, 
-          ktorí chcú rýchlo nadobudnúť praktické skúsenosti, pracovať v tímoch a získať mentoring od skúsených profesionálov.
+          Program A je intensívny program určený pre študentov vysokých škôl a začínajúcich odborníkov, ktorí chcú
+          rýchlo nadobudnúť praktické skúsenosti, pracovať v tímoch a získať mentoring od skúsených profesionálov.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -121,21 +121,24 @@
             class="bg-white border border-gray-200 rounded-lg overflow-hidden"
           >
             <button
-              @click="toggleFaq(idx)"
               class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              @click="toggleFaq(idx)"
             >
               <span class="font-bold text-navy text-left">{{ faq.question }}</span>
               <ChevronDown
                 :class="{
                   'rotate-180': expandedFaq === idx,
-                  'transition-transform duration-300': true
+                  'transition-transform duration-300': true,
                 }"
                 class="w-5 h-5 text-gray-500"
               />
             </button>
 
             <Transition name="fade">
-              <div v-if="expandedFaq === idx" class="px-6 py-4 bg-gray-50 border-t text-gray-700">
+              <div
+                v-if="expandedFaq === idx"
+                class="px-6 py-4 bg-gray-50 border-t text-gray-700"
+              >
                 {{ faq.answer }}
               </div>
             </Transition>
@@ -166,7 +169,7 @@
 import { ref } from 'vue'
 
 definePageMeta({
-  layout: 'default'
+  layout: 'default',
 })
 
 useHead({
@@ -174,9 +177,9 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'Program A je 3-mesačný intenzívny program pre študentov s mentorstvom a prácou na reálnych projektoch.'
-    }
-  ]
+      content: 'Program A je 3-mesačný intenzívny program pre študentov s mentorstvom a prácou na reálnych projektoch.',
+    },
+  ],
 })
 
 const expandedFaq = ref(null)
@@ -184,24 +187,27 @@ const expandedFaq = ref(null)
 const faqs = [
   {
     question: 'Koľko stojí Program A?',
-    answer: 'Program A je úplne bezplatný. Všetci účastníci dostávajú rovnaký prístup k mentorom, workshopom a materiálom, bez skrytých poplatkov.'
+    answer:
+      'Program A je úplne bezplatný. Všetci účastníci dostávajú rovnaký prístup k mentorom, workshopom a materiálom, bez skrytých poplatkov.',
   },
   {
     question: 'Máš skúsenosti s prácou mimo školy?',
-    answer: 'Nie, nie je to povinné! Väčšina našich účastníkov nemá pracovné skúsenosti. Dôležité je mať vôľu učiť sa a spolupracovať s tímom.'
+    answer:
+      'Nie, nie je to povinné! Väčšina našich účastníkov nemá pracovné skúsenosti. Dôležité je mať vôľu učiť sa a spolupracovať s tímom.',
   },
   {
     question: 'Ako dlho trvá program?',
-    answer: 'Program trvá 3 mesiace, od apríla do júla. Očakávame časovú investíciu 15-20 hodín týždenne.'
+    answer: 'Program trvá 3 mesiace, od apríla do júla. Očakávame časovú investíciu 15-20 hodín týždenne.',
   },
   {
     question: 'Môžem sa prihlásiť, ak som zamestnaný?',
-    answer: 'Áno, ale vrúcame vám, aby ste mali aspoň 15 hodín týždenne čistého času na program.'
+    answer: 'Áno, ale vrúcame vám, aby ste mali aspoň 15 hodín týždenne čistého času na program.',
   },
   {
     question: 'Čo sa stane po skončení programu?',
-    answer: 'Po skončení sa tímy prezentujú svojich projektov a výsledkov. Podľa výkonu sa môžu nastaviť ďalšie príležitosti spolupráce alebo práce.'
-  }
+    answer:
+      'Po skončení sa tímy prezentujú svojich projektov a výsledkov. Podľa výkonu sa môžu nastaviť ďalšie príležitosti spolupráce alebo práce.',
+  },
 ]
 
 const toggleFaq = (idx) => {

@@ -11,8 +11,8 @@
       <div class="max-w-4xl mx-auto">
         <h2 class="text-4xl font-bold text-navy mb-6">Čo je Program B?</h2>
         <p class="text-lg text-gray-600 leading-relaxed mb-8">
-          Program B spája firmy s talentovanými študentami a juniormi, ktorí riešia reálne technické výzvy. 
-          Vaša firma dostane inovatívne riešenia, zatiaľ čo študenti získajú praktické skúsenosti a mentoring od profesionálov.
+          Program B spája firmy s talentovanými študentami a juniormi, ktorí riešia reálne technické výzvy. Vaša firma
+          dostane inovatívne riešenia, zatiaľ čo študenti získajú praktické skúsenosti a mentoring od profesionálov.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -47,7 +47,8 @@
             <div>
               <h3 class="text-xl font-bold text-navy mb-2">Registrácia vašej firmy</h3>
               <p class="text-gray-700">
-                Zaregistrujte si firemný profil a identifikujte vaše tímové potreby a technické výzvy, ktoré chcete riešiť.
+                Zaregistrujte si firemný profil a identifikujte vaše tímové potreby a technické výzvy, ktoré chcete
+                riešiť.
               </p>
             </div>
           </div>
@@ -61,7 +62,8 @@
             <div>
               <h3 class="text-xl font-bold text-navy mb-2">Vytvorenie výzvy</h3>
               <p class="text-gray-700">
-                Definujte svoju výzvu — čo má byť vyriešené, aké sú konečné ciele a akí študenti sú ideálni (junior, senior aj.).
+                Definujte svoju výzvu — čo má byť vyriešené, aké sú konečné ciele a akí študenti sú ideálni (junior,
+                senior aj.).
               </p>
             </div>
           </div>
@@ -75,7 +77,8 @@
             <div>
               <h3 class="text-xl font-bold text-navy mb-2">Výber tímu</h3>
               <p class="text-gray-700">
-                Prezerajte si prihlášenné tímy, budujte si komentáre s potenciálnymi kandidátmi a vyberte najlepší tím pre vašu výzvu.
+                Prezerajte si prihlášenné tímy, budujte si komentáre s potenciálnymi kandidátmi a vyberte najlepší tím
+                pre vašu výzvu.
               </p>
             </div>
           </div>
@@ -103,7 +106,8 @@
             <div>
               <h3 class="text-xl font-bold text-navy mb-2">Prezentácia & nasadenie</h3>
               <p class="text-gray-700">
-                Tím prezentuje finálne riešenie. Rozhodujete sa, či ho budete ďalej rozvíjať alebo nasadzovať do produkcie.
+                Tím prezentuje finálne riešenie. Rozhodujete sa, či ho budete ďalej rozvíjať alebo nasadzovať do
+                produkcie.
               </p>
             </div>
           </div>
@@ -140,7 +144,8 @@
 
         <div class="mt-8 bg-yellow-50 p-6 rounded-lg border border-yellow-200">
           <p class="text-gray-700">
-            <strong>Pro tip:</strong> Čím presnejšie a jasnejšie popíšete vašu výzvu, tým lepšie tímy si na ňu budú chcieť prihlásit.
+            <strong>Pro tip:</strong> Čím presnejšie a jasnejšie popíšete vašu výzvu, tým lepšie tímy si na ňu budú
+            chcieť prihlásit.
           </p>
         </div>
       </div>
@@ -158,21 +163,24 @@
             class="bg-white border border-gray-200 rounded-lg overflow-hidden"
           >
             <button
-              @click="toggleFaq(idx)"
               class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              @click="toggleFaq(idx)"
             >
               <span class="font-bold text-navy text-left">{{ faq.question }}</span>
               <ChevronDown
                 :class="{
                   'rotate-180': expandedFaq === idx,
-                  'transition-transform duration-300': true
+                  'transition-transform duration-300': true,
                 }"
                 class="w-5 h-5 text-gray-500"
               />
             </button>
 
             <Transition name="fade">
-              <div v-if="expandedFaq === idx" class="px-6 py-4 bg-gray-50 border-t text-gray-700">
+              <div
+                v-if="expandedFaq === idx"
+                class="px-6 py-4 bg-gray-50 border-t text-gray-700"
+              >
                 {{ faq.answer }}
               </div>
             </Transition>
@@ -203,7 +211,7 @@
 import { ref } from 'vue'
 
 definePageMeta({
-  layout: 'default'
+  layout: 'default',
 })
 
 useHead({
@@ -211,9 +219,10 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'Program B spája firmy s talentovanými študentami. Prezentujte svoje technické výzvy a získajte inovatívne riešenia.'
-    }
-  ]
+      content:
+        'Program B spája firmy s talentovanými študentami. Prezentujte svoje technické výzvy a získajte inovatívne riešenia.',
+    },
+  ],
 })
 
 const expandedFaq = ref(null)
@@ -221,28 +230,31 @@ const expandedFaq = ref(null)
 const faqs = [
   {
     question: 'Koľko to bude stáť?',
-    answer: 'Program B je úplne bezplatný pre firmy. Neplatíte nič za výber tímu, mentoring alebo nasadenie riešenia.'
+    answer: 'Program B je úplne bezplatný pre firmy. Neplatíte nič za výber tímu, mentoring alebo nasadenie riešenia.',
   },
   {
     question: 'Ako dlho trvá program?',
-    answer: 'Program B je koncipovaný ako 3-mesačný projekt. Študenti budú pracovať na vašej výzve konsekventne počas tejto doby.'
+    answer:
+      'Program B je koncipovaný ako 3-mesačný projekt. Študenti budú pracovať na vašej výzve konsekventne počas tejto doby.',
   },
   {
     question: 'Koľko úsilia budeme musím investovať ako mentori?',
-    answer: 'Rôzne — podľa vašich preferenovaní. Minimálne vedenie aj asynchronné feedback, maximálne týždenné stretnutia. Dohoduje sa individuálne.'
+    answer:
+      'Rôzne — podľa vašich preferenovaní. Minimálne vedenie aj asynchronné feedback, maximálne týždenné stretnutia. Dohoduje sa individuálne.',
   },
   {
     question: 'Budeme si chránit IP našich riešení?',
-    answer: 'Áno. IP riešenia ostáva väčšinou vašej fireme. Študenti získajú možnosť zahrnúť projekt do svojho portfolia.'
+    answer:
+      'Áno. IP riešenia ostáva väčšinou vašej fireme. Študenti získajú možnosť zahrnúť projekt do svojho portfolia.',
   },
   {
     question: 'Čo ak sa tím nevysporiadá s výzvou?',
-    answer: 'To je zriedkavé, ale ak sa to stane, pomôžeme vám nájsť iný tím alebo prispôsobiť výzvu.'
+    answer: 'To je zriedkavé, ale ak sa to stane, pomôžeme vám nájsť iný tím alebo prispôsobiť výzvu.',
   },
   {
     question: 'Môžeme si vybrať tím pred štartom?',
-    answer: 'Áno! Vidíte všetky prihlášenné tímy, komunikujete s nimi a vyberáte si najlepší pre vašu výzvu.'
-  }
+    answer: 'Áno! Vidíte všetky prihlášenné tímy, komunikujete s nimi a vyberáte si najlepší pre vašu výzvu.',
+  },
 ]
 
 const toggleFaq = (idx) => {

@@ -41,7 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await api.post('/auth/login', {
         email,
-        password
+        password,
       })
 
       token.value = response.token
@@ -131,7 +131,7 @@ export const useAuthStore = defineStore('auth', () => {
       return await api.post('/auth/reset-password', {
         token,
         password,
-        password_confirmation
+        password_confirmation,
       })
     } catch (err) {
       error.value = (err as Error).message
@@ -185,6 +185,6 @@ export const useAuthStore = defineStore('auth', () => {
     resetPassword,
     getCurrentUser,
     hasRole,
-    hydrate
+    hydrate,
   }
 })

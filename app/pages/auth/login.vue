@@ -2,16 +2,21 @@
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
       <!-- Header -->
-      
 
       <!-- Form -->
-      <form @submit.prevent="handleLogin" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-5">
+      <form
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-5"
+        @submit.prevent="handleLogin"
+      >
         <div class="mb-8 text-center">
-        <NuxtLink to="/" class="inline-block mb-6">
-        </NuxtLink>
-        <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">Prihlásenie</h1>
-        <p class="text-gray-600">Prihlaste sa do svojho účtu</p>
-      </div>
+          <NuxtLink
+            to="/"
+            class="inline-block mb-6"
+          >
+          </NuxtLink>
+          <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">Prihlásenie</h1>
+          <p class="text-gray-600">Prihlaste sa do svojho účtu</p>
+        </div>
         <UiInput
           v-model="formData.email"
           type="email"
@@ -32,13 +37,19 @@
 
         <!-- Forgotten password link -->
         <div class="flex justify-end">
-          <NuxtLink to="/auth/forgot-password" class="text-sm text-blue-600 hover:underline">
+          <NuxtLink
+            to="/auth/forgot-password"
+            class="text-sm text-blue-600 hover:underline"
+          >
             Zabudli ste heslo?
           </NuxtLink>
         </div>
 
         <!-- Error message -->
-        <div v-if="loginError" class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded text-sm">
+        <div
+          v-if="loginError"
+          class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded text-sm"
+        >
           {{ loginError }}
         </div>
 
@@ -55,7 +66,10 @@
         <!-- Register link -->
         <p class="text-center text-gray-600 text-sm">
           Nemáte účet?
-          <NuxtLink to="/auth/register" class="text-blue-600 hover:underline font-medium">
+          <NuxtLink
+            to="/auth/register"
+            class="text-blue-600 hover:underline font-medium"
+          >
             Zaregistrujte sa
           </NuxtLink>
         </p>
@@ -69,7 +83,7 @@ import { ref, reactive } from 'vue'
 
 definePageMeta({
   layout: 'default',
-  middleware: 'guest'
+  middleware: 'guest',
 })
 
 useHead({
@@ -77,9 +91,9 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'Prihlaste sa do vášho NTI účtu'
-    }
-  ]
+      content: 'Prihlaste sa do vášho NTI účtu',
+    },
+  ],
 })
 
 const authStore = useAuthStore()
@@ -91,12 +105,12 @@ const loginError = ref(null)
 
 const formData = reactive({
   email: '',
-  password: ''
+  password: '',
 })
 
 const errors = reactive({
   email: null,
-  password: null
+  password: null,
 })
 
 const validateForm = () => {

@@ -27,13 +27,20 @@
     </div>
 
     <!-- Required actions -->
-    <div v-if="mockActions.length" class="mb-8 bg-amber-50 border border-amber-200 rounded-lg p-5">
+    <div
+      v-if="mockActions.length"
+      class="mb-8 bg-amber-50 border border-amber-200 rounded-lg p-5"
+    >
       <div class="flex items-center gap-2 mb-3">
         <AlertTriangle class="w-5 h-5 text-amber-600" />
         <h2 class="text-lg font-semibold text-amber-800">Vyžadované akcie</h2>
       </div>
       <ul class="space-y-2">
-        <li v-for="action in mockActions" :key="action.id" class="flex items-center justify-between">
+        <li
+          v-for="action in mockActions"
+          :key="action.id"
+          class="flex items-center justify-between"
+        >
           <span class="text-sm text-amber-700">{{ action.message }}</span>
           <NuxtLink
             :to="action.link"
@@ -74,7 +81,10 @@
     <div class="mb-8">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-navy">Moje prihlášky</h2>
-        <NuxtLink to="/prihlasky" class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
+        <NuxtLink
+          to="/prihlasky"
+          class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
+        >
           Zobraziť všetky
           <ChevronRight class="w-4 h-4" />
         </NuxtLink>
@@ -120,7 +130,10 @@
     <div>
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-navy">Moje tímy</h2>
-        <NuxtLink to="/timy" class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
+        <NuxtLink
+          to="/timy"
+          class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
+        >
           Zobraziť všetky
           <ChevronRight class="w-4 h-4" />
         </NuxtLink>
@@ -137,7 +150,9 @@
               <Users class="w-4 h-4" />
               {{ team.members }} členov
             </span>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
+            <span
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600"
+            >
               {{ team.role }}
             </span>
           </div>
@@ -157,7 +172,7 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Dashboard | NTI'
+  title: 'Dashboard | NTI',
 })
 
 const authStore = useAuthStore()
@@ -169,7 +184,7 @@ if (!authStore.user) {
     email: 'jan.novak@example.com',
     first_name: 'Ján',
     last_name: 'Novák',
-    role: 'student'
+    role: 'student',
   }
   authStore.token = 'mock-token'
 }
@@ -188,11 +203,56 @@ const userDisplayName = computed(() => {
 
 // Mock data
 const mockApplications = [
-  { id: 1, title: 'EcoTrack - Sledovanie uhlíkovej stopy', program: 'Program A', team: 'GreenTech tím', status: 'approved', submittedAt: '2026-02-15', members: 4, documents: 6 },
-  { id: 2, title: 'StudyBuddy - AI asistent pre študentov', program: 'Program A', team: 'AI Innovators', status: 'evaluating', submittedAt: '2026-03-10', members: 3, documents: 4 },
-  { id: 3, title: 'FitConnect - Fitness platforma', program: 'Program B', team: 'HealthTech', status: 'submitted', submittedAt: '2026-03-25', members: 5, documents: 3 },
-  { id: 4, title: 'LocalMarket - Farmársky marketplace', program: 'Program A', team: 'AgriDigital', status: 'draft', submittedAt: null, members: 3, documents: 1 },
-  { id: 5, title: 'SmartPark - Inteligentné parkovanie', program: 'Program B', team: 'UrbanTech', status: 'rejected', submittedAt: '2026-01-20', members: 4, documents: 5 },
+  {
+    id: 1,
+    title: 'EcoTrack - Sledovanie uhlíkovej stopy',
+    program: 'Program A',
+    team: 'GreenTech tím',
+    status: 'approved',
+    submittedAt: '2026-02-15',
+    members: 4,
+    documents: 6,
+  },
+  {
+    id: 2,
+    title: 'StudyBuddy - AI asistent pre študentov',
+    program: 'Program A',
+    team: 'AI Innovators',
+    status: 'evaluating',
+    submittedAt: '2026-03-10',
+    members: 3,
+    documents: 4,
+  },
+  {
+    id: 3,
+    title: 'FitConnect - Fitness platforma',
+    program: 'Program B',
+    team: 'HealthTech',
+    status: 'submitted',
+    submittedAt: '2026-03-25',
+    members: 5,
+    documents: 3,
+  },
+  {
+    id: 4,
+    title: 'LocalMarket - Farmársky marketplace',
+    program: 'Program A',
+    team: 'AgriDigital',
+    status: 'draft',
+    submittedAt: null,
+    members: 3,
+    documents: 1,
+  },
+  {
+    id: 5,
+    title: 'SmartPark - Inteligentné parkovanie',
+    program: 'Program B',
+    team: 'UrbanTech',
+    status: 'rejected',
+    submittedAt: '2026-01-20',
+    members: 4,
+    documents: 5,
+  },
 ]
 
 const mockTeams = [
@@ -208,13 +268,19 @@ const mockDeadlines = [
 
 const mockActions = [
   { id: 1, type: 'draft', message: 'Dokončite rozpracovanú prihlášku "LocalMarket"', link: '/prihlasky/4' },
-  { id: 2, type: 'supplement', message: 'Doplňte dokumenty k prihláške "FitConnect"', link: '/prihlasky/3', deadline: '2026-04-05' },
+  {
+    id: 2,
+    type: 'supplement',
+    message: 'Doplňte dokumenty k prihláške "FitConnect"',
+    link: '/prihlasky/3',
+    deadline: '2026-04-05',
+  },
 ]
 
 const stats = computed(() => ({
   total: mockApplications.length,
-  approved: mockApplications.filter(a => a.status === 'approved').length,
-  inProcess: mockApplications.filter(a => ['submitted', 'evaluating'].includes(a.status)).length,
-  rejected: mockApplications.filter(a => a.status === 'rejected').length,
+  approved: mockApplications.filter((a) => a.status === 'approved').length,
+  inProcess: mockApplications.filter((a) => ['submitted', 'evaluating'].includes(a.status)).length,
+  rejected: mockApplications.filter((a) => a.status === 'rejected').length,
 }))
 </script>

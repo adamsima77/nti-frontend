@@ -1,10 +1,16 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
     <!-- Not found -->
-    <div v-if="!application" class="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center">
+    <div
+      v-if="!application"
+      class="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center"
+    >
       <FileText class="w-12 h-12 text-gray-300 mx-auto mb-3" />
       <p class="text-gray-500 font-medium mb-4">Prihláška nenájdená</p>
-      <NuxtLink to="/prihlasky" class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1 justify-center">
+      <NuxtLink
+        to="/prihlasky"
+        class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1 justify-center"
+      >
         <ArrowLeft class="w-4 h-4" />
         Späť na prihlášky
       </NuxtLink>
@@ -12,7 +18,10 @@
 
     <template v-else>
       <!-- Back link -->
-      <NuxtLink to="/prihlasky" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 mb-6">
+      <NuxtLink
+        to="/prihlasky"
+        class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 mb-6"
+      >
         <ArrowLeft class="w-4 h-4" />
         Späť na prihlášky
       </NuxtLink>
@@ -44,7 +53,10 @@
           <!-- Dokumenty -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
             <h2 class="text-xl font-bold text-navy mb-3">Dokumenty</h2>
-            <div v-if="application.documentsList.length" class="space-y-3">
+            <div
+              v-if="application.documentsList.length"
+              class="space-y-3"
+            >
               <div
                 v-for="doc in application.documentsList"
                 :key="doc.name"
@@ -60,13 +72,21 @@
                 </div>
               </div>
             </div>
-            <p v-else class="text-sm text-gray-400">Žiadne dokumenty</p>
+            <p
+              v-else
+              class="text-sm text-gray-400"
+            >
+              Žiadne dokumenty
+            </p>
           </div>
 
           <!-- Komentáre -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
             <h2 class="text-xl font-bold text-navy mb-3">Komentáre</h2>
-            <div v-if="application.comments.length" class="space-y-4">
+            <div
+              v-if="application.comments.length"
+              class="space-y-4"
+            >
               <div
                 v-for="(comment, i) in application.comments"
                 :key="i"
@@ -79,7 +99,12 @@
                 <p class="text-sm text-gray-600">{{ comment.text }}</p>
               </div>
             </div>
-            <p v-else class="text-sm text-gray-400">Žiadne komentáre</p>
+            <p
+              v-else
+              class="text-sm text-gray-400"
+            >
+              Žiadne komentáre
+            </p>
           </div>
         </div>
 
@@ -126,12 +151,20 @@
                     class="w-3 h-3 rounded-full flex-shrink-0"
                     :class="historyDotColor(entry.status)"
                   />
-                  <div v-if="i < application.history.length - 1" class="w-px flex-1 bg-gray-200 mt-1" />
+                  <div
+                    v-if="i < application.history.length - 1"
+                    class="w-px flex-1 bg-gray-200 mt-1"
+                  />
                 </div>
                 <div class="pb-4">
                   <p class="text-sm font-medium text-navy">{{ historyLabel(entry.status) }}</p>
                   <p class="text-xs text-gray-400">{{ entry.date }}</p>
-                  <p v-if="entry.note" class="text-xs text-gray-500 mt-0.5">{{ entry.note }}</p>
+                  <p
+                    v-if="entry.note"
+                    class="text-xs text-gray-500 mt-0.5"
+                  >
+                    {{ entry.note }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -162,7 +195,7 @@ if (!authStore.user) {
     email: 'jan.novak@example.com',
     first_name: 'Ján',
     last_name: 'Novák',
-    role: 'student'
+    role: 'student',
   }
   authStore.token = 'mock-token'
 }
@@ -176,7 +209,8 @@ const mockApplications = [
     status: 'approved',
     submittedAt: '2026-02-15',
     members: 4,
-    description: 'Aplikácia na sledovanie a znižovanie uhlíkovej stopy pre študentov a malé firmy. Projekt využíva IoT senzory na meranie spotreby energie a ponúka personalizované odporúčania na zníženie emisií. Cieľom je vytvoriť komunitu uvedomelých spotrebiteľov.',
+    description:
+      'Aplikácia na sledovanie a znižovanie uhlíkovej stopy pre študentov a malé firmy. Projekt využíva IoT senzory na meranie spotreby energie a ponúka personalizované odporúčania na zníženie emisií. Cieľom je vytvoriť komunitu uvedomelých spotrebiteľov.',
     documentsList: [
       { name: 'Podnikateľský plán.pdf', size: '2.4 MB', uploadedAt: '2026-02-10' },
       { name: 'Finančná projekcia.xlsx', size: '1.1 MB', uploadedAt: '2026-02-12' },
@@ -190,8 +224,16 @@ const mockApplications = [
       { status: 'draft', date: '2026-02-01', note: 'Vytvorenie prihlášky' },
     ],
     comments: [
-      { author: 'Ing. Mária Kováčová', text: 'Výborný projekt s jasnou víziou. Odporúčam schváliť.', date: '2026-02-28' },
-      { author: 'Doc. Peter Horváth', text: 'Technická špecifikácia je dobre spracovaná, ale chýba analýza konkurencie.', date: '2026-02-22' },
+      {
+        author: 'Ing. Mária Kováčová',
+        text: 'Výborný projekt s jasnou víziou. Odporúčam schváliť.',
+        date: '2026-02-28',
+      },
+      {
+        author: 'Doc. Peter Horváth',
+        text: 'Technická špecifikácia je dobre spracovaná, ale chýba analýza konkurencie.',
+        date: '2026-02-22',
+      },
     ],
   },
   {
@@ -202,7 +244,8 @@ const mockApplications = [
     status: 'evaluating',
     submittedAt: '2026-03-10',
     members: 3,
-    description: 'Inteligentný asistent využívajúci AI na personalizované učenie a prípravu na skúšky. Systém analyzuje študijné návyky a navrhuje optimálny učebný plán.',
+    description:
+      'Inteligentný asistent využívajúci AI na personalizované učenie a prípravu na skúšky. Systém analyzuje študijné návyky a navrhuje optimálny učebný plán.',
     documentsList: [
       { name: 'Projektový zámer.pdf', size: '1.8 MB', uploadedAt: '2026-03-08' },
       { name: 'Prototyp dokumentácia.pdf', size: '4.1 MB', uploadedAt: '2026-03-09' },
@@ -213,7 +256,11 @@ const mockApplications = [
       { status: 'draft', date: '2026-02-25', note: 'Vytvorenie prihlášky' },
     ],
     comments: [
-      { author: 'Ing. Tomáš Novotný', text: 'Zaujímavý koncept, čakáme na výsledky pilotného testovania.', date: '2026-03-18' },
+      {
+        author: 'Ing. Tomáš Novotný',
+        text: 'Zaujímavý koncept, čakáme na výsledky pilotného testovania.',
+        date: '2026-03-18',
+      },
     ],
   },
   {
@@ -224,7 +271,8 @@ const mockApplications = [
     status: 'submitted',
     submittedAt: '2026-03-25',
     members: 5,
-    description: 'Komunitná fitness platforma prepájajúca trénerov so študentmi univerzity. Ponúka skupinové tréningy, individuálne plány a sledovanie pokroku.',
+    description:
+      'Komunitná fitness platforma prepájajúca trénerov so študentmi univerzity. Ponúka skupinové tréningy, individuálne plány a sledovanie pokroku.',
     documentsList: [
       { name: 'Špecifikácia zadania.pdf', size: '2.0 MB', uploadedAt: '2026-03-24' },
       { name: 'Wireframes.pdf', size: '6.3 MB', uploadedAt: '2026-03-25' },
@@ -243,13 +291,10 @@ const mockApplications = [
     status: 'draft',
     submittedAt: null,
     members: 3,
-    description: 'Online trhovisko pre lokálnych farmárov s možnosťou predplatného a doručenia. Platforma umožňuje priame prepojenie producentov so spotrebiteľmi.',
-    documentsList: [
-      { name: 'Náčrt konceptu.pdf', size: '0.8 MB', uploadedAt: '2026-03-20' },
-    ],
-    history: [
-      { status: 'draft', date: '2026-03-18', note: 'Vytvorenie prihlášky' },
-    ],
+    description:
+      'Online trhovisko pre lokálnych farmárov s možnosťou predplatného a doručenia. Platforma umožňuje priame prepojenie producentov so spotrebiteľmi.',
+    documentsList: [{ name: 'Náčrt konceptu.pdf', size: '0.8 MB', uploadedAt: '2026-03-20' }],
+    history: [{ status: 'draft', date: '2026-03-18', note: 'Vytvorenie prihlášky' }],
     comments: [],
   },
   {
@@ -260,7 +305,8 @@ const mockApplications = [
     status: 'rejected',
     submittedAt: '2026-01-20',
     members: 4,
-    description: 'Systém inteligentného parkovania s IoT senzormi a mobilnou aplikáciou. Riešenie je navrhnuté pre univerzitné kampusy a mestské zóny.',
+    description:
+      'Systém inteligentného parkovania s IoT senzormi a mobilnou aplikáciou. Riešenie je navrhnuté pre univerzitné kampusy a mestské zóny.',
     documentsList: [
       { name: 'Podnikateľský plán.pdf', size: '2.1 MB', uploadedAt: '2026-01-18' },
       { name: 'Technický návrh.pdf', size: '3.5 MB', uploadedAt: '2026-01-19' },
@@ -273,15 +319,23 @@ const mockApplications = [
       { status: 'draft', date: '2026-01-05', note: 'Vytvorenie prihlášky' },
     ],
     comments: [
-      { author: 'Doc. Peter Horváth', text: 'Projekt nemá dostatočnú analýzu existujúcich riešení na trhu.', date: '2026-02-05' },
-      { author: 'Ing. Mária Kováčová', text: 'Technicky zaujímavé, ale chýba jasný obchodný model.', date: '2026-02-08' },
+      {
+        author: 'Doc. Peter Horváth',
+        text: 'Projekt nemá dostatočnú analýzu existujúcich riešení na trhu.',
+        date: '2026-02-05',
+      },
+      {
+        author: 'Ing. Mária Kováčová',
+        text: 'Technicky zaujímavé, ale chýba jasný obchodný model.',
+        date: '2026-02-08',
+      },
     ],
   },
 ]
 
 const application = computed(() => {
   const id = Number(route.params.id)
-  return mockApplications.find(a => a.id === id) || null
+  return mockApplications.find((a) => a.id === id) || null
 })
 
 function historyDotColor(status: string): string {

@@ -20,7 +20,9 @@
 
         <!-- Role badge -->
         <div class="mb-3">
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
+          <span
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600"
+          >
             {{ team.myRole }}
           </span>
         </div>
@@ -83,7 +85,7 @@ if (!authStore.user) {
     email: 'jan.novak@example.com',
     first_name: 'Ján',
     last_name: 'Novák',
-    role: 'student'
+    role: 'student',
   }
   authStore.token = 'mock-token'
 }
@@ -133,7 +135,7 @@ const mockTeams = [
 function getInitials(name: string): string {
   return name
     .split(' ')
-    .map(n => n[0])
+    .map((n) => n[0])
     .join('')
     .toUpperCase()
     .slice(0, 2)

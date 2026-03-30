@@ -19,20 +19,19 @@
       </NuxtLink>
 
       <p class="mt-6 text-sm sm:text-base text-gray-500">
-        Ak si myslíš, že ide o chybu, 
-        <NuxtLink 
-          to="/kontakt" 
+        Ak si myslíš, že ide o chybu,
+        <NuxtLink
+          to="/kontakt"
           class="text-blue-500 hover:text-blue-600 underline underline-offset-4 transition all duration-300 ease-in-out font-medium"
         >
           kontaktuj nás
         </NuxtLink>
       </p>
-
     </div>
   </div>
 </template>
 <script setup>
 const props = defineProps({
-  error: Object
+  error: Object,
 })
 </script>

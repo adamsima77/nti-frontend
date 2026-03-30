@@ -24,14 +24,14 @@ export const useApi = () => {
       const url = `${apiBaseUrl}${endpoint}`
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        ...getAuthHeader()
+        ...getAuthHeader(),
       }
 
       const fetchOptions: RequestInit = {
         method,
         headers,
         credentials: 'include', // Pre cookies (Sanctum)
-        ...options
+        ...options,
       }
 
       if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
@@ -77,6 +77,6 @@ export const useApi = () => {
     post: (endpoint: string, data: any, options?: RequestInit) => request('POST', endpoint, data, options),
     put: (endpoint: string, data: any, options?: RequestInit) => request('PUT', endpoint, data, options),
     patch: (endpoint: string, data: any, options?: RequestInit) => request('PATCH', endpoint, data, options),
-    delete: (endpoint: string, options?: RequestInit) => request('DELETE', endpoint, null, options)
+    delete: (endpoint: string, options?: RequestInit) => request('DELETE', endpoint, null, options),
   }
 }

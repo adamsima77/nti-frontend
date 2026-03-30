@@ -2,7 +2,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const authStore = useAuthStore()
 
   // Ak nemáme token, skúsime načítať zo sessionStorage a hydratovať
-  if (!authStore.isAuthenticated && process.client) {
+  if (!authStore.isAuthenticated && import.meta.client) {
     authStore.hydrate()
   }
 
@@ -10,7 +10,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (!authStore.isAuthenticated) {
     return navigateTo({
       path: '/auth/login',
-      query: { redirect: to.fullPath }
+      query: { redirect: to.fullPath },
     })
   }
 })

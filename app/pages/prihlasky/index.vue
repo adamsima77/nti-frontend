@@ -31,7 +31,10 @@
     </div>
 
     <!-- Application cards -->
-    <div v-if="filteredApplications.length" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div
+      v-if="filteredApplications.length"
+      class="grid grid-cols-1 lg:grid-cols-2 gap-4"
+    >
       <div
         v-for="app in filteredApplications"
         :key="app.id"
@@ -69,7 +72,10 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else class="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center">
+    <div
+      v-else
+      class="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center"
+    >
       <FileText class="w-12 h-12 text-gray-300 mx-auto mb-3" />
       <p class="text-gray-500 font-medium">Žiadne prihlášky</p>
       <p class="text-sm text-gray-400 mt-1">Skúste zmeniť filtre alebo vytvorte novú prihlášku</p>
@@ -95,7 +101,7 @@ if (!authStore.user) {
     email: 'jan.novak@example.com',
     first_name: 'Ján',
     last_name: 'Novák',
-    role: 'student'
+    role: 'student',
   }
   authStore.token = 'mock-token'
 }
@@ -122,15 +128,65 @@ const programOptions = [
 
 // Mock data
 const mockApplications = [
-  { id: 1, title: 'EcoTrack - Sledovanie uhlíkovej stopy', program: 'Program A', team: 'GreenTech tím', status: 'approved', submittedAt: '2026-02-15', members: 4, documents: 6, description: 'Aplikácia na sledovanie a znižovanie uhlíkovej stopy pre študentov a malé firmy.' },
-  { id: 2, title: 'StudyBuddy - AI asistent pre študentov', program: 'Program A', team: 'AI Innovators', status: 'evaluating', submittedAt: '2026-03-10', members: 3, documents: 4, description: 'Inteligentný asistent využívajúci AI na personalizované učenie a prípravu na skúšky.' },
-  { id: 3, title: 'FitConnect - Fitness platforma', program: 'Program B', team: 'HealthTech', status: 'submitted', submittedAt: '2026-03-25', members: 5, documents: 3, description: 'Komunitná fitness platforma prepájajúca trénerov so študentmi univerzity.' },
-  { id: 4, title: 'LocalMarket - Farmársky marketplace', program: 'Program A', team: 'AgriDigital', status: 'draft', submittedAt: null, members: 3, documents: 1, description: 'Online trhovisko pre lokálnych farmárov s možnosťou predplatného a doručenia.' },
-  { id: 5, title: 'SmartPark - Inteligentné parkovanie', program: 'Program B', team: 'UrbanTech', status: 'rejected', submittedAt: '2026-01-20', members: 4, documents: 5, description: 'Systém inteligentného parkovania s IoT senzormi a mobilnou aplikáciou.' },
+  {
+    id: 1,
+    title: 'EcoTrack - Sledovanie uhlíkovej stopy',
+    program: 'Program A',
+    team: 'GreenTech tím',
+    status: 'approved',
+    submittedAt: '2026-02-15',
+    members: 4,
+    documents: 6,
+    description: 'Aplikácia na sledovanie a znižovanie uhlíkovej stopy pre študentov a malé firmy.',
+  },
+  {
+    id: 2,
+    title: 'StudyBuddy - AI asistent pre študentov',
+    program: 'Program A',
+    team: 'AI Innovators',
+    status: 'evaluating',
+    submittedAt: '2026-03-10',
+    members: 3,
+    documents: 4,
+    description: 'Inteligentný asistent využívajúci AI na personalizované učenie a prípravu na skúšky.',
+  },
+  {
+    id: 3,
+    title: 'FitConnect - Fitness platforma',
+    program: 'Program B',
+    team: 'HealthTech',
+    status: 'submitted',
+    submittedAt: '2026-03-25',
+    members: 5,
+    documents: 3,
+    description: 'Komunitná fitness platforma prepájajúca trénerov so študentmi univerzity.',
+  },
+  {
+    id: 4,
+    title: 'LocalMarket - Farmársky marketplace',
+    program: 'Program A',
+    team: 'AgriDigital',
+    status: 'draft',
+    submittedAt: null,
+    members: 3,
+    documents: 1,
+    description: 'Online trhovisko pre lokálnych farmárov s možnosťou predplatného a doručenia.',
+  },
+  {
+    id: 5,
+    title: 'SmartPark - Inteligentné parkovanie',
+    program: 'Program B',
+    team: 'UrbanTech',
+    status: 'rejected',
+    submittedAt: '2026-01-20',
+    members: 4,
+    documents: 5,
+    description: 'Systém inteligentného parkovania s IoT senzormi a mobilnou aplikáciou.',
+  },
 ]
 
 const filteredApplications = computed(() => {
-  return mockApplications.filter(app => {
+  return mockApplications.filter((app) => {
     const matchesSearch = !searchQuery.value || app.title.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesStatus = !statusFilter.value || app.status === statusFilter.value
     const matchesProgram = !programFilter.value || app.program === programFilter.value
