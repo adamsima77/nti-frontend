@@ -104,14 +104,14 @@
         </div>
 
         <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex flex-col">
-          <h3 class="text-lg font-bold text-navy mb-4">Životopis</h3>
-          <div
-            class="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-colors cursor-pointer flex-1 flex flex-col items-center justify-center"
-          >
-            <Upload class="w-10 h-10 text-gray-300 mb-3" />
-            <p class="text-sm text-gray-500 mb-1">Nahrajte svoj životopis</p>
-            <p class="text-xs text-gray-400">.pdf, .docx</p>
-          </div>
+          <UiFileUpload
+            v-model="form.cv"
+            accept=".pdf,.docx"
+            label="Životopis"
+            description="Nahrajte svoj životopis"
+            :max-size="5"
+            @error="(msg: string) => addToast({ message: msg, type: 'error' })"
+          />
         </div>
       </div>
 
@@ -163,7 +163,7 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue'
-import { X, Upload } from 'lucide-vue-next'
+import { X } from 'lucide-vue-next'
 
 const { addToast } = useToast()
 
@@ -197,6 +197,7 @@ const form = reactive({
   bio: 'Študent informatiky so záujmom o udržateľné technológie a IoT riešenia. Aktívne sa zapájam do hackathonov a študentských projektov.',
   linkedin: 'https://linkedin.com/in/jan-novak',
   skills: ['Vue.js', 'TypeScript', 'Node.js', 'IoT', 'Python'],
+  cv: null as File | null,
 })
 
 const newSkill = ref('')

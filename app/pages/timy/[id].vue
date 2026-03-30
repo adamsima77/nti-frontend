@@ -45,59 +45,59 @@
           <!-- Members -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
             <h2 class="text-xl font-bold text-navy mb-6">Členovia tímu</h2>
-            <div class="divide-y divide-gray-100">
-              <div
-                v-for="member in team.members"
-                :key="member.name"
-                class="flex items-center justify-between py-4 first:pt-0 last:pb-0"
-              >
-                <div class="flex items-center gap-4">
+            <UiDataTable
+              :columns="memberColumns"
+              :rows="team.members"
+              row-key="email"
+              empty-title="Žiadni členovia"
+            >
+              <template #cell-name="{ row }">
+                <div class="flex items-center gap-3">
                   <div
-                    class="w-10 h-10 rounded-full bg-navy text-white text-sm font-medium flex items-center justify-center flex-shrink-0"
+                    class="w-8 h-8 rounded-full bg-navy text-white text-xs font-medium flex items-center justify-center flex-shrink-0"
                   >
-                    {{ getInitials(member.name) }}
+                    {{ getInitials(row.name) }}
                   </div>
                   <div>
-                    <p class="text-sm font-semibold text-navy">{{ member.name }}</p>
-                    <p class="text-sm text-gray-400 mt-0.5">{{ member.email }}</p>
+                    <p class="text-sm font-semibold text-navy">{{ row.name }}</p>
+                    <p class="text-xs text-gray-400">{{ row.email }}</p>
                   </div>
                 </div>
+              </template>
+              <template #cell-role="{ value }">
                 <span
                   :class="[
                     'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium',
-                    member.role === 'Team Lead' ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-600',
+                    value === 'Team Lead' ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-600',
                   ]"
                 >
-                  {{ member.role }}
+                  {{ value }}
                 </span>
-              </div>
-            </div>
+              </template>
+            </UiDataTable>
           </div>
 
           <!-- Applications -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
             <h2 class="text-xl font-bold text-navy mb-6">Prihlášky tímu</h2>
-            <div
-              v-if="team.applications.length"
-              class="divide-y divide-gray-100"
+            <UiDataTable
+              :columns="appColumns"
+              :rows="team.applications"
+              empty-title="Tím zatiaľ nemá žiadne prihlášky"
+              @row-click="(row: any) => navigateTo(`/prihlasky/${row.id}`)"
             >
-              <NuxtLink
-                v-for="app in team.applications"
-                :key="app.id"
-                :to="`/prihlasky/${app.id}`"
-                class="flex items-center justify-between py-4 first:pt-0 last:pb-0 hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors"
-              >
+              <template #cell-title="{ row }">
                 <div>
-                  <p class="text-sm font-medium text-navy">{{ app.title }}</p>
-                  <p class="text-sm text-gray-400 mt-1">{{ app.program }} · {{ app.submittedAt || 'Rozpracovaná' }}</p>
+                  <p class="text-sm font-medium text-navy">{{ row.title }}</p>
+                  <p class="text-xs text-gray-400 mt-0.5">
+                    {{ row.program }} · {{ row.submittedAt || 'Rozpracovaná' }}
+                  </p>
                 </div>
-                <UiStatusBadge :status="app.status" />
-              </NuxtLink>
-            </div>
-            <UiEmptyState
-              v-else
-              title="Tím zatiaľ nemá žiadne prihlášky"
-            />
+              </template>
+              <template #cell-status="{ value }">
+                <UiStatusBadge :status="value" />
+              </template>
+            </UiDataTable>
           </div>
         </div>
 
@@ -252,6 +252,16 @@ const team = computed(() => {
   const id = Number(route.params.id)
   return mockTeams.find((t) => t.id === id) || null
 })
+
+const memberColumns = [
+  { key: 'name', label: 'Člen' },
+  { key: 'role', label: 'Rola' },
+]
+
+const appColumns = [
+  { key: 'title', label: 'Prihláška' },
+  { key: 'status', label: 'Stav' },
+]
 
 function getInitials(name: string): string {
   return name

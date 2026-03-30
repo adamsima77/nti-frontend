@@ -52,30 +52,20 @@
           <!-- Dokumenty -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
             <h2 class="text-xl font-bold text-navy mb-3">Dokumenty</h2>
-            <div
-              v-if="application.documentsList.length"
-              class="space-y-3"
+            <UiDataTable
+              :columns="docColumns"
+              :rows="application.documentsList"
+              row-key="name"
+              empty-title="Žiadne dokumenty"
+              :empty-icon="Paperclip"
             >
-              <div
-                v-for="doc in application.documentsList"
-                :key="doc.name"
-                class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0"
-              >
+              <template #cell-name="{ value }">
                 <div class="flex items-center gap-2">
                   <Paperclip class="w-4 h-4 text-gray-400" />
-                  <span class="text-sm text-navy font-medium">{{ doc.name }}</span>
+                  <span class="font-medium text-navy">{{ value }}</span>
                 </div>
-                <div class="flex items-center gap-4 text-xs text-gray-400">
-                  <span>{{ doc.size }}</span>
-                  <span>{{ doc.uploadedAt }}</span>
-                </div>
-              </div>
-            </div>
-            <UiEmptyState
-              v-else
-              :icon="Paperclip"
-              title="Žiadne dokumenty"
-            />
+              </template>
+            </UiDataTable>
           </div>
 
           <!-- Komentáre -->
@@ -344,6 +334,12 @@ function historyDotColor(status: string): string {
   }
   return colors[status] || 'bg-gray-400'
 }
+
+const docColumns = [
+  { key: 'name', label: 'Názov' },
+  { key: 'size', label: 'Veľkosť' },
+  { key: 'uploadedAt', label: 'Nahrané' },
+]
 
 function historyLabel(status: string): string {
   const labels: Record<string, string> = {
