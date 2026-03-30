@@ -4,7 +4,6 @@
       <!-- Header -->
       <div class="mb-8 text-center">
         <NuxtLink to="/" class="inline-block mb-6">
-          <img src="/nti-logo.svg" alt="NTI" class="h-12 w-auto" />
         </NuxtLink>
         <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">Registrácia</h1>
         <p class="text-gray-600">Vytvorte si nový účet v NTI</p>
@@ -193,7 +192,7 @@
           :disabled="isSubmitting"
           class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span v-if="!isSubmitting">Zaregistrovať się</span>
+          <span v-if="!isSubmitting">Zaregistrovať</span>
           <span v-else>Registrácia prebieha...</span>
         </button>
 

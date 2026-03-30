@@ -2,16 +2,16 @@
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
       <!-- Header -->
-      <div class="mb-8 text-center">
+      
+
+      <!-- Form -->
+      <form @submit.prevent="handleLogin" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-5">
+        <div class="mb-8 text-center">
         <NuxtLink to="/" class="inline-block mb-6">
-          <img src="/nti-logo.svg" alt="NTI" class="h-12 w-auto" />
         </NuxtLink>
         <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">Prihlásenie</h1>
         <p class="text-gray-600">Prihlaste sa do svojho účtu</p>
       </div>
-
-      <!-- Form -->
-      <form @submit.prevent="handleLogin" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-5">
         <UiInput
           v-model="formData.email"
           type="email"
