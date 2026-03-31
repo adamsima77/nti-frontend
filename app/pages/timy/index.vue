@@ -3,16 +3,39 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-navy">Moje tímy</h1>
-      <UiButton>
-        <Plus class="w-4 h-4" />
-        Vytvoriť tím
-      </UiButton>
+      <NuxtLink to="/timy/vytvorit">
+        <UiButton>
+          <Plus class="w-4 h-4" />
+          Vytvoriť tím
+        </UiButton>
+      </NuxtLink>
+    </div>
+
+    <!-- Loading state -->
+    <div v-if="teamsStore.isLoading" class="space-y-4">
+      <div v-for="i in 3" :key="i" class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 h-64 animate-pulse" />
+    </div>
+
+    <!-- Empty state -->
+    <div v-else-if="teamsStore.teams.length === 0" class="bg-white rounded-lg shadow-sm border border-gray-100">
+      <UiEmptyState
+        :icon="Users"
+        title="Zatiaľ nemáte žiadne tímy"
+        description="Vytvorte si svoj prvý tím a pozvite členov!"
+      >
+        <NuxtLink to="/timy/vytvorit">
+          <UiButton>
+            <Plus class="w-4 h-4" />
+            Vytvoriť tím
+          </UiButton>
+        </NuxtLink>
+      </UiEmptyState>
     </div>
 
     <!-- Team cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div
-        v-for="team in mockTeams"
+        v-for="team in teamsStore.teams"
         :key="team.id"
         class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow"
       >
@@ -69,68 +92,26 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, FileText, ChevronRight } from 'lucide-vue-next'
+import { Plus, FileText, ChevronRight, Users } from 'lucide-vue-next'
+import { onMounted } from 'vue'
 
 definePageMeta({
   layout: 'portal',
+  // middleware: 'auth', // TODO: re-enable when backend is available
 })
 
 useHead({ title: 'Moje tímy | NTI' })
 
-const authStore = useAuthStore()
+const teamsStore = useTeamsStore()
 
-if (!authStore.user) {
-  authStore.user = {
-    id: 1,
-    email: 'jan.novak@example.com',
-    first_name: 'Ján',
-    last_name: 'Novák',
-    role: 'student',
+// Load teams when page mounts
+onMounted(async () => {
+  try {
+    await teamsStore.fetchTeams()
+  } catch (err) {
+    console.error('Failed to load teams:', err)
   }
-  authStore.token = 'mock-token'
-}
-
-const mockTeams = [
-  {
-    id: 1,
-    name: 'GreenTech tím',
-    myRole: 'Team Lead',
-    applicationCount: 1,
-    createdAt: '2025-12-01',
-    members: [
-      { name: 'Ján Novák', role: 'Team Lead' },
-      { name: 'Anna Kováčová', role: 'Developer' },
-      { name: 'Peter Horváth', role: 'Designer' },
-      { name: 'Eva Tóthová', role: 'Analyst' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'AI Innovators',
-    myRole: 'Člen',
-    applicationCount: 1,
-    createdAt: '2026-01-15',
-    members: [
-      { name: 'Lucia Szabóová', role: 'Team Lead' },
-      { name: 'Ján Novák', role: 'Developer' },
-      { name: 'Marek Varga', role: 'ML Engineer' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'HealthTech',
-    myRole: 'Člen',
-    applicationCount: 1,
-    createdAt: '2026-02-10',
-    members: [
-      { name: 'Tomáš Beneš', role: 'Team Lead' },
-      { name: 'Ján Novák', role: 'Backend Dev' },
-      { name: 'Katarína Molnárová', role: 'Frontend Dev' },
-      { name: 'Michal Oravec', role: 'Designer' },
-      { name: 'Zuzana Krajčíová', role: 'Tester' },
-    ],
-  },
-]
+})
 
 function getInitials(name: string): string {
   return name

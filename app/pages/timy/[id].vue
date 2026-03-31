@@ -1,8 +1,13 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
+    <!-- Loading state -->
+    <div v-if="teamsStore.isLoading" class="space-y-4">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 h-96 animate-pulse" />
+    </div>
+
     <!-- Not found -->
     <div
-      v-if="!team"
+      v-else-if="!teamsStore.currentTeam"
       class="bg-white rounded-lg shadow-sm border border-gray-100"
     >
       <UiEmptyState
@@ -22,19 +27,19 @@
     <template v-else>
       <!-- Breadcrumbs -->
       <div class="mb-8">
-        <UiBreadcrumbs :items="[{ label: 'Tímy', to: '/timy' }, { label: team.name }]" />
+        <UiBreadcrumbs :items="[{ label: 'Tímy', to: '/timy' }, { label: teamsStore.currentTeam.name }]" />
       </div>
 
       <!-- Header -->
       <div class="flex items-start justify-between mb-8">
         <div>
-          <h1 class="text-2xl font-bold text-navy mb-1">{{ team.name }}</h1>
+          <h1 class="text-2xl font-bold text-navy mb-1">{{ teamsStore.currentTeam.name }}</h1>
           <p class="text-sm text-gray-500">
-            Vytvorený {{ team.createdAt }} · {{ team.members.length }} členov · {{ team.applications.length }} prihlášok
+            Vytvorený {{ teamsStore.currentTeam.createdAt }} · {{ teamsStore.currentTeam.members.length }} členov · {{ teamsStore.currentTeam.applications.length }} prihlášok
           </p>
         </div>
         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
-          {{ team.myRole }}
+          {{ teamsStore.currentTeam.myRole }}
         </span>
       </div>
 
@@ -44,10 +49,18 @@
         <div class="lg:col-span-2 space-y-6">
           <!-- Members -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-            <h2 class="text-xl font-bold text-navy mb-6">Členovia tímu</h2>
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-navy">Členovia tímu</h2>
+              <button
+                @click="showInviteModal = true"
+                class="text-sm font-medium text-blue-600 hover:text-blue-800"
+              >
+                + Pozvať
+              </button>
+            </div>
             <UiDataTable
               :columns="memberColumns"
-              :rows="team.members"
+              :rows="teamsStore.currentTeam.members"
               row-key="email"
               empty-title="Žiadni členovia"
             >
@@ -74,6 +87,15 @@
                   {{ value }}
                 </span>
               </template>
+              <template #cell-actions="{ row }">
+                <button
+                  v-if="teamsStore.currentTeam.myRole === 'Team Lead' && row.role !== 'Team Lead'"
+                  @click="removeMemberAction(row.id)"
+                  class="text-xs font-medium text-red-600 hover:text-red-800"
+                >
+                  Odstrániť
+                </button>
+              </template>
             </UiDataTable>
           </div>
 
@@ -82,7 +104,7 @@
             <h2 class="text-xl font-bold text-navy mb-6">Prihlášky tímu</h2>
             <UiDataTable
               :columns="appColumns"
-              :rows="team.applications"
+              :rows="teamsStore.currentTeam.applications"
               empty-title="Tím zatiaľ nemá žiadne prihlášky"
               @row-click="(row: any) => navigateTo(`/prihlasky/${row.id}`)"
             >
@@ -109,19 +131,19 @@
             <dl class="space-y-4">
               <div class="flex justify-between items-center">
                 <dt class="text-sm text-gray-500">Vytvorený</dt>
-                <dd class="text-sm font-medium text-navy">{{ team.createdAt }}</dd>
+                <dd class="text-sm font-medium text-navy">{{ teamsStore.currentTeam.createdAt }}</dd>
               </div>
               <div class="flex justify-between items-center">
                 <dt class="text-sm text-gray-500">Členov</dt>
-                <dd class="text-sm font-medium text-navy">{{ team.members.length }}</dd>
+                <dd class="text-sm font-medium text-navy">{{ teamsStore.currentTeam.members.length }}</dd>
               </div>
               <div class="flex justify-between items-center">
                 <dt class="text-sm text-gray-500">Prihlášok</dt>
-                <dd class="text-sm font-medium text-navy">{{ team.applications.length }}</dd>
+                <dd class="text-sm font-medium text-navy">{{ teamsStore.currentTeam.applications.length }}</dd>
               </div>
               <div class="flex justify-between items-center">
                 <dt class="text-sm text-gray-500">Vaša rola</dt>
-                <dd class="text-sm font-medium text-navy">{{ team.myRole }}</dd>
+                <dd class="text-sm font-medium text-navy">{{ teamsStore.currentTeam.myRole }}</dd>
               </div>
             </dl>
           </div>
@@ -130,13 +152,13 @@
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
             <h2 class="text-lg font-bold text-navy mb-5">Akcie</h2>
             <div class="space-y-3">
-              <UiButton
-                variant="outline"
-                class="w-full"
+              <button
+                @click="showInviteModal = true"
+                class="w-full px-4 py-2.5 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition flex items-center justify-center gap-2"
               >
                 <UserPlus class="w-4 h-4" />
                 Pozvať člena
-              </UiButton>
+              </button>
               <NuxtLink
                 to="/prihlasky/nova"
                 class="block"
@@ -153,115 +175,84 @@
           </div>
         </div>
       </div>
+
+      <!-- Invite Modal -->
+      <TeamInviteModal
+        v-model="showInviteModal"
+        :team-id="Number(route.params.id)"
+        @invited="handleMemberInvited"
+      />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ArrowLeft, Users, UserPlus, FileText } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
+  // middleware: 'auth', // TODO: re-enable when backend is available
 })
 
 const route = useRoute()
-
 useHead({ title: 'Detail tímu | NTI' })
 
-const authStore = useAuthStore()
+const teamsStore = useTeamsStore()
+const { addToast } = useToast()
 
-if (!authStore.user) {
-  authStore.user = {
-    id: 1,
-    email: 'jan.novak@example.com',
-    first_name: 'Ján',
-    last_name: 'Novák',
-    role: 'student',
-  }
-  authStore.token = 'mock-token'
-}
-
-const mockTeams = [
-  {
-    id: 1,
-    name: 'GreenTech tím',
-    myRole: 'Team Lead',
-    createdAt: '2025-12-01',
-    members: [
-      { name: 'Ján Novák', role: 'Team Lead', email: 'jan.novak@example.com' },
-      { name: 'Anna Kováčová', role: 'Developer', email: 'anna.kovacova@example.com' },
-      { name: 'Peter Horváth', role: 'Designer', email: 'peter.horvath@example.com' },
-      { name: 'Eva Tóthová', role: 'Analyst', email: 'eva.tothova@example.com' },
-    ],
-    applications: [
-      {
-        id: 1,
-        title: 'EcoTrack - Sledovanie uhlíkovej stopy',
-        program: 'Program A',
-        status: 'approved',
-        submittedAt: '2026-02-15',
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: 'AI Innovators',
-    myRole: 'Člen',
-    createdAt: '2026-01-15',
-    members: [
-      { name: 'Lucia Szabóová', role: 'Team Lead', email: 'lucia.szaboova@example.com' },
-      { name: 'Ján Novák', role: 'Developer', email: 'jan.novak@example.com' },
-      { name: 'Marek Varga', role: 'ML Engineer', email: 'marek.varga@example.com' },
-    ],
-    applications: [
-      {
-        id: 2,
-        title: 'StudyBuddy - AI asistent pre študentov',
-        program: 'Program A',
-        status: 'evaluating',
-        submittedAt: '2026-03-10',
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: 'HealthTech',
-    myRole: 'Člen',
-    createdAt: '2026-02-10',
-    members: [
-      { name: 'Tomáš Beneš', role: 'Team Lead', email: 'tomas.benes@example.com' },
-      { name: 'Ján Novák', role: 'Backend Dev', email: 'jan.novak@example.com' },
-      { name: 'Katarína Molnárová', role: 'Frontend Dev', email: 'katarina.molnarova@example.com' },
-      { name: 'Michal Oravec', role: 'Designer', email: 'michal.oravec@example.com' },
-      { name: 'Zuzana Krajčíová', role: 'Tester', email: 'zuzana.krajciova@example.com' },
-    ],
-    applications: [
-      {
-        id: 3,
-        title: 'FitConnect - Fitness platforma',
-        program: 'Program B',
-        status: 'submitted',
-        submittedAt: '2026-03-25',
-      },
-    ],
-  },
-]
-
-const team = computed(() => {
-  const id = Number(route.params.id)
-  return mockTeams.find((t) => t.id === id) || null
-})
+const showInviteModal = ref(false)
 
 const memberColumns = [
   { key: 'name', label: 'Člen' },
   { key: 'role', label: 'Rola' },
+  { key: 'actions', label: '' },
 ]
 
 const appColumns = [
   { key: 'title', label: 'Prihláška' },
   { key: 'status', label: 'Stav' },
 ]
+
+// Load team data on mount
+onMounted(async () => {
+  try {
+    await teamsStore.fetchTeamById(route.params.id)
+  } catch (err) {
+    console.error('Failed to load team:', err)
+    addToast({
+      message: 'Chyba pri načítavaní tímu',
+      type: 'error',
+    })
+  }
+})
+
+const removeMemberAction = async (memberId: number) => {
+  if (!confirm('Naozaj chcete odstrániť tohto člena z tímu?')) return
+
+  try {
+    await teamsStore.removeMember(route.params.id as string, memberId)
+    addToast({
+      message: 'Člen bol odstránený z tímu',
+      type: 'success',
+    })
+  } catch (err) {
+    addToast({
+      message: 'Chyba pri odstraňovaní člena',
+      type: 'error',
+    })
+  }
+}
+
+const handleMemberInvited = () => {
+  showInviteModal.value = false
+  addToast({
+    message: 'Člen bol pozvnaný',
+    type: 'success',
+  })
+  // Reload team data
+  teamsStore.fetchTeamById(route.params.id)
+}
 
 function getInitials(name: string): string {
   return name
