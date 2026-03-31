@@ -19,7 +19,9 @@ export interface FormField {
 }
 
 export interface FormSchema {
-  id: string
+  id?: string
+  title?: string
+  description?: string
   fields: FormField[]
   sections?: Array<{
     title: string

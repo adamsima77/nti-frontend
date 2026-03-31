@@ -114,13 +114,34 @@ export const useCallsStore = defineStore('calls', () => {
     isLoading.value = true
     error.value = null
 
+    const callId = typeof id === 'string' ? parseInt(id) : id
+
     try {
+      // 1. If not in calls array yet, try to load available calls first
+      if (calls.value.length === 0) {
+        await fetchOpenCalls()
+      }
+
+      // 2. Try to find in calls array
+      const found = calls.value.find((c) => c.id === callId)
+      if (found) {
+        currentCall.value = found
+        return currentCall.value
+      }
+
+      // 3. Try API
       const response = await api.get(`/calls/${id}`)
       currentCall.value = response.data || response
       return currentCall.value
     } catch (err) {
+      // 4. Fallback to mock for development
+      console.warn(`Failed to load call ${id}, using mock:`, err)
+      if (callId === 999) {
+        currentCall.value = TEST_CALL
+        error.value = null
+        return currentCall.value
+      }
       error.value = (err as Error).message
-      console.error(`Error fetching call ${id}:`, err)
       throw err
     } finally {
       isLoading.value = false
