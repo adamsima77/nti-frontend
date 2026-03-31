@@ -179,7 +179,7 @@
       <!-- Invite Modal -->
       <TeamInviteModal
         v-model="showInviteModal"
-        :team-id="Number(route.params.id)"
+        :team-id="Number(teamId)"
         @invited="handleMemberInvited"
       />
     </template>
@@ -201,6 +201,7 @@ useHead({ title: 'Detail tímu | NTI' })
 const teamsStore = useTeamsStore()
 const { addToast } = useToast()
 
+const teamId = route.params.id as string
 const showInviteModal = ref(false)
 
 const memberColumns = [
@@ -217,7 +218,7 @@ const appColumns = [
 // Load team data on mount
 onMounted(async () => {
   try {
-    await teamsStore.fetchTeamById(route.params.id)
+    await teamsStore.fetchTeamById(teamId)
   } catch (err) {
     console.error('Failed to load team:', err)
     addToast({
@@ -231,7 +232,7 @@ const removeMemberAction = async (memberId: number) => {
   if (!confirm('Naozaj chcete odstrániť tohto člena z tímu?')) return
 
   try {
-    await teamsStore.removeMember(route.params.id as string, memberId)
+    await teamsStore.removeMember(teamId, memberId)
     addToast({
       message: 'Člen bol odstránený z tímu',
       type: 'success',
@@ -251,7 +252,7 @@ const handleMemberInvited = () => {
     type: 'success',
   })
   // Reload team data
-  teamsStore.fetchTeamById(route.params.id)
+  teamsStore.fetchTeamById(teamId)
 }
 
 function getInitials(name: string): string {

@@ -73,7 +73,7 @@
         <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
           <span class="flex items-center gap-1">
             <FileText class="w-4 h-4" />
-            {{ team.applicationCount }} prihlášok
+            {{ team.applications.length }} prihlášok
           </span>
           <span class="text-xs text-gray-400">{{ team.createdAt }}</span>
         </div>
