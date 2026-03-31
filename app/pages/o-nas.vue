@@ -64,7 +64,7 @@
 
 <script setup>
   useSeoMeta({
-  title: 'NTI | O nás',
+  title: 'O nás | NTI',
   description: 'NTI je komunita zameraná na dizajn, vývoj a inovácie. Podporujeme talentovaných ľudí, mentorov a partnerov a poskytujeme príležitosti na rast a spoluprácu.',
   });
 </script>

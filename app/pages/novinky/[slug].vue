@@ -145,7 +145,7 @@
 
 <script setup>
 useSeoMeta({
-  //title: `NTI | ${article.title}`,
+  //title: `${article.title} | NTI`,
   //description: article.description,
 });
 </script>

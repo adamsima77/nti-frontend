@@ -54,7 +54,7 @@
 
 <script setup>
 useSeoMeta({
-  title: 'NTI | Novinky',
+  title: 'Novinky | NTI',
   description: 'Sleduj najnovšie novinky, udalosti a aktuality z komunity NTI. Objav nové príležitosti, projekty a inšpirácie zo sveta dizajnu, vývoja a podnikania.'
 });
 </script>

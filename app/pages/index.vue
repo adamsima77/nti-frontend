@@ -16,10 +16,12 @@
       <UiProgramCard
         title="Program A"
         description="Intenzívny kurz pre rýchly osobný rast a nové zručnosti."
+        link = "/program-a"
       />
       <UiProgramCard
         title="Program B"
         description="Mentoring a komunita pre dlhodobý profesionálny rozvoj."
+        link = "/program-b"
       />
     </div>
   </div>
@@ -98,7 +100,7 @@
 
 <script setup>
 useSeoMeta({
-  title: 'NTI | Domov',
+  title: 'Domov | NTI',
   description: 'Budujeme komunitu talentovaných ľudí v oblasti dizajnu, vývoja a podnikania. Objav mentorov, partnerov a príležitosti na rast.'
 });
 </script>

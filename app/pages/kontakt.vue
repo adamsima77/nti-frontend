@@ -89,7 +89,7 @@
 
 <script setup>
 useSeoMeta({
-  title: 'NTI | Kontakt',
+  title: 'Kontakt | NTI',
   description: 'Kontaktuj tím NTI. Máš otázky, návrhy alebo záujem o spoluprácu? Spoj sa s nami a radi ti pomôžeme.',
 });
 </script>
