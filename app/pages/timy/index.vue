@@ -106,11 +106,7 @@ const teamsStore = useTeamsStore()
 
 // Load teams when page mounts
 onMounted(async () => {
-  try {
-    await teamsStore.fetchTeams()
-  } catch (err) {
-    console.error('Failed to load teams:', err)
-  }
+  await teamsStore.fetchTeams()
 })
 
 function getInitials(name: string): string {

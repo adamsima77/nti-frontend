@@ -183,18 +183,11 @@ useHead({
 
 // Load call data when ID changes
 const loadCall = async () => {
-  console.log('🔄 Loading call:', route.params.id)
-  try {
-    await callsStore.fetchCallById(route.params.id as string)
-    console.log('✅ Call loaded:', callsStore.currentCall)
-  } catch (err) {
-    console.error('❌ Failed to load call:', err)
-  }
+  await callsStore.fetchCallById(route.params.id as string)
 }
 
 // Watch for route param changes (immediate: true executes on mount)
 watch(() => route.params.id, () => {
-  console.log('🔗 Route param changed:', route.params.id)
   loadCall()
 }, { immediate: true })
 

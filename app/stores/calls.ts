@@ -68,7 +68,6 @@ export const useCallsStore = defineStore('calls', () => {
   const calls = ref<Call[]>([])
   const currentCall = ref<Call | null>(null)
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
 
   // Computed
   const openCalls = computed(() => calls.value.filter((c) => c.status === 'open'))
@@ -76,16 +75,11 @@ export const useCallsStore = defineStore('calls', () => {
   // Actions
   const fetchCalls = async () => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.get('/calls')
       calls.value = response.data || response
       return calls.value
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error('Error fetching calls:', err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -93,17 +87,14 @@ export const useCallsStore = defineStore('calls', () => {
 
   const fetchOpenCalls = async () => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.get('/calls/open')
       calls.value = response.data || response
       return calls.value
     } catch (err) {
-      // Fallback to test call for development
-      console.warn('API error, loading test call:', err)
+      // Fallback to test call for development (API error is already handled by useApi)
       calls.value = [TEST_CALL]
-      error.value = null
       return calls.value
     } finally {
       isLoading.value = false
@@ -112,7 +103,6 @@ export const useCallsStore = defineStore('calls', () => {
 
   const fetchCallById = async (id: number | string) => {
     isLoading.value = true
-    error.value = null
 
     const callId = typeof id === 'string' ? parseInt(id) : id
 
@@ -134,14 +124,11 @@ export const useCallsStore = defineStore('calls', () => {
       currentCall.value = response.data || response
       return currentCall.value
     } catch (err) {
-      // 4. Fallback to mock for development
-      console.warn(`Failed to load call ${id}, using mock:`, err)
+      // 4. Fallback to mock for development (API error is already handled by useApi)
       if (callId === 999) {
         currentCall.value = TEST_CALL
-        error.value = null
         return currentCall.value
       }
-      error.value = (err as Error).message
       throw err
     } finally {
       isLoading.value = false
@@ -153,7 +140,6 @@ export const useCallsStore = defineStore('calls', () => {
     calls: computed(() => calls.value),
     currentCall: computed(() => currentCall.value),
     isLoading: computed(() => isLoading.value),
-    error: computed(() => error.value),
 
     // Computed
     openCalls,

@@ -135,15 +135,7 @@ const isSubmitting = ref(false)
 
 // Load calls and teams on mount
 onMounted(async () => {
-  try {
-    await Promise.all([callsStore.fetchOpenCalls(), teamsStore.fetchTeams()])
-  } catch (err) {
-    console.error('Error loading data:', err)
-    addToast({
-      message: 'Chyba pri načítaní údajov',
-      type: 'error',
-    })
-  }
+  await Promise.all([callsStore.fetchOpenCalls(), teamsStore.fetchTeams()])
 })
 
 const selectCall = async (call: Call) => {
@@ -201,11 +193,6 @@ const handleSubmit = async (data: Record<string, any>) => {
 
     // Redirect to application detail
     await router.push(`/prihlasky/${application.id}`)
-  } catch (err) {
-    addToast({
-      message: 'Chyba pri vytváraní prihlášky',
-      type: 'error',
-    })
   } finally {
     isSubmitting.value = false
   }

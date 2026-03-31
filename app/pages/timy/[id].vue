@@ -217,32 +217,17 @@ const appColumns = [
 
 // Load team data on mount
 onMounted(async () => {
-  try {
-    await teamsStore.fetchTeamById(teamId)
-  } catch (err) {
-    console.error('Failed to load team:', err)
-    addToast({
-      message: 'Chyba pri načítavaní tímu',
-      type: 'error',
-    })
-  }
+  await teamsStore.fetchTeamById(teamId)
 })
 
 const removeMemberAction = async (memberId: number) => {
   if (!confirm('Naozaj chcete odstrániť tohto člena z tímu?')) return
 
-  try {
-    await teamsStore.removeMember(teamId, memberId)
-    addToast({
-      message: 'Člen bol odstránený z tímu',
-      type: 'success',
-    })
-  } catch (err) {
-    addToast({
-      message: 'Chyba pri odstraňovaní člena',
-      type: 'error',
-    })
-  }
+  await teamsStore.removeMember(teamId, memberId)
+  addToast({
+    message: 'Člen bol odstránený z tímu',
+    type: 'success',
+  })
 }
 
 const handleMemberInvited = () => {

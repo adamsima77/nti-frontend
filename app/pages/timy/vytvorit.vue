@@ -218,11 +218,6 @@ const handleSubmit = async () => {
     })
 
     await router.push(`/timy/${team.id}`)
-  } catch (err) {
-    addToast({
-      message: 'Chyba pri vytváraní tímu',
-      type: 'error',
-    })
   } finally {
     isSubmitting.value = false
   }

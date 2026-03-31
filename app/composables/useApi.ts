@@ -16,6 +16,36 @@ export const useApi = () => {
     }
   }
 
+  const handleError = (err: unknown, endpoint: string, method: string) => {
+    let errMessage: string
+
+    if (err instanceof Error) {
+      errMessage = err.message
+    } else if (typeof err === 'string') {
+      errMessage = err
+    } else {
+      errMessage = 'Neznáma chyba'
+    }
+
+    error.value = errMessage
+    console.error(`API Error [${method} ${endpoint}]:`, err)
+
+    // Automaticky zobrazí error ako toast (pokiaľ je dostupný)
+    try {
+      const toast = useToast()
+      // Nezobazvujeme toast pre 401 (unauthorized) - to handleuje logout
+      if (!errMessage.includes('Unauthorized')) {
+        toast.addToast({
+          message: `${method} ${endpoint}: ${errMessage}`,
+          type: 'error',
+          duration: 5000,
+        })
+      }
+    } catch (e) {
+      // Toast composable možno nie je dostupný (napr. SSR), ignorujeme
+    }
+  }
+
   const request = async (method: string, endpoint: string, data: any = null, options: RequestInit = {}) => {
     isLoading.value = true
     error.value = null
@@ -59,9 +89,7 @@ export const useApi = () => {
       const result = await response.json()
       return result
     } catch (err: unknown) {
-      const errMessage = err instanceof Error ? err.message : 'Unknown error'
-      error.value = errMessage
-      console.error(`API Error [${method} ${endpoint}]:`, err)
+      handleError(err, endpoint, method)
       throw err
     } finally {
       isLoading.value = false

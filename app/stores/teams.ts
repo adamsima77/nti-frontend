@@ -40,7 +40,6 @@ export const useTeamsStore = defineStore('teams', () => {
   const teams = ref<Team[]>([])
   const currentTeam = ref<Team | null>(null)
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
 
   // Computed
   const userTeams = computed(() => teams.value)
@@ -48,7 +47,6 @@ export const useTeamsStore = defineStore('teams', () => {
   // Actions
   const fetchTeams = async () => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.get('/teams')
@@ -56,9 +54,7 @@ export const useTeamsStore = defineStore('teams', () => {
       return teams.value
     } catch (err) {
       // Fallback to test team for development
-      console.warn('API error, loading test team:', err)
       teams.value = [TEST_TEAM]
-      error.value = null
       return teams.value
     } finally {
       isLoading.value = false
@@ -67,16 +63,11 @@ export const useTeamsStore = defineStore('teams', () => {
 
   const fetchTeamById = async (id: number | string) => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.get(`/teams/${id}`)
       currentTeam.value = response.data || response
       return currentTeam.value
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error(`Error fetching team ${id}:`, err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -88,7 +79,6 @@ export const useTeamsStore = defineStore('teams', () => {
     members?: string[] // emails na pozvanie
   }) => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.post('/teams', teamData)
@@ -97,10 +87,6 @@ export const useTeamsStore = defineStore('teams', () => {
       // Pridaj do zoznamu
       teams.value.push(newTeam)
       return newTeam
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error('Error creating team:', err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -108,7 +94,6 @@ export const useTeamsStore = defineStore('teams', () => {
 
   const updateTeam = async (id: number | string, teamData: any) => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.put(`/teams/${id}`, teamData)
@@ -126,10 +111,6 @@ export const useTeamsStore = defineStore('teams', () => {
       }
 
       return updatedTeam
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error(`Error updating team ${id}:`, err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -137,7 +118,6 @@ export const useTeamsStore = defineStore('teams', () => {
 
   const deleteTeam = async (id: number | string) => {
     isLoading.value = true
-    error.value = null
 
     try {
       await api.delete(`/teams/${id}`)
@@ -149,10 +129,6 @@ export const useTeamsStore = defineStore('teams', () => {
       if (currentTeam.value?.id === id) {
         currentTeam.value = null
       }
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error(`Error deleting team ${id}:`, err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -160,15 +136,10 @@ export const useTeamsStore = defineStore('teams', () => {
 
   const inviteMember = async (teamId: number | string, inviteData: { email: string; role?: string }) => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.post(`/teams/${teamId}/invite`, inviteData)
       return response.data || response
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error(`Error inviting member to team ${teamId}:`, err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -176,7 +147,6 @@ export const useTeamsStore = defineStore('teams', () => {
 
   const removeMember = async (teamId: number | string, memberId: number) => {
     isLoading.value = true
-    error.value = null
 
     try {
       await api.delete(`/teams/${teamId}/members/${memberId}`)
@@ -185,10 +155,6 @@ export const useTeamsStore = defineStore('teams', () => {
       if (currentTeam.value?.id === teamId) {
         currentTeam.value.members = currentTeam.value.members.filter((m) => m.id !== memberId)
       }
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error(`Error removing member ${memberId} from team ${teamId}:`, err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -200,7 +166,6 @@ export const useTeamsStore = defineStore('teams', () => {
     role: string
   ) => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.patch(`/teams/${teamId}/members/${memberId}`, { role })
@@ -214,10 +179,6 @@ export const useTeamsStore = defineStore('teams', () => {
       }
 
       return response.data || response
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error(`Error updating member role:`, err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -228,7 +189,6 @@ export const useTeamsStore = defineStore('teams', () => {
     teams: computed(() => teams.value),
     currentTeam: computed(() => currentTeam.value),
     isLoading: computed(() => isLoading.value),
-    error: computed(() => error.value),
 
     // Computed
     userTeams,

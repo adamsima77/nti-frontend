@@ -59,7 +59,6 @@ export const useApplicationsStore = defineStore('applications', () => {
   const currentApplication = ref<Application | null>(null)
   const applicationDrafts = ref<Map<string, ApplicationDraft>>(new Map())
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
 
   // Computed
   const userApplications = computed(() => applications.value)
@@ -67,16 +66,11 @@ export const useApplicationsStore = defineStore('applications', () => {
   // Actions
   const fetchApplications = async () => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.get('/applications')
       applications.value = response.data || response
       return applications.value
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error('Error fetching applications:', err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -84,16 +78,11 @@ export const useApplicationsStore = defineStore('applications', () => {
 
   const fetchApplicationById = async (id: number | string) => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.get(`/applications/${id}`)
       currentApplication.value = response.data || response
       return currentApplication.value
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error(`Error fetching application ${id}:`, err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -101,7 +90,6 @@ export const useApplicationsStore = defineStore('applications', () => {
 
   const createApplication = async (appData: Partial<Application>) => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.post('/applications', appData)
@@ -115,10 +103,6 @@ export const useApplicationsStore = defineStore('applications', () => {
       applicationDrafts.value.delete(draftKey)
 
       return newApp
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error('Error creating application:', err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -126,7 +110,6 @@ export const useApplicationsStore = defineStore('applications', () => {
 
   const updateApplication = async (id: number | string, appData: Partial<Application>) => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.put(`/applications/${id}`, appData)
@@ -142,10 +125,6 @@ export const useApplicationsStore = defineStore('applications', () => {
       }
 
       return updatedApp
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error(`Error updating application ${id}:`, err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -153,7 +132,6 @@ export const useApplicationsStore = defineStore('applications', () => {
 
   const submitApplication = async (id: number | string) => {
     isLoading.value = true
-    error.value = null
 
     try {
       const response = await api.post(`/applications/${id}/submit`, {})
@@ -169,10 +147,6 @@ export const useApplicationsStore = defineStore('applications', () => {
       }
 
       return submittedApp
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error(`Error submitting application ${id}:`, err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -180,7 +154,6 @@ export const useApplicationsStore = defineStore('applications', () => {
 
   const deleteApplication = async (id: number | string) => {
     isLoading.value = true
-    error.value = null
 
     try {
       await api.delete(`/applications/${id}`)
@@ -190,10 +163,6 @@ export const useApplicationsStore = defineStore('applications', () => {
       if (currentApplication.value?.id === id) {
         currentApplication.value = null
       }
-    } catch (err) {
-      error.value = (err as Error).message
-      console.error(`Error deleting application ${id}:`, err)
-      throw err
     } finally {
       isLoading.value = false
     }
@@ -246,7 +215,6 @@ export const useApplicationsStore = defineStore('applications', () => {
     applications: computed(() => applications.value),
     currentApplication: computed(() => currentApplication.value),
     isLoading: computed(() => isLoading.value),
-    error: computed(() => error.value),
 
     // Computed
     userApplications,
