@@ -12,6 +12,10 @@ export interface FormField {
   options?: Array<{ label: string; value: any }>
   maxLength?: number
   minLength?: number
+  // File upload specific
+  maxFileSize?: number // bytes, default 10MB
+  allowMultiple?: boolean
+  accept?: string // MIME types: 'image/*', 'application/pdf', etc.
 }
 
 export interface FormSchema {

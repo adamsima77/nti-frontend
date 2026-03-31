@@ -159,22 +159,16 @@
       </label>
     </div>
 
-    <!-- File Input -->
-    <input
+    <!-- File Input with Drag & Drop -->
+    <FileUploadZone
       v-if="field.type === 'file'"
-      :id="`field-${field.name}`"
-      type="file"
-      :required="field.required"
-      :class="[
-        'px-3 py-2.5 rounded-md border text-sm transition-all duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-offset-0',
-        'file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-50 file:text-blue-600',
-        hasError
-          ? 'border-danger-300 focus:ring-danger-500 focus:border-danger-300'
-          : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500',
-      ]"
-      @change="$emit('update:modelValue', ($event.target as HTMLInputElement).files?.[0])"
-      @blur="$emit('blur')"
+      :model-value="modelValue"
+      :max-file-size="field.maxFileSize || 10 * 1024 * 1024"
+      :allow-multiple="field.allowMultiple || false"
+      :accept="field.accept || '*'"
+      :error="error"
+      @update:model-value="$emit('update:modelValue', $event)"
+      @change="$emit('blur')"
     />
 
     <!-- Error Message -->
