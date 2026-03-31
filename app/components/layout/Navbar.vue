@@ -46,7 +46,7 @@
 
       <li>
         <NuxtLink
-          to="/partneri"
+          to="/partneri-mentori"
           class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
           active-class="text-blue-500"
           exact-active-class="text-blue-500"

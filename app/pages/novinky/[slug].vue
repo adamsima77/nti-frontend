@@ -143,4 +143,9 @@
   </section>
 </template>
 
-<script setup></script>
+<script setup>
+useSeoMeta({
+  //title: `NTI | ${article.title}`,
+  //description: article.description,
+});
+</script>

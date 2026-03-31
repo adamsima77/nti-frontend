@@ -96,4 +96,9 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+useSeoMeta({
+  title: 'NTI | Domov',
+  description: 'Budujeme komunitu talentovaných ľudí v oblasti dizajnu, vývoja a podnikania. Objav mentorov, partnerov a príležitosti na rast.'
+});
+</script>

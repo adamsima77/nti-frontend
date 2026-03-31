@@ -32,7 +32,7 @@
         <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy mb-8">Náš tím</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           <UiTeamCard
-            image="/team/person1.jpg"
+            image=""
             alt="John Doe"
             name="John Doe"
             role="CEO"
@@ -44,14 +44,14 @@
             role="CTO"
           />
           <UiTeamCard
-            image="/team/person3.jpg"
+            image=""
             alt="Alex Novak"
             name="Alex Novak"
             role="Lead Designer"
           />
 
           <UiTeamCard
-            image="/team/person3.jpg"
+            image=""
             alt="Alex Novak"
             name="Alex Novak"
             role="Lead Designer"
@@ -62,4 +62,9 @@
   </section>
 </template>
 
-<script setup></script>
+<script setup>
+  useSeoMeta({
+  title: 'NTI | O nás',
+  description: 'NTI je komunita zameraná na dizajn, vývoj a inovácie. Podporujeme talentovaných ľudí, mentorov a partnerov a poskytujeme príležitosti na rast a spoluprácu.',
+  });
+</script>
