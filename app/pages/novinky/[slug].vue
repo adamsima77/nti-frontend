@@ -23,6 +23,7 @@
           alt=""
         />
       </div>
+
       <div class="w-full h-1 bg-gray-300 my-6"></div>
 
       <div class="text-justify font-sans text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed">
@@ -104,40 +105,47 @@
           purus nec mi dictum, at tempus purus varius.
         </p>
       </div>
+
       <div class="w-full h-1 bg-gray-300 my-6"></div>
 
       <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy mb-6">Súvisiace články</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-        <div
-          class="bg-gray-50 rounded-2xl shadow-[0_-8px_20px_rgba(0,0,0,0.06),0_8px_20px_rgba(0,0,0,0.06)] p-6 sm:p-8 flex flex-col h-full"
-        >
-          <img
-            src="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
-            class="rounded-lg mb-4 sm:mb-5 hover:opacity-90 shadow-lg transition-opacity duration-300 ease-in-out cursor-pointer"
-            alt="Novinka #1"
-          />
 
-          <div class="flex-1 flex flex-col justify-between">
-            <NuxtLink to="">
-              <h3 class="text-lg sm:text-xl md:text-xl font-bold text-blue-700 mb-2 hover:underline">Novinka #1</h3>
-            </NuxtLink>
-            <NuxtLink
-              to=""
-              class="text-sm text-blue-600 font-semibold mb-2"
-              >Kategória</NuxtLink
-            >
-            <p class="text-sm sm:text-base md:text-base text-gray-500">
-              Zaujímavé aktuality a tipy pre tvoj profesionálny rast.
-            </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <UiItem
+          title="Novinka #1"
+          description="Zaujímavé aktuality a tipy pre tvoj profesionálny rast."
+          category="Tipy & Novinky"
+          image="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
+          alt="Novinka #1"
+          link="#"
+        />
 
-            <NuxtLink
-              to=""
-              class="mt-3 text-blue-500 font-bold hover:underline"
-            >
-              Čítať viac →
-            </NuxtLink>
-          </div>
-        </div>
+        <UiItem
+          title="Novinka #2"
+          description="Zaujímavé aktuality a tipy pre tvoj profesionálny rast."
+          category="Tipy & Novinky"
+          image="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
+          alt="Novinka #2"
+          link="#"
+        />
+
+        <UiItem
+          title="Novinka #3"
+          description="Zaujímavé aktuality a tipy pre tvoj profesionálny rast."
+          category="Tipy & Novinky"
+          image="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
+          alt="Novinka #3"
+          link="#"
+        />
+
+        <UiItem
+          title="Novinka #4"
+          description="Zaujímavé aktuality a tipy pre tvoj profesionálny rast."
+          category="Tipy & Novinky"
+          image="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
+          alt="Novinka #4"
+          link="#"
+        />
       </div>
     </div>
   </section>
