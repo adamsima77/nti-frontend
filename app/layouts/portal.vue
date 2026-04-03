@@ -52,10 +52,10 @@ const navItems = computed(() => {
 
   if (role === 'company') {
     return [
-      { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-      { label: 'Profil organizácie', to: '/firma/profil', icon: Building2 },
-      { label: 'Zadania', to: '/firma/zadania', icon: ClipboardList },
-      { label: 'Prihlášky tímov', to: '/firma/prihlasky', icon: FileText },
+      { label: 'Dashboard',          to: '/firma',           icon: LayoutDashboard },
+      { label: 'Profil organizácie', to: '/firma/profil',    icon: Building2 },
+      { label: 'Zadania',            to: '/firma/zadania',   icon: ClipboardList },
+      { label: 'Správa členov',      to: '/firma/clenovia',  icon: Users },
     ]
   }
 

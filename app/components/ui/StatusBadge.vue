@@ -66,6 +66,38 @@ const statusConfig = {
     color: '#9A3412',
     bgClass: 'bg-gradient-to-r from-orange-50 to-orange-50 text-orange-700',
   },
+
+  // firma/zadania
+  published: {
+    label: 'Publikované',
+    color: '#0D5FBF',
+    bgClass: 'bg-blue-50 text-blue-600',
+  },
+  matching: {
+    label: 'V párovaní',
+    color: '#7C3AED',
+    bgClass: 'bg-purple-50 text-purple-700',
+  },
+  assigned: {
+    label: 'Pridelené',
+    color: '#0369A1',
+    bgClass: 'bg-sky-50 text-sky-700',
+  },
+  in_progress: {
+    label: 'V realizácii',
+    color: '#D97706',
+    bgClass: 'bg-warning-50 text-warning-700',
+  },
+  completed: {
+    label: 'Dokončené',
+    color: '#16803C',
+    bgClass: 'bg-success-50 text-success-700',
+  },
+  closed: {
+    label: 'Uzavreté',
+    color: '#64748B',
+    bgClass: 'bg-gray-100 text-gray-500',
+  },
 }
 
 const statusColor = computed(() => statusConfig[props.status]?.color || '#64748B')
