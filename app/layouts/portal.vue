@@ -33,10 +33,10 @@ import {
   ClipboardCheck,
 } from 'lucide-vue-next'
 
-const authStore = useAuthStore()
-
 const mobileSidebarOpen = ref(false)
 const sidebarCollapsed = ref(false)
+
+const authStore = useAuthStore()
 
 const navItems = computed(() => {
   const role = authStore.userRole
@@ -46,16 +46,16 @@ const navItems = computed(() => {
       { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
       { label: 'Moje prihlášky', to: '/prihlasky', icon: FileText },
       { label: 'Moje tímy', to: '/timy', icon: Users },
-      { label: 'Môj profil', to: '/profil', icon: UserCircle },
+      { label: 'Môj profil', to: '/profil', icon: UserCircle }
     ]
   }
 
   if (role === 'company') {
     return [
-      { label: 'Dashboard',          to: '/firma',           icon: LayoutDashboard },
-      { label: 'Profil organizácie', to: '/firma/profil',    icon: Building2 },
-      { label: 'Zadania',            to: '/firma/zadania',   icon: ClipboardList },
-      { label: 'Správa členov',      to: '/firma/clenovia',  icon: Users },
+      { label: 'Dashboard', to: '/firma', icon: LayoutDashboard },
+      { label: 'Profil organizácie', to: '/firma/profil', icon: Building2 },
+      { label: 'Zadania', to: '/firma/zadania', icon: ClipboardList },
+      { label: 'Správa členov', to: '/firma/clenovia', icon: Users }
     ]
   }
 
@@ -63,7 +63,7 @@ const navItems = computed(() => {
     return [
       { label: 'Dashboard', to: '/mentor', icon: LayoutDashboard },
       { label: 'Projekty', to: '/mentor/projekty', icon: FolderKanban },
-      { label: 'Konzultácie', to: '/mentor/konzultacie', icon: MessageSquare },
+      { label: 'Konzultácie', to: '/mentor/konzultacie', icon: MessageSquare }
     ]
   }
 
@@ -74,7 +74,6 @@ const navItems = computed(() => {
     ]
   }
 
-  // Fallback
   return [{ label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard }]
 })
 </script>
