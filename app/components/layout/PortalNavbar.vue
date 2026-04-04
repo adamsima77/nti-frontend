@@ -33,39 +33,59 @@
          v-if="showNotifications"
          class="absolute top-full right-0 mt-0 w-[calc(100vw-5rem)] sm:w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50"
       >
-        <NuxtLink to="/notifications">
-          <div class="group flex items-center justify-between px-4 py-3 text-xs sm:text-sm hover:bg-gray-50 cursor-pointer border-b border-gray-100 active:scale-[0.99]">
-            <p class="font-medium">Notifications</p>
-            <div class="group flex items-center">
-              <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-navy transition-colors" />
-            </div>
-          </div>
-        </NuxtLink>
+        <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100">
+          <NuxtLink to = "/notifications"><p class="font-medium text-sm">Notifikácie</p></NuxtLink>
+          <button
+            :class="{'text-blue-500 text-xs sm:text-sm hover:underline': unreadCount > 0,
+                     'text-gray-500 text-xs sm:text-sm': unreadCount === 0}"
+            @click="markAllAsRead"
+          >
+            Označiť ako prečítané
+          </button>
+        </div>
 
         <div class="max-h-80 overflow-y-auto">
           <div v-if="notifications.length === 0" class="p-4 text-xs sm:text-sm text-gray-500 text-center">
             No notifications
           </div>
           <div v-else>
-            <NuxtLink
-              v-for="(n, index) in notifications"
-              :key="index"
-              :to="n.link || '#'"
-              class="group flex items-center justify-between px-4 py-3 text-xs sm:text-sm hover:bg-gray-50 cursor-pointer border-b border-gray-100 active:scale-[0.99]"
-            >
-              <div>
-                <div :class="n.read ? 'text-gray-500 text-xs sm:text-sm' : 'text-navy font-medium text-xs sm:text-sm'">
-                  {{ n.title }}
-                </div>
-                <div class="text-[10px] sm:text-xs text-gray-500">
-                  {{ n.time }}
-                </div>
-              </div>
-              <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-navy transition-colors" />
-            </NuxtLink>
-          </div>
-        </div>
+  <div
+    v-for="(n, index) in notifications"
+    :key="index"
+    class="flex items-center justify-between px-4 py-3 text-xs sm:text-sm hover:bg-gray-50 border-b border-gray-100 active:scale-[0.99]"
+  >
+    
+    <NuxtLink
+      :to="n.link || '#'"
+      class="flex items-center justify-between w-full gap-2"
+    >
+      <div :class="n.read ? 'text-gray-500 text-xs sm:text-sm' : 'text-navy font-medium text-xs sm:text-sm'">
+        {{ n.title }}
       </div>
+      <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-navy transition-colors" />
+    </NuxtLink>
+
+   
+   <button
+  v-if="!n.read"
+  @click.stop="markAsRead(index)"
+  class="text-green-500 hover:text-green-600 ml-2"
+  title="Označte ako prečítané"
+>
+  <Check class="w-4 h-4" />
+</button>
+<button
+  v-else
+  @click.stop="toggleRead(index)"
+  class="ml-2"
+  title="Označte ako neprečítané"
+>
+  <Check class="w-4 h-4 text-blue-400" />
+</button>
+  </div>
+</div>
+</div>
+</div>
 
       <span class="hidden sm:inline text-sm font-medium text-navy truncate max-w-[120px] md:max-w-none">
         {{ userName }}
@@ -84,7 +104,7 @@
 
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
-import { Menu, Bell, LogOut, ChevronRight } from 'lucide-vue-next'
+import { Menu, Bell, LogOut, ChevronRight, Check } from 'lucide-vue-next'
 
 const props = defineProps({
   sidebarCollapsed: Boolean
@@ -119,12 +139,24 @@ const toggleNotifications = () => {
   showNotifications.value = !showNotifications.value
 }
 
+const markAsRead = (index) => {
+  notifications.value[index].read = true
+}
+
+const markAllAsRead = () => {
+  notifications.value = notifications.value.map(n => ({ ...n, read: true }))
+}
+
 const dropdownRef = ref(null)
 
 const handleClickOutside = (event) => {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
     showNotifications.value = false
   }
+}
+
+const toggleRead = (index) => {
+  notifications.value[index].read = !notifications.value[index].read
 }
 
 onMounted(() => {
