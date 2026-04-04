@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="fixed top-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 z-40 left-0 md:left-64 transition-all duration-300"
+    class="fixed top-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-3 sm:px-4 md:px-6 z-40 left-0 md:left-64 transition-all duration-300"
     :class="sidebarCollapsed ? 'md:!left-20' : ''"
   >
     <div class="flex items-center gap-3">
@@ -10,18 +10,66 @@
       >
         <Menu class="w-6 h-6" />
       </button>
-
-      <div class="text-sm text-gray-500">
+      <div class="text-xs sm:text-sm text-gray-500">
         <slot name="breadcrumb" />
       </div>
     </div>
 
-    <div class="flex items-center gap-4">
-      <button class="text-gray-500 hover:text-navy transition-colors relative">
+    <div class="flex items-center gap-2 sm:gap-3 md:gap-4" ref="dropdownRef">
+      <button
+        class="text-gray-500 hover:text-navy transition-colors relative"
+        @click="toggleNotifications"
+      >
         <Bell class="w-5 h-5" />
+        <span
+          v-if="unreadCount > 0"
+          class="absolute -top-1 -right-1 bg-danger-500 text-white text-[9px] sm:text-[10px] font-semibold rounded-full px-1.5 py-0.5 leading-none"
+        >
+          {{ unreadCount }}
+        </span>
       </button>
 
-      <span class="hidden sm:inline text-sm font-medium text-navy">{{ userName }}</span>
+      <div
+         v-if="showNotifications"
+         class="absolute top-full right-0 mt-0 w-[calc(100vw-5rem)] sm:w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50"
+      >
+        <NuxtLink to="/notifications">
+          <div class="group flex items-center justify-between px-4 py-3 text-xs sm:text-sm hover:bg-gray-50 cursor-pointer border-b border-gray-100 active:scale-[0.99]">
+            <p class="font-medium">Notifications</p>
+            <div class="group flex items-center">
+              <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-navy transition-colors" />
+            </div>
+          </div>
+        </NuxtLink>
+
+        <div class="max-h-80 overflow-y-auto">
+          <div v-if="notifications.length === 0" class="p-4 text-xs sm:text-sm text-gray-500 text-center">
+            No notifications
+          </div>
+          <div v-else>
+            <NuxtLink
+              v-for="(n, index) in notifications"
+              :key="index"
+              :to="n.link || '#'"
+              class="group flex items-center justify-between px-4 py-3 text-xs sm:text-sm hover:bg-gray-50 cursor-pointer border-b border-gray-100 active:scale-[0.99]"
+            >
+              <div>
+                <div :class="n.read ? 'text-gray-500 text-xs sm:text-sm' : 'text-navy font-medium text-xs sm:text-sm'">
+                  {{ n.title }}
+                </div>
+                <div class="text-[10px] sm:text-xs text-gray-500">
+                  {{ n.time }}
+                </div>
+              </div>
+              <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-navy transition-colors" />
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+
+      <span class="hidden sm:inline text-sm font-medium text-navy truncate max-w-[120px] md:max-w-none">
+        {{ userName }}
+      </span>
 
       <button
         class="text-gray-500 hover:text-danger-600 transition-colors"
@@ -35,16 +83,12 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { Menu, Bell, LogOut } from 'lucide-vue-next'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { Menu, Bell, LogOut, ChevronRight } from 'lucide-vue-next'
 
-defineProps({
-  sidebarCollapsed: {
-    type: Boolean,
-    default: false,
-  },
+const props = defineProps({
+  sidebarCollapsed: Boolean
 })
-
 const emit = defineEmits(['toggle-sidebar'])
 
 const authStore = useAuthStore()
@@ -61,4 +105,33 @@ const handleLogout = async () => {
   await authStore.logout()
   navigateTo('/auth/login')
 }
+
+const showNotifications = ref(false)
+const notifications = ref([
+  { title: 'New user registered', time: '2 min ago', read: false, link: '/users' },
+  { title: 'Server restart scheduled', time: '10 min ago', read: false, link: '/status' },
+  { title: 'Invoice paid', time: '1 hour ago', read: true, link: '/invoices' }
+])
+
+const unreadCount = computed(() => notifications.value.filter(n => !n.read).length)
+
+const toggleNotifications = () => {
+  showNotifications.value = !showNotifications.value
+}
+
+const dropdownRef = ref(null)
+
+const handleClickOutside = (event) => {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
+    showNotifications.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
