@@ -1,4 +1,4 @@
-<!-- pages/mentor/[projectId].vue -->
+<!-- pages/mentor/projekty/[id].vue -->
 <template>
   <div class="max-w-5xl mx-auto px-6 py-10">
 
