@@ -30,7 +30,7 @@ import {
   ClipboardList,
   FolderKanban,
   MessageSquare,
-  CheckSquare
+  ClipboardCheck,
 } from 'lucide-vue-next'
 
 const mobileSidebarOpen = ref(false)
@@ -69,8 +69,8 @@ const navItems = computed(() => {
 
   if (role === 'evaluator') {
     return [
-      { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-      { label: 'Na hodnotenie', to: '/hodnotenie', icon: CheckSquare }
+      { label: 'Dashboard', to: '/hodnotenie', icon: LayoutDashboard },
+      { label: 'Hodnotenia',  to: '/hodnotenie/zoznam', icon: ClipboardCheck },
     ]
   }
 
