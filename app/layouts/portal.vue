@@ -61,7 +61,7 @@ const navItems = computed(() => {
 
   if (role === 'mentor') {
     return [
-      { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
+      { label: 'Dashboard', to: '/mentor', icon: LayoutDashboard },
       { label: 'Projekty', to: '/mentor/projekty', icon: FolderKanban },
       { label: 'Konzultácie', to: '/mentor/konzultacie', icon: MessageSquare },
     ]
