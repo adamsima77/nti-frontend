@@ -34,7 +34,7 @@
          class="absolute top-full right-0 mt-0 w-[calc(100vw-5rem)] sm:w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50"
       >
         <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100">
-          <NuxtLink to = "/notifications"><p class="font-medium text-sm">Notifikácie</p></NuxtLink>
+          <NuxtLink to = "/notifikacie" @click = "showNotifications = false"><p class="font-medium text-sm">Notifikácie</p></NuxtLink>
           <button
             :class="{'text-blue-500 text-xs sm:text-sm hover:underline': unreadCount > 0,
                      'text-gray-500 text-xs sm:text-sm': unreadCount === 0}"
@@ -56,8 +56,9 @@
   >
     
     <NuxtLink
-      :to="n.link || '#'"
+      :to="n.link || ''"
       class="flex items-center justify-between w-full gap-2"
+      @click = "showNotifications = false"
     >
       <div :class="n.read ? 'text-gray-500 text-xs sm:text-sm' : 'text-navy font-medium text-xs sm:text-sm'">
         {{ n.title }}
