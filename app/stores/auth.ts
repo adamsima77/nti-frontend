@@ -106,14 +106,39 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const verifyEmail = async (token: string): Promise<any> => {
+  const verifyEmail = async (verificationPath: string): Promise<any> => {
+    isLoading.value = true
+    error.value = null
     try {
-      const response = await api.post('/auth/verify-email', { token })
-      user.value = response.user
+      // verificationPath bude napr: "12/abcde...hash?expires=123&signature=xyz"
+      const response = await api.post(`/auth/verify-email/${verificationPath}`, {})
+      
+      // Ak backend po overení vráti aj usera a token, prihlásime ho
+      if (response.token && response.user) {
+        token.value = response.token
+        user.value = response.user
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('auth_token', response.token)
+        }
+      }
       return response
-    } catch (err) {
-      error.value = (err as Error).message
+    } catch (err: any) {
+      error.value = err.message || 'Overenie zlyhalo'
       throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const resendVerificationEmail = async (email: string): Promise<any> => {
+    isLoading.value = true
+    try {
+      return await api.post('/auth/email/resend', { email })
+    } catch (err: any) {
+      error.value = err.message
+      throw err
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -181,6 +206,7 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     verifyEmail,
+    resendVerificationEmail,
     requestPasswordReset,
     resetPassword,
     getCurrentUser,
