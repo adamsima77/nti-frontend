@@ -90,38 +90,25 @@ const emit = defineEmits<Emits>()
 const formData = reactive<Record<string, any>>({})
 const errors = reactive<Record<string, string>>({})
 const isSubmitting = ref(false)
-const lastAutoSaveTime = ref<string | null>(null)
 
 // Initialize form data
 if (props.initialData) {
   Object.assign(formData, props.initialData)
 }
 
-// Auto-save draft every 30 seconds
-let autoSaveInterval: ReturnType<typeof setInterval> | null = null
+// Setup debounced auto-save (30 seconds)
+const { markDirty, lastSaveTime } = useAutoSave({
+  debounceMs: 30000,
+  onSave: () => {
+    emit('save-draft', formData)
+  },
+})
 
-const startAutoSave = () => {
-  if (autoSaveInterval) clearInterval(autoSaveInterval)
-
-  autoSaveInterval = setInterval(() => {
-    saveDraft()
-  }, 30000) // 30 seconds
-}
-
-const stopAutoSave = () => {
-  if (autoSaveInterval) {
-    clearInterval(autoSaveInterval)
-    autoSaveInterval = null
-  }
-}
-
-// Watch for changes to start auto-save
+// Watch for changes to trigger auto-save
 watch(
   () => formData,
   () => {
-    if (!autoSaveInterval) {
-      startAutoSave()
-    }
+    markDirty()
   },
   { deep: true }
 )
@@ -187,7 +174,6 @@ const validateForm = (): boolean => {
 
 const saveDraft = () => {
   emit('save-draft', formData)
-  lastAutoSaveTime.value = new Date().toLocaleTimeString('sk-SK')
 }
 
 const handleSubmit = async () => {
@@ -199,7 +185,6 @@ const handleSubmit = async () => {
 
   try {
     emit('submit', formData)
-    stopAutoSave()
   } finally {
     isSubmitting.value = false
   }
@@ -207,6 +192,6 @@ const handleSubmit = async () => {
 
 // Cleanup on unmount
 onUnmounted(() => {
-  stopAutoSave()
+  // Auto-save cleanup is handled by useAutoSave composable
 })
 </script>

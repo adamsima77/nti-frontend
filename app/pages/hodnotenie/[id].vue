@@ -197,6 +197,10 @@
             <AlertCircle class="w-4 h-4 shrink-0" /> {{ submitError }}
           </div>
 
+          <div v-if="lastAutoSaveTime" class="mb-4 text-xs text-gray-500 text-center">
+            💾 Rozpracované bolo uložené: {{ lastAutoSaveTime }}
+          </div>
+
           <div class="flex flex-col sm:flex-row gap-3">
             <button
               @click="handleSaveDraft"
@@ -298,7 +302,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import {
   ChevronLeft, FileText, Star, MessageSquare, Gavel,
   CheckCircle, AlertCircle, Paperclip,
@@ -312,6 +316,7 @@ definePageMeta({
 })
 
 const authStore = useAuthStore()
+const api = useApi()
 
 if (!authStore.user) {
   authStore.user = { 
@@ -413,6 +418,39 @@ const scoringForm = reactive({
 const isSubmitted  = ref(false)
 const isSubmitting = ref(false)
 const submitError  = ref<string | null>(null)
+const lastAutoSaveTime = ref<string | null>(null)
+
+// Setup debounced auto-save (30 seconds)
+const { markDirty } = useAutoSave({
+  debounceMs: 30000,
+  onSave: async () => {
+    try {
+      // Save draft to API (when endpoint is available)
+      await api.post(`/hodnotenie/${application.id}/draft`, {
+        criteria: scoringForm.criteria,
+        internalNote: scoringForm.internalNote,
+        recommendation: scoringForm.recommendation,
+        requestSupplement: scoringForm.requestSupplement,
+        supplementNote: scoringForm.supplementNote,
+      })
+      lastAutoSaveTime.value = new Date().toLocaleTimeString('sk-SK')
+    } catch (error) {
+      console.error('Failed to save draft:', error)
+      // Error is already handled by useApi toast notification
+    }
+  },
+})
+
+// Watch for changes to trigger auto-save
+watch(
+  () => scoringForm,
+  () => {
+    if (!isSubmitted.value) {
+      markDirty()
+    }
+  },
+  { deep: true }
+)
 
 // ── Computed ─────────────────────────────────────────────────
 const totalScore    = computed(() => scoringForm.criteria.reduce((s, c) => s + (c.score || 0), 0))
@@ -481,8 +519,22 @@ const handleSaveDraft = async () => {
   isSubmitting.value = true
   submitError.value  = null
   try {
-    // TODO: await api.post(`/hodnotenie/${application.id}/draft`, scoringForm)
-    await new Promise(r => setTimeout(r, 600))
+    // Call the auto-save function with API endpoint
+    await api.post(`/hodnotenie/${application.id}/draft`, {
+      criteria: scoringForm.criteria,
+      internalNote: scoringForm.internalNote,
+      recommendation: scoringForm.recommendation,
+      requestSupplement: scoringForm.requestSupplement,
+      supplementNote: scoringForm.supplementNote,
+    })
+    lastAutoSaveTime.value = new Date().toLocaleTimeString('sk-SK')
+    // Show success toast
+    useToast().addToast({
+      message: 'Rozpracované hodnotenie bolo uložené',
+      type: 'success',
+    })
+  } catch (error) {
+    submitError.value = 'Nastala chyba pri ukladaní. Skúste znova.'
   } finally {
     isSubmitting.value = false
   }
