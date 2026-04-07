@@ -196,7 +196,17 @@ definePageMeta({
 })
 
 const route = useRoute()
-useHead({ title: 'Detail tímu | NTI' })
+useSeoMeta({
+  title: 'Detail tímu | NTI',
+  description: 'Detail tímu v Nitrianskom technickom inkubátore. Členy, projektov a komunikácia.',
+  ogTitle: 'Detail tímu — NTI',
+  ogDescription: 'Detainý popis tímu s členmi, projektaného a históriou spolupráce.',
+  ogType: 'website',
+  ogUrl: 'https://nti.sk/timy',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Detail tímu — NTI',
+  twitterDescription: 'Popis tímu a jeho projektov.',
+})
 
 const teamsStore = useTeamsStore()
 const { addToast } = useToast()

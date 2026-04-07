@@ -153,7 +153,14 @@
 
 <script setup>
 useSeoMeta({
-  //title: `${article.title} | NTI`,
-  //description: article.description,
+  title: 'Novinky a články | NTI',
+  description: 'Čítajte najnovšie články a novinky z komunity NTI.',
+  ogTitle: 'Novinky — NTI',
+  ogDescription: 'Najnovšie články a novinky z komunity Nitrianského technického inkubátora.',
+  ogType: 'article',
+  ogUrl: 'https://nti.sk/novinky',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Novinky — NTI',
+  twitterDescription: 'Čítajte novinky a články z komunity NTI.',
 });
 </script>

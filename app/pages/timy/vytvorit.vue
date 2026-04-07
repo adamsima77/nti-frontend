@@ -120,7 +120,17 @@ definePageMeta({
   // middleware: 'auth', // TODO: re-enable when backend is available
 })
 
-useHead({ title: 'Vytvoriť tím | NTI' })
+useSeoMeta({
+  title: 'Vytvoriť nový tím | NTI',
+  description: 'Vytvoriť nový tím na Nitrianskom technickom inkubátore a spustiť spoluprácu.',
+  ogTitle: 'Vytvoriť nový tím — NTI',
+  ogDescription: 'Vytvorte nový tím a pridajte svojich členov do projektu.',
+  ogType: 'website',
+  ogUrl: 'https://nti.sk/timy/vytvorit',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Vytvoriť nový tím — NTI',
+  twitterDescription: 'Vytvorte nový tím a spustite spoluprácu.',
+})
 
 const router = useRouter()
 const teamsStore = useTeamsStore()

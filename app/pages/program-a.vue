@@ -172,14 +172,16 @@ definePageMeta({
   layout: 'default',
 })
 
-useHead({
+useSeoMeta({
   title: 'Program A — Intenzívne zrýchlenie | NTI',
-  meta: [
-    {
-      name: 'description',
-      content: 'Program A je 3-mesačný intenzívny program pre študentov s mentorstvom a prácou na reálnych projektoch.',
-    },
-  ],
+  description: 'Program A je 3-mesačný intenzívny program pre študentov vysokých škôl s mentorstvom, tímovou prácou a reálnymi projektmi.',
+  ogTitle: 'Program A — Intenzívne zrýchlenie',
+  ogDescription: 'Dynamický 3-mesačný program pre študentov a začínajúcich profesionálov. Získaj skúsenosti, mentoring a sieť kontaktov.',
+  ogType: 'website',
+  ogUrl: 'https://nti.sk/program-a',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Program A — Intenzívne zrýchlenie | NTI',
+  twitterDescription: 'Dynamický 3-mesačný program pre študentov s mentorstvom a prácou na reálnych projektoch.',
 })
 
 const expandedFaq = ref(null)

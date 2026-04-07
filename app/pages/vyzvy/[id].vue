@@ -171,14 +171,16 @@ definePageMeta({
 const route = useRoute()
 const callsStore = useCallsStore()
 
-useHead({
+useSeoMeta({
   title: 'Detail výzvy | NTI',
-  meta: [
-    {
-      name: 'description',
-      content: 'Detail výzvy v Nitrianskom technickom inkubátore.',
-    },
-  ],
+  description: 'Detail výzvy v Nitrianskom technickom inkubátore. Požiadavky, termíny a ako sa prihlásiť.',
+  ogTitle: 'Detail výzvy — NTI',
+  ogDescription: 'Detailný popis výzvy s požiadavkami, termínmi a možnosťou prihlásenia sa k účasti.',
+  ogType: 'website',
+  ogUrl: 'https://nti.sk/vyzvy',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Detail výzvy — NTI',
+  twitterDescription: 'Detailný popis výzvy a informácie o prihlasovaní sa.',
 })
 
 // Load call data when ID changes

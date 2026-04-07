@@ -100,7 +100,17 @@ definePageMeta({
   // middleware: 'auth', // TODO: re-enable when backend is available
 })
 
-useHead({ title: 'Moje tímy | NTI' })
+useSeoMeta({
+  title: 'Moje tímy | NTI',
+  description: 'Spravujte svoje tímy, sledujte projektov a komunikujte so svojimi členaní.',
+  ogTitle: 'Moje tímy — NTI',
+  ogDescription: 'Správa tímov, sledovanie projektov a spolupráca s členmi tímu.',
+  ogType: 'website',
+  ogUrl: 'https://nti.sk/timy',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Moje tímy — NTI',
+  twitterDescription: 'Spravujte svoje tímy a projektov.',
+})
 
 const teamsStore = useTeamsStore()
 

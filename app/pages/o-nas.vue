@@ -64,7 +64,14 @@
 
 <script setup>
   useSeoMeta({
-  title: 'O nás | NTI',
-  description: 'NTI je komunita zameraná na dizajn, vývoj a inovácie. Podporujeme talentovaných ľudí, mentorov a partnerov a poskytujeme príležitosti na rast a spoluprácu.',
+    title: 'O nás | NTI',
+    description: 'NTI je komunita zamerená na dizajn, vývoj a inovácie. Podporujeme talentovaných ľudí, mentorov a partnerov a poskytujeme príležitosti na rast a spoluprácu.',
+    ogTitle: 'O nás — NTI',
+    ogDescription: 'Spoznajte NTI komunitu, našu misíu a viziú. Ako podporujeme talentov v oblasti vývoja, dizajnu a podnikania.',
+    ogType: 'website',
+    ogUrl: 'https://nti.sk/o-nas',
+    twitterCard: 'summary_large_image',
+    twitterTitle: 'O nás — NTI Komunita',
+    twitterDescription: 'NTI je komunita zameraná na dizajn, vývoj a inovácie. Spoznajte nášu historiu a valu, ktorú prinášame.',
   });
 </script>

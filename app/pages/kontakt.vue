@@ -90,6 +90,11 @@
 <script setup>
 useSeoMeta({
   title: 'Kontakt | NTI',
-  description: 'Kontaktuj tím NTI. Máš otázky, návrhy alebo záujem o spoluprácu? Spoj sa s nami a radi ti pomôžeme.',
-});
+  description: 'Kontaktuj tím NTI. Máš otázky, návrhy alebo záujem o spoluprácu? Spoj sa s nami a radi ti pomôžeme.',  ogTitle: 'Kontakt — NTI',
+  ogDescription: 'Spoj sa s tímom NTI. Máš otázky? Chceš spolupracošvať? Napíš nám a odpovieme čo 24 hodín.',
+  ogType: 'website',
+  ogUrl: 'https://nti.sk/kontakt',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Kontakt — NTI',
+  twitterDescription: 'Kontaktuj tím NTI. Máš otázky alebo záujem o spoluprácu?',});
 </script>

@@ -214,15 +214,16 @@ definePageMeta({
   layout: 'default',
 })
 
-useHead({
+useSeoMeta({
   title: 'Program B — Inovácia za firemných výziev | NTI',
-  meta: [
-    {
-      name: 'description',
-      content:
-        'Program B spája firmy s talentovanými študentami. Prezentujte svoje technické výzvy a získajte inovatívne riešenia.',
-    },
-  ],
+  description: 'Program B spája firmy s talentovanými študentami a juniormi vývojármi. Riešte technické výzvy s inovatívnymi riešeniami.',
+  ogTitle: 'Program B — Inovácia za firemných výziev',
+  ogDescription: 'Najímte talentované študentov a juniorov na riešenie svojich technických problémov. Pozrite si inovatívne riešenia.',
+  ogType: 'website',
+  ogUrl: 'https://nti.sk/program-b',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Program B — Inovácia za firemných výziev | NTI',
+  twitterDescription: 'Spájame firmy s talentovanými študentami na riešenie reálnych technických výziev.',
 })
 
 const expandedFaq = ref(null)

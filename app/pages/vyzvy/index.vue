@@ -91,14 +91,16 @@ definePageMeta({
   layout: 'default',
 })
 
-useHead({
+useSeoMeta({
   title: 'Výzvy a termíny | NTI',
-  meta: [
-    {
-      name: 'description',
-      content: 'Prezerajte si dostupné výzvy a termíny prihlášok pre Nitriansky technický inkubátor.',
-    },
-  ],
+  description: 'Prezerajte si dostupné výzvy a termíny prihlášok pre Nitriansky technický inkubátor.',
+  ogTitle: 'Výzvy a termíny — NTI',
+  ogDescription: 'Prijavlňujúce sa výzvy na Program A a Program B. Zistite termíny prihlášok a požiadavky.',
+  ogType: 'website',
+  ogUrl: 'https://nti.sk/vyzvy',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Výzvy a termíny — NTI',
+  twitterDescription: 'Prezerajte si dostupné výzvy a termíny prihlášok.',
 })
 
 const callsStore = useCallsStore()

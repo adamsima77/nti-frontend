@@ -94,6 +94,13 @@
 <script setup>
   useSeoMeta({
     title: 'Partneri a mentori | NTI',
-    description: 'Spoznajte našich partnerov a mentorov, ktorí podporujú náš projekt a pomáhajú rásť talentom v oblasti vývoja.'
-});
+    description: 'Spoznajte našich partnerov a mentorov, ktorí podporujú náš projekt a pomáhajú rásť talentom v oblasti vývoja.',
+    ogTitle: 'Partneri a mentori — NTI',
+    ogDescription: 'Spoznajte našich partnerov a mentorov. Firmy, učitelia a odbornosti, ktoré tvoria komunitu NTI.',
+    ogType: 'website',
+    ogUrl: 'https://nti.sk/partneri-mentori',
+    twitterCard: 'summary_large_image',
+    twitterTitle: 'Partneri a mentori — NTI',
+    twitterDescription: 'Spoznajte našich partnerov a mentorov, ktorí podporujú talentov.',
+  });
 </script>
