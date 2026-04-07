@@ -126,6 +126,59 @@
       </div>
     </div>
 
+    <!-- Active projects milestones -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-navy">Aktívne projekty — Míľníky</h2>
+      </div>
+      <div v-if="activeProjectsWithMilestones.length" class="grid grid-cols-1 gap-4">
+        <div
+          v-for="project in activeProjectsWithMilestones"
+          :key="project.id"
+          class="bg-white rounded-lg shadow-sm border border-gray-100 p-5"
+        >
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <h3 class="font-semibold text-navy text-base">{{ project.title }}</h3>
+              <p class="text-xs text-gray-500 mt-1">{{ project.team }}</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-gray-400">{{ project.completedMilestones }}/{{ project.milestones.length }} míľníky</span>
+              <div class="mt-1 h-1.5 w-20 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-600" :style="{ width: milestoneProgress(project) +'%' }" />
+              </div>
+            </div>
+          </div>
+          
+          <div class="space-y-2">
+            <div
+              v-for="milestone in project.milestones.slice(0, 2)"
+              :key="milestone.id"
+              class="flex items-center gap-2 text-sm"
+            >
+              <CheckCircle v-if="milestone.status === 'completed'" class="w-4 h-4 text-success-500 flex-shrink-0" />
+              <Clock v-else-if="milestone.status === 'in_progress'" class="w-4 h-4 text-blue-500 flex-shrink-0" />
+              <Circle v-else class="w-4 h-4 text-gray-300 flex-shrink-0" />
+              <span class="text-gray-700 flex-1 truncate">{{ milestone.title }}</span>
+              <span class="text-gray-400 text-xs">{{ milestone.dueDate }}</span>
+            </div>
+            <div v-if="project.milestones.length > 2" class="text-xs text-gray-400 ml-6">
+              +{{ project.milestones.length - 2 }} ďalšie míľníky
+            </div>
+          </div>
+
+          <NuxtLink
+            :to="`/prihlasky/${project.id}`"
+            class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 mt-3"
+          >
+            Zobraziť detail
+            <ChevronRight class="w-3 h-3" />
+          </NuxtLink>
+        </div>
+      </div>
+      <UiEmptyState v-else title="Žiadne aktívne projekty s míľníkami" />
+    </div>
+
     <!-- My teams -->
     <div>
       <div class="flex items-center justify-between mb-4">
@@ -164,7 +217,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { FileText, Users, User, Calendar, AlertTriangle, Clock, Paperclip, ChevronRight } from 'lucide-vue-next'
+import { FileText, Users, User, Calendar, AlertTriangle, Clock, Paperclip, ChevronRight, CheckCircle, Circle } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
@@ -212,6 +265,11 @@ const mockApplications = [
     submittedAt: '2026-02-15',
     members: 4,
     documents: 6,
+    milestones: [
+      { id: 1, title: 'MVP vývoj', dueDate: '2026-04-30', status: 'completed' },
+      { id: 2, title: 'Pilotný test', dueDate: '2026-05-31', status: 'in_progress' },
+      { id: 3, title: 'Beta launch', dueDate: '2026-06-30', status: 'pending' },
+    ],
   },
   {
     id: 2,
@@ -222,6 +280,7 @@ const mockApplications = [
     submittedAt: '2026-03-10',
     members: 3,
     documents: 4,
+    milestones: [],
   },
   {
     id: 3,
@@ -232,6 +291,7 @@ const mockApplications = [
     submittedAt: '2026-03-25',
     members: 5,
     documents: 3,
+    milestones: [],
   },
   {
     id: 4,
@@ -242,6 +302,7 @@ const mockApplications = [
     submittedAt: null,
     members: 3,
     documents: 1,
+    milestones: [],
   },
   {
     id: 5,
@@ -252,6 +313,7 @@ const mockApplications = [
     submittedAt: '2026-01-20',
     members: 4,
     documents: 5,
+    milestones: [],
   },
 ]
 
@@ -283,4 +345,19 @@ const stats = computed(() => ({
   inProcess: mockApplications.filter((a) => ['submitted', 'evaluating'].includes(a.status)).length,
   rejected: mockApplications.filter((a) => a.status === 'rejected').length,
 }))
+
+// Compute active projects with milestones (approved with milestones)
+const activeProjectsWithMilestones = computed(() => {
+  return mockApplications
+    .filter((a) => a.status === 'approved' && a.milestones && a.milestones.length > 0)
+    .map((app) => ({
+      ...app,
+      completedMilestones: app.milestones.filter((m) => m.status === 'completed').length,
+    }))
+})
+
+function milestoneProgress(project: any): number {
+  if (!project.milestones || project.milestones.length === 0) return 0
+  return Math.round((project.completedMilestones / project.milestones.length) * 100)
+}
 </script>

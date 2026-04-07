@@ -92,6 +92,51 @@
               title="Žiadne komentáre"
             />
           </div>
+
+          <!-- Míľníky -->
+          <div v-if="application.status === 'approved' && application.milestones.length" class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
+            <h2 class="text-xl font-bold text-navy mb-3">Míľníkový prehľad</h2>
+            <div class="space-y-3">
+              <div
+                v-for="milestone in application.milestones"
+                :key="milestone.id"
+                class="border rounded-lg p-4"
+                :class="{
+                  'border-green-200 bg-green-50': milestone.status === 'completed',
+                  'border-blue-200 bg-blue-50': milestone.status === 'in_progress',
+                  'border-gray-200': milestone.status === 'pending',
+                }"
+              >
+                <div class="flex items-start justify-between gap-3 mb-2">
+                  <div class="flex items-start gap-3">
+                    <div class="mt-0.5 shrink-0">
+                      <CheckCircle v-if="milestone.status === 'completed'" class="w-5 h-5 text-success-500" />
+                      <Clock v-else-if="milestone.status === 'in_progress'" class="w-5 h-5 text-blue-500" />
+                      <Circle v-else class="w-5 h-5 text-gray-300" />
+                    </div>
+                    <div>
+                      <p class="font-medium text-navy text-sm">{{ milestone.title }}</p>
+                      <p class="text-xs text-gray-500 mt-0.5">Termín: {{ milestone.dueDate }}</p>
+                    </div>
+                  </div>
+                  <span
+                    class="text-xs px-2 py-1 rounded-full font-medium shrink-0"
+                    :class="{
+                      'bg-success-100 text-success-700': milestone.status === 'completed',
+                      'bg-blue-100 text-blue-700': milestone.status === 'in_progress',
+                      'bg-gray-100 text-gray-700': milestone.status === 'pending',
+                    }"
+                  >
+                    {{ milestoneStatus(milestone.status) }}
+                  </span>
+                </div>
+                <p v-if="milestone.description" class="text-xs text-gray-600 ml-8">{{ milestone.description }}</p>
+                <p v-if="milestone.status === 'completed'" class="text-xs text-gray-500 ml-8 mt-2">
+                  ✓ Dokončené: {{ milestone.completedAt }}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Right column -->
@@ -163,7 +208,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ArrowLeft, Paperclip, FileText } from 'lucide-vue-next'
+import { ArrowLeft, Paperclip, FileText, CheckCircle, Clock, Circle } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
@@ -221,6 +266,32 @@ const mockApplications = [
         date: '2026-02-22',
       },
     ],
+    milestones: [
+      {
+        id: 1,
+        title: 'MVP vývoj',
+        description: 'Vytvorenie základnej verzie aplikácie s core funkciami',
+        dueDate: '2026-04-30',
+        status: 'completed',
+        completedAt: '2026-04-15',
+      },
+      {
+        id: 2,
+        title: 'Pilotný test',
+        description: 'Testovanie s vybranou skupinou používateľov',
+        dueDate: '2026-05-31',
+        status: 'in_progress',
+        completedAt: null,
+      },
+      {
+        id: 3,
+        title: 'Beta launch',
+        description: 'Verejné otestovanie s otvoreným prístupom',
+        dueDate: '2026-06-30',
+        status: 'pending',
+        completedAt: null,
+      },
+    ],
   },
   {
     id: 2,
@@ -248,6 +319,24 @@ const mockApplications = [
         date: '2026-03-18',
       },
     ],
+    milestones: [
+      {
+        id: 1,
+        title: 'Prototyp AI modelu',
+        description: 'Vývoj a trénovanie základného AI modelu',
+        dueDate: '2026-05-15',
+        status: 'in_progress',
+        completedAt: null,
+      },
+      {
+        id: 2,
+        title: 'Integrácia do aplikácie',
+        description: 'Prepojenie AI s používateľským rozhraním',
+        dueDate: '2026-06-30',
+        status: 'pending',
+        completedAt: null,
+      },
+    ],
   },
   {
     id: 3,
@@ -268,6 +357,24 @@ const mockApplications = [
       { status: 'draft', date: '2026-03-15', note: 'Vytvorenie prihlášky' },
     ],
     comments: [],
+    milestones: [
+      {
+        id: 1,
+        title: 'Dizajn aplikácie',
+        description: 'UX/UI dizajn a prototyp',
+        dueDate: '2026-04-30',
+        status: 'pending',
+        completedAt: null,
+      },
+      {
+        id: 2,
+        title: 'Backend vývoj',
+        description: 'API a databáza',
+        dueDate: '2026-05-31',
+        status: 'pending',
+        completedAt: null,
+      },
+    ],
   },
   {
     id: 4,
@@ -282,6 +389,7 @@ const mockApplications = [
     documentsList: [{ name: 'Náčrt konceptu.pdf', size: '0.8 MB', uploadedAt: '2026-03-20' }],
     history: [{ status: 'draft', date: '2026-03-18', note: 'Vytvorenie prihlášky' }],
     comments: [],
+    milestones: [],
   },
   {
     id: 5,
@@ -316,6 +424,7 @@ const mockApplications = [
         date: '2026-02-08',
       },
     ],
+    milestones: [],
   },
 ]
 
@@ -348,6 +457,15 @@ function historyLabel(status: string): string {
     submitted: 'Podané',
     draft: 'Draft',
     rejected: 'Zamietnuté',
+  }
+  return labels[status] || status
+}
+
+function milestoneStatus(status: string): string {
+  const labels: Record<string, string> = {
+    'completed': 'Dokončené',
+    'in_progress': 'V progrese',
+    'pending': 'Čakajúce',
   }
   return labels[status] || status
 }
