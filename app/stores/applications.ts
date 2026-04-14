@@ -97,7 +97,7 @@ export const useApplicationsStore = defineStore('applications', () => {
 
       applications.value.push(newApp)
       currentApplication.value = newApp
-      
+
       // Clear draft if exists
       const draftKey = `${newApp.teamId}_${newApp.callId}`
       applicationDrafts.value.delete(draftKey)
@@ -177,7 +177,7 @@ export const useApplicationsStore = defineStore('applications', () => {
       data,
       lastSavedAt: new Date().toISOString(),
     })
-    
+
     // Also persist to localStorage for offline support
     const drafts = JSON.parse(localStorage.getItem('app_drafts') || '{}')
     drafts[draftKey] = applicationDrafts.value.get(draftKey)
@@ -186,25 +186,25 @@ export const useApplicationsStore = defineStore('applications', () => {
 
   const getDraft = (teamId: number, callId: number): ApplicationDraft | undefined => {
     const draftKey = `${teamId}_${callId}`
-    
+
     // Check memory first
     if (applicationDrafts.value.has(draftKey)) {
       return applicationDrafts.value.get(draftKey)
     }
-    
+
     // Check localStorage
     const drafts = JSON.parse(localStorage.getItem('app_drafts') || '{}')
     if (drafts[draftKey]) {
       return drafts[draftKey]
     }
-    
+
     return undefined
   }
 
   const clearDraft = (teamId: number, callId: number) => {
     const draftKey = `${teamId}_${callId}`
     applicationDrafts.value.delete(draftKey)
-    
+
     const drafts = JSON.parse(localStorage.getItem('app_drafts') || '{}')
     delete drafts[draftKey]
     localStorage.setItem('app_drafts', JSON.stringify(drafts))

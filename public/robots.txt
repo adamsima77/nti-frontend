@@ -1,2 +1,12 @@
-User-Agent: *
-Disallow:
+User-agent: *
+Disallow: /auth/
+Disallow: /student/
+Disallow: /prihlasky/
+Disallow: /timy/
+Disallow: /hodnotenie/
+Disallow: /mentor/
+Disallow: /firma/
+Disallow: /admin/
+Disallow: /notifikacie/
+
+# Sitemap: https://nti.sk/sitemap.xml

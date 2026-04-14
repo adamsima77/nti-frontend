@@ -12,7 +12,7 @@
       <div class="flex items-center gap-3">
         <UiButton
           variant="ghost"
-          @click="navigateTo('/admin/cms')"
+          @click="navigateTo(localePath('/admin/cms'))"
         >
           Zrušiť
         </UiButton>
@@ -87,6 +87,8 @@
 import { Save } from 'lucide-vue-next'
 import type { CmsBlock } from '~/types/cms'
 
+const localePath = useLocalePath()
+
 definePageMeta({
   layout: 'admin',
   // middleware: ['auth'],
@@ -115,8 +117,8 @@ const page = ref<{
 useHead({ title: computed(() => `${page.value.title || 'Stránka'} — CMS — Admin | NTI`) })
 
 const breadcrumbs = computed(() => [
-  { label: 'CMS', to: '/admin/cms' },
-  { label: 'Stránky', to: '/admin/cms' },
+  { label: 'CMS', to: localePath('/admin/cms') },
+  { label: 'Stránky', to: localePath('/admin/cms') },
   { label: page.value.title || 'Nová stránka' },
 ])
 

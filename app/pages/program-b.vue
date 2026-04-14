@@ -210,7 +210,7 @@
         </p>
 
         <NuxtLink
-          to="/auth/login"
+          :to="localePath('/auth/login')"
           class="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors"
         >
           {{ $t('program-b.cta.button') }}
@@ -223,15 +223,19 @@
 <script setup>
 import { ref } from 'vue'
 
+const localePath = useLocalePath()
+
 definePageMeta({
   layout: 'default',
 })
 
 useSeoMeta({
   title: 'Program B — Inovácia za firemných výziev | NTI',
-  description: 'Program B spája firmy s talentovanými študentami a juniormi vývojármi. Riešte technické výzvy s inovatívnymi riešeniami.',
+  description:
+    'Program B spája firmy s talentovanými študentami a juniormi vývojármi. Riešte technické výzvy s inovatívnymi riešeniami.',
   ogTitle: 'Program B — Inovácia za firemných výziev',
-  ogDescription: 'Najímte talentované študentov a juniorov na riešenie svojich technických problémov. Pozrite si inovatívne riešenia.',
+  ogDescription:
+    'Najímte talentované študentov a juniorov na riešenie svojich technických problémov. Pozrite si inovatívne riešenia.',
   ogType: 'website',
   ogUrl: 'https://nti.sk/program-b',
   twitterCard: 'summary_large_image',

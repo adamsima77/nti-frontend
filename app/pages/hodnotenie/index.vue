@@ -1,7 +1,6 @@
 <!-- pages/hodnotenie/index.vue -->
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
-
     <!-- Header -->
     <div class="mb-10">
       <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
@@ -29,13 +28,20 @@
     </div>
 
     <!-- Required actions -->
-    <div v-if="urgentApplications.length" class="mb-8 bg-amber-50 border border-amber-200 rounded-lg p-5">
+    <div
+      v-if="urgentApplications.length"
+      class="mb-8 bg-amber-50 border border-amber-200 rounded-lg p-5"
+    >
       <div class="flex items-center gap-2 mb-3">
         <AlertTriangle class="w-5 h-5 text-amber-600" />
         <h2 class="text-lg font-semibold text-amber-800">Čakajú na vaše hodnotenie</h2>
       </div>
       <ul class="space-y-2">
-        <li v-for="app in urgentApplications" :key="app.id" class="flex items-center justify-between">
+        <li
+          v-for="app in urgentApplications"
+          :key="app.id"
+          class="flex items-center justify-between"
+        >
           <span class="text-sm text-amber-700">{{ app.projectName }} — {{ app.teamName }}</span>
           <NuxtLink
             :to="`/hodnotenie/${app.id}`"
@@ -52,7 +58,7 @@
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-navy">Najnovšie prihlášky</h2>
         <NuxtLink
-          to="/hodnotenie/zoznam"
+          :to="localePath('/hodnotenie/zoznam')"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
         >
           Zobraziť všetky <ChevronRight class="w-4 h-4" />
@@ -79,19 +85,30 @@
               </div>
               <p class="text-sm text-gray-500 mb-3">
                 {{ app.teamName }} · Podané {{ app.submittedAt }}
-                <span v-if="app.deadline" class="ml-2 text-warning-500 font-medium">
+                <span
+                  v-if="app.deadline"
+                  class="ml-2 text-warning-500 font-medium"
+                >
                   · Deadline: {{ app.deadline }}
                 </span>
               </p>
-              <div v-if="app.myScore !== null" class="flex items-center gap-3">
+              <div
+                v-if="app.myScore !== null"
+                class="flex items-center gap-3"
+              >
                 <div class="flex items-center gap-1.5">
                   <Star class="w-4 h-4 text-warning-500" />
                   <span class="text-sm font-semibold text-navy">{{ app.myScore }}/100</span>
                   <span class="text-xs text-gray-400">váš skór</span>
                 </div>
-                <div v-if="app.avgScore !== null" class="flex items-center gap-1.5">
+                <div
+                  v-if="app.avgScore !== null"
+                  class="flex items-center gap-1.5"
+                >
                   <span class="text-xs text-gray-400">·</span>
-                  <span class="text-sm text-gray-500">priemer komisie: <strong class="text-navy">{{ app.avgScore }}/100</strong></span>
+                  <span class="text-sm text-gray-500"
+                    >priemer komisie: <strong class="text-navy">{{ app.avgScore }}/100</strong></span
+                  >
                 </div>
               </div>
             </div>
@@ -99,12 +116,20 @@
               <NuxtLink
                 :to="`/hodnotenie/${app.id}`"
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                :class="app.myScore === null && app.status === 'evaluating'
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'border border-gray-200 text-gray-600 hover:bg-gray-50'"
+                :class="
+                  app.myScore === null && app.status === 'evaluating'
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+                "
               >
-                <ClipboardCheck v-if="app.myScore === null && app.status === 'evaluating'" class="w-4 h-4" />
-                <Eye v-else class="w-4 h-4" />
+                <ClipboardCheck
+                  v-if="app.myScore === null && app.status === 'evaluating'"
+                  class="w-4 h-4"
+                />
+                <Eye
+                  v-else
+                  class="w-4 h-4"
+                />
                 {{ app.myScore === null && app.status === 'evaluating' ? 'Hodnotiť' : 'Detail' }}
               </NuxtLink>
             </div>
@@ -112,7 +137,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -120,22 +144,18 @@
 import { computed } from 'vue'
 import { ChevronRight, AlertTriangle, Star, ClipboardCheck, Eye } from 'lucide-vue-next'
 
-definePageMeta({ 
-  layout: 'portal', 
-  //middleware: 'auth', 
-  roles: ['evaluator'] 
-})
+const localePath = useLocalePath()
 
 useHead({ title: 'Dashboard | NTI Komisia' })
 
 const authStore = useAuthStore()
 
 if (!authStore.user) {
-  authStore.user = { 
-    id: 20, email: 'evaluator@nti.sk', 
-    first_name: 'Eva', 
-    last_name: 'Komisárová', 
-    role: 'evaluator' 
+  authStore.user = {
+    id: 20, email: 'evaluator@nti.sk',
+    first_name: 'Eva',
+    last_name: 'Komisárová',
+    role: 'evaluator'
   }
   authStore.token = 'mock-token'
 }

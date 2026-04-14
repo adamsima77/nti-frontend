@@ -1,7 +1,6 @@
 <!-- pages/firma/zadania/[id].vue -->
 <template>
   <div class="max-w-5xl mx-auto px-6 py-10">
-
     <!-- Back -->
     <NuxtLink
       to="/firma/zadania"
@@ -39,10 +38,8 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
       <!-- Left column: main info -->
       <div class="lg:col-span-2 space-y-6">
-
         <!-- Description -->
         <div class="bg-white rounded-lg border border-gray-100 p-6">
           <h2 class="text-base font-semibold text-navy mb-3">Popis zadania</h2>
@@ -96,17 +93,18 @@
               </div>
             </div>
 
-            <p v-if="!task.applications.length" class="text-sm text-gray-400 text-center py-6">
+            <p
+              v-if="!task.applications.length"
+              class="text-sm text-gray-400 text-center py-6"
+            >
               Žiadne prihlášky zatiaľ
             </p>
           </div>
         </div>
-
       </div>
 
       <!-- Right column: stats & budget -->
       <div class="space-y-4">
-
         <!-- Budget card -->
         <div class="bg-white rounded-lg border border-gray-100 p-5">
           <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Rozpočet</h3>
@@ -154,7 +152,10 @@
         </div>
 
         <!-- Assigned team card -->
-        <div v-if="task.assignedTeam" class="bg-blue-50 border border-blue-100 rounded-lg p-5">
+        <div
+          v-if="task.assignedTeam"
+          class="bg-blue-50 border border-blue-100 rounded-lg p-5"
+        >
           <h3 class="text-sm font-semibold text-blue-800 mb-2">Priradený tím</h3>
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
@@ -166,10 +167,8 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
-
   </div>
 </template>
 
@@ -228,7 +227,8 @@ const task = {
       submittedAt: '12.03.2026',
       members: 3,
       status: 'approved',
-      summary: 'Tím s 2-ročnými skúsenosťami v oblasti NLP. Plánujú použiť OpenAI API s custom fine-tuningom na firemné dáta.',
+      summary:
+        'Tím s 2-ročnými skúsenosťami v oblasti NLP. Plánujú použiť OpenAI API s custom fine-tuningom na firemné dáta.',
     },
     {
       id: 12,
@@ -236,7 +236,8 @@ const task = {
       submittedAt: '15.03.2026',
       members: 4,
       status: 'submitted',
-      summary: 'Navrhujú hybridné riešenie kombinujúce rule-based systém s ML modelom pre lepšiu predvídateľnosť odpovedí.',
+      summary:
+        'Navrhujú hybridné riešenie kombinujúce rule-based systém s ML modelom pre lepšiu predvídateľnosť odpovedí.',
     },
     {
       id: 13,

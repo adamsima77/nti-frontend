@@ -43,10 +43,10 @@ const navItems = computed(() => {
 
   if (role === 'student' || role === 'team_lead') {
     return [
-      { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-      { label: 'Moje prihlášky', to: '/prihlasky', icon: FileText },
-      { label: 'Moje tímy', to: '/timy', icon: Users },
-      { label: 'Môj profil', to: '/profil', icon: UserCircle }
+      { label: 'Dashboard', to: '/student', icon: LayoutDashboard },
+      { label: 'Moje prihlášky', to: '/student/prihlasky', icon: FileText },
+      { label: 'Moje tímy', to: '/student/timy', icon: Users },
+      { label: 'Môj profil', to: '/student/profil', icon: UserCircle },
     ]
   }
 
@@ -55,7 +55,7 @@ const navItems = computed(() => {
       { label: 'Dashboard', to: '/firma', icon: LayoutDashboard },
       { label: 'Profil organizácie', to: '/firma/profil', icon: Building2 },
       { label: 'Zadania', to: '/firma/zadania', icon: ClipboardList },
-      { label: 'Správa členov', to: '/firma/clenovia', icon: Users }
+      { label: 'Správa členov', to: '/firma/clenovia', icon: Users },
     ]
   }
 
@@ -63,14 +63,14 @@ const navItems = computed(() => {
     return [
       { label: 'Dashboard', to: '/mentor', icon: LayoutDashboard },
       { label: 'Projekty', to: '/mentor/projekty', icon: FolderKanban },
-      { label: 'Konzultácie', to: '/mentor/konzultacie', icon: MessageSquare }
+      { label: 'Konzultácie', to: '/mentor/konzultacie', icon: MessageSquare },
     ]
   }
 
   if (role === 'evaluator') {
     return [
       { label: 'Dashboard', to: '/hodnotenie', icon: LayoutDashboard },
-      { label: 'Hodnotenia',  to: '/hodnotenie/zoznam', icon: ClipboardCheck },
+      { label: 'Hodnotenia', to: '/hodnotenie/zoznam', icon: ClipboardCheck },
     ]
   }
 

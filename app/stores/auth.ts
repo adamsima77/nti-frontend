@@ -112,7 +112,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       // verificationPath bude napr: "12/abcde...hash?expires=123&signature=xyz"
       const response = await api.post(`/auth/verify-email/${verificationPath}`, {})
-      
+
       // Ak backend po overení vráti aj usera a token, prihlásime ho
       if (response.token && response.user) {
         token.value = response.token

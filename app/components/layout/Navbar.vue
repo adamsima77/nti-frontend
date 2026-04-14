@@ -1,6 +1,5 @@
 <template>
   <nav class="flex flex-row p-4 md:p-5 bg-navy text-white justify-between shadow-2xl fixed z-100 w-full">
-    
     <!-- LOGO -->
     <div class="shrink-0">
       <NuxtLink :to="localePath('/')">
@@ -14,7 +13,6 @@
 
     <!-- DESKTOP NAV -->
     <ul class="hidden md:flex items-center gap-4 lg:gap-6 whitespace-nowrap text-sm md:text-base lg:text-lg">
-      
       <li>
         <NuxtLink
           :to="localePath('/novinky')"
@@ -69,12 +67,10 @@
           {{ $t('nav.challenges') }}
         </NuxtLink>
       </li>
-
     </ul>
 
     <!-- RIGHT SIDE -->
     <div class="flex items-center gap-3">
-
       <!-- USER ICON -->
       <NuxtLink
         :to="localePath('/auth/login')"
@@ -89,9 +85,7 @@
           @click="setLocale('en')"
           :class="[
             'px-2 py-1 text-xs font-medium rounded transition-colors duration-200',
-            locale === 'en'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            locale === 'en' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
           ]"
           :title="$t('locale.en_title')"
         >
@@ -102,9 +96,7 @@
           @click="setLocale('sk')"
           :class="[
             'px-2 py-1 text-xs font-medium rounded transition-colors duration-200',
-            locale === 'sk'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            locale === 'sk' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
           ]"
           :title="$t('locale.sk_title')"
         >
@@ -122,7 +114,6 @@
           class="w-6 h-6 cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-in-out"
         />
       </button>
-
     </div>
   </nav>
 </template>
@@ -135,7 +126,7 @@ const logo = '/nti-logo.svg'
 
 // i18n
 const { setLocale, locale } = useI18n()
-const localePath = useLocalePath() 
+const localePath = useLocalePath()
 
 // emits
 const emit = defineEmits(['open-sidebar'])

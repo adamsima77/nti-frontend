@@ -1,7 +1,6 @@
 <!-- pages/firma/zadania/index.vue -->
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
-
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
@@ -24,9 +23,11 @@
         :key="f.value"
         @click="activeFilter = f.value"
         class="px-3 py-1.5 rounded-full text-sm font-medium transition-colors"
-        :class="activeFilter === f.value
-          ? 'bg-blue-600 text-white'
-          : 'bg-white border border-gray-200 text-gray-600 hover:border-blue-300'"
+        :class="
+          activeFilter === f.value
+            ? 'bg-blue-600 text-white'
+            : 'bg-white border border-gray-200 text-gray-600 hover:border-blue-300'
+        "
       >
         {{ f.label }}
         <span class="ml-1 opacity-60">{{ f.count }}</span>
@@ -82,7 +83,10 @@
               <FileText class="w-4 h-4" />
               {{ task.applicationsCount }} prihlášok
             </span>
-            <span v-if="task.deadline" class="flex items-center gap-1">
+            <span
+              v-if="task.deadline"
+              class="flex items-center gap-1"
+            >
               <Calendar class="w-4 h-4" />
               {{ task.deadline }}
             </span>
@@ -114,7 +118,6 @@
         </NuxtLink>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -152,7 +155,8 @@ const mockTasks = [
     id: 1,
     title: 'AI chatbot pre zákaznícku podporu',
     program: 'Program A',
-    description: 'Vyvíjate inteligentného chatbota schopného riešiť bežné otázky zákazníkov, integrovať sa s CRM systémom a eskalovať komplexné prípady na živého operátora.',
+    description:
+      'Vyvíjate inteligentného chatbota schopného riešiť bežné otázky zákazníkov, integrovať sa s CRM systémom a eskalovať komplexné prípady na živého operátora.',
     budget: 8000,
     spent: 3200,
     status: 'active',
@@ -165,7 +169,8 @@ const mockTasks = [
     id: 2,
     title: 'Optimalizácia logistického softvéru',
     program: 'Program B',
-    description: 'Analýza a zefektívnenie existujúceho softvéru pre správu skladových zásob a plánovanie prepravy s cieľom znížiť prevádzkové náklady o 20 %.',
+    description:
+      'Analýza a zefektívnenie existujúceho softvéru pre správu skladových zásob a plánovanie prepravy s cieľom znížiť prevádzkové náklady o 20 %.',
     budget: 12000,
     spent: 9800,
     status: 'active',
@@ -178,7 +183,8 @@ const mockTasks = [
     id: 3,
     title: 'Mobilná aplikácia pre HR',
     program: 'Program A',
-    description: 'Mobilná aplikácia umožňujúca zamestnancom spravovať dovolenky, dochádzku a benefity priamo zo smartfónu.',
+    description:
+      'Mobilná aplikácia umožňujúca zamestnancom spravovať dovolenky, dochádzku a benefity priamo zo smartfónu.',
     budget: 6000,
     spent: 6000,
     status: 'completed',
@@ -191,7 +197,8 @@ const mockTasks = [
     id: 4,
     title: 'Dashboard pre analýzu predajov',
     program: 'Program B',
-    description: 'Interaktívny dashboard zobrazujúci kľúčové predajné metriky v reálnom čase s možnosťou filtrovania podľa regiónu, produktu a obchodného zástupcu.',
+    description:
+      'Interaktívny dashboard zobrazujúci kľúčové predajné metriky v reálnom čase s možnosťou filtrovania podľa regiónu, produktu a obchodného zástupcu.',
     budget: 5000,
     spent: 0,
     status: 'draft',
@@ -204,15 +211,13 @@ const mockTasks = [
 
 const filters = computed(() => [
   { label: 'Všetky', value: 'all', count: mockTasks.length },
-  { label: 'Aktívne', value: 'active', count: mockTasks.filter(t => t.status === 'active').length },
-  { label: 'Dokončené', value: 'completed', count: mockTasks.filter(t => t.status === 'completed').length },
-  { label: 'Drafty', value: 'draft', count: mockTasks.filter(t => t.status === 'draft').length },
+  { label: 'Aktívne', value: 'active', count: mockTasks.filter((t) => t.status === 'active').length },
+  { label: 'Dokončené', value: 'completed', count: mockTasks.filter((t) => t.status === 'completed').length },
+  { label: 'Drafty', value: 'draft', count: mockTasks.filter((t) => t.status === 'draft').length },
 ])
 
 const filteredTasks = computed(() =>
-  activeFilter.value === 'all'
-    ? mockTasks
-    : mockTasks.filter(t => t.status === activeFilter.value)
+  activeFilter.value === 'all' ? mockTasks : mockTasks.filter((t) => t.status === activeFilter.value),
 )
 
 const formatCurrency = (val: number) =>

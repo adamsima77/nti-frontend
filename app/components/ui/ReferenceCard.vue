@@ -1,6 +1,5 @@
 <template>
   <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition flex flex-col">
-    
     <div class="flex items-center gap-4 mb-4">
       <img
         :src="image"
@@ -13,9 +12,7 @@
       </div>
     </div>
 
-    <p class="text-sm text-gray-600 leading-relaxed">
-      “{{ quote }}”
-    </p>
+    <p class="text-sm text-gray-600 leading-relaxed">“{{ quote }}”</p>
   </div>
 </template>
 
@@ -25,5 +22,5 @@ defineProps({
   name: String,
   role: String,
   quote: String,
-});
+})
 </script>

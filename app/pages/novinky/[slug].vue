@@ -162,5 +162,5 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
   twitterTitle: 'Novinky — NTI',
   twitterDescription: 'Čítajte novinky a články z komunity NTI.',
-});
+})
 </script>

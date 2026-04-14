@@ -1,7 +1,6 @@
 <!-- pages/firma/zadania/[id]/edit.vue -->
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
-
     <NuxtLink
       :to="`/firma/zadania/${route.params.id}`"
       class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-navy transition-colors mb-6"
@@ -15,12 +14,22 @@
         <h1 class="text-2xl font-bold text-navy mb-1">Upraviť zadanie</h1>
         <p class="text-gray-500 text-sm">Program B — živá prax</p>
       </div>
-      <UiStatusBadge v-if="taskData" :status="taskData.status" />
+      <UiStatusBadge
+        v-if="taskData"
+        :status="taskData.status"
+      />
     </div>
 
     <!-- Loading state -->
-    <div v-if="isLoading" class="space-y-4">
-      <div v-for="i in 4" :key="i" class="bg-white rounded-lg border border-gray-100 p-6 animate-pulse">
+    <div
+      v-if="isLoading"
+      class="space-y-4"
+    >
+      <div
+        v-for="i in 4"
+        :key="i"
+        class="bg-white rounded-lg border border-gray-100 p-6 animate-pulse"
+      >
         <div class="h-4 bg-gray-200 rounded w-1/4 mb-4" />
         <div class="space-y-3">
           <div class="h-10 bg-gray-100 rounded" />
@@ -38,8 +47,14 @@
     />
 
     <!-- Delete confirm modal -->
-    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div class="absolute inset-0 bg-black/40" @click="showDeleteModal = false" />
+    <div
+      v-if="showDeleteModal"
+      class="fixed inset-0 z-50 flex items-center justify-center px-4"
+    >
+      <div
+        class="absolute inset-0 bg-black/40"
+        @click="showDeleteModal = false"
+      />
       <div class="relative bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
         <h3 class="font-semibold text-navy mb-2">Zmazať zadanie?</h3>
         <p class="text-sm text-gray-500 mb-6">
@@ -61,7 +76,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -91,16 +105,16 @@ if (!authStore.user) {
   authStore.token = 'mock-token'
 }
 
-const route  = useRoute()
+const route = useRoute()
 const router = useRouter()
 
-const isLoading      = ref(true)
+const isLoading = ref(true)
 const showDeleteModal = ref(false)
-const taskData       = ref<Record<string, any> | null>(null)
+const taskData = ref<Record<string, any> | null>(null)
 
 onMounted(async () => {
   // TODO: const data = await api.get(`/firma/zadania/${route.params.id}`)
-  await new Promise(r => setTimeout(r, 400))
+  await new Promise((r) => setTimeout(r, 400))
   taskData.value = {
     id: route.params.id,
     title: 'AI chatbot pre zákaznícku podporu',
@@ -132,7 +146,7 @@ const handleDelete = () => {
 
 const confirmDelete = async () => {
   // TODO: await api.delete(`/firma/zadania/${route.params.id}`)
-  await new Promise(r => setTimeout(r, 600))
+  await new Promise((r) => setTimeout(r, 600))
   showDeleteModal.value = false
   router.push('/firma/zadania')
 }

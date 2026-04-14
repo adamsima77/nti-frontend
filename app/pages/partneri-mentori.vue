@@ -1,9 +1,10 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 py-20 md:px-6 md:py-16 space-y-20">
-
     <!-- HERO -->
     <div class="relative bg-blue-500 overflow-hidden rounded-lg shadow-2xl">
-      <div class="absolute inset-0 bg-gradient-to-b from-blue-500/70 to-blue-700/70 mix-blend-multiply pointer-events-none"></div>
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-blue-500/70 to-blue-700/70 mix-blend-multiply pointer-events-none"
+      ></div>
 
       <div class="relative max-w-3xl mx-auto text-center text-white py-10 sm:py-12 md:py-16 px-4 md:px-8">
         <h2 class="text-3xl sm:text-4xl md:text-4xl font-extrabold mb-2">
@@ -84,8 +85,12 @@
       </div>
 
       <div class="relative">
-        <div class="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent z-10"></div>
-        <div class="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent z-10"></div>
+        <div
+          class="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent z-10"
+        ></div>
+        <div
+          class="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent z-10"
+        ></div>
 
         <div class="overflow-hidden">
           <div
@@ -103,33 +108,31 @@
         </div>
       </div>
     </section>
-
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
-  useSeoMeta({
-    title: 'Partneri a mentori | NTI',
-    description: 'Spoznajte našich partnerov a mentorov, ktorí podporujú náš projekt a pomáhajú rásť talentom v oblasti vývoja.',
-    ogTitle: 'Partneri a mentori — NTI',
-    ogDescription: 'Spoznajte našich partnerov a mentorov. Firmy, učitelia a odbornosti, ktoré tvoria komunitu NTI.',
-    ogType: 'website',
-    ogUrl: 'https://nti.sk/partneri-mentori',
-    twitterCard: 'summary_large_image',
-    twitterTitle: 'Partneri a mentori — NTI',
-    twitterDescription: 'Spoznajte našich partnerov a mentorov, ktorí podporujú talentov.',
-  });
+useSeoMeta({
+  title: 'Partneri a mentori | NTI',
+  description:
+    'Spoznajte našich partnerov a mentorov, ktorí podporujú náš projekt a pomáhajú rásť talentom v oblasti vývoja.',
+  ogTitle: 'Partneri a mentori — NTI',
+  ogDescription: 'Spoznajte našich partnerov a mentorov. Firmy, učitelia a odbornosti, ktoré tvoria komunitu NTI.',
+  ogType: 'website',
+  ogUrl: 'https://nti.sk/partneri-mentori',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Partneri a mentori — NTI',
+  twitterDescription: 'Spoznajte našich partnerov a mentorov, ktorí podporujú talentov.',
+})
 
-  const scrollContainer = ref(null)
+const scrollContainer = ref(null)
 
-  const scrollAmount = 320 
+const scrollAmount = 320
 
-  
 const canScrollLeft = ref(false)
 const canScrollRight = ref(true)
-
 
 const updateScrollButtons = () => {
   if (!scrollContainer.value) return
@@ -138,10 +141,10 @@ const updateScrollButtons = () => {
   canScrollRight.value = scrollLeft + clientWidth < scrollWidth - 1
 }
 
-  const scrollLeft = () => {
-    scrollContainer.value?.scrollBy({
-      left: -scrollAmount,
-      behavior: 'smooth',
+const scrollLeft = () => {
+  scrollContainer.value?.scrollBy({
+    left: -scrollAmount,
+    behavior: 'smooth',
   })
 }
 
@@ -152,16 +155,16 @@ const scrollRight = () => {
   })
 }
 
- onMounted(() => {
+onMounted(() => {
   updateScrollButtons()
   scrollContainer.value?.addEventListener('scroll', updateScrollButtons)
 })
 
 onUnmounted(() => {
-  scrollContainer.value?.removeEventListener('scroll', updateScrollButtons);
+  scrollContainer.value?.removeEventListener('scroll', updateScrollButtons)
 })
 
-  const partners = [
+const partners = [
   {
     image: '/test_logo.png',
     alt: 'Partner 1',
@@ -214,25 +217,25 @@ const references = [
     role: 'Project Manager',
     quote: 'Odporúčam NTI ako spoľahlivú platformu.',
   },
-   {
+  {
     image: '/team/person3.jpg',
     name: 'Ján Kováč',
     role: 'Project Manager',
     quote: 'Odporúčam NTI ako spoľahlivú platformu.',
   },
-   {
+  {
     image: '/team/person3.jpg',
     name: 'Ján Kováč',
     role: 'Project Manager',
     quote: 'Odporúčam NTI ako spoľahlivú platformu.',
   },
-   {
+  {
     image: '/team/person3.jpg',
     name: 'Ján Kováč',
     role: 'Project Manager',
     quote: 'Odporúčam NTI ako spoľahlivú platformu.',
   },
-   {
+  {
     image: '/team/person3.jpg',
     name: 'Ján Kováč',
     role: 'Project Manager',
@@ -242,12 +245,12 @@ const references = [
 </script>
 
 <style scoped>
-    .no-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 
-    .no-scrollbar {
-        -ms-overflow-style: none;
-         scrollbar-width: none;
-    }
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 </style>

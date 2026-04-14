@@ -4,27 +4,51 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   css: ['./app/assets/main.css'],
-  modules: ['@pinia/nuxt', '@nuxt/eslint', '@nuxtjs/i18n'],
+  modules: ['@pinia/nuxt', '@nuxt/eslint', '@nuxtjs/i18n','@nuxtjs/sitemap'],
+  sitemap: {
+    //siteurl: 'https://nti.sk',
+    //Not indexed
+    exclude: [
+      '/auth/**',
+      '/student/**',
+      '/hodnotenie/**',
+      '/mentor/**',
+      '/firma/**',
+      '/admin/**',
+      '/notifikacie/**'
+    ],
+    //Indexed routes
+    urls: [
+      '/',
+      '/kontakt',
+      '/o-nas',
+      '/partneri-mentori',
+      '/program-a',
+      '/program-b',
+      '/novinky',
+      '/vyzvy'
+    ]
+  },
   routeRules: {
     '/auth/**': { ssr: false },
-    '/dashboard/**': { ssr: false },
+    '/student/**': { ssr: false },
     '/prihlasky/**': { ssr: false },
     '/timy/**': { ssr: false },
     '/hodnotenie/**': { ssr: false },
     '/mentor/**': { ssr: false },
     '/firma/**': { ssr: false },
     '/admin/**': { ssr: false },
+    '/notifikacie/**': { ssr: false }
   },
     i18n: {
-    strategy: 'prefix',
+    strategy: 'prefix_except_default',
     defaultLocale: 'sk',
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
       fallbackLocale: 'en',
-      alwaysRedirect: true
+      alwaysRedirect: false
     },
-    lazy: true,
     langDir: 'locales/',
 
     locales: [

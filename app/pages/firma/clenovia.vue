@@ -1,7 +1,6 @@
 <!-- pages/firma/clenovia.vue -->
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
-
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
@@ -20,7 +19,8 @@
     <!-- Info box -->
     <div class="bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 mb-6 flex gap-2 text-sm text-blue-700">
       <Info class="w-4 h-4 mt-0.5 shrink-0" />
-      Každý člen dostane prístup do firemného portálu podľa svojej roly. Administrátor môže spravovať zadania a profil, člen má iba prístup na čítanie.
+      Každý člen dostane prístup do firemného portálu podľa svojej roly. Administrátor môže spravovať zadania a profil,
+      člen má iba prístup na čítanie.
     </div>
 
     <!-- Members table -->
@@ -37,7 +37,11 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
-            <tr v-for="member in members" :key="member.id" class="hover:bg-gray-50 transition-colors">
+            <tr
+              v-for="member in members"
+              :key="member.id"
+              class="hover:bg-gray-50 transition-colors"
+            >
               <td class="px-5 py-4">
                 <div class="flex items-center gap-3">
                   <!-- Avatar initials -->
@@ -50,7 +54,11 @@
                   <div>
                     <p class="font-medium text-navy">
                       {{ member.name }}
-                      <span v-if="member.id === currentUserId" class="ml-1.5 text-xs font-normal text-gray-400">(vy)</span>
+                      <span
+                        v-if="member.id === currentUserId"
+                        class="ml-1.5 text-xs font-normal text-gray-400"
+                        >(vy)</span
+                      >
                     </p>
                     <p class="text-xs text-gray-400">{{ member.email }}</p>
                   </div>
@@ -67,16 +75,25 @@
                   <option value="member">Člen</option>
                   <option value="po">Product Owner</option>
                 </select>
-                <span v-else class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" :class="roleClass(member.role)">
+                <span
+                  v-else
+                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                  :class="roleClass(member.role)"
+                >
                   {{ roleLabel(member.role) }}
                 </span>
               </td>
               <td class="px-5 py-4">
                 <span
                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-                  :class="member.status === 'active' ? 'bg-success-50 text-success-500' : 'bg-warning-50 text-warning-500'"
+                  :class="
+                    member.status === 'active' ? 'bg-success-50 text-success-500' : 'bg-warning-50 text-warning-500'
+                  "
                 >
-                  <span class="w-1.5 h-1.5 rounded-full" :class="member.status === 'active' ? 'bg-success-500' : 'bg-warning-500'" />
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    :class="member.status === 'active' ? 'bg-success-500' : 'bg-warning-500'"
+                  />
                   {{ member.status === 'active' ? 'Aktívny' : 'Čaká na prijatie' }}
                 </span>
               </td>
@@ -108,7 +125,10 @@
     </div>
 
     <!-- Pending invites section -->
-    <div v-if="pendingInvites.length" class="bg-warning-50 border border-warning-200 rounded-lg p-5">
+    <div
+      v-if="pendingInvites.length"
+      class="bg-warning-50 border border-warning-200 rounded-lg p-5"
+    >
       <h3 class="text-sm font-semibold text-warning-800 mb-3 flex items-center gap-2">
         <Clock class="w-4 h-4" />
         Čakajúce pozvánky ({{ pendingInvites.length }})
@@ -119,22 +139,43 @@
           :key="invite.email"
           class="flex items-center justify-between text-sm"
         >
-          <span class="text-warning-700">{{ invite.email }} — <span class="font-medium">{{ roleLabel(invite.role) }}</span></span>
+          <span class="text-warning-700"
+            >{{ invite.email }} — <span class="font-medium">{{ roleLabel(invite.role) }}</span></span
+          >
           <div class="flex gap-2">
-            <button @click="resendInvite(invite)" class="text-xs text-warning-700 hover:underline">Znova odoslať</button>
-            <button @click="cancelInvite(invite)" class="text-xs text-danger-600 hover:underline">Zrušiť</button>
+            <button
+              @click="resendInvite(invite)"
+              class="text-xs text-warning-700 hover:underline"
+            >
+              Znova odoslať
+            </button>
+            <button
+              @click="cancelInvite(invite)"
+              class="text-xs text-danger-600 hover:underline"
+            >
+              Zrušiť
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- ── Invite modal ── -->
-    <div v-if="showInviteModal" class="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div class="absolute inset-0 bg-black/40" @click="showInviteModal = false" />
+    <div
+      v-if="showInviteModal"
+      class="fixed inset-0 z-50 flex items-center justify-center px-4"
+    >
+      <div
+        class="absolute inset-0 bg-black/40"
+        @click="showInviteModal = false"
+      />
       <div class="relative bg-white rounded-xl shadow-lg p-6 max-w-md w-full">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-semibold text-navy text-lg">Pozvať nového člena</h3>
-          <button @click="showInviteModal = false" class="text-gray-400 hover:text-gray-600">
+          <button
+            @click="showInviteModal = false"
+            class="text-gray-400 hover:text-gray-600"
+          >
             <X class="w-5 h-5" />
           </button>
         </div>
@@ -163,27 +204,38 @@
           <!-- Role description -->
           <div class="bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-500">
             <template v-if="inviteForm.role === 'admin'">
-              <strong class="text-gray-700">Administrátor</strong> — môže upravovať firemný profil, vytvárať a spravovať zadania, pozývať členov a vidieť všetky prihlášky.
+              <strong class="text-gray-700">Administrátor</strong> — môže upravovať firemný profil, vytvárať a spravovať
+              zadania, pozývať členov a vidieť všetky prihlášky.
             </template>
             <template v-else-if="inviteForm.role === 'po'">
-              <strong class="text-gray-700">Product Owner</strong> — môže komunikovať s realizačným tímom, schvaľovať míľniky a odovzdania. Nemôže meniť profil ani rozpočty.
+              <strong class="text-gray-700">Product Owner</strong> — môže komunikovať s realizačným tímom, schvaľovať
+              míľniky a odovzdania. Nemôže meniť profil ani rozpočty.
             </template>
             <template v-else>
               <strong class="text-gray-700">Člen</strong> — môže vidieť zadania a prihlášky tímov. Nemôže nič meniť.
             </template>
           </div>
 
-          <div v-if="inviteSuccess" class="bg-success-50 border border-success-200 text-success-700 px-3 py-2 rounded text-sm flex items-center gap-2">
+          <div
+            v-if="inviteSuccess"
+            class="bg-success-50 border border-success-200 text-success-700 px-3 py-2 rounded text-sm flex items-center gap-2"
+          >
             <CheckCircle class="w-4 h-4 shrink-0" />
             Pozvánka bola odoslaná na {{ inviteForm.email }}.
           </div>
-          <div v-if="inviteError" class="bg-danger-50 border border-danger-200 text-danger-700 px-3 py-2 rounded text-sm">
+          <div
+            v-if="inviteError"
+            class="bg-danger-50 border border-danger-200 text-danger-700 px-3 py-2 rounded text-sm"
+          >
             {{ inviteError }}
           </div>
         </div>
 
         <div class="flex gap-3 mt-6">
-          <button @click="showInviteModal = false" class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50">
+          <button
+            @click="showInviteModal = false"
+            class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50"
+          >
             Zrušiť
           </button>
           <button
@@ -191,9 +243,25 @@
             :disabled="isInviting"
             class="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            <svg v-if="isInviting" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
+            <svg
+              v-if="isInviting"
+              class="animate-spin w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+              />
             </svg>
             {{ isInviting ? 'Odosielam...' : 'Odoslať pozvánku' }}
           </button>
@@ -202,20 +270,35 @@
     </div>
 
     <!-- Remove confirm modal -->
-    <div v-if="memberToRemove" class="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div class="absolute inset-0 bg-black/40" @click="memberToRemove = null" />
+    <div
+      v-if="memberToRemove"
+      class="fixed inset-0 z-50 flex items-center justify-center px-4"
+    >
+      <div
+        class="absolute inset-0 bg-black/40"
+        @click="memberToRemove = null"
+      />
       <div class="relative bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
         <h3 class="font-semibold text-navy mb-2">Odstrániť člena?</h3>
         <p class="text-sm text-gray-500 mb-6">
           <strong>{{ memberToRemove.name }}</strong> stratí prístup do firemného portálu NTI.
         </p>
         <div class="flex gap-3">
-          <button @click="memberToRemove = null" class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50">Zrušiť</button>
-          <button @click="executeRemove" class="flex-1 px-4 py-2.5 bg-danger-500 text-white rounded-lg text-sm font-medium hover:bg-danger-600">Odstrániť</button>
+          <button
+            @click="memberToRemove = null"
+            class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50"
+          >
+            Zrušiť
+          </button>
+          <button
+            @click="executeRemove"
+            class="flex-1 px-4 py-2.5 bg-danger-500 text-white rounded-lg text-sm font-medium hover:bg-danger-600"
+          >
+            Odstrániť
+          </button>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -257,19 +340,47 @@ interface Member {
 }
 
 const members = ref<Member[]>([
-  { id: 2,  name: 'Peter Kováč',    email: 'peter.kovac@techfirma.sk',    role: 'admin',  status: 'active',  addedAt: '10.01.2026' },
-  { id: 3,  name: 'Jana Horáková',  email: 'jana.horakova@techfirma.sk',  role: 'po',     status: 'active',  addedAt: '15.01.2026' },
-  { id: 4,  name: 'Marek Sloboda',  email: 'marek.sloboda@techfirma.sk',  role: 'member', status: 'active',  addedAt: '20.02.2026' },
-  { id: 5,  name: 'Eva Nováková',   email: 'eva.novakova@techfirma.sk',   role: 'member', status: 'pending', addedAt: '28.03.2026' },
+  {
+    id: 2,
+    name: 'Peter Kováč',
+    email: 'peter.kovac@techfirma.sk',
+    role: 'admin',
+    status: 'active',
+    addedAt: '10.01.2026',
+  },
+  {
+    id: 3,
+    name: 'Jana Horáková',
+    email: 'jana.horakova@techfirma.sk',
+    role: 'po',
+    status: 'active',
+    addedAt: '15.01.2026',
+  },
+  {
+    id: 4,
+    name: 'Marek Sloboda',
+    email: 'marek.sloboda@techfirma.sk',
+    role: 'member',
+    status: 'active',
+    addedAt: '20.02.2026',
+  },
+  {
+    id: 5,
+    name: 'Eva Nováková',
+    email: 'eva.novakova@techfirma.sk',
+    role: 'member',
+    status: 'pending',
+    addedAt: '28.03.2026',
+  },
 ])
 
-const pendingInvites = computed(() => members.value.filter(m => m.status === 'pending'))
+const pendingInvites = computed(() => members.value.filter((m) => m.status === 'pending'))
 
 // ── Invite ───────────────────────────────────────────────────
 const showInviteModal = ref(false)
-const isInviting      = ref(false)
-const inviteSuccess   = ref(false)
-const inviteError     = ref<string | null>(null)
+const isInviting = ref(false)
+const inviteSuccess = ref(false)
+const inviteError = ref<string | null>(null)
 
 const inviteForm = reactive({ email: '', role: 'member' })
 const inviteErrors = reactive<Record<string, string | null>>({ email: null })
@@ -284,7 +395,7 @@ const handleInvite = async () => {
   isInviting.value = true
   try {
     // TODO: await api.post('/firma/clenovia/invite', inviteForm)
-    await new Promise(r => setTimeout(r, 800))
+    await new Promise((r) => setTimeout(r, 800))
     members.value.push({
       id: Date.now(),
       name: inviteForm.email.split('@')[0] ?? inviteForm.email,
@@ -295,8 +406,11 @@ const handleInvite = async () => {
     })
     inviteSuccess.value = true
     inviteForm.email = ''
-    inviteForm.role  = 'member'
-    setTimeout(() => { showInviteModal.value = false; inviteSuccess.value = false }, 2000)
+    inviteForm.role = 'member'
+    setTimeout(() => {
+      showInviteModal.value = false
+      inviteSuccess.value = false
+    }, 2000)
   } catch {
     inviteError.value = 'Nastala chyba. Skúste znova.'
   } finally {
@@ -307,37 +421,45 @@ const handleInvite = async () => {
 // ── Role change ──────────────────────────────────────────────
 const handleRoleChange = async (member: Member) => {
   // TODO: await api.patch(`/firma/clenovia/${member.id}`, { role: member.role })
-  await new Promise(r => setTimeout(r, 300))
+  await new Promise((r) => setTimeout(r, 300))
 }
 
 // ── Remove ───────────────────────────────────────────────────
 const memberToRemove = ref<Member | null>(null)
-const confirmRemove  = (m: Member) => { memberToRemove.value = m }
-const executeRemove  = async () => {
+const confirmRemove = (m: Member) => {
+  memberToRemove.value = m
+}
+const executeRemove = async () => {
   if (!memberToRemove.value) return
   // TODO: await api.delete(`/firma/clenovia/${memberToRemove.value.id}`)
-  members.value = members.value.filter(m => m.id !== memberToRemove.value!.id)
+  members.value = members.value.filter((m) => m.id !== memberToRemove.value!.id)
   memberToRemove.value = null
 }
 
 // ── Invite actions ───────────────────────────────────────────
 const resendInvite = async (member: any) => {
   // TODO: await api.post('/firma/clenovia/resend', { email: member.email })
-  await new Promise(r => setTimeout(r, 400))
+  await new Promise((r) => setTimeout(r, 400))
 }
 const cancelInvite = (member: any) => {
-  members.value = members.value.filter(m => m.email !== member.email)
+  members.value = members.value.filter((m) => m.email !== member.email)
 }
 
 // ── Helpers ──────────────────────────────────────────────────
 const initials = (name: string) =>
-  name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
 
-const roleLabel = (role: string) => ({ admin: 'Administrátor', member: 'Člen', po: 'Product Owner' }[role] || role)
+const roleLabel = (role: string) => ({ admin: 'Administrátor', member: 'Člen', po: 'Product Owner' })[role] || role
 
-const roleClass = (role: string) => ({
-  admin:  'bg-blue-50 text-blue-700',
-  po:     'bg-purple-50 text-purple-700',
-  member: 'bg-gray-100 text-gray-600',
-}[role] || 'bg-gray-100 text-gray-600')
+const roleClass = (role: string) =>
+  ({
+    admin: 'bg-blue-50 text-blue-700',
+    po: 'bg-purple-50 text-purple-700',
+    member: 'bg-gray-100 text-gray-600',
+  })[role] || 'bg-gray-100 text-gray-600'
 </script>

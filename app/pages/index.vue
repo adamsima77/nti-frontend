@@ -16,12 +16,12 @@
       <UiProgramCard
         title="Program A"
         description="Intenzívny kurz pre rýchly osobný rast a nové zručnosti."
-        link = "/program-a"
+        link="/program-a"
       />
       <UiProgramCard
         title="Program B"
         description="Mentoring a komunita pre dlhodobý profesionálny rozvoj."
-        link = "/program-b"
+        link="/program-b"
       />
     </div>
   </div>
@@ -101,13 +101,16 @@
 <script setup>
 useSeoMeta({
   title: 'Domov | NTI',
-  description: 'Budujeme komunitu talentovaných ľudí v oblasti dizajnu, vývoja a podnikania. Objav mentorov, partnerov a príležitosti na rast.',
+  description:
+    'Budujeme komunitu talentovaných ľudí v oblasti dizajnu, vývoja a podnikania. Objav mentorov, partnerov a príležitosti na rast.',
   ogTitle: 'NTI — Komunita pre talentov',
-  ogDescription: 'Budujeme komunitu talentovaných ľudí v oblasti dizajnu, vývoja a podnikania. Objav program A, program B a komunitu.',
+  ogDescription:
+    'Budujeme komunitu talentovaných ľudí v oblasti dizajnu, vývoja a podnikania. Objav program A, program B a komunitu.',
   ogType: 'website',
   ogUrl: 'https://nti.sk/',
   twitterCard: 'summary_large_image',
   twitterTitle: 'NTI — Komunita pre talentov',
-  twitterDescription: 'Budujeme komunitu talentovaných ľudí. Zúzasti sa na Program A alebo Program B a rast spolu s námi.',
-});
+  twitterDescription:
+    'Budujeme komunitu talentovaných ľudí. Zúzasti sa na Program A alebo Program B a rast spolu s námi.',
+})
 </script>

@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
-
       <!-- Invalid / expired token -->
       <div
         v-if="tokenInvalid"
@@ -9,10 +8,30 @@
       >
         <div class="flex justify-center">
           <div class="w-16 h-16 rounded-full bg-danger-50 flex items-center justify-center">
-            <svg class="w-8 h-8 text-danger-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="15" y1="9" x2="9" y2="15"/>
-              <line x1="9" y1="9" x2="15" y2="15"/>
+            <svg
+              class="w-8 h-8 text-danger-500"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+              />
+              <line
+                x1="15"
+                y1="9"
+                x2="9"
+                y2="15"
+              />
+              <line
+                x1="9"
+                y1="9"
+                x2="15"
+                y2="15"
+              />
             </svg>
           </div>
         </div>
@@ -40,7 +59,6 @@
           @submit.prevent="handleResetPassword"
           class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-5"
         >
-
           <!-- Header -->
           <div class="mb-8 text-center">
             <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">
@@ -62,7 +80,10 @@
           />
 
           <!-- Password strength indicator -->
-          <div v-if="formData.password" class="space-y-1.5">
+          <div
+            v-if="formData.password"
+            class="space-y-1.5"
+          >
             <div class="flex gap-1">
               <div
                 v-for="i in 4"
@@ -71,7 +92,10 @@
                 :class="strengthBarColor(i)"
               />
             </div>
-            <p class="text-xs" :class="strengthTextColor">
+            <p
+              class="text-xs"
+              :class="strengthTextColor"
+            >
               {{ strengthLabel }}
             </p>
           </div>
@@ -93,9 +117,23 @@
               class="flex items-center gap-2 text-xs transition-colors"
               :class="req.met ? 'text-success-500' : 'text-gray-400'"
             >
-              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <polyline v-if="req.met" points="20 6 9 17 4 12"/>
-                <circle v-else cx="12" cy="12" r="9"/>
+              <svg
+                class="w-3.5 h-3.5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <polyline
+                  v-if="req.met"
+                  points="20 6 9 17 4 12"
+                />
+                <circle
+                  v-else
+                  cx="12"
+                  cy="12"
+                  r="9"
+                />
               </svg>
               {{ req.label }}
             </li>
@@ -106,10 +144,30 @@
             v-if="serverError"
             class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg text-sm flex items-start gap-2"
           >
-            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            <svg
+              class="w-4 h-4 mt-0.5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+              />
+              <line
+                x1="12"
+                y1="8"
+                x2="12"
+                y2="12"
+              />
+              <line
+                x1="12"
+                y1="16"
+                x2="12.01"
+                y2="16"
+              />
             </svg>
             {{ serverError }}
           </div>
@@ -119,9 +177,25 @@
             :disabled="isLoading"
             class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            <svg v-if="isLoading" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
+            <svg
+              v-if="isLoading"
+              class="animate-spin w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+              />
             </svg>
 
             <span>
@@ -136,8 +210,18 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-5">
           <div class="flex justify-center">
             <div class="w-16 h-16 rounded-full bg-success-50 flex items-center justify-center">
-              <svg class="w-8 h-8 text-success-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              <svg
+                class="w-8 h-8 text-success-500"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
           </div>
@@ -154,7 +238,6 @@
           </NuxtLink>
         </div>
       </template>
-
     </div>
   </div>
 </template>
@@ -164,7 +247,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 
 definePageMeta({
   layout: 'default',
-  middleware: 'guest'
+  middleware: 'guest',
 })
 
 useHead({
@@ -172,9 +255,9 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'Nastavte nové heslo pre váš NTI účet'
-    }
-  ]
+      content: 'Nastavte nové heslo pre váš NTI účet',
+    },
+  ],
 })
 
 const route = useRoute()
@@ -188,12 +271,12 @@ const resetSuccess = ref(false)
 
 const formData = reactive({
   password: '',
-  password_confirmation: ''
+  password_confirmation: '',
 })
 
 const errors = reactive({
   password: null,
-  password_confirmation: null
+  password_confirmation: null,
 })
 
 // Token from query param (?token=xxx)
@@ -213,7 +296,7 @@ const passwordRequirements = computed(() => [
   { label: 'Aspoň jeden špeciálny znak', met: /[^A-Za-z0-9]/.test(formData.password) },
 ])
 
-const strengthScore = computed(() => passwordRequirements.value.filter(r => r.met).length)
+const strengthScore = computed(() => passwordRequirements.value.filter((r) => r.met).length)
 
 const strengthBarColor = (i) => {
   if (formData.password.length === 0) return 'bg-gray-200'
@@ -276,11 +359,7 @@ const handleResetPassword = async () => {
   serverError.value = null
 
   try {
-    await authStore.resetPassword(
-      resetToken.value,
-      formData.password,
-      formData.password_confirmation
-    )
+    await authStore.resetPassword(resetToken.value, formData.password, formData.password_confirmation)
     resetSuccess.value = true
   } catch (err) {
     const msg = err?.message || ''

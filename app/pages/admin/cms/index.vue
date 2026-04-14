@@ -57,7 +57,7 @@
               v-if="activeTab === 'stranky'"
               class="text-blue-600 hover:text-blue-800"
               title="Upraviť bloky"
-              @click="navigateTo(`/admin/cms/${row.id}`)"
+              @click="navigateTo(localePath(`/admin/cms/${row.id}`))"
             >
               <LayoutGrid class="w-4 h-4" />
             </button>
@@ -112,6 +112,8 @@
 
 <script setup lang="ts">
 import { Plus, Pencil, Trash2, LayoutGrid } from 'lucide-vue-next'
+
+const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'admin',
@@ -300,7 +302,7 @@ function openModalForTab() {
 
   // For stranky (pages), navigate to editor if editing, or create via simple modal
   if (activeTab.value === 'stranky' && editingItem.value) {
-    navigateTo(`/admin/cms/${editingItem.value.id}`)
+    navigateTo(localePath(`/admin/cms/${editingItem.value.id}`))
     return
   }
 

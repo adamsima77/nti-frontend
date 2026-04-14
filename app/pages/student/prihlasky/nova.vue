@@ -12,14 +12,27 @@
     </div>
 
     <!-- Step 1: Select Call -->
-    <div v-if="!selectedCall" class="space-y-6">
+    <div
+      v-if="!selectedCall"
+      class="space-y-6"
+    >
       <!-- Loading -->
-      <div v-if="callsStore.isLoading" class="grid gap-4">
-        <div v-for="i in 3" :key="i" class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 h-40 animate-pulse" />
+      <div
+        v-if="callsStore.isLoading"
+        class="grid gap-4"
+      >
+        <div
+          v-for="i in 3"
+          :key="i"
+          class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 h-40 animate-pulse"
+        />
       </div>
 
       <!-- Available Calls -->
-      <div v-else-if="callsStore.openCalls.length" class="grid gap-4">
+      <div
+        v-else-if="callsStore.openCalls.length"
+        class="grid gap-4"
+      >
         <div
           v-for="call in callsStore.openCalls"
           :key="call.id"
@@ -31,7 +44,9 @@
               <h3 class="text-xl font-bold text-navy">{{ call.title }}</h3>
               <p class="text-sm text-gray-500 mt-1">{{ call.programName }}</p>
             </div>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+            <span
+              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700"
+            >
               Otvorené
             </span>
           </div>
@@ -52,7 +67,10 @@
       </div>
 
       <!-- Empty state -->
-      <div v-else class="bg-white rounded-lg shadow-sm border border-gray-100">
+      <div
+        v-else
+        class="bg-white rounded-lg shadow-sm border border-gray-100"
+      >
         <UiEmptyState
           :icon="FileText"
           title="Žiadne otvorené výzvy"
@@ -66,7 +84,10 @@
     </div>
 
     <!-- Step 2: Fill Form -->
-    <div v-else class="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
+    <div
+      v-else
+      class="bg-white rounded-lg shadow-sm border border-gray-100 p-8"
+    >
       <!-- Call Header -->
       <div class="mb-8 pb-8 border-b">
         <div class="flex items-start justify-between mb-4">
@@ -89,8 +110,17 @@
             v-model="selectedTeamId"
             class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="" disabled>Vyberte tím</option>
-            <option v-for="team in teamsStore.teams" :key="team.id" :value="team.id">
+            <option
+              value=""
+              disabled
+            >
+              Vyberte tím
+            </option>
+            <option
+              v-for="team in teamsStore.teams"
+              :key="team.id"
+              :value="team.id"
+            >
               {{ team.name }}
             </option>
           </select>

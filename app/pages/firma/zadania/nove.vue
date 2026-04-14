@@ -1,7 +1,6 @@
 <!-- pages/firma/zadania/nove.vue -->
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
-
     <NuxtLink
       to="/firma/zadania"
       class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-navy transition-colors mb-6"
@@ -19,7 +18,6 @@
       :is-new="true"
       @saved="handleSaved"
     />
-
   </div>
 </template>
 

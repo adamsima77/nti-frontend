@@ -1,14 +1,31 @@
 <template>
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
-
       <!-- Stav: Loading -->
-      <div v-if="status === 'loading'" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-4">
+      <div
+        v-if="status === 'loading'"
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-4"
+      >
         <div class="flex justify-center">
           <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-            <svg class="animate-spin w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
+            <svg
+              class="animate-spin w-8 h-8 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+              />
             </svg>
           </div>
         </div>
@@ -17,11 +34,24 @@
       </div>
 
       <!-- Stav: Success -->
-      <div v-else-if="status === 'success'" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-5">
+      <div
+        v-else-if="status === 'success'"
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-5"
+      >
         <div class="flex justify-center">
           <div class="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center">
-            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <svg
+              class="w-8 h-8 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
         </div>
@@ -40,23 +70,37 @@
       </div>
 
       <!-- Stav: Error -->
-      <div v-else class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-5">
+      <div
+        v-else
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-5"
+      >
         <div class="flex justify-center">
           <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            <svg
+              class="w-8 h-8 text-red-600"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+              />
             </svg>
           </div>
         </div>
         <div>
           <h1 class="text-2xl font-bold text-slate-900 mb-2">Odkaz vypršal</h1>
-          <p class="text-sm text-gray-500 leading-relaxed">
-            Overovací odkaz je neplatný alebo jeho platnosť vypršala.
-          </p>
+          <p class="text-sm text-gray-500 leading-relaxed">Overovací odkaz je neplatný alebo jeho platnosť vypršala.</p>
         </div>
 
         <!-- Resend form -->
-        <div v-if="!resendSuccess" class="space-y-3 pt-4 border-t border-gray-100">
+        <div
+          v-if="!resendSuccess"
+          class="space-y-3 pt-4 border-t border-gray-100"
+        >
           <p class="text-xs text-left font-medium text-gray-700">Zaslať nový odkaz:</p>
           <UiInput
             v-model="resendEmail"
@@ -69,19 +113,41 @@
             :disabled="isResending"
             class="w-full bg-slate-800 text-white py-3 px-4 rounded-lg font-medium hover:bg-slate-900 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
           >
-            <svg v-if="isResending" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
+            <svg
+              v-if="isResending"
+              class="animate-spin w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+              />
             </svg>
             {{ isResending ? 'Odosielam...' : 'Odoslať nový e-mail' }}
           </button>
         </div>
 
-        <div v-else class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+        <div
+          v-else
+          class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm"
+        >
           Nový overovací e-mail bol odoslaný.
         </div>
 
-        <NuxtLink to="/auth/login" class="block text-sm text-gray-500 hover:text-slate-900 transition-colors">
+        <NuxtLink
+          to="/auth/login"
+          class="block text-sm text-gray-500 hover:text-slate-900 transition-colors"
+        >
           ← Späť na prihlásenie
         </NuxtLink>
       </div>
@@ -106,10 +172,10 @@ const resendSuccess = ref(false)
 
 onMounted(async () => {
   const { id, hash } = route.params
-  
+
   // Získame všetky query parametre (expires, signature...)
   const queryParams = new URLSearchParams(route.query as any).toString()
-  
+
   if (!id || !hash) {
     status.value = 'error'
     return
@@ -118,7 +184,7 @@ onMounted(async () => {
   try {
     // Poskladáme cestu: "123/abcde?expires=xxx&signature=yyy"
     const fullPath = `${id}/${hash}${queryParams ? '?' + queryParams : ''}`
-    
+
     await authStore.verifyEmail(fullPath)
     status.value = 'success'
   } catch (err) {
@@ -129,7 +195,7 @@ onMounted(async () => {
 
 const handleResend = async () => {
   resendError.value = ''
-  
+
   if (!resendEmail.value) {
     resendError.value = 'Zadajte e-mail'
     return

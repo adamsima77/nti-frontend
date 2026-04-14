@@ -1,14 +1,12 @@
 <template>
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
-
       <!-- REQUEST RESET -->
       <template v-if="!emailSent">
         <form
           @submit.prevent="handleRequestReset"
           class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-5"
         >
-
           <!-- HEADER -->
           <div class="mb-8 text-center">
             <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">
@@ -29,7 +27,10 @@
             :error="emailError"
           />
 
-          <div v-if="serverError" class="text-red-500 text-sm">
+          <div
+            v-if="serverError"
+            class="text-red-500 text-sm"
+          >
             {{ serverError }}
           </div>
 
@@ -48,25 +49,27 @@
 
           <p class="text-center text-gray-500 text-sm">
             {{ $t('auth.forgot.remember_password') }}
-            <NuxtLink to="/auth/login" class="text-blue-600 hover:underline font-medium">
+            <NuxtLink
+              to="/auth/login"
+              class="text-blue-600 hover:underline font-medium"
+            >
               {{ $t('auth.forgot.login') }}
             </NuxtLink>
           </p>
-
         </form>
       </template>
 
       <!-- EMAIL SENT -->
       <template v-else>
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-5">
-
           <h1 class="text-2xl font-bold text-navy">
             {{ $t('auth.forgot.sent_title') }}
           </h1>
 
           <p class="text-gray-600 text-sm">
             {{ $t('auth.forgot.success_text') }}
-            <span class="font-semibold">{{ email }}</span>.
+            <span class="font-semibold">{{ email }}</span
+            >.
           </p>
 
           <p class="text-gray-500 text-sm">
@@ -82,9 +85,7 @@
             :disabled="resendCooldown > 0 || isLoading"
             class="w-full border py-2.5 rounded-lg text-sm"
           >
-            <span v-if="resendCooldown > 0">
-              {{ $t('auth.forgot.resend_wait') }} {{ resendCooldown }}s
-            </span>
+            <span v-if="resendCooldown > 0"> {{ $t('auth.forgot.resend_wait') }} {{ resendCooldown }}s </span>
             <span v-else>
               {{ $t('auth.forgot.resend') }}
             </span>
@@ -96,10 +97,8 @@
           >
             ← {{ $t('auth.forgot.login') }}
           </NuxtLink>
-
         </div>
       </template>
-
     </div>
   </div>
 </template>
@@ -109,7 +108,7 @@ import { ref } from 'vue'
 
 definePageMeta({
   layout: 'default',
-  middleware: 'guest'
+  middleware: 'guest',
 })
 
 useHead({
@@ -117,9 +116,9 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'Obnovte prístup do svojho NTI účtu pomocou e-mailu'
-    }
-  ]
+      content: 'Obnovte prístup do svojho NTI účtu pomocou e-mailu',
+    },
+  ],
 })
 
 const authStore = useAuthStore()

@@ -12,13 +12,13 @@
         </p>
         <div class="flex flex-col md:flex-row gap-4 mt-6 sm:mt-8">
           <NuxtLink
-            to="/auth/login"
+            :to="localePath('/auth/login')"
             class="bg-blue-500 cursor-pointer md:shrink-0 text-white py-4 px-8 sm:px-10 rounded-full font-bold shadow-lg hover:bg-blue-400 transition-all duration-300 ease-in-out"
           >
             Začni teraz
           </NuxtLink>
           <NuxtLink
-            to="/o-nas"
+            :to="localePath('/o-nas')"
             class="border-2 bg-white md:shrink-0 text-blue-500 md:bg-transparent cursor-pointer md:border-white md:text-white py-4 px-8 sm:px-10 rounded-full font-bold md:hover:bg-white md:hover:text-blue-500 transition-all"
           >
             Zisti viac
@@ -48,4 +48,6 @@ const props = defineProps({
   title: String,
   description: String,
 })
+
+const localePath = useLocalePath()
 </script>

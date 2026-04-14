@@ -1,8 +1,6 @@
 <template>
   <footer class="bg-navy text-white p-4 md:p-5 shadow-2xl">
-    
     <div class="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
-      
       <!-- LOGO -->
       <div>
         <NuxtLink :to="localePath('/')">
@@ -15,7 +13,6 @@
 
       <!-- LINKS -->
       <div class="flex items-center gap-3 whitespace-nowrap text-sm md:text-base lg:text-lg text-blue-50">
-        
         <NuxtLink
           :to="localePath('/o-nas')"
           class="hover:text-blue-500 transition-colors duration-300"
@@ -35,12 +32,10 @@
         >
           {{ $t('nav.contact') }}
         </NuxtLink>
-
       </div>
 
       <!-- SOCIALS -->
       <div class="flex gap-3 items-center">
-        
         <a
           href="#"
           class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
@@ -61,9 +56,7 @@
         >
           <Linkedin class="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
         </a>
-
       </div>
-
     </div>
   </footer>
 </template>

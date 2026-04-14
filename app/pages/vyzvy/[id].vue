@@ -1,15 +1,24 @@
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
     <!-- Loading state -->
-    <div v-if="callsStore.isLoading" class="bg-white rounded-lg shadow-sm border border-gray-100 p-8 h-96 animate-pulse" />
+    <div
+      v-if="callsStore.isLoading"
+      class="bg-white rounded-lg shadow-sm border border-gray-100 p-8 h-96 animate-pulse"
+    />
 
     <!-- Not found -->
-    <div v-else-if="!callsStore.currentCall" class="bg-white rounded-lg shadow-sm border border-gray-100">
+    <div
+      v-else-if="!callsStore.currentCall"
+      class="bg-white rounded-lg shadow-sm border border-gray-100"
+    >
       <UiEmptyState
         :icon="AlertCircle"
         title="Výzva nenájdená"
       >
-        <NuxtLink to="/vyzvy" class="text-sm font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
+        <NuxtLink
+          :to="localePath('/vyzvy')"
+          class="text-sm font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+        >
           <ArrowLeft class="w-4 h-4" />
           Späť na výzvy
         </NuxtLink>
@@ -19,7 +28,9 @@
     <template v-else>
       <!-- Breadcrumbs -->
       <div class="mb-8">
-        <UiBreadcrumbs :items="[{ label: 'Výzvy', to: '/vyzvy' }, { label: callsStore.currentCall.title }]" />
+        <UiBreadcrumbs
+          :items="[{ label: 'Výzvy', to: localePath('/vyzvy') }, { label: callsStore.currentCall.title }]"
+        />
       </div>
 
       <!-- Header -->
@@ -76,16 +87,32 @@
           </div>
 
           <!-- Form Preview -->
-          <div v-if="callsStore.currentCall.formSchema" class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+          <div
+            v-if="callsStore.currentCall.formSchema"
+            class="bg-white rounded-lg shadow-sm border border-gray-100 p-6"
+          >
             <h2 class="text-2xl font-bold text-navy mb-4">Formulár prihlášky</h2>
             <div class="text-gray-700">
-              <p v-if="callsStore.currentCall.formSchema?.description" class="mb-3">{{ callsStore.currentCall.formSchema?.description }}</p>
+              <p
+                v-if="callsStore.currentCall.formSchema?.description"
+                class="mb-3"
+              >
+                {{ callsStore.currentCall.formSchema?.description }}
+              </p>
               <div class="bg-gray-50 p-4 rounded-lg">
                 <p class="text-sm font-medium text-gray-700 mb-3">Polia v prihláškovom formulári:</p>
                 <ul class="space-y-2">
-                  <li v-for="field in callsStore.currentCall.formSchema.fields" :key="field.name" class="text-sm text-gray-600">
+                  <li
+                    v-for="field in callsStore.currentCall.formSchema.fields"
+                    :key="field.name"
+                    class="text-sm text-gray-600"
+                  >
                     <span class="font-medium text-navy">{{ field.label }}</span>
-                    <span v-if="field.required" class="text-red-500 ml-1">*</span>
+                    <span
+                      v-if="field.required"
+                      class="text-red-500 ml-1"
+                      >*</span
+                    >
                     <span class="text-gray-500 ml-2">— {{ field.type }}</span>
                   </li>
                 </ul>
@@ -109,7 +136,9 @@
                 <dd
                   :class="[
                     'text-sm font-medium rounded px-2 py-1',
-                    callsStore.currentCall.status === 'open' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-700',
+                    callsStore.currentCall.status === 'open'
+                      ? 'bg-green-50 text-green-700'
+                      : 'bg-gray-100 text-gray-700',
                   ]"
                 >
                   {{ callsStore.currentCall.status === 'open' ? 'Otvorené' : 'Zatvorené' }}
@@ -119,7 +148,10 @@
                 <dt class="text-sm text-gray-600">Prihlášok</dt>
                 <dd class="text-sm font-medium text-navy">{{ callsStore.currentCall.applicantsCount || 0 }}</dd>
               </div>
-              <div v-if="callsStore.currentCall.maxTeams" class="flex justify-between items-start">
+              <div
+                v-if="callsStore.currentCall.maxTeams"
+                class="flex justify-between items-start"
+              >
                 <dt class="text-sm text-gray-600">Max. tímov</dt>
                 <dd class="text-sm font-medium text-navy">{{ callsStore.currentCall.maxTeams }}</dd>
               </div>
@@ -129,17 +161,22 @@
           <!-- CTA Button -->
           <NuxtLink
             v-if="callsStore.currentCall.status === 'open'"
-            to="/prihlasky/nova"
+            :to="localePath('/student/prihlasky/nova')"
             class="block"
           >
-            <button class="w-full px-6 py-4 text-lg font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+            <button
+              class="w-full px-6 py-4 text-lg font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+            >
               <FileText class="w-5 h-5" />
               Prihlásiť sa
             </button>
           </NuxtLink>
 
           <!-- Closed warning -->
-          <div v-else class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div
+            v-else
+            class="bg-yellow-50 border border-yellow-200 rounded-lg p-4"
+          >
             <p class="text-sm text-yellow-800">
               <span class="font-semibold">Prihlášky sú zatvorené</span>
               <br />
@@ -149,7 +186,7 @@
 
           <!-- Back link -->
           <NuxtLink
-            to="/vyzvy"
+            :to="localePath('/vyzvy')"
             class="block text-center px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
           >
             ← Späť na výzvy
@@ -163,6 +200,8 @@
 <script setup lang="ts">
 import { watch } from 'vue'
 import { Calendar, Clock, FileText, ArrowLeft, AlertCircle } from 'lucide-vue-next'
+
+const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'default',
@@ -189,9 +228,13 @@ const loadCall = async () => {
 }
 
 // Watch for route param changes (immediate: true executes on mount)
-watch(() => route.params.id, () => {
-  loadCall()
-}, { immediate: true })
+watch(
+  () => route.params.id,
+  () => {
+    loadCall()
+  },
+  { immediate: true },
+)
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('sk-SK')

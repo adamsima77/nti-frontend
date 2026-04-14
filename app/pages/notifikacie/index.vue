@@ -36,7 +36,10 @@
             class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
             :class="notificationColor(notification.type)"
           >
-            <component :is="notificationIcon(notification.type)" class="w-5 h-5 text-white" />
+            <component
+              :is="notificationIcon(notification.type)"
+              class="w-5 h-5 text-white"
+            />
           </div>
           <div class="flex flex-col gap-1">
             <p class="text-sm font-medium text-navy">{{ notification.title }}</p>
@@ -45,12 +48,18 @@
           </div>
         </div>
         <div class="flex flex-col items-end gap-2">
-          <button @click="toggleRead(notification.id)" class="text-xs text-gray-400 hover:text-gray-700">
+          <button
+            @click="toggleRead(notification.id)"
+            class="text-xs text-gray-400 hover:text-gray-700"
+          >
             {{ notification.read ? 'Označiť ako neprečítané' : 'Označiť ako prečítané' }}
           </button>
         </div>
       </div>
-      <div v-if="!filteredNotifications.length" class="p-8 text-center text-gray-400 text-sm">
+      <div
+        v-if="!filteredNotifications.length"
+        class="p-8 text-center text-gray-400 text-sm"
+      >
         Žiadne notifikácie
       </div>
     </div>
@@ -77,7 +86,6 @@ definePageMeta({
 
 useHead({ title: 'Notifikácie | NTI' })
 
-
 const authStore = useAuthStore()
 const userRole = authStore.user?.role || 'student'
 
@@ -89,44 +97,88 @@ const availableTypes = [
 ]
 
 const notifications = ref([
-  { id: 1, type: 'project', title: 'Nový projekt', message: 'EcoTrack priradený', date: '02.04.2026', read: false, roles: ['mentor', 'student'] },
-  { id: 2, type: 'milestone', title: 'Míľnik čaká na schválenie', message: 'AI chatbot – MVP', date: '01.04.2026', read: false, roles: ['mentor', 'evaluator'] },
-  { id: 3, type: 'consultation', title: 'Nová konzultácia', message: 'EcoTrack review', date: '28.03.2026', read: true, roles: ['mentor'] },
-  { id: 4, type: 'system_alert', title: 'Údržba systému', message: 'Downtime 04.04.2026 02:00–04:00', date: '03.04.2026', read: false, roles: ['admin', 'superadmin', 'mentor', 'student'] },
+  {
+    id: 1,
+    type: 'project',
+    title: 'Nový projekt',
+    message: 'EcoTrack priradený',
+    date: '02.04.2026',
+    read: false,
+    roles: ['mentor', 'student'],
+  },
+  {
+    id: 2,
+    type: 'milestone',
+    title: 'Míľnik čaká na schválenie',
+    message: 'AI chatbot – MVP',
+    date: '01.04.2026',
+    read: false,
+    roles: ['mentor', 'evaluator'],
+  },
+  {
+    id: 3,
+    type: 'consultation',
+    title: 'Nová konzultácia',
+    message: 'EcoTrack review',
+    date: '28.03.2026',
+    read: true,
+    roles: ['mentor'],
+  },
+  {
+    id: 4,
+    type: 'system_alert',
+    title: 'Údržba systému',
+    message: 'Downtime 04.04.2026 02:00–04:00',
+    date: '03.04.2026',
+    read: false,
+    roles: ['admin', 'superadmin', 'mentor', 'student'],
+  },
 ])
 
 const filterType = ref<'all' | string>('all')
 
 const filteredNotifications = computed(() =>
-  notifications.value.filter(n =>
-    n.roles.includes(userRole) && (filterType.value === 'all' || n.type === filterType.value)
-  )
+  notifications.value.filter(
+    (n) => n.roles.includes(userRole) && (filterType.value === 'all' || n.type === filterType.value),
+  ),
 )
 
 const notificationIcon = (type: string) => {
   switch (type) {
-    case 'project': return Users
-    case 'milestone': return Flag
-    case 'consultation': return MessageSquare
-    case 'system_alert': return AlertTriangle
-    default: return Clock
+    case 'project':
+      return Users
+    case 'milestone':
+      return Flag
+    case 'consultation':
+      return MessageSquare
+    case 'system_alert':
+      return AlertTriangle
+    default:
+      return Clock
   }
 }
 
 const notificationColor = (type: string) => {
   switch (type) {
-    case 'project': return 'bg-blue-600'
-    case 'milestone': return 'bg-yellow-500'
-    case 'consultation': return 'bg-purple-600'
-    case 'system_alert': return 'bg-red-600'
-    default: return 'bg-gray-400'
+    case 'project':
+      return 'bg-blue-600'
+    case 'milestone':
+      return 'bg-yellow-500'
+    case 'consultation':
+      return 'bg-purple-600'
+    case 'system_alert':
+      return 'bg-red-600'
+    default:
+      return 'bg-gray-400'
   }
 }
 
 const toggleRead = (id: number) => {
-  const n = notifications.value.find(n => n.id === id)
+  const n = notifications.value.find((n) => n.id === id)
   if (n) n.read = !n.read
 }
 
-const clearAll = () => { notifications.value = [] }
+const clearAll = () => {
+  notifications.value = []
+}
 </script>

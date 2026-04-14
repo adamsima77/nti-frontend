@@ -1,5 +1,8 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-8">
+  <form
+    @submit.prevent="handleSubmit"
+    class="space-y-8"
+  >
     <!-- Sections or flat fields -->
     <div
       v-if="formSchema.sections && formSchema.sections.length"
@@ -10,7 +13,12 @@
       <!-- Section Header -->
       <div class="pt-6 border-t border-gray-200">
         <h3 class="text-lg font-semibold text-navy mb-1">{{ section.title }}</h3>
-        <p v-if="section.description" class="text-sm text-gray-600">{{ section.description }}</p>
+        <p
+          v-if="section.description"
+          class="text-sm text-gray-600"
+        >
+          {{ section.description }}
+        </p>
       </div>
 
       <!-- Fields in section -->
@@ -27,7 +35,10 @@
     </div>
 
     <!-- Flat fields (no sections) -->
-    <div v-else class="space-y-4">
+    <div
+      v-else
+      class="space-y-4"
+    >
       <FormField
         v-for="field in formSchema.fields"
         :key="field.name"
@@ -110,7 +121,7 @@ watch(
   () => {
     markDirty()
   },
-  { deep: true }
+  { deep: true },
 )
 
 const getFieldByName = (name: string): FormFieldType => {

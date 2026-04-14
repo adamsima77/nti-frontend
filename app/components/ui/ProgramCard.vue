@@ -16,6 +16,6 @@
 const props = defineProps({
   title: String,
   description: String,
-  link: String
+  link: String,
 })
 </script>

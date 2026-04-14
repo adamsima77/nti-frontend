@@ -77,7 +77,7 @@
             @click="setLocale('en')"
             :class="[
               'px-3 py-2 text-sm font-medium rounded transition-colors duration-200 flex-1',
-              locale === 'en' ? 'bg-blue-500 text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
+              locale === 'en' ? 'bg-blue-500 text-white' : 'bg-white/10 text-white/70 hover:bg-white/20',
             ]"
             :title="$t('locale.en_title')"
           >
@@ -87,7 +87,7 @@
             @click="setLocale('sk')"
             :class="[
               'px-3 py-2 text-sm font-medium rounded transition-colors duration-200 flex-1',
-              locale === 'sk' ? 'bg-blue-500 text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
+              locale === 'sk' ? 'bg-blue-500 text-white' : 'bg-white/10 text-white/70 hover:bg-white/20',
             ]"
             :title="$t('locale.sk_title')"
           >

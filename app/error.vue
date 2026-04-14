@@ -12,7 +12,7 @@
       <div class="w-16 h-1 bg-blue-500 mx-auto mb-8 rounded-full"></div>
 
       <NuxtLink
-        to="/"
+        :to="localePath('/')"
         class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md transition all duration-300 ease-in-out shadow-md text-sm sm:text-base"
       >
         Späť na domov
@@ -21,7 +21,7 @@
       <p class="mt-6 text-sm sm:text-base text-gray-500">
         Ak si myslíš, že ide o chybu,
         <NuxtLink
-          to="/kontakt"
+          :to="localePath('/kontakt')"
           class="text-blue-500 hover:text-blue-600 underline underline-offset-4 transition all duration-300 ease-in-out font-medium"
         >
           kontaktuj nás
@@ -34,4 +34,6 @@
 const props = defineProps({
   error: Object,
 })
+
+const localePath = useLocalePath()
 </script>

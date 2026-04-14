@@ -154,7 +154,7 @@
           {{ $t('program-a.cta.description') }}
         </p>
         <NuxtLink
-          to="/auth/login"
+          :to="localePath('/auth/login')"
           class="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors"
         >
           {{ $t('program-a.cta.button') }}
@@ -167,15 +167,19 @@
 <script setup>
 import { ref } from 'vue'
 
+const localePath = useLocalePath()
+
 definePageMeta({
   layout: 'default',
 })
 
 useSeoMeta({
   title: 'Program A — Intenzívne zrýchlenie | NTI',
-  description: 'Program A je 3-mesačný intenzívny program pre študentov vysokých škôl s mentorstvom, tímovou prácou a reálnymi projektmi.',
+  description:
+    'Program A je 3-mesačný intenzívny program pre študentov vysokých škôl s mentorstvom, tímovou prácou a reálnymi projektmi.',
   ogTitle: 'Program A — Intenzívne zrýchlenie',
-  ogDescription: 'Dynamický 3-mesačný program pre študentov a začínajúcich profesionálov. Získaj skúsenosti, mentoring a sieť kontaktov.',
+  ogDescription:
+    'Dynamický 3-mesačný program pre študentov a začínajúcich profesionálov. Získaj skúsenosti, mentoring a sieť kontaktov.',
   ogType: 'website',
   ogUrl: 'https://nti.sk/program-a',
   twitterCard: 'summary_large_image',

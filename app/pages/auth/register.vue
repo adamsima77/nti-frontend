@@ -1,10 +1,12 @@
 <template>
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
-
       <!-- HEADER -->
       <div class="mb-8 text-center">
-        <NuxtLink to="/" class="inline-block mb-6" />
+        <NuxtLink
+          to="/"
+          class="inline-block mb-6"
+        />
 
         <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">
           {{ $t('auth.register.title') }}
@@ -16,8 +18,10 @@
       </div>
 
       <!-- STEP SELECTION -->
-      <div v-if="step === 'type-selection'" class="space-y-4">
-
+      <div
+        v-if="step === 'type-selection'"
+        class="space-y-4"
+      >
         <p class="text-center text-gray-700 font-medium mb-6">
           {{ $t('auth.register.type_selection.title') }}
         </p>
@@ -28,8 +32,9 @@
           @click="selectAccountType('student')"
         >
           <div class="flex items-start gap-4">
-
-            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+            <div
+              class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors"
+            >
               <GraduationCap class="w-6 h-6 text-blue-600" />
             </div>
 
@@ -42,7 +47,6 @@
                 {{ $t('auth.register.type_selection.student.description') }}
               </p>
             </div>
-
           </div>
         </button>
 
@@ -52,8 +56,9 @@
           @click="selectAccountType('organization')"
         >
           <div class="flex items-start gap-4">
-
-            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+            <div
+              class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors"
+            >
               <Briefcase class="w-6 h-6 text-blue-600" />
             </div>
 
@@ -66,10 +71,8 @@
                 {{ $t('auth.register.type_selection.organization.description') }}
               </p>
             </div>
-
           </div>
         </button>
-
       </div>
 
       <!-- FORM -->
@@ -78,7 +81,6 @@
         class="space-y-4"
         @submit.prevent="submitRegistration"
       >
-
         <!-- BACK -->
         <button
           type="button"
@@ -90,8 +92,10 @@
         </button>
 
         <!-- STUDENT -->
-        <div v-if="accountType === 'student'" class="space-y-4">
-
+        <div
+          v-if="accountType === 'student'"
+          class="space-y-4"
+        >
           <UiInput
             v-model="formData.firstName"
             :label="$t('auth.register.fields.first_name')"
@@ -135,12 +139,13 @@
             required
             :error="errors.password_confirmation"
           />
-
         </div>
 
         <!-- ORGANIZATION -->
-        <div v-else-if="accountType === 'organization'" class="space-y-4">
-
+        <div
+          v-else-if="accountType === 'organization'"
+          class="space-y-4"
+        >
           <UiInput
             v-model="formData.organizationName"
             :label="$t('auth.register.fields.organization_name')"
@@ -176,7 +181,6 @@
             required
             :error="errors.password_confirmation"
           />
-
         </div>
 
         <!-- TERMS -->
@@ -189,16 +193,25 @@
             required
           />
 
-          <label for="terms" class="text-sm text-gray-700">
+          <label
+            for="terms"
+            class="text-sm text-gray-700"
+          >
             {{ $t('auth.register.terms.text') }}
 
-            <NuxtLink to="#" class="text-blue-600 hover:underline">
+            <NuxtLink
+              to="#"
+              class="text-blue-600 hover:underline"
+            >
               {{ $t('auth.register.terms.terms') }}
             </NuxtLink>
 
             {{ ' a ' }}
 
-            <NuxtLink to="#" class="text-blue-600 hover:underline">
+            <NuxtLink
+              to="#"
+              class="text-blue-600 hover:underline"
+            >
               {{ $t('auth.register.terms.privacy') }}
             </NuxtLink>
           </label>
@@ -222,13 +235,14 @@
         <!-- LOGIN -->
         <p class="text-center text-gray-600">
           {{ $t('auth.register.login.text') }}
-          <NuxtLink to="/auth/login" class="text-blue-600 hover:underline font-medium">
+          <NuxtLink
+            to="/auth/login"
+            class="text-blue-600 hover:underline font-medium"
+          >
             {{ $t('auth.register.login.link') }}
           </NuxtLink>
         </p>
-
       </form>
-
     </div>
   </div>
 </template>

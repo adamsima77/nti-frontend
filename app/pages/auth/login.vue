@@ -1,13 +1,15 @@
 <template>
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
-
       <form
         class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-5"
         @submit.prevent="handleLogin"
       >
         <div class="mb-8 text-center">
-          <NuxtLink to="/" class="inline-block mb-6" />
+          <NuxtLink
+            to="/"
+            class="inline-block mb-6"
+          />
 
           <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">
             {{ $t('auth.login.title') }}
@@ -38,7 +40,7 @@
 
         <div class="flex justify-end">
           <NuxtLink
-            to="/auth/forgot-password"
+            :to="localePath('/auth/forgot-password')"
             class="text-sm text-blue-600 hover:underline"
           >
             {{ $t('auth.login.forgot_password') }}
@@ -61,20 +63,21 @@
         <p class="text-center text-gray-600 text-sm">
           {{ $t('auth.login.no_account') }}
           <NuxtLink
-            to="/auth/register"
+            :to="localePath('/auth/register')"
             class="text-blue-600 hover:underline font-medium"
           >
             {{ $t('auth.login.register') }}
           </NuxtLink>
         </p>
       </form>
-
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
+
+const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'default',

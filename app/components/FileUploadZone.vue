@@ -21,17 +21,26 @@
       />
 
       <!-- Empty state -->
-      <div v-if="selectedFiles.length === 0" class="text-center cursor-pointer" @click="fileInput?.click()">
+      <div
+        v-if="selectedFiles.length === 0"
+        class="text-center cursor-pointer"
+        @click="fileInput?.click()"
+      >
         <Upload class="w-8 h-8 mx-auto mb-2 text-gray-400" />
         <p class="text-sm font-medium text-gray-700">Presuňte súbory sem alebo kliknite na výber</p>
-        <p class="text-xs text-gray-500 mt-1">
-          Maximálna veľkosť {{ formatBytes(maxFileSize) }} na súbor
-        </p>
+        <p class="text-xs text-gray-500 mt-1">Maximálna veľkosť {{ formatBytes(maxFileSize) }} na súbor</p>
       </div>
 
       <!-- Files list -->
-      <div v-else class="space-y-2">
-        <div v-for="(file, idx) in selectedFiles" :key="idx" class="flex items-center gap-3 p-3 bg-white rounded border border-gray-200">
+      <div
+        v-else
+        class="space-y-2"
+      >
+        <div
+          v-for="(file, idx) in selectedFiles"
+          :key="idx"
+          class="flex items-center gap-3 p-3 bg-white rounded border border-gray-200"
+        >
           <File class="w-4 h-4 text-gray-400 flex-shrink-0" />
 
           <div class="flex-1 min-w-0">
@@ -40,8 +49,14 @@
           </div>
 
           <!-- Progress bar -->
-          <div v-if="uploadProgress[idx]" class="w-20 h-1 bg-gray-200 rounded-full overflow-hidden">
-            <div class="h-full bg-blue-500 transition-all" :style="{ width: uploadProgress[idx] + '%' }" />
+          <div
+            v-if="uploadProgress[idx]"
+            class="w-20 h-1 bg-gray-200 rounded-full overflow-hidden"
+          >
+            <div
+              class="h-full bg-blue-500 transition-all"
+              :style="{ width: uploadProgress[idx] + '%' }"
+            />
           </div>
 
           <!-- Remove button -->
@@ -68,7 +83,11 @@
     </div>
 
     <!-- Error message -->
-    <span v-if="hasError" class="text-xs text-danger-600">{{ error }}</span>
+    <span
+      v-if="hasError"
+      class="text-xs text-danger-600"
+      >{{ error }}</span
+    >
   </div>
 </template>
 

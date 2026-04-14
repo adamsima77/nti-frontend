@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-navy">Moje prihlášky</h1>
-      <NuxtLink to="/prihlasky/nova">
+      <NuxtLink :to="localePath('/student/prihlasky/nova')">
         <UiButton>
           <Plus class="w-4 h-4" />
           Nová prihláška
@@ -81,7 +81,7 @@
         title="Žiadne prihlášky"
         description="Skúste zmeniť filtre alebo vytvorte novú prihlášku"
       >
-        <NuxtLink to="/prihlasky/nova">
+        <NuxtLink :to="localePath('/student/prihlasky/nova')">
           <UiButton size="sm">Nová prihláška</UiButton>
         </NuxtLink>
       </UiEmptyState>
@@ -92,6 +92,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Plus, Users, Paperclip, ChevronRight, FileText } from 'lucide-vue-next'
+
+const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'portal',

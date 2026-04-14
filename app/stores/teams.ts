@@ -160,11 +160,7 @@ export const useTeamsStore = defineStore('teams', () => {
     }
   }
 
-  const updateMemberRole = async (
-    teamId: number | string,
-    memberId: number,
-    role: string
-  ) => {
+  const updateMemberRole = async (teamId: number | string, memberId: number, role: string) => {
     isLoading.value = true
 
     try {

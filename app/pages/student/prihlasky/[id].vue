@@ -94,7 +94,10 @@
           </div>
 
           <!-- Míľníky -->
-          <div v-if="application.status === 'approved' && application.milestones.length" class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
+          <div
+            v-if="application.status === 'approved' && application.milestones.length"
+            class="bg-white rounded-lg shadow-sm border border-gray-100 p-5"
+          >
             <h2 class="text-xl font-bold text-navy mb-3">Míľníkový prehľad</h2>
             <div class="space-y-3">
               <div
@@ -110,9 +113,18 @@
                 <div class="flex items-start justify-between gap-3 mb-2">
                   <div class="flex items-start gap-3">
                     <div class="mt-0.5 shrink-0">
-                      <CheckCircle v-if="milestone.status === 'completed'" class="w-5 h-5 text-success-500" />
-                      <Clock v-else-if="milestone.status === 'in_progress'" class="w-5 h-5 text-blue-500" />
-                      <Circle v-else class="w-5 h-5 text-gray-300" />
+                      <CheckCircle
+                        v-if="milestone.status === 'completed'"
+                        class="w-5 h-5 text-success-500"
+                      />
+                      <Clock
+                        v-else-if="milestone.status === 'in_progress'"
+                        class="w-5 h-5 text-blue-500"
+                      />
+                      <Circle
+                        v-else
+                        class="w-5 h-5 text-gray-300"
+                      />
                     </div>
                     <div>
                       <p class="font-medium text-navy text-sm">{{ milestone.title }}</p>
@@ -130,8 +142,16 @@
                     {{ milestoneStatus(milestone.status) }}
                   </span>
                 </div>
-                <p v-if="milestone.description" class="text-xs text-gray-600 ml-8">{{ milestone.description }}</p>
-                <p v-if="milestone.status === 'completed'" class="text-xs text-gray-500 ml-8 mt-2">
+                <p
+                  v-if="milestone.description"
+                  class="text-xs text-gray-600 ml-8"
+                >
+                  {{ milestone.description }}
+                </p>
+                <p
+                  v-if="milestone.status === 'completed'"
+                  class="text-xs text-gray-500 ml-8 mt-2"
+                >
                   ✓ Dokončené: {{ milestone.completedAt }}
                 </p>
               </div>
@@ -463,9 +483,9 @@ function historyLabel(status: string): string {
 
 function milestoneStatus(status: string): string {
   const labels: Record<string, string> = {
-    'completed': 'Dokončené',
-    'in_progress': 'V progrese',
-    'pending': 'Čakajúce',
+    completed: 'Dokončené',
+    in_progress: 'V progrese',
+    pending: 'Čakajúce',
   }
   return labels[status] || status
 }

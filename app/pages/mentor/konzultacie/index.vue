@@ -1,7 +1,6 @@
 <!-- pages/mentor/konzultacie/index.vue -->
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
-
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
@@ -24,7 +23,13 @@
         class="px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-400"
       >
         <option value="">Všetky projekty</option>
-        <option v-for="p in projectOptions" :key="p.value" :value="p.value">{{ p.label }}</option>
+        <option
+          v-for="p in projectOptions"
+          :key="p.value"
+          :value="p.value"
+        >
+          {{ p.label }}
+        </option>
       </select>
       <!-- Type filter -->
       <select
@@ -75,10 +80,18 @@
           <div>
             <div class="flex items-center gap-2 mb-0.5">
               <h3 class="font-semibold text-navy text-sm">{{ c.title }}</h3>
-              <span class="text-xs px-2 py-0.5 rounded-full font-medium" :class="typeClass(c.type)">{{ c.type }}</span>
+              <span
+                class="text-xs px-2 py-0.5 rounded-full font-medium"
+                :class="typeClass(c.type)"
+                >{{ c.type }}</span
+              >
             </div>
             <p class="text-xs text-gray-400">
-              <NuxtLink :to="`/mentor/${c.projectId}`" class="text-purple-600 hover:underline">{{ c.projectName }}</NuxtLink>
+              <NuxtLink
+                :to="`/mentor/${c.projectId}`"
+                class="text-purple-600 hover:underline"
+                >{{ c.projectName }}</NuxtLink
+              >
               · {{ c.date }} · {{ c.duration }} min
             </p>
           </div>
@@ -90,7 +103,10 @@
           </NuxtLink>
         </div>
         <p class="text-sm text-gray-600 leading-relaxed mb-3 line-clamp-2">{{ c.summary }}</p>
-        <div v-if="c.actionItems.length" class="flex flex-wrap gap-1.5">
+        <div
+          v-if="c.actionItems.length"
+          class="flex flex-wrap gap-1.5"
+        >
           <span
             v-for="item in c.actionItems"
             :key="item"
@@ -101,13 +117,15 @@
         </div>
       </div>
 
-      <div v-if="!filteredConsultations.length" class="text-center py-16 bg-white rounded-lg border border-gray-100">
+      <div
+        v-if="!filteredConsultations.length"
+        class="text-center py-16 bg-white rounded-lg border border-gray-100"
+      >
         <MessageSquare class="w-12 h-12 text-gray-300 mx-auto mb-3" />
         <p class="text-gray-500 font-medium">Žiadne záznamy</p>
         <p class="text-sm text-gray-400 mt-1">Skúste zmeniť filtre alebo pridajte novú konzultáciu</p>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -115,10 +133,10 @@
 import { ref, computed } from 'vue'
 import { Plus, ExternalLink, ArrowRight, MessageSquare } from 'lucide-vue-next'
 
-definePageMeta({ 
-  layout: 'portal', 
-  //middleware: 'auth', 
-  roles: ['mentor'] 
+definePageMeta({
+  layout: 'portal',
+  //middleware: 'auth',
+  roles: ['mentor'],
 })
 
 useHead({ title: 'Konzultácie | NTI Mentor' })
@@ -127,19 +145,19 @@ const authStore = useAuthStore()
 
 // TODO: remove when backend is available
 if (!authStore.user) {
-  authStore.user = { 
-    id: 10, 
-    email: 'mentor@nti.sk', 
-    first_name: 'Matej', 
-    last_name: 'Novotný', 
-    role: 'mentor' 
+  authStore.user = {
+    id: 10,
+    email: 'mentor@nti.sk',
+    first_name: 'Matej',
+    last_name: 'Novotný',
+    role: 'mentor',
   }
   authStore.token = 'mock-token'
 }
 
 const filterProject = ref('')
-const filterType    = ref('')
-const filterMonth   = ref('')
+const filterType = ref('')
+const filterMonth = ref('')
 
 const projectOptions = [
   { value: '1', label: 'EcoTrack' },
@@ -149,15 +167,65 @@ const projectOptions = [
 
 // TODO: fetch from API
 const allConsultations = [
-  { id: 1, projectId: 2, projectName: 'AI chatbot', title: 'Sprint review #2',           type: 'online',   date: '01.04.2026', duration: 45, summary: 'Tím predviedol MVP chatbota. Kvalita odpovedí je dobrá, chýba handling edge-case otázok.', actionItems: ['Otestovať edge cases', 'Pripraviť dokumentáciu pre Salesforce integráciu'] },
-  { id: 2, projectId: 1, projectName: 'EcoTrack',   title: 'Review databázovej schémy',  type: 'online',   date: '28.03.2026', duration: 60, summary: 'Diskusia o optimalizácii dotazov pre veľké datasety. Rozhodnutie použiť TimescaleDB.', actionItems: ['Prepísať migrácie na TimescaleDB', 'Benchmarky dotazov'] },
-  { id: 3, projectId: 2, projectName: 'AI chatbot', title: 'Review architektúry',        type: 'online',   date: '22.03.2026', duration: 60, summary: 'Diskusia o voľbe LLM providera. Rozhodnutie: OpenAI pre MVP, self-hosted pre produkciu.', actionItems: ['Pridať rate limiting', 'Dokumentovať fallback scenáre'] },
-  { id: 4, projectId: 1, projectName: 'EcoTrack',   title: 'Kick-off',                   type: 'personal', date: '16.02.2026', duration: 90, summary: 'Úvodné stretnutie. Definícia cieľov, roadmapa, rozdelenie rolí v tíme.',              actionItems: ['Nastaviť repo a CI/CD', 'Vypracovať tech spec'] },
-  { id: 5, projectId: 2, projectName: 'AI chatbot', title: 'Kick-off konzultácia',       type: 'personal', date: '05.03.2026', duration: 90, summary: 'Predstavenie projektu a zadania firmy. Dohodnutý spôsob komunikácie.',                actionItems: ['Vytvoriť repo', 'Pripraviť tech spec do 10.03.'] },
+  {
+    id: 1,
+    projectId: 2,
+    projectName: 'AI chatbot',
+    title: 'Sprint review #2',
+    type: 'online',
+    date: '01.04.2026',
+    duration: 45,
+    summary: 'Tím predviedol MVP chatbota. Kvalita odpovedí je dobrá, chýba handling edge-case otázok.',
+    actionItems: ['Otestovať edge cases', 'Pripraviť dokumentáciu pre Salesforce integráciu'],
+  },
+  {
+    id: 2,
+    projectId: 1,
+    projectName: 'EcoTrack',
+    title: 'Review databázovej schémy',
+    type: 'online',
+    date: '28.03.2026',
+    duration: 60,
+    summary: 'Diskusia o optimalizácii dotazov pre veľké datasety. Rozhodnutie použiť TimescaleDB.',
+    actionItems: ['Prepísať migrácie na TimescaleDB', 'Benchmarky dotazov'],
+  },
+  {
+    id: 3,
+    projectId: 2,
+    projectName: 'AI chatbot',
+    title: 'Review architektúry',
+    type: 'online',
+    date: '22.03.2026',
+    duration: 60,
+    summary: 'Diskusia o voľbe LLM providera. Rozhodnutie: OpenAI pre MVP, self-hosted pre produkciu.',
+    actionItems: ['Pridať rate limiting', 'Dokumentovať fallback scenáre'],
+  },
+  {
+    id: 4,
+    projectId: 1,
+    projectName: 'EcoTrack',
+    title: 'Kick-off',
+    type: 'personal',
+    date: '16.02.2026',
+    duration: 90,
+    summary: 'Úvodné stretnutie. Definícia cieľov, roadmapa, rozdelenie rolí v tíme.',
+    actionItems: ['Nastaviť repo a CI/CD', 'Vypracovať tech spec'],
+  },
+  {
+    id: 5,
+    projectId: 2,
+    projectName: 'AI chatbot',
+    title: 'Kick-off konzultácia',
+    type: 'personal',
+    date: '05.03.2026',
+    duration: 90,
+    summary: 'Predstavenie projektu a zadania firmy. Dohodnutý spôsob komunikácie.',
+    actionItems: ['Vytvoriť repo', 'Pripraviť tech spec do 10.03.'],
+  },
 ]
 
 const filteredConsultations = computed(() =>
-  allConsultations.filter(c => {
+  allConsultations.filter((c) => {
     if (filterProject.value && String(c.projectId) !== filterProject.value) return false
     if (filterType.value) {
       const map: Record<string, string> = { online: 'online', personal: 'personal', written: 'written' }
@@ -165,10 +233,10 @@ const filteredConsultations = computed(() =>
       if (typeKey !== map[filterType.value]) return false
     }
     return true
-  })
+  }),
 )
 
-const totalTime        = computed(() => filteredConsultations.value.reduce((s, c) => s + c.duration, 0))
+const totalTime = computed(() => filteredConsultations.value.reduce((s, c) => s + c.duration, 0))
 const totalActionItems = computed(() => filteredConsultations.value.reduce((s, c) => s + c.actionItems.length, 0))
 
 const typeClass = (type: string) => {

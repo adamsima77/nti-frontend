@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-navy">Moje tímy</h1>
-      <NuxtLink to="/timy/vytvorit">
+      <NuxtLink :to="localePath('/student/timy/vytvorit')">
         <UiButton>
           <Plus class="w-4 h-4" />
           Vytvoriť tím
@@ -12,18 +12,28 @@
     </div>
 
     <!-- Loading state -->
-    <div v-if="teamsStore.isLoading" class="space-y-4">
-      <div v-for="i in 3" :key="i" class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 h-64 animate-pulse" />
+    <div
+      v-if="teamsStore.isLoading"
+      class="space-y-4"
+    >
+      <div
+        v-for="i in 3"
+        :key="i"
+        class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 h-64 animate-pulse"
+      />
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="teamsStore.teams.length === 0" class="bg-white rounded-lg shadow-sm border border-gray-100">
+    <div
+      v-else-if="teamsStore.teams.length === 0"
+      class="bg-white rounded-lg shadow-sm border border-gray-100"
+    >
       <UiEmptyState
         :icon="Users"
         title="Zatiaľ nemáte žiadne tímy"
         description="Vytvorte si svoj prvý tím a pozvite členov!"
       >
-        <NuxtLink to="/timy/vytvorit">
+        <NuxtLink :to="localePath('/student/timy/vytvorit')">
           <UiButton>
             <Plus class="w-4 h-4" />
             Vytvoriť tím
@@ -33,7 +43,10 @@
     </div>
 
     <!-- Team cards -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div
+      v-else
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+    >
       <div
         v-for="team in teamsStore.teams"
         :key="team.id"
@@ -94,6 +107,8 @@
 <script setup lang="ts">
 import { Plus, FileText, ChevronRight, Users } from 'lucide-vue-next'
 import { onMounted } from 'vue'
+
+const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'portal',

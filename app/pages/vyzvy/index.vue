@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen flex flex-col">
-
     <!-- HERO -->
     <div class="bg-gradient-to-br from-navy via-blue-900 to-blue-800 text-white py-20 px-6">
       <div class="max-w-7xl mx-auto">
@@ -16,9 +15,11 @@
     <!-- CONTENT -->
     <div class="flex-1 bg-gray-50 py-20 px-6">
       <div class="max-w-7xl mx-auto">
-
         <!-- LOADING -->
-        <div v-if="callsStore.isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div
+          v-if="callsStore.isLoading"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           <div
             v-for="i in 6"
             :key="i"
@@ -39,16 +40,19 @@
         </div>
 
         <!-- GRID -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
+        <div
+          v-else
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           <NuxtLink
             v-for="call in callsStore.calls"
             :key="call.id"
             :to="`/vyzvy/${call.id}`"
             class="group"
           >
-            <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6 h-full hover:shadow-xl hover:border-blue-400 transition-all cursor-pointer flex flex-col">
-
+            <div
+              class="bg-white rounded-lg shadow-md border border-gray-200 p-6 h-full hover:shadow-xl hover:border-blue-400 transition-all cursor-pointer flex flex-col"
+            >
               <!-- 🚫 STATUS BOX LEFT EXACTLY AS-IS -->
               <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
@@ -100,12 +104,9 @@
                 {{ $t('calls.vyzvy_terminy.cta') }}
                 <ChevronRight class="w-4 h-4" />
               </button>
-
             </div>
           </NuxtLink>
-
         </div>
-
       </div>
     </div>
   </div>

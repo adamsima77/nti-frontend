@@ -82,7 +82,7 @@
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-navy">Moje prihlášky</h2>
         <NuxtLink
-          to="/prihlasky"
+          :to="localePath('/student/prihlasky')"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
         >
           Zobraziť všetky
@@ -131,7 +131,10 @@
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-navy">Aktívne projekty — Míľníky</h2>
       </div>
-      <div v-if="activeProjectsWithMilestones.length" class="grid grid-cols-1 gap-4">
+      <div
+        v-if="activeProjectsWithMilestones.length"
+        class="grid grid-cols-1 gap-4"
+      >
         <div
           v-for="project in activeProjectsWithMilestones"
           :key="project.id"
@@ -143,26 +146,43 @@
               <p class="text-xs text-gray-500 mt-1">{{ project.team }}</p>
             </div>
             <div class="text-right">
-              <span class="text-xs text-gray-400">{{ project.completedMilestones }}/{{ project.milestones.length }} míľníky</span>
+              <span class="text-xs text-gray-400"
+                >{{ project.completedMilestones }}/{{ project.milestones.length }} míľníky</span
+              >
               <div class="mt-1 h-1.5 w-20 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full bg-blue-600" :style="{ width: milestoneProgress(project) +'%' }" />
+                <div
+                  class="h-full bg-blue-600"
+                  :style="{ width: milestoneProgress(project) + '%' }"
+                />
               </div>
             </div>
           </div>
-          
+
           <div class="space-y-2">
             <div
               v-for="milestone in project.milestones.slice(0, 2)"
               :key="milestone.id"
               class="flex items-center gap-2 text-sm"
             >
-              <CheckCircle v-if="milestone.status === 'completed'" class="w-4 h-4 text-success-500 flex-shrink-0" />
-              <Clock v-else-if="milestone.status === 'in_progress'" class="w-4 h-4 text-blue-500 flex-shrink-0" />
-              <Circle v-else class="w-4 h-4 text-gray-300 flex-shrink-0" />
+              <CheckCircle
+                v-if="milestone.status === 'completed'"
+                class="w-4 h-4 text-success-500 flex-shrink-0"
+              />
+              <Clock
+                v-else-if="milestone.status === 'in_progress'"
+                class="w-4 h-4 text-blue-500 flex-shrink-0"
+              />
+              <Circle
+                v-else
+                class="w-4 h-4 text-gray-300 flex-shrink-0"
+              />
               <span class="text-gray-700 flex-1 truncate">{{ milestone.title }}</span>
               <span class="text-gray-400 text-xs">{{ milestone.dueDate }}</span>
             </div>
-            <div v-if="project.milestones.length > 2" class="text-xs text-gray-400 ml-6">
+            <div
+              v-if="project.milestones.length > 2"
+              class="text-xs text-gray-400 ml-6"
+            >
               +{{ project.milestones.length - 2 }} ďalšie míľníky
             </div>
           </div>
@@ -176,7 +196,10 @@
           </NuxtLink>
         </div>
       </div>
-      <UiEmptyState v-else title="Žiadne aktívne projekty s míľníkami" />
+      <UiEmptyState
+        v-else
+        title="Žiadne aktívne projekty s míľníkami"
+      />
     </div>
 
     <!-- My teams -->
@@ -184,7 +207,7 @@
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-navy">Moje tímy</h2>
         <NuxtLink
-          to="/timy"
+          :to="localePath('/student/timy')"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
         >
           Zobraziť všetky
@@ -217,7 +240,20 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { FileText, Users, User, Calendar, AlertTriangle, Clock, Paperclip, ChevronRight, CheckCircle, Circle } from 'lucide-vue-next'
+import {
+  FileText,
+  Users,
+  User,
+  Calendar,
+  AlertTriangle,
+  Clock,
+  Paperclip,
+  ChevronRight,
+  CheckCircle,
+  Circle,
+} from 'lucide-vue-next'
+
+const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'portal',

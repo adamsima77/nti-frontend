@@ -2,7 +2,7 @@
   <div class="max-w-2xl mx-auto px-6 py-10">
     <!-- Breadcrumbs -->
     <div class="mb-8">
-      <UiBreadcrumbs :items="[{ label: 'Tímy', to: '/timy' }, { label: 'Vytvoriť nový tím' }]" />
+      <UiBreadcrumbs :items="[{ label: 'Tímy', to: localePath('/student/timy') }, { label: 'Vytvoriť nový tím' }]" />
     </div>
 
     <!-- Header -->
@@ -12,7 +12,10 @@
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-6">
+    <form
+      @submit.prevent="handleSubmit"
+      class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-6"
+    >
       <!-- Team name -->
       <UiInput
         v-model="formData.name"
@@ -40,7 +43,10 @@
         </p>
 
         <!-- Members list -->
-        <div v-if="formData.members.length > 0" class="space-y-2">
+        <div
+          v-if="formData.members.length > 0"
+          class="space-y-2"
+        >
           <div
             v-for="(member, index) in formData.members"
             :key="index"
@@ -114,6 +120,8 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { X } from 'lucide-vue-next'
+
+const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'portal',

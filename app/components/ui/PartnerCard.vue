@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md p-6 flex flex-col items-center text-center transition">
+  <div
+    class="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md p-6 flex flex-col items-center text-center transition"
+  >
     <img
       :src="image"
       :alt="alt"
@@ -20,5 +22,5 @@ defineProps({
   alt: String,
   name: String,
   description: String,
-});
+})
 </script>

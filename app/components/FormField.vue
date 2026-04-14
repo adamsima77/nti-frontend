@@ -1,5 +1,8 @@
 <template>
-  <div v-if="field" class="flex flex-col gap-1.5">
+  <div
+    v-if="field"
+    class="flex flex-col gap-1.5"
+  >
     <!-- Label -->
     <label
       v-if="field.label"
@@ -7,11 +10,18 @@
       class="text-sm font-medium text-gray-700"
     >
       {{ field.label }}
-      <span v-if="field.required" class="text-danger-500">*</span>
+      <span
+        v-if="field.required"
+        class="text-danger-500"
+        >*</span
+      >
     </label>
 
     <!-- Description -->
-    <p v-if="field.description" class="text-xs text-gray-500">
+    <p
+      v-if="field.description"
+      class="text-xs text-gray-500"
+    >
       {{ field.description }}
     </p>
 
@@ -112,7 +122,10 @@
     />
 
     <!-- Select -->
-    <div v-if="field.type === 'select'" class="relative">
+    <div
+      v-if="field.type === 'select'"
+      class="relative"
+    >
       <select
         :id="`field-${field.name}`"
         :value="modelValue"
@@ -127,7 +140,11 @@
         @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
         @blur="$emit('blur')"
       >
-        <option value="" disabled :selected="!modelValue">
+        <option
+          value=""
+          disabled
+          :selected="!modelValue"
+        >
           {{ field.placeholder || 'Vyberte...' }}
         </option>
         <option
@@ -142,7 +159,10 @@
     </div>
 
     <!-- Checkbox -->
-    <div v-if="field.type === 'checkbox'" class="flex items-center gap-2">
+    <div
+      v-if="field.type === 'checkbox'"
+      class="flex items-center gap-2"
+    >
       <input
         :id="`field-${field.name}`"
         type="checkbox"
@@ -154,7 +174,10 @@
         @change="$emit('update:modelValue', ($event.target as HTMLInputElement).checked)"
         @blur="$emit('blur')"
       />
-      <label :for="`field-${field.name}`" class="text-sm text-gray-700 cursor-pointer">
+      <label
+        :for="`field-${field.name}`"
+        class="text-sm text-gray-700 cursor-pointer"
+      >
         {{ field.label }}
       </label>
     </div>
@@ -172,7 +195,10 @@
     />
 
     <!-- Error Message -->
-    <span v-if="hasError" class="text-xs text-danger-600">
+    <span
+      v-if="hasError"
+      class="text-xs text-danger-600"
+    >
       {{ error || 'Chyba pri vyplnení' }}
     </span>
   </div>

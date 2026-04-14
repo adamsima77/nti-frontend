@@ -1,7 +1,10 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
     <!-- Loading state -->
-    <div v-if="teamsStore.isLoading" class="space-y-4">
+    <div
+      v-if="teamsStore.isLoading"
+      class="space-y-4"
+    >
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 h-96 animate-pulse" />
     </div>
 
@@ -15,7 +18,7 @@
         title="Tím nenájdený"
       >
         <NuxtLink
-          to="/timy"
+          :to="localePath('/student/timy')"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
         >
           <ArrowLeft class="w-4 h-4" />
@@ -35,7 +38,8 @@
         <div>
           <h1 class="text-2xl font-bold text-navy mb-1">{{ teamsStore.currentTeam.name }}</h1>
           <p class="text-sm text-gray-500">
-            Vytvorený {{ teamsStore.currentTeam.createdAt }} · {{ teamsStore.currentTeam.members.length }} členov · {{ teamsStore.currentTeam.applications.length }} prihlášok
+            Vytvorený {{ teamsStore.currentTeam.createdAt }} · {{ teamsStore.currentTeam.members.length }} členov ·
+            {{ teamsStore.currentTeam.applications.length }} prihlášok
           </p>
         </div>
         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
@@ -106,7 +110,7 @@
               :columns="appColumns"
               :rows="teamsStore.currentTeam.applications"
               empty-title="Tím zatiaľ nemá žiadne prihlášky"
-              @row-click="(row: any) => navigateTo(`/prihlasky/${row.id}`)"
+              @row-click="(row: any) => navigateTo(localePath(`/student/prihlasky/${row.id}`))"
             >
               <template #cell-title="{ row }">
                 <div>
@@ -189,6 +193,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ArrowLeft, Users, UserPlus, FileText } from 'lucide-vue-next'
+
+const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'portal',

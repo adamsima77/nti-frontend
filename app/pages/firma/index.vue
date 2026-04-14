@@ -1,7 +1,6 @@
 <!-- pages/firma/index.vue -->
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
-
     <!-- Header -->
     <div class="mb-10">
       <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
@@ -95,7 +94,9 @@
                       {{ Math.round((task.spent / task.budget) * 100) }}%
                     </span>
                   </div>
-                  <p class="text-xs text-gray-400 mt-1">{{ formatCurrency(task.spent) }} z {{ formatCurrency(task.budget) }}</p>
+                  <p class="text-xs text-gray-400 mt-1">
+                    {{ formatCurrency(task.spent) }} z {{ formatCurrency(task.budget) }}
+                  </p>
                 </td>
                 <td class="px-5 py-4">
                   <UiStatusBadge :status="task.status" />
@@ -106,8 +107,8 @@
         </div>
         <div class="px-5 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
           <span class="text-sm text-gray-500">
-            Celkový rozpočet: <span class="font-semibold text-navy">{{ formatCurrency(totalBudget) }}</span>
-            · Čerpanie: <span class="font-semibold text-navy">{{ formatCurrency(totalSpent) }}</span>
+            Celkový rozpočet: <span class="font-semibold text-navy">{{ formatCurrency(totalBudget) }}</span> · Čerpanie:
+            <span class="font-semibold text-navy">{{ formatCurrency(totalSpent) }}</span>
           </span>
           <NuxtLink
             to="/firma/zadania"
@@ -122,7 +123,6 @@
 
     <!-- Assigned teams & applications -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-
       <!-- Assigned teams -->
       <div>
         <div class="flex items-center justify-between mb-4">
@@ -150,7 +150,10 @@
               </span>
             </div>
           </div>
-          <p v-if="!mockAssignedTeams.length" class="text-sm text-gray-400 text-center py-6">
+          <p
+            v-if="!mockAssignedTeams.length"
+            class="text-sm text-gray-400 text-center py-6"
+          >
             Zatiaľ žiadne priradené tímy
           </p>
         </div>
@@ -191,7 +194,10 @@
               </NuxtLink>
             </div>
           </div>
-          <p v-if="!mockPendingApplications.length" class="text-sm text-gray-400 text-center py-6">
+          <p
+            v-if="!mockPendingApplications.length"
+            class="text-sm text-gray-400 text-center py-6"
+          >
             Žiadne čakajúce prihlášky
           </p>
         </div>
@@ -221,7 +227,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -305,8 +310,20 @@ const mockAssignedTeams = [
 ]
 
 const mockPendingApplications = [
-  { id: 11, teamName: 'DataFlow tím', task: 'Dashboard pre analýzu predajov', submittedAt: '30.03.2026', status: 'submitted' },
-  { id: 12, teamName: 'CodeCraft', task: 'Dashboard pre analýzu predajov', submittedAt: '01.04.2026', status: 'submitted' },
+  {
+    id: 11,
+    teamName: 'DataFlow tím',
+    task: 'Dashboard pre analýzu predajov',
+    submittedAt: '30.03.2026',
+    status: 'submitted',
+  },
+  {
+    id: 12,
+    teamName: 'CodeCraft',
+    task: 'Dashboard pre analýzu predajov',
+    submittedAt: '01.04.2026',
+    status: 'submitted',
+  },
 ]
 
 const mockDeadlines = [
@@ -323,7 +340,7 @@ const mockActions = [
 
 const stats = computed(() => ({
   totalTasks: mockTasks.length,
-  activeTasks: mockTasks.filter(t => t.status === 'active').length,
+  activeTasks: mockTasks.filter((t) => t.status === 'active').length,
   assignedTeams: mockAssignedTeams.length,
   pendingApplications: mockPendingApplications.length,
 }))

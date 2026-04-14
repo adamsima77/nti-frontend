@@ -1,15 +1,16 @@
 <!-- pages/firma/profil.vue -->
 <template>
   <div class="max-w-3xl mx-auto px-6 py-10">
-
     <!-- Header -->
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-navy mb-1">Profil organizácie</h1>
       <p class="text-gray-500">Informácie o vašej firme viditeľné pre tímy a NTI</p>
     </div>
 
-    <form @submit.prevent="handleSave" class="space-y-6">
-
+    <form
+      @submit.prevent="handleSave"
+      class="space-y-6"
+    >
       <!-- Basic info -->
       <div class="bg-white rounded-lg border border-gray-100 p-6">
         <h2 class="text-base font-semibold text-navy mb-4">Základné informácie</h2>
@@ -28,9 +29,7 @@
             :error="errors.ico"
           />
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">
-              Popis organizácie
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"> Popis organizácie </label>
             <textarea
               v-model="form.description"
               rows="4"
@@ -90,7 +89,13 @@
               class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
             >
               <option value="">Vyberte odvetvie</option>
-              <option v-for="ind in industries" :key="ind" :value="ind">{{ ind }}</option>
+              <option
+                v-for="ind in industries"
+                :key="ind"
+                :value="ind"
+              >
+                {{ ind }}
+              </option>
             </select>
           </div>
           <div>
@@ -139,14 +144,29 @@
           :disabled="isSaving"
           class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          <svg v-if="isSaving" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
+          <svg
+            v-if="isSaving"
+            class="animate-spin w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+            />
           </svg>
           {{ isSaving ? 'Ukladám...' : 'Uložiť profil' }}
         </button>
       </div>
-
     </form>
   </div>
 </template>
@@ -199,7 +219,8 @@ const industries = [
 const initialForm = {
   organization_name: 'TechFirma s.r.o.',
   ico: '12345678',
-  description: 'Sme inovatívna technologická firma z Nitry špecializujúca sa na vývoj softvérových riešení pre malé a stredné podniky.',
+  description:
+    'Sme inovatívna technologická firma z Nitry špecializujúca sa na vývoj softvérových riešení pre malé a stredné podniky.',
   website: 'https://techfirma.sk',
   contact_name: 'Peter Kováč',
   contact_email: 'peter.kovac@techfirma.sk',
@@ -220,9 +241,8 @@ const resetForm = () => {
 
 const validate = () => {
   errors.organization_name = form.organization_name ? undefined : 'Názov organizácie je povinný'
-  errors.contact_email = form.contact_email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contact_email)
-    ? undefined
-    : 'Zadajte platný e-mail'
+  errors.contact_email =
+    form.contact_email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contact_email) ? undefined : 'Zadajte platný e-mail'
   return !Object.values(errors).some(Boolean)
 }
 
@@ -236,9 +256,11 @@ const handleSave = async () => {
 
   try {
     // TODO: await api.put('/firma/profil', form)
-    await new Promise(r => setTimeout(r, 800))
+    await new Promise((r) => setTimeout(r, 800))
     saveSuccess.value = true
-    setTimeout(() => { saveSuccess.value = false }, 4000)
+    setTimeout(() => {
+      saveSuccess.value = false
+    }, 4000)
   } catch (err) {
     saveError.value = 'Nastala chyba pri ukladaní. Skúste znova.'
   } finally {
