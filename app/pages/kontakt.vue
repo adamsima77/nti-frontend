@@ -2,28 +2,28 @@
   <section class="bg-white py-16 px-4 mt-30 shadow-2xl rounded-lg">
     <div class="max-w-6xl mx-auto">
       <div class="mb-12 text-center">
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-navy mb-4">Kontaktujte nás</h1>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-navy mb-4">{{ $t('contact.page.title') }}</h1>
         <p class="text-sm sm:text-base md:text-lg text-gray-500 max-w-xl mx-auto">
-          Máte otázky ohľadom programov NTI alebo spolupráce? Ozvite sa nám.
+          {{ $t('contact.page.subtitle') }}
         </p>
       </div>
 
       <div class="flex flex-col lg:flex-row gap-8">
         <div class="flex-1 bg-gray-50 p-8 rounded-lg border border-gray-200">
-          <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-navy mb-6">Kontaktné informácie</h2>
+          <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-navy mb-6">{{ $t('contact.page.info.title') }}</h2>
 
           <div class="mb-4">
-            <p class="text-xs sm:text-sm text-gray-400">Email</p>
+            <p class="text-xs sm:text-sm text-gray-400">{{ $t('contact.page.info.email') }}</p>
             <p class="text-sm sm:text-base md:text-lg text-blue-600 font-medium">info@nti.sk</p>
           </div>
 
           <div class="mb-4">
-            <p class="text-xs sm:text-sm text-gray-400">Telefón</p>
+            <p class="text-xs sm:text-sm text-gray-400">{{ $t('contact.page.info.phone') }}</p>
             <p class="text-sm sm:text-base md:text-lg text-navy font-medium">+421 900 000 000</p>
           </div>
 
           <div class="mb-6">
-            <p class="text-xs sm:text-sm text-gray-400">Adresa</p>
+            <p class="text-xs sm:text-sm text-gray-400">{{ $t('contact.page.info.address') }}</p>
             <p class="text-sm sm:text-base md:text-lg text-navy font-medium">Nitra, Slovensko</p>
           </div>
 
@@ -37,40 +37,40 @@
         </div>
 
         <div class="flex-1 bg-white p-8 rounded-lg border border-gray-200">
-          <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-navy mb-6">Napíšte nám</h2>
+          <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-navy mb-6">{{ $t('contact.page.form.title') }}</h2>
 
           <form class="flex flex-col gap-4">
             <div class="flex flex-col gap-1">
-              <label class="text-sm text-gray-500 font-bold">Meno:</label>
+              <label class="text-sm text-gray-500 font-bold">{{ $t('contact.page.form.fields.first_name') }}:</label>
               <input
                 type="text"
-                placeholder="Meno"
+                :placeholder="$t('contact.page.form.fields.first_name')"
                 class="p-3 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500"
               />
             </div>
 
             <div class="flex flex-col gap-1">
-              <label class="text-sm text-gray-500 font-bold">Priezvisko:</label>
+              <label class="text-sm text-gray-500 font-bold">{{ $t('contact.page.form.fields.last_name') }} :</label>
               <input
                 type="text"
-                placeholder="Priezvisko"
+                :placeholder="$t('contact.page.form.fields.last_name')"
                 class="p-3 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500"
               />
             </div>
 
             <div class="flex flex-col gap-1">
-              <label class="text-sm text-gray-500 font-bold">Email:</label>
+              <label class="text-sm text-gray-500 font-bold">{{ $t('contact.page.form.fields.email') }}:</label>
               <input
                 type="email"
-                placeholder="Email"
+                :placeholder="$t('contact.page.form.fields.email')"
                 class="p-3 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500"
               />
             </div>
 
             <div class="flex flex-col gap-1">
-              <label class="text-sm text-gray-500 font-bold">Správa:</label>
+              <label class="text-sm text-gray-500 font-bold">{{ $t('contact.page.form.fields.message') }}:</label>
               <textarea
-                placeholder="Správa"
+                :placeholder="$t('contact.page.form.fields.message')"
                 class="p-3 h-32 text-sm sm:text-base border border-gray-200 rounded-md focus:outline-none focus:border-blue-500"
               ></textarea>
             </div>
@@ -78,7 +78,7 @@
             <button
               class="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white text-sm sm:text-base md:text-lg py-3 rounded-md transition"
             >
-              Odoslať správu
+              {{ $t('contact.page.form.button') }}
             </button>
           </form>
         </div>

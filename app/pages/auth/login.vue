@@ -1,27 +1,28 @@
 <template>
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
-      <!-- Header -->
 
-      <!-- Form -->
       <form
         class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-5"
         @submit.prevent="handleLogin"
       >
         <div class="mb-8 text-center">
-          <NuxtLink
-            to="/"
-            class="inline-block mb-6"
-          >
-          </NuxtLink>
-          <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">Prihlásenie</h1>
-          <p class="text-gray-600">Prihlaste sa do svojho účtu</p>
+          <NuxtLink to="/" class="inline-block mb-6" />
+
+          <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">
+            {{ $t('auth.login.title') }}
+          </h1>
+
+          <p class="text-gray-600">
+            {{ $t('auth.login.subtitle') }}
+          </p>
         </div>
+
         <UiInput
           v-model="formData.email"
           type="email"
-          label="Email"
-          placeholder="vas@email.com"
+          :label="$t('auth.login.fields.email.label')"
+          :placeholder="$t('auth.login.fields.email.placeholder')"
           required
           :error="errors.email"
         />
@@ -29,43 +30,45 @@
         <UiInput
           v-model="formData.password"
           type="password"
-          label="Heslo"
-          placeholder="••••••••••"
+          :label="$t('auth.login.fields.password.label')"
+          :placeholder="$t('auth.login.fields.password.placeholder')"
           required
           :error="errors.password"
         />
 
-        <!-- Forgotten password link -->
         <div class="flex justify-end">
           <NuxtLink
             to="/auth/forgot-password"
             class="text-sm text-blue-600 hover:underline"
           >
-            Zabudli ste heslo?
+            {{ $t('auth.login.forgot_password') }}
           </NuxtLink>
         </div>
 
-        <!-- Submit button -->
         <button
           type="submit"
           :disabled="isLoading"
           class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span v-if="!isLoading">Prihlásiť sa</span>
-          <span v-else>Prihlasovanie...</span>
+          <span v-if="!isLoading">
+            {{ $t('auth.login.submit') }}
+          </span>
+          <span v-else>
+            {{ $t('auth.login.loading') }}
+          </span>
         </button>
 
-        <!-- Register link -->
         <p class="text-center text-gray-600 text-sm">
-          Nemáte účet?
+          {{ $t('auth.login.no_account') }}
           <NuxtLink
             to="/auth/register"
             class="text-blue-600 hover:underline font-medium"
           >
-            Zaregistrujte sa
+            {{ $t('auth.login.register') }}
           </NuxtLink>
         </p>
       </form>
+
     </div>
   </div>
 </template>

@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   css: ['./app/assets/main.css'],
-  modules: ['@pinia/nuxt', '@nuxt/eslint'],
+  modules: ['@pinia/nuxt', '@nuxt/eslint', '@nuxtjs/i18n'],
   routeRules: {
     '/auth/**': { ssr: false },
     '/dashboard/**': { ssr: false },
@@ -14,6 +14,33 @@ export default defineNuxtConfig({
     '/mentor/**': { ssr: false },
     '/firma/**': { ssr: false },
     '/admin/**': { ssr: false },
+  },
+    i18n: {
+    strategy: 'prefix',
+    defaultLocale: 'sk',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      fallbackLocale: 'en',
+      alwaysRedirect: true
+    },
+    lazy: true,
+    langDir: 'locales/',
+
+    locales: [
+      {
+        code: 'en',
+        name: 'English',
+        lang: 'en-US',
+        file: 'en.json'
+      },
+      {
+        code: 'sk',
+        name: 'Slovak',
+        lang: 'sk-SK',
+        file: 'sk.json'
+      }
+    ]
   },
   runtimeConfig: {
     apiBase: process.env.NUXT_API_BASE || 'http://localhost:8000/api',

@@ -34,7 +34,7 @@
         :to="link"
         class="w-fit cursor-pointer px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
       >
-        Čítať viac
+        {{ $t('news.read_more') }}
       </NuxtLink>
     </div>
   </div>

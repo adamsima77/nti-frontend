@@ -1,0 +1,412 @@
+{
+  "home": {
+    "program_header": "Naše programy",
+    "partners_header": "Naši partneri",
+    "news_header": "Novinky"
+  },
+
+  "news": {
+    "read_more": "Čítaj viac",
+    "more_news": "Viac noviniek",
+    "publicated": "Publikované"
+  },
+
+  "nav": {
+    "news": "Novinky",
+    "program_a": "Program A",
+    "program_b": "Program B",
+    "partners": "Partneri",
+    "challenges": "Výzvy a termíny",
+    "about": "O NTI",
+    "contact": "Kontakt"
+  },
+
+  "portal": {
+    "notifications": "Notifikácie",
+    "mark_all_read": "Označiť ako prečítané",
+    "logout": "Odhlásiť sa",
+    "no_notifications": "Žiadne notifikácie",
+    "mark_as_read": "Označte ako prečítané",
+    "mark_as_unread": "Označte ako neprečítané"
+  },
+
+  "admin": {
+    "badge": "Admin"
+  },
+
+  "locale": {
+    "en_title": "English",
+    "sk_title": "Slovenčina"
+  },
+
+  "program-a": {
+    "title": "Čo je program A",
+    "description": "Program A je intenzívny program určený pre študentov vysokých škôl a začínajúcich odborníkov, ktorí chcú rýchlo nadobudnúť praktické skúsenosti, pracovať v tímoch a získať mentoring od skúsených profesionálov.",
+
+    "benefits": {
+      "first": {
+        "title": "3 mesiace",
+        "description": "Intenzívny program s týždenným mentorstvom a workshopmi."
+      },
+      "second": {
+        "title": "Tímová práca",
+        "description": "Pracuješ v multidisciplinárnom tíme s vlastnými ideami."
+      },
+      "third": {
+        "title": "Reálne projekty",
+        "description": "Vypracovávate reálne výzvy s dopadom na komunitu."
+      }
+    },
+
+    "signup_title": "Kto sa môže prihlásiť?",
+    "signup_students": {
+      "title": "Kategória: Študenti",
+      "list": [
+        "Vysokoškoláci všetkých ročníkov",
+        "Základná znalosť aspoň jednej technológie",
+        "Možnosť venovať 15-20 hodín týždne",
+        "Motivácia a ochota učiť sa"
+      ]
+    },
+
+    "signup_juniors": {
+      "title": "Kategória: Junior/Entry-level",
+      "list": [
+        "Do 2 rokov pracovnej skúsenosti",
+        "Začínajúci alebo samouk vývojári",
+        "Ochota venovať čas programu",
+        "Otvorený mindset pre prácu"
+      ]
+    },
+
+    "timeline": {
+      "header": "Časový plán",
+      "applications": {
+        "title": "📋 Prihlášky otvorené",
+        "period": "1. január — 31. január 2026"
+      },
+      "evaluation": {
+        "title": "⏱️ Vyhodnocovanie prihlášok",
+        "period": "1. február — 15. február 2026"
+      },
+      "program": {
+        "title": "🚀 Program štartuje",
+        "period": "1. apríl — 30. júl 2026"
+      }
+    },
+
+    "faq": {
+      "header": "Časté otázky",
+      "questions": [
+        {
+          "question": "Koľko stojí Program A?",
+          "answer": "Program A je úplne bezplatný. Všetci účastníci dostávajú rovnaký prístup k mentorom, workshopom a materiálom, bez skrytých poplatkov."
+        },
+        {
+          "question": "Máš skúsenosti s prácou mimo školy?",
+          "answer": "Nie, nie je to povinné! Väčšina našich účastníkov nemá pracovné skúsenosti. Dôležité je mať vôľu učiť sa a spolupracovať s tímom."
+        }
+      ]
+    },
+
+    "cta": {
+      "title": "Pripravený na výzvu?",
+      "description": "Prihlásiť sa do Programu A je jednoduché. Potrebujem iba základné informácie a tvoju motiváciu.",
+      "button": "Prihlásiť sa teraz"
+    }
+  },
+
+  "program-b": {
+    "title": "Čo je program B",
+
+    "description": "Program B spája firmy s talentovanými študentami a juniormi, ktorí riešia reálne technické výzvy. Vaša firma dostane inovatívne riešenia, zatiaľ čo študenti získajú praktické skúsenosti a mentoring od profesionálov.",
+
+    "benefits": {
+      "first": {
+        "title": "Inovatívne riešenia",
+        "description": "Študenti prinesú čerstvý pohľad na vaše technické problémy."
+      },
+      "second": {
+        "title": "Flexibilná angažovanosť",
+        "description": "Určite sami, ako silno sa chcete angažovať a mentorovat študentov."
+      },
+      "third": {
+        "title": "Bez skrytých nákladov",
+        "description": "Program je bezplatný pre obidve strany — firmy aj študenty."
+      }
+    },
+
+    "how_it_works_header": "Ako to funguje?",
+    "how_it_works_items": {
+      "first": {
+        "title": "Registrácia vašej firmy",
+        "description": "Zaregistrujte si firemný profil a identifikujte vaše tímové potreby a technické výzvy, ktoré chcete riešiť."
+      },
+      "second": {
+        "title": "Vytvorenie výzvy",
+        "description": "Definujte svoju výzvu — čo má byť vyriešené, aké sú konečné ciele a akí študenti sú ideálni (junior, senior aj.)."
+      },
+      "third": {
+        "title": "Výber tímu",
+        "description": "Prezerajte si prihlášenné tímy, budujte si komentáre s potenciálnymi kandidátmi a vyberte najlepší tím pre vašu výzvu."
+      },
+      "fourth": {
+        "title": "Implementácia & mentoring",
+        "description": "Vybraný tím začína s vývojom. Poskytujete feedback a mentorstvo počas 3-mesačného programu."
+      },
+      "fifth": {
+        "title": "Prezentácia & nasadenie",
+        "description": "Tím prezentuje finálne riešenie. Rozhodujete sa, či ho budete ďalej rozvíjať alebo nasadzovať do produkcie."
+      }
+    },
+
+    "requirements_header": "Čo potrebujeme od vašej firmy?",
+    "requirements_company_profile": {
+      "title": "Firemný profil",
+      "items": [
+        "✓ Názov a popis firmy",
+        "✓ Vaša webová stránka",
+        "✓ Kontakt (email, telefón)",
+        "✓ Logo a branding"
+      ]
+    },
+
+    "requirements_technical_spec": {
+      "title": "Technická špecifikácia výzvy",
+      "items": [
+        "✓ Jasný popis problému",
+        "✓ Očakávané technológie",
+        "✓ Rozpočet času / náročnosť",
+        "✓ Konečné ciele a kritériá úspechu"
+      ]
+    },
+
+    "requirements_tip": "Pro tip: Čím presnejšie a jasnejšie popíšete vašu výzvu, tým lepšie tímy si na ňu budú chcieť prihlásit.",
+
+    "faq": {
+      "header": "Časté otázky",
+      "questions": [
+        {
+          "question": "Koľko to bude stáť?",
+          "answer": "Program B je úplne bezplatný pre firmy. Neplatíte nič za výber tímu, mentoring alebo nasadenie riešenia."
+        },
+        {
+          "question": "Ako dlho trvá program?",
+          "answer": "Program B je koncipovaný ako 3-mesačný projekt. Študenti budú pracovať na vašej výzve konsekventne počas tejto doby."
+        }
+      ]
+    },
+
+    "cta": {
+      "title": "Chcete spolupracovať s nami?",
+      "description": "Prihláste svoju firmu a definujte svoju výzvu. Naši študenti čakajú na príležitosť!",
+      "button": "Zastaviť sa ako firma"
+    }
+  },
+    "partners_page": {
+    "hero": {
+      "title": "Naši partneri a mentori",
+      "description": "Spoznajte firmy a odborníkov, ktorí podporujú talent a pomáhajú budovať dôveru v našu komunitu."
+    },
+    "partners": {
+      "title": "Partneri",
+      "subtitle": "Spolupracujeme s top firmami"
+    },
+    "mentors": {
+      "title": "Mentori",
+      "subtitle": "Ľudia, ktorí ťa posunú"
+    },
+    "references": {
+      "title": "Referencie"
+    }
+  },
+  "calls": {
+    "vyzvy_terminy": {
+      "hero": {
+        "title": "Výzvy a termíny",
+        "subtitle": "Pozrite si dostupné výzvy a zúčastnite sa tých, ktoré vás inšpirujú"
+      },
+
+      "empty": {
+        "title": "Zatiaľ nie sú dostupné žiadne výzvy",
+        "description": "Skúste sa pozrieť neskôr. Nové výzvy budú čoskoro pridané."
+      },
+
+      "applicants": {
+        "single": "prihláška",
+        "plural": "prihlášok"
+      },
+
+      "cta": "Zobraziť detail"
+    }
+  },
+  "contact": {
+    "page": {
+      "title": "Kontaktujte nás",
+      "subtitle": "Máte otázky ohľadom programov NTI alebo spolupráce? Ozvite sa nám.",
+
+      "info": {
+        "title": "Kontaktné informácie",
+        "email": "Email",
+        "phone": "Telefón",
+        "address": "Adresa"
+      },
+
+      "form": {
+        "title": "Napíšte nám",
+        "fields": {
+          "first_name": "Meno",
+          "last_name": "Priezvisko",
+          "email": "Email",
+          "message": "Správa"
+        },
+        "button": "Odoslať správu"
+      }
+    }
+  },
+  "about_nti": {
+    "title": "O NTI",
+    "description": "Nitriansky Technický Inkubátor je spoľahlivá inštitúcia podporujúca inovácie a technologický rozvoj. Budujeme ekosystém spolupráce medzi fakultami, firmami a startupmi.",
+
+    "cards": {
+      "mission": {
+        "title": "Misia",
+        "description": "Podporujeme inovácie, vzdelávanie a udržateľný technologický rozvoj v regióne."
+      },
+      "pillars": {
+        "title": "Piliere",
+        "description": "Odbornosť, transparentnosť a spolupráca tvoria základ našej dôveryhodnosti."
+      },
+      "ecosystem": {
+        "title": "Ekosystém",
+        "description": "Prepojujeme fakulty, startupy a firmy, aby vznikali reálne inovácie a projekty s dopadom."
+      },
+      "faculties": {
+        "title": "Fakulty",
+        "description": "Spolupracujeme s fakultami a akademickými partnermi, aby sme prinášali nové projekty, výskum a odborné znalosti do praxe."
+      }
+    },
+
+    "team": {
+      "title": "Náš tím"
+    }
+  },
+ "auth": {
+   "forgot": {
+  "title": "Zabudnuté heslo",
+  "subtitle": "Zadajte svoju e-mailovú adresu a pošleme vám odkaz na obnovenie hesla",
+
+  "sent_title": "Skontrolujte email",
+  "sent_subtitle": "Ak účet existuje, poslali sme vám inštrukcie na obnovenie hesla",
+
+  "email_label": "E-mailová adresa",
+  "email_placeholder": "vas-email.com",
+
+  "button_send": "Odoslať odkaz na obnovenie",
+  "button_sending": "Odosielam...",
+
+  "remember_password": "Spomínate si na heslo?",
+  "login": "Prihláste sa",
+
+  "success_text": "Odkaz bol odoslaný na",
+  "expires": "Platnosť odkazu je 60 minút",
+
+  "resend": "Odoslať znova",
+  "resend_wait": "Znova odoslať za",
+
+  "info": "Ak email nenájdete v doručenej pošte, skontrolujte spam."
+},
+"reset": {
+  "title": "Nové heslo",
+  "subtitle": "Zadajte nové heslo pre váš účet",
+
+  "new_password": "Nové heslo",
+  "confirm_password": "Potvrdiť nové heslo",
+
+  "saving": "Ukladám...",
+  "submit": "Nastaviť nové heslo",
+
+  "success_text": "Vaše heslo bolo úspešne zmenené. Môžete sa teraz prihlásiť.",
+  "go_login": "Prejsť na prihlásenie",
+
+  "invalid_title": "Odkaz je neplatný alebo vypršal",
+  "invalid_text": "Odkaz na obnovenie hesla je platný 60 minút. Požiadajte o nový.",
+  "request_new_link": "Požiadať o nový odkaz"
+},
+  "login": {
+    "title": "Prihlásenie",
+    "subtitle": "Prihláste sa do vášho NTI účtu",
+
+    "fields": {
+      "email": {
+        "label": "Email",
+        "placeholder": "your-email.com"
+      },
+      "password": {
+        "label": "Heslo",
+        "placeholder": "••••••••••"
+      }
+    },
+
+    "forgot_password": "Zabudli ste heslo?",
+    "submit": "Prihlásiť sa",
+    "loading": "Prihlasovanie...",
+    "no_account": "Nemáte účet?",
+    "register": "Zaregistrujte sa"
+  },
+
+  "register": {
+    "title": "Registrácia",
+    "subtitle": "Vytvorte si nový účet v NTI",
+
+    "type_selection": {
+      "title": "Vyberte si typ vášho účtu",
+
+      "student": {
+        "title": "Študent / Junior developer",
+        "description": "Zapájam sa do programov, učím sa a pracujem na projektoch"
+      },
+
+      "organization": {
+        "title": "Firma / Organizácia",
+        "description": "Chceme zapojiť talentovaných ľudí do našich výziev"
+      }
+    },
+
+    "fields": {
+      "first_name": "Meno",
+      "last_name": "Priezvisko",
+      "email": "Email",
+      "organization_name": "Názov organizácie",
+      "password": "Heslo",
+      "password_confirmation": "Potvrďte heslo"
+    },
+
+    "placeholders": {
+      "first_name": "Janko",
+      "last_name": "Hraško",
+      "email": "janko-example.com",
+      "organization_email": "kontakt-firma.sk",
+      "password": "••••••••••",
+      "organization_name": "Moja firma s.r.o."
+    },
+
+    "terms": {
+      "text": "Súhlasím s",
+      "terms": "podmienkami používania",
+      "privacy": "ochranou osobných údajov"
+    },
+
+    "buttons": {
+      "register": "Zaregistrovať",
+      "registering": "Registrácia prebieha...",
+      "back": "Späť"
+    },
+
+    "login": {
+      "text": "Už máte účet?",
+      "link": "Prihláste sa"
+    }
+  }
+}
+}

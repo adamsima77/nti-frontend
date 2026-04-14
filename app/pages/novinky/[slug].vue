@@ -14,7 +14,7 @@
         Kategória
       </NuxtLink>
 
-      <p class="text-sm sm:text-base text-gray-400 mb-8">Publikované: 12.03.2026</p>
+      <p class="text-sm sm:text-base text-gray-400 mb-8">{{ $t('news.publicated') }}: 12.03.2026</p>
 
       <div class="w-full max-h-125 lg:max-h-225 overflow-hidden rounded-lg">
         <img
@@ -108,7 +108,7 @@
 
       <div class="w-full h-1 bg-gray-300 my-6"></div>
 
-      <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy mb-6">Súvisiace články</h2>
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy mb-6">{{ $t('news.more_news') }}</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <UiItem

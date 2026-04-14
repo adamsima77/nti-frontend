@@ -1,25 +1,29 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 py-20 md:px-6 md:py-16 space-y-20">
 
-<div class="relative bg-blue-500 overflow-hidden rounded-lg shadow-2xl">
- 
-  <div class="absolute inset-0 bg-gradient-to-b from-blue-500/70 to-blue-700/70 mix-blend-multiply pointer-events-none"></div>
+    <!-- HERO -->
+    <div class="relative bg-blue-500 overflow-hidden rounded-lg shadow-2xl">
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-500/70 to-blue-700/70 mix-blend-multiply pointer-events-none"></div>
 
-  
-  <div class="relative max-w-3xl mx-auto text-center text-white py-10 sm:py-12 md:py-16 px-4 md:px-8">
-    <h2 class="text-3xl sm:text-4xl md:text-4xl font-extrabold mb-2">
-      Naši partneri a mentori
-    </h2>
-    <p class="text-sm sm:text-base md:text-lg leading-relaxed">
-      Spoznajte firmy a odborníkov, ktorí podporujú talent a pomáhajú budovať dôveru v našu komunitu.
-    </p>
-  </div>
-</div>
+      <div class="relative max-w-3xl mx-auto text-center text-white py-10 sm:py-12 md:py-16 px-4 md:px-8">
+        <h2 class="text-3xl sm:text-4xl md:text-4xl font-extrabold mb-2">
+          {{ $t('partners_page.hero.title') }}
+        </h2>
+        <p class="text-sm sm:text-base md:text-lg leading-relaxed">
+          {{ $t('partners_page.hero.description') }}
+        </p>
+      </div>
+    </div>
+
+    <!-- PARTNERS -->
     <section>
       <div class="flex items-center justify-between mb-10">
-        <h2 class="text-3xl font-bold text-navy">Partneri</h2>
+        <h2 class="text-3xl font-bold text-navy">
+          {{ $t('partners_page.partners.title') }}
+        </h2>
+
         <span class="text-sm text-gray-400 hidden md:block">
-          Spolupracujeme s top firmami
+          {{ $t('partners_page.partners.subtitle') }}
         </span>
       </div>
 
@@ -32,12 +36,15 @@
       </div>
     </section>
 
-
+    <!-- MENTORS -->
     <section>
       <div class="flex items-center justify-between mb-10">
-        <h2 class="text-3xl font-bold text-navy">Mentori</h2>
+        <h2 class="text-3xl font-bold text-navy">
+          {{ $t('partners_page.mentors.title') }}
+        </h2>
+
         <span class="text-sm text-gray-400 hidden md:block">
-          Ľudia, ktorí ťa posunú
+          {{ $t('partners_page.mentors.subtitle') }}
         </span>
       </div>
 
@@ -50,53 +57,53 @@
       </div>
     </section>
 
+    <!-- REFERENCES -->
+    <section>
+      <div class="flex items-center justify-between mb-10">
+        <h2 class="text-3xl font-bold text-navy">
+          {{ $t('partners_page.references.title') }}
+        </h2>
 
-<section>
-  <div class="flex items-center justify-between mb-10">
-    <h2 class="text-3xl font-bold text-navy">Referencie</h2>
+        <div class="flex items-center gap-2">
+          <button
+            @click="scrollLeft"
+            :disabled="!canScrollLeft"
+            class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <LucideChevronLeft class="w-5 h-5" />
+          </button>
 
-    <div class="flex items-center gap-2">
-       <button
-      @click="scrollLeft"
-      :disabled="!canScrollLeft"
-      class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-    >
-      <LucideChevronLeft class="w-5 h-5" />
-    </button>
-
-    <button
-      @click="scrollRight"
-      :disabled="!canScrollRight"
-      class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-    >
-      <LucideChevronRight class="w-5 h-5" />
-    </button>
-    </div>
-  </div>
-
-  <div class="relative">
-
-    <div class="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent z-10"></div>
-
-    <div class="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent z-10"></div>
-
-    <div class="overflow-hidden">
-      <div
-        ref="scrollContainer"
-        class="flex gap-6 overflow-x-auto pb-2 scroll-smooth snap-x snap-mandatory no-scrollbar"
-      >
-        <div
-          v-for="(r, i) in references"
-          :key="i"
-          class="min-w-[280px] max-w-[320px] snap-start"
-        >
-          <UiReferenceCard v-bind="r" />
+          <button
+            @click="scrollRight"
+            :disabled="!canScrollRight"
+            class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <LucideChevronRight class="w-5 h-5" />
+          </button>
         </div>
       </div>
-    </div>
 
-  </div>
-</section>
+      <div class="relative">
+        <div class="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent z-10"></div>
+        <div class="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent z-10"></div>
+
+        <div class="overflow-hidden">
+          <div
+            ref="scrollContainer"
+            class="flex gap-6 overflow-x-auto pb-2 scroll-smooth snap-x snap-mandatory no-scrollbar"
+          >
+            <div
+              v-for="(r, i) in references"
+              :key="i"
+              class="min-w-[280px] max-w-[320px] snap-start"
+            >
+              <UiReferenceCard v-bind="r" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
 </template>
 

@@ -1,4 +1,3 @@
-<!-- pages/auth/reset-password.vue -->
 <template>
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
@@ -11,19 +10,27 @@
         <div class="flex justify-center">
           <div class="w-16 h-16 rounded-full bg-danger-50 flex items-center justify-center">
             <svg class="w-8 h-8 text-danger-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
             </svg>
           </div>
         </div>
+
         <div>
-          <p class="font-semibold text-navy mb-1">Odkaz je neplatný alebo vypršal</p>
-          <p class="text-sm text-gray-500">Platnosť odkazu na obnovenie hesla je 60 minút. Požiadajte o nový.</p>
+          <p class="font-semibold text-navy mb-1">
+            {{ $t('auth.reset.invalid_title') }}
+          </p>
+          <p class="text-sm text-gray-500">
+            {{ $t('auth.reset.invalid_text') }}
+          </p>
         </div>
+
         <NuxtLink
           to="/auth/forgot-password"
           class="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-center text-sm"
         >
-          Požiadať o nový odkaz
+          {{ $t('auth.reset.request_new_link') }}
         </NuxtLink>
       </div>
 
@@ -36,24 +43,19 @@
 
           <!-- Header -->
           <div class="mb-8 text-center">
-            <template v-if="!resetSuccess">
-              <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">Nové heslo</h1>
-              <p class="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
-                Zadajte nové heslo pre váš účet.
-              </p>
-            </template>
-            <template v-else>
-              <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">Heslo zmenené</h1>
-              <p class="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
-                Vaše heslo bolo úspešne nastavené.
-              </p>
-            </template>
+            <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">
+              {{ $t('auth.reset.title') }}
+            </h1>
+
+            <p class="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
+              {{ $t('auth.reset.subtitle') }}
+            </p>
           </div>
 
           <UiInput
             v-model="formData.password"
             type="password"
-            label="Nové heslo"
+            :label="$t('auth.reset.new_password')"
             placeholder="••••••••••"
             required
             :error="errors.password"
@@ -77,7 +79,7 @@
           <UiInput
             v-model="formData.password_confirmation"
             type="password"
-            label="Potvrdiť nové heslo"
+            :label="$t('auth.reset.confirm_password')"
             placeholder="••••••••••"
             required
             :error="errors.password_confirmation"
@@ -105,7 +107,9 @@
             class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg text-sm flex items-start gap-2"
           >
             <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
             {{ serverError }}
           </div>
@@ -119,7 +123,10 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
             </svg>
-            <span>{{ isLoading ? 'Ukladám...' : 'Nastaviť nové heslo' }}</span>
+
+            <span>
+              {{ isLoading ? $t('auth.reset.saving') : $t('auth.reset.submit') }}
+            </span>
           </button>
         </form>
       </template>
@@ -136,14 +143,14 @@
           </div>
 
           <p class="text-sm text-gray-600 leading-relaxed">
-            Vaše heslo bolo úspešne zmenené. Môžete sa teraz prihlásiť.
+            {{ $t('auth.reset.success_text') }}
           </p>
 
           <NuxtLink
             to="/auth/login"
             class="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-center text-sm"
           >
-            Prejsť na prihlásenie
+            {{ $t('auth.reset.go_login') }}
           </NuxtLink>
         </div>
       </template>

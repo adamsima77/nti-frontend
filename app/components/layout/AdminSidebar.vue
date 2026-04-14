@@ -1,13 +1,11 @@
 <template>
   <div>
-    <!-- Mobile backdrop -->
     <div
       v-if="isOpen"
       class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
       @click="emit('close')"
     />
 
-    <!-- Sidebar -->
     <aside
       :class="[
         'fixed top-0 left-0 h-screen bg-navy text-white flex flex-col z-50 transition-all duration-300',
@@ -16,12 +14,11 @@
         isCollapsed ? 'md:w-20' : 'md:w-64',
       ]"
     >
-      <!-- Logo + admin badge + collapse toggle -->
       <div class="flex flex-col border-b border-white/10">
         <div class="flex items-center justify-between px-4 py-4">
           <NuxtLink
             v-if="!isCollapsed"
-            to="/"
+            :to="localePath('/')"
             class="flex items-center"
           >
             <img
@@ -45,11 +42,11 @@
         <span
           v-if="!isCollapsed"
           class="text-[10px] font-semibold uppercase tracking-wider bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full mx-4 mb-3 w-fit"
-          >Admin</span
         >
+          {{ $t('admin.badge') }}
+        </span>
       </div>
 
-      <!-- Nav items grouped by section -->
       <nav class="flex-1 overflow-y-auto py-4">
         <template
           v-for="(sectionItems, sectionName) in groupedItems"
@@ -68,7 +65,7 @@
               :key="item.to"
             >
               <NuxtLink
-                :to="item.to"
+                :to="localePath(item.to)"
                 :class="[
                   'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-200',
                   isCollapsed ? 'justify-center' : '',
@@ -86,8 +83,9 @@
                 <span
                   v-if="!isCollapsed"
                   class="truncate"
-                  >{{ item.label }}</span
                 >
+                  {{ item.label }}
+                </span>
               </NuxtLink>
             </li>
           </ul>
@@ -120,6 +118,7 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
+const localePath = useLocalePath()
 
 const groupedItems = computed(() => {
   const groups: Record<string, NavItem[]> = {}
@@ -134,7 +133,8 @@ const groupedItems = computed(() => {
 })
 
 const isActive = (to: string) => {
-  return route.path === to || route.path.startsWith(to + '/')
+  const localized = localePath(to)
+  return route.path === localized || route.path.startsWith(localized + '/')
 }
 
 const closeMobileIfOpen = () => {

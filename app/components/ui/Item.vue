@@ -27,7 +27,7 @@
         :to="link"
         class="mt-3 text-blue-500 font-bold hover:underline"
       >
-        Čítať viac →
+        {{ $t('news.read_more') }} →
       </NuxtLink>
     </div>
   </div>

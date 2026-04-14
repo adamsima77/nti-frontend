@@ -9,7 +9,10 @@
     <!-- Čo je Program B -->
     <section class="mt-20 px-6 md:px-20 py-16">
       <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-6">Čo je Program B?</h2>
+        <h2 class="text-4xl font-bold text-navy mb-6">
+          {{ $t('program-b.title') }}
+        </h2>
+
         <p class="text-lg text-gray-600 leading-relaxed mb-8">
           Program B spája firmy s talentovanými študentami a juniormi, ktorí riešia reálne technické výzvy. Vaša firma
           dostane inovatívne riešenia, zatiaľ čo študenti získajú praktické skúsenosti a mentoring od profesionálov.
@@ -35,7 +38,9 @@
     <!-- Ako to funguje -->
     <section class="mt-16 px-6 md:px-20 py-16 bg-gray-50 rounded-lg">
       <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-12">Ako to funguje?</h2>
+        <h2 class="text-4xl font-bold text-navy mb-12">
+          {{ $t('program-b.how_it_works_header') }}
+        </h2>
 
         <div class="space-y-6">
           <div class="flex gap-6">
@@ -118,7 +123,9 @@
     <!-- Čo potrebujete odoslať -->
     <section class="mt-20 px-6 md:px-20 py-16">
       <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-8">Čo potrebujeme od vašej firmy?</h2>
+        <h2 class="text-4xl font-bold text-navy mb-8">
+          {{ $t('program-b.requirements_header') }}
+        </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-600">
@@ -154,7 +161,9 @@
     <!-- FAQ -->
     <section class="mt-20 px-6 md:px-20 py-16 bg-gray-50 rounded-lg">
       <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-12">Časté otázky</h2>
+        <h2 class="text-4xl font-bold text-navy mb-12">
+          {{ $t('program-b.faq.header') }}
+        </h2>
 
         <div class="space-y-4">
           <div
@@ -192,15 +201,19 @@
     <!-- CTA -->
     <section class="mt-20 mb-20 px-6 md:px-20 py-16">
       <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-4xl font-bold text-navy mb-6">Chcete spolupracovať s nami?</h2>
+        <h2 class="text-4xl font-bold text-navy mb-6">
+          {{ $t('program-b.cta.title') }}
+        </h2>
+
         <p class="text-lg text-gray-600 mb-8">
-          Prihláste svoju firmu a definujte svoju výzvu. Naši študenti čakajú na príležitosť!
+          {{ $t('program-b.cta.description') }}
         </p>
+
         <NuxtLink
           to="/auth/login"
           class="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors"
         >
-          Zastaviť sa ako firma
+          {{ $t('program-b.cta.button') }}
         </NuxtLink>
       </div>
     </section>

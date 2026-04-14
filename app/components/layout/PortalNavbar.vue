@@ -13,6 +13,30 @@
       <div class="text-xs sm:text-sm text-gray-500">
         <slot name="breadcrumb" />
       </div>
+
+      <!-- Locale Switcher - shown on md+ screens -->
+      <div class="hidden md:flex items-center gap-1 ml-4">
+        <button
+          @click="setLocale('en')"
+          :class="[
+            'px-2 py-1 text-xs font-medium rounded transition-colors duration-200',
+            locale === 'en' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          ]"
+          :title="$t('locale.en_title')"
+        >
+          EN
+        </button>
+        <button
+          @click="setLocale('sk')"
+          :class="[
+            'px-2 py-1 text-xs font-medium rounded transition-colors duration-200',
+            locale === 'sk' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          ]"
+          :title="$t('locale.sk_title')"
+        >
+          SK
+        </button>
+      </div>
     </div>
 
     <div class="flex items-center gap-2 sm:gap-3 md:gap-4" ref="dropdownRef">
@@ -34,19 +58,19 @@
          class="absolute top-full right-0 mt-0 w-[calc(100vw-5rem)] sm:w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50"
       >
         <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100">
-          <NuxtLink to = "/notifikacie" @click = "showNotifications = false"><p class="font-medium text-sm">Notifikácie</p></NuxtLink>
+          <NuxtLink to = "/notifikacie" @click = "showNotifications = false"><p class="font-medium text-sm">{{ $t('portal.notifications') }}</p></NuxtLink>
           <button
             :class="{'text-blue-500 text-xs sm:text-sm hover:underline': unreadCount > 0,
                      'text-gray-500 text-xs sm:text-sm': unreadCount === 0}"
             @click="markAllAsRead"
           >
-            Označiť ako prečítané
+            {{ $t('portal.mark_all_read') }}
           </button>
         </div>
 
         <div class="max-h-80 overflow-y-auto">
           <div v-if="notifications.length === 0" class="p-4 text-xs sm:text-sm text-gray-500 text-center">
-            No notifications
+            {{ $t('portal.no_notifications') }}
           </div>
           <div v-else>
   <div
@@ -71,7 +95,7 @@
   v-if="!n.read"
   @click.stop="markAsRead(index)"
   class="text-green-500 hover:text-green-600 ml-2"
-  title="Označte ako prečítané"
+  :title="$t('portal.mark_as_read')"
 >
   <Check class="w-4 h-4" />
 </button>
@@ -79,7 +103,7 @@
   v-else
   @click.stop="toggleRead(index)"
   class="ml-2"
-  title="Označte ako neprečítané"
+  :title="$t('portal.mark_as_unread')"
 >
   <Check class="w-4 h-4 text-blue-400" />
 </button>
@@ -94,7 +118,7 @@
 
       <button
         class="text-gray-500 hover:text-danger-600 transition-colors"
-        title="Odhlásiť sa"
+        :title="$t('portal.logout')"
         @click="handleLogout"
       >
         <LogOut class="w-5 h-5" />
@@ -106,6 +130,8 @@
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { Menu, Bell, LogOut, ChevronRight, Check } from 'lucide-vue-next'
+
+const { setLocale, locale } = useI18n()
 
 const props = defineProps({
   sidebarCollapsed: Boolean

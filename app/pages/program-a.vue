@@ -9,10 +9,9 @@
     <!-- Čo je Program A -->
     <section class="mt-20 px-6 md:px-20 py-16">
       <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-6">Čo je Program A?</h2>
+        <h2 class="text-4xl font-bold text-navy mb-6">{{ $t('program-a.title') }}</h2>
         <p class="text-lg text-gray-600 leading-relaxed mb-8">
-          Program A je intensívny program určený pre študentov vysokých škôl a začínajúcich odborníkov, ktorí chcú
-          rýchlo nadobudnúť praktické skúsenosti, pracovať v tímoch a získať mentoring od skúsených profesionálov.
+          {{ $t('program-a.description') }}
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -35,11 +34,11 @@
     <!-- Kto sa môže prihlásiť -->
     <section class="mt-16 px-6 md:px-20 py-16 bg-gray-50 rounded-lg">
       <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-8">Kto sa môže prihlásiť?</h2>
+        <h2 class="text-4xl font-bold text-navy mb-8">{{ $t('program-a.signup_title') }}</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <h3 class="text-xl font-bold text-blue-600 mb-4">Kategória: Študenti</h3>
+            <h3 class="text-xl font-bold text-blue-600 mb-4">{{ $t('program-a.signup_students.title') }}</h3>
             <ul class="space-y-3 text-gray-700">
               <li class="flex items-start gap-3">
                 <CheckCircle class="w-5 h-5 text-success-500 flex-shrink-0 mt-1" />
@@ -61,7 +60,7 @@
           </div>
 
           <div>
-            <h3 class="text-xl font-bold text-blue-600 mb-4">Kategória: Junior/Entry-level</h3>
+            <h3 class="text-xl font-bold text-blue-600 mb-4">{{ $t('program-a.signup_juniors.title') }}</h3>
             <ul class="space-y-3 text-gray-700">
               <li class="flex items-start gap-3">
                 <CheckCircle class="w-5 h-5 text-success-500 flex-shrink-0 mt-1" />
@@ -88,7 +87,7 @@
     <!-- Časový plán -->
     <section class="mt-20 px-6 md:px-20 py-16">
       <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-8">Časový plán</h2>
+        <h2 class="text-4xl font-bold text-navy mb-8">{{ $t('program-a.timeline.header') }}</h2>
 
         <div class="space-y-4">
           <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded">
@@ -112,7 +111,7 @@
     <!-- FAQ -->
     <section class="mt-20 px-6 md:px-20 py-16 bg-gray-50 rounded-lg">
       <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-12">Časté otázky</h2>
+        <h2 class="text-4xl font-bold text-navy mb-12">{{ $t('program-a.faq.header') }}</h2>
 
         <div class="space-y-4">
           <div
@@ -150,15 +149,15 @@
     <!-- CTA -->
     <section class="mt-20 mb-20 px-6 md:px-20 py-16">
       <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-4xl font-bold text-navy mb-6">Pripravený na výzvu?</h2>
+        <h2 class="text-4xl font-bold text-navy mb-6">{{ $t('program-a.cta.title') }}</h2>
         <p class="text-lg text-gray-600 mb-8">
-          Prihlásiť sa do Programu A je jednoduché. Potrebujem iba základné informácie a tvoju motiváciu.
+          {{ $t('program-a.cta.description') }}
         </p>
         <NuxtLink
           to="/auth/login"
           class="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors"
         >
-          Prihlásiť sa teraz
+          {{ $t('program-a.cta.button') }}
         </NuxtLink>
       </div>
     </section>

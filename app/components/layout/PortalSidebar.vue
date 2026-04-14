@@ -1,13 +1,11 @@
 <template>
   <div>
-    <!-- Mobile backdrop -->
     <div
       v-if="isOpen"
       class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
       @click="emit('close')"
     />
 
-    <!-- Sidebar -->
     <aside
       :class="[
         'fixed top-0 left-0 h-screen bg-navy text-white flex flex-col z-50 transition-all duration-300',
@@ -16,11 +14,10 @@
         isCollapsed ? 'md:w-20' : 'md:w-64',
       ]"
     >
-      <!-- Logo + collapse toggle -->
       <div class="flex items-center justify-between px-4 py-4 border-b border-white/10">
         <NuxtLink
           v-if="!isCollapsed"
-          to="/"
+          :to="localePath('/')"
           class="flex items-center"
         >
           <img
@@ -41,7 +38,6 @@
         </button>
       </div>
 
-      <!-- Nav items -->
       <nav class="flex-1 overflow-y-auto py-4">
         <ul class="flex flex-col gap-1 px-2">
           <li
@@ -49,7 +45,7 @@
             :key="item.to"
           >
             <NuxtLink
-              :to="item.to"
+              :to="localePath(item.to)"
               :class="[
                 'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-200',
                 isCollapsed ? 'justify-center' : '',
@@ -67,18 +63,47 @@
               <span
                 v-if="!isCollapsed"
                 class="truncate"
-                >{{ item.label }}</span
               >
+                {{ item.label }}
+              </span>
             </NuxtLink>
           </li>
         </ul>
       </nav>
+
+      <div class="md:hidden px-2 pb-4 border-t border-white/10 mt-4">
+        <div class="flex items-center justify-center gap-1">
+          <button
+            @click="setLocale('en')"
+            :class="[
+              'px-3 py-2 text-sm font-medium rounded transition-colors duration-200 flex-1',
+              locale === 'en' ? 'bg-blue-500 text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
+            ]"
+            :title="$t('locale.en_title')"
+          >
+            EN
+          </button>
+          <button
+            @click="setLocale('sk')"
+            :class="[
+              'px-3 py-2 text-sm font-medium rounded transition-colors duration-200 flex-1',
+              locale === 'sk' ? 'bg-blue-500 text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
+            ]"
+            :title="$t('locale.sk_title')"
+          >
+            SK
+          </button>
+        </div>
+      </div>
     </aside>
   </div>
 </template>
 
 <script setup>
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+
+const { setLocale, locale } = useI18n()
+const localePath = useLocalePath()
 
 const props = defineProps({
   items: {
@@ -100,7 +125,8 @@ const emit = defineEmits(['close', 'toggle-collapse'])
 const route = useRoute()
 
 const isActive = (to) => {
-  return route.path === to || route.path.startsWith(to + '/')
+  const localized = localePath(to)
+  return route.path === localized || route.path.startsWith(localized + '/')
 }
 
 const closeMobileIfOpen = () => {

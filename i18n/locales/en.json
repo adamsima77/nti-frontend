@@ -1,0 +1,413 @@
+{
+  "home": {
+    "program_header": "Our Programs",
+    "partners_header": "Our Partners",
+    "news_header": "News"
+  },
+
+  "news": {
+    "read_more": "Read more",
+    "more_news": "More news",
+    "publicated": "Published on"
+  },
+
+  "nav": {
+    "news": "News",
+    "program_a": "Program A",
+    "program_b": "Program B",
+    "partners": "Partners",
+    "challenges": "Challenges and Deadlines",
+    "about": "About NTI",
+    "contact": "Contact"
+  },
+
+  "portal": {
+    "notifications": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "logout": "Log out",
+    "no_notifications": "No notifications",
+    "mark_as_read": "Mark as read",
+    "mark_as_unread": "Mark as unread"
+  },
+
+  "admin": {
+    "badge": "Admin"
+  },
+
+  "locale": {
+    "en_title": "English",
+    "sk_title": "Slovenčina"
+  },
+
+  "program-a": {
+    "title": "What is Program A",
+    "description": "Program A is an intensive program designed for university students and junior professionals who want to quickly gain practical experience, work in teams, and receive mentoring from experienced professionals.",
+
+    "benefits": {
+      "first": {
+        "title": "3 months",
+        "description": "Intensive program with weekly mentoring and workshops."
+      },
+      "second": {
+        "title": "Team work",
+        "description": "You work in a multidisciplinary team with your own ideas."
+      },
+      "third": {
+        "title": "Real projects",
+        "description": "You develop real challenges with community impact."
+      }
+    },
+
+    "signup_title": "Who can apply?",
+    "signup_students": {
+      "title": "Category: Students",
+      "list": [
+        "University students of all years",
+        "Basic knowledge of at least one technology",
+        "Ability to dedicate 15-20 hours per week",
+        "Motivation and willingness to learn"
+      ]
+    },
+
+    "signup_juniors": {
+      "title": "Category: Junior/Entry-level",
+      "list": [
+        "Up to 2 years of work experience",
+        "Beginning or self-taught developers",
+        "Willingness to dedicate time to the program",
+        "Open mindset for work"
+      ]
+    },
+
+    "timeline": {
+      "header": "Timeline",
+      "applications": {
+        "title": "📋 Applications open",
+        "period": "January 1 — January 31, 2026"
+      },
+      "evaluation": {
+        "title": "⏱️ Application evaluation",
+        "period": "February 1 — February 15, 2026"
+      },
+      "program": {
+        "title": "🚀 Program starts",
+        "period": "April 1 — July 30, 2026"
+      }
+    },
+
+    "faq": {
+      "header": "Frequently Asked Questions",
+      "questions": [
+        {
+          "question": "How much does Program A cost?",
+          "answer": "Program A is completely free. All participants get equal access to mentors, workshops and materials, without hidden fees."
+        },
+        {
+          "question": "Do you need work experience outside of school?",
+          "answer": "No, it's not mandatory! Most of our participants don't have work experience. What's important is having the will to learn and collaborate with the team."
+        }
+      ]
+    },
+
+    "cta": {
+      "title": "Ready for the challenge?",
+      "description": "Signing up for Program A is simple. I just need basic information and your motivation.",
+      "button": "Sign up now"
+    }
+  },
+
+  "program-b": {
+    "title": "What is Program B",
+
+    "description": "Program B connects companies with talented students and juniors who solve real technical challenges. Your company gets innovative solutions, while students gain practical experience and mentoring from professionals.",
+
+    "benefits": {
+      "first": {
+        "title": "Innovative solutions",
+        "description": "Students bring a fresh perspective to your technical problems."
+      },
+      "second": {
+        "title": "Flexible engagement",
+        "description": "You decide how strongly you want to engage and mentor students."
+      },
+      "third": {
+        "title": "No hidden costs",
+        "description": "The program is free for both parties - companies and students."
+      }
+    },
+
+    "how_it_works_header": "How does it work?",
+    "how_it_works_items": {
+      "first": {
+        "title": "Company registration",
+        "description": "Register your company profile and identify your team needs and technical challenges to solve."
+      },
+      "second": {
+        "title": "Challenge creation",
+        "description": "Define your challenge - what needs to be solved, what are the final goals, and what students are ideal."
+      },
+      "third": {
+        "title": "Team selection",
+        "description": "Browse registered teams and choose the best fit for your challenge."
+      },
+      "fourth": {
+        "title": "Implementation & mentoring",
+        "description": "The selected team starts development with your feedback and mentoring."
+      },
+      "fifth": {
+        "title": "Presentation & deployment",
+        "description": "The team presents the final solution and it can be deployed or further developed."
+      }
+    },
+
+    "requirements_header": "What do we need from your company?",
+    "requirements_company_profile": {
+      "title": "Company profile",
+      "items": [
+        "Company name and description",
+        "Website",
+        "Contact details",
+        "Logo and branding"
+      ]
+    },
+
+    "requirements_technical_spec": {
+      "title": "Technical specification of the challenge",
+      "items": [
+        "Clear problem description",
+        "Expected technologies",
+        "Time budget / difficulty",
+        "Success criteria"
+      ]
+    },
+
+    "requirements_tip": "The more precise your challenge, the better teams you will attract.",
+
+    "faq": {
+      "header": "Frequently Asked Questions",
+      "questions": [
+        {
+          "question": "How much will it cost?",
+          "answer": "Program B is completely free for companies."
+        },
+        {
+          "question": "How long does the program last?",
+          "answer": "The program lasts 3 months."
+        }
+      ]
+    },
+
+    "cta": {
+      "title": "Want to cooperate with us?",
+      "description": "Register your company and define your challenge. Our students are ready!",
+      "button": "Register as a company"
+    }
+  },
+  "partners_page": {
+    "hero": {
+      "title": "Our partners and mentors",
+      "description": "Meet companies and experts who support talent and help build trust in our community."
+    },
+    "partners": {
+      "title": "Partners",
+      "subtitle": "We collaborate with top companies"
+    },
+    "mentors": {
+      "title": "Mentors",
+      "subtitle": "People who will push you forward"
+    },
+    "references": {
+      "title": "References"
+    }
+  },
+"calls": {
+    "vyzvy_terminy": {
+      "hero": {
+        "title": "Challenges and deadlines",
+        "subtitle": "Browse available challenges and join the ones that inspire you"
+      },
+
+      "empty": {
+        "title": "No challenges available yet",
+        "description": "Check back later. New challenges will be added soon."
+      },
+
+      "applicants": {
+        "single": "application",
+        "plural": "applications"
+      },
+
+      "cta": "View details"
+    }
+  },
+  "contact": {
+    "page": {
+      "title": "Contact us",
+      "subtitle": "Have questions about NTI programs or cooperation? Get in touch with us.",
+
+      "info": {
+        "title": "Contact information",
+        "email": "Email",
+        "phone": "Phone",
+        "address": "Address"
+      },
+
+      "form": {
+        "title": "Write to us",
+        "fields": {
+          "first_name": "First name",
+          "last_name": "Last name",
+          "email": "Email",
+          "message": "Message"
+        },
+        "button": "Send message"
+      }
+    }
+  },
+   "about_nti": {
+    "title": "About NTI",
+    "description": "The Nitra Technology Incubator is a reliable institution supporting innovation and technological development. We build an ecosystem of collaboration between faculties, companies, and startups.",
+
+    "cards": {
+      "mission": {
+        "title": "Mission",
+        "description": "We support innovation, education, and sustainable technological development in the region."
+      },
+      "pillars": {
+        "title": "Pillars",
+        "description": "Expertise, transparency, and collaboration form the foundation of our credibility."
+      },
+      "ecosystem": {
+        "title": "Ecosystem",
+        "description": "We connect faculties, startups, and companies to create real innovations and impactful projects."
+      },
+      "faculties": {
+        "title": "Faculties",
+        "description": "We collaborate with faculties and academic partners to bring new projects, research, and expertise into practice."
+      }
+    },
+
+    "team": {
+      "title": "Our team"
+    }
+  },
+ "auth": {
+  "forgot": {
+  "title": "Forgot password",
+  "subtitle": "Enter your email and we will send you a password reset link",
+
+  "sent_title": "Check your email",
+  "sent_subtitle": "If the account exists, we sent reset instructions",
+
+  "email_label": "Email address",
+  "email_placeholder": "your-email.com",
+
+  "button_send": "Send reset link",
+  "button_sending": "Sending...",
+
+  "remember_password": "Remember your password?",
+  "login": "Sign in",
+
+  "success_text": "We sent a link to",
+  "expires": "The link is valid for 60 minutes",
+
+  "resend": "Resend email",
+  "resend_wait": "Resend in",
+
+  "info": "If you don't see the email, check spam or promotions."
+},
+"reset": {
+  "title": "New password",
+  "subtitle": "Enter your new password",
+
+  "new_password": "New password",
+  "confirm_password": "Confirm new password",
+
+  "saving": "Saving...",
+  "submit": "Set new password",
+
+  "success_text": "Your password has been successfully changed. You can now log in.",
+  "go_login": "Go to login",
+
+  "invalid_title": "Link is invalid or expired",
+  "invalid_text": "Password reset link is valid for 60 minutes. Please request a new one.",
+  "request_new_link": "Request new link"
+},
+  "login": {
+    "title": "Login",
+    "subtitle": "Sign in to your NTI account",
+
+    "fields": {
+      "email": {
+        "label": "Email",
+        "placeholder": "your-email.com"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "••••••••••"
+      }
+    },
+
+    "forgot_password": "Forgot your password?",
+    "submit": "Sign in",
+    "loading": "Signing in...",
+    "no_account": "Don't have an account?",
+    "register": "Sign up"
+  },
+
+  "register": {
+    "title": "Register",
+    "subtitle": "Create a new NTI account",
+
+    "type_selection": {
+      "title": "Choose your account type",
+
+      "student": {
+        "title": "Student / Junior developer",
+        "description": "I join programs, learn and work on projects"
+      },
+
+      "organization": {
+        "title": "Company / Organization",
+        "description": "We want to involve talented people in solving our challenges"
+      }
+    },
+
+    "fields": {
+      "first_name": "First name",
+      "last_name": "Last name",
+      "email": "Email",
+      "organization_name": "Organization name",
+      "password": "Password",
+      "password_confirmation": "Confirm password"
+    },
+
+    "placeholders": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john-example.com",
+      "organization_email": "contact-company.com",
+      "password": "••••••••••",
+      "organization_name": "My Company Ltd."
+    },
+
+    "terms": {
+      "text": "I agree to",
+      "terms": "terms of use",
+      "privacy": "privacy policy"
+    },
+
+    "buttons": {
+      "register": "Register",
+      "registering": "Registering...",
+      "back": "Back"
+    },
+
+    "login": {
+      "text": "Already have an account?",
+      "link": "Sign in"
+    }
+  }
+
+}
+}
