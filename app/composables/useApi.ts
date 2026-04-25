@@ -1,110 +1,63 @@
-import { ref, computed } from 'vue'
-
 export const useApi = () => {
   const config = useRuntimeConfig()
-  const apiBaseUrl = config.public.apiBase || 'http://localhost:8000/api'
-
+  const base = () => import.meta.server ? config.apiBase : config.public.apiBase
+ 
   const isLoading = ref(false)
   const error = ref<string | null>(null)
-
+ 
   const getAuthHeader = (): Record<string, string> => {
     try {
-      const authStore = useAuthStore()
-      return authStore.token ? { Authorization: `Bearer ${authStore.token}` } : {}
-    } catch {
-      return {}
-    }
+      const { token } = useAuthStore()
+      return token ? { Authorization: `Bearer ${token}` } : {}
+    } catch { return {} }
   }
-
-  const handleError = (err: unknown, endpoint: string, method: string) => {
-    let errMessage: string
-
-    if (err instanceof Error) {
-      errMessage = err.message
-    } else if (typeof err === 'string') {
-      errMessage = err
-    } else {
-      errMessage = 'Neznáma chyba'
-    }
-
-    error.value = errMessage
+ 
+  const handleError = (err: unknown, method: string, endpoint: string) => {
+    const message = err instanceof Error ? err.message : typeof err === 'string' ? err : 'Neznáma chyba'
+    error.value = message
     console.error(`API Error [${method} ${endpoint}]:`, err)
-
-    // Automaticky zobrazí error ako toast (pokiaľ je dostupný)
     try {
-      const toast = useToast()
-      // Nezobazvujeme toast pre 401 (unauthorized) - to handleuje logout
-      if (!errMessage.includes('Unauthorized')) {
-        toast.addToast({
-          message: `${method} ${endpoint}: ${errMessage}`,
-          type: 'error',
-          duration: 5000,
-        })
+      if (!message.includes('Unauthorized')) {
+        useToast().addToast({ message: `${method} ${endpoint}: ${message}`, type: 'error', duration: 5000 })
       }
-    } catch (e) {
-      // Toast composable možno nie je dostupný (napr. SSR), ignorujeme
-    }
+    } catch {}
   }
-
-  const request = async (method: string, endpoint: string, data: any = null, options: RequestInit = {}) => {
+ 
+  const request = async (method: string, endpoint: string, data?: any, options: RequestInit = {}) => {
     isLoading.value = true
     error.value = null
-
     try {
-      const url = `${apiBaseUrl}${endpoint}`
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-        ...getAuthHeader(),
-      }
-
-      const fetchOptions: RequestInit = {
+      const response = await fetch(`${base()}${endpoint}`, {
         method,
-        headers,
-        credentials: 'include', // Pre cookies (Sanctum)
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: data && ['POST', 'PUT', 'PATCH'].includes(method) ? JSON.stringify(data) : undefined,
         ...options,
-      }
-
-      if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
-        fetchOptions.body = JSON.stringify(data) as BodyInit
-      }
-
-      const response = await fetch(url, fetchOptions)
-
-      // Ak je unauthorized (401), logout
+      })
       if (response.status === 401) {
-        try {
-          const authStore = useAuthStore()
-          await authStore.logout()
-        } catch (e) {
-          console.error('Logout failed:', e)
-        }
+        try { await useAuthStore().logout() } catch (e) { console.error('Logout failed:', e) }
         throw new Error('Unauthorized')
       }
-
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || `HTTP ${response.status}`)
+        const { message } = await response.json().catch(() => ({}))
+        throw new Error(message || `HTTP ${response.status}`)
       }
-
-      const result = await response.json()
-      return result
-    } catch (err: unknown) {
-      handleError(err, endpoint, method)
+      return response.json()
+    } catch (err) {
+      handleError(err, method, endpoint)
       throw err
     } finally {
       isLoading.value = false
     }
   }
-
+ 
   return {
     isLoading: computed(() => isLoading.value),
     error: computed(() => error.value),
-
-    // HTTP Methods
-    get: (endpoint: string, options?: RequestInit) => request('GET', endpoint, null, options),
-    post: (endpoint: string, data: any, options?: RequestInit) => request('POST', endpoint, data, options),
-    put: (endpoint: string, data: any, options?: RequestInit) => request('PUT', endpoint, data, options),
-    patch: (endpoint: string, data: any, options?: RequestInit) => request('PATCH', endpoint, data, options),
+    get:    (endpoint: string, options?: RequestInit) => request('GET',    endpoint, null, options),
+    post:   (endpoint: string, data: any, options?: RequestInit) => request('POST',   endpoint, data, options),
+    put:    (endpoint: string, data: any, options?: RequestInit) => request('PUT',    endpoint, data, options),
+    patch:  (endpoint: string, data: any, options?: RequestInit) => request('PATCH',  endpoint, data, options),
     delete: (endpoint: string, options?: RequestInit) => request('DELETE', endpoint, null, options),
   }
 }

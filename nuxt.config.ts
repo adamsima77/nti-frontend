@@ -40,38 +40,30 @@ export default defineNuxtConfig({
     '/admin/**': { ssr: false },
     '/notifikacie/**': { ssr: false }
   },
-    i18n: {
+     i18n: {
     strategy: 'prefix_except_default',
     defaultLocale: 'sk',
+    fallbackLocale: 'en',
+ 
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
       fallbackLocale: 'en',
-      alwaysRedirect: false
+      alwaysRedirect: false,
     },
-    langDir: 'locales/',
 
+    langDir: 'locales/',
     locales: [
-      {
-        code: 'en',
-        name: 'English',
-        lang: 'en-US',
-        file: 'en.json'
-      },
-      {
-        code: 'sk',
-        name: 'Slovak',
-        lang: 'sk-SK',
-        file: 'sk.json'
-      }
-    ]
+      { code: 'en', name: 'English', lang: 'en-US', file: 'en.json' },
+      { code: 'sk', name: 'Slovak',  lang: 'sk-SK', file: 'sk.json' }
+    ],
   },
   runtimeConfig: {
-    apiBase: process.env.NUXT_API_BASE || 'http://localhost:8000/api',
-    public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000/api',
-    },
+    apiBase: 'http://backend:8000/api',
+  public: {
+    apiBase: 'http://localhost/backend',
   },
+},
   vite: {
     plugins: [tailwindcss()],
   },

@@ -1,7 +1,7 @@
 <template>
   <UiHero
-    title="Objav Nitriansky Technický Inkubátor!"
-    description="Interaktívne programy, mentorstvo a komunita, ktorá ťa posunie vpred."
+      :title="banner?.hero_banner_translations?.[0]?.title"
+      :description="banner?.hero_banner_translations?.[0]?.description"
   ></UiHero>
 
   <div
@@ -96,9 +96,13 @@
       />
     </div>
   </div>
+
+  
 </template>
 
 <script setup>
+import { useBanner } from '../composables/modules/content/banners/fetchBanner'
+import { PageType } from '../composables/modules/content/enum/PageType'
 useSeoMeta({
   title: 'Domov | NTI',
   description:
@@ -113,4 +117,6 @@ useSeoMeta({
   twitterDescription:
     'Budujeme komunitu talentovaných ľudí. Zúzasti sa na Program A alebo Program B a rast spolu s námi.',
 })
+
+const { banner } = useBanner(PageType.HOME)
 </script>
