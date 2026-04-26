@@ -4,7 +4,7 @@
       <!-- HEADER -->
       <div class="mb-8 text-center">
         <NuxtLink
-          to="/"
+          :to="localePath('/')"
           class="inline-block mb-6"
         />
 
@@ -236,7 +236,7 @@
         <p class="text-center text-gray-600">
           {{ $t('auth.register.login.text') }}
           <NuxtLink
-            to="/auth/login"
+            :to="localePath('/auth/login')"
             class="text-blue-600 hover:underline font-medium"
           >
             {{ $t('auth.register.login.link') }}
@@ -268,7 +268,7 @@ useHead({
 const authStore = useAuthStore()
 const router = useRouter()
 const api = useApi()
-
+const localePath = useLocalePath()
 const { addToast } = useToast()
 const step = ref('type-selection')
 const accountType = ref(null)

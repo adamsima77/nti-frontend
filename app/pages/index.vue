@@ -9,26 +9,23 @@
     class="mt-20 px-6 md:px-0 flex flex-col"
   >
     <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-extrabold text-navy mb-12 text-center md:text-left">
-      Naše programy
+      {{ $t('home.program_header') }}
     </h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <UiProgramCard
-        title="Program A"
-        description="Intenzívny kurz pre rýchly osobný rast a nové zručnosti."
-        link="/program-a"
-      />
-      <UiProgramCard
-        title="Program B"
-        description="Mentoring a komunita pre dlhodobý profesionálny rozvoj."
-        link="/program-b"
-      />
+  <UiProgramCard
+  v-for="(item, index) in tm('home.program_cards.cards')"
+  :key="index"
+  :title="rt(item.title)"
+  :description="rt(item.description)"
+  :link="localePath(programLinks[index])"
+/>
     </div>
   </div>
 
   <section class="mt-16 mb-20 px-6 md:px-0">
     <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-extrabold text-navy mb-12 text-center md:text-left">
-      Naši partneri
+      {{ $t('home.partners_header') }}
     </h2>
     <div
       class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 justify-items-center md:justify-items-start gap-6 sm:gap-8 md:gap-10"
@@ -58,7 +55,7 @@
 
   <div class="mb-20 mt-10 px-6 md:px-0">
     <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-extrabold text-navy mb-12 text-center md:text-left">
-      Novinky
+      {{ $t('home.news_header') }}
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <UiItem
@@ -117,6 +114,9 @@ useSeoMeta({
   twitterDescription:
     'Budujeme komunitu talentovaných ľudí. Zúzasti sa na Program A alebo Program B a rast spolu s námi.',
 })
-
+const localePath = useLocalePath()
+const { t } = useI18n() 
+const { tm, rt } = useI18n()
 const { banner } = useBanner(PageType.HOME)
+const programLinks = ['/program-a', '/program-b']
 </script>

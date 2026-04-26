@@ -46,7 +46,7 @@
         </div>
 
         <NuxtLink
-          to="/auth/forgot-password"
+          :to="localePath('/auth/forgot-password')"
           class="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-center text-sm"
         >
           {{ $t('auth.reset.request_new_link') }}
@@ -231,7 +231,7 @@
           </p>
 
           <NuxtLink
-            to="/auth/login"
+            :to="localePath('/auth/login')"
             class="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-center text-sm"
           >
             {{ $t('auth.reset.go_login') }}
@@ -244,7 +244,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-
+const localePath = useLocalePath()
 definePageMeta({
   layout: 'default',
   middleware: 'guest',

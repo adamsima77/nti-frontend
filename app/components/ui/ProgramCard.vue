@@ -7,7 +7,7 @@
     <NuxtLink
       :to="link"
       class="text-blue-500 font-bold hover:underline mt-2 md:mt-0"
-      >Viac info →</NuxtLink
+      >{{ $t('home.program_cards.more_info') }} →</NuxtLink
     >
   </div>
 </template>

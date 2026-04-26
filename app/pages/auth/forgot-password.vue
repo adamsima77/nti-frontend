@@ -50,7 +50,7 @@
           <p class="text-center text-gray-500 text-sm">
             {{ $t('auth.forgot.remember_password') }}
             <NuxtLink
-              to="/auth/login"
+              :to="localePath('/auth/login')"
               class="text-blue-600 hover:underline font-medium"
             >
               {{ $t('auth.forgot.login') }}
@@ -92,7 +92,7 @@
           </button>
 
           <NuxtLink
-            to="/auth/login"
+            :to="localePath('/auth/login')"
             class="block text-sm text-gray-500"
           >
             ← {{ $t('auth.forgot.login') }}
@@ -105,7 +105,7 @@
 
 <script setup>
 import { ref } from 'vue'
-
+const localePath = useLocalePath()
 definePageMeta({
   layout: 'default',
   middleware: 'guest',

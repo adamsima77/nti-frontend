@@ -2,8 +2,8 @@
   <div>
     <!-- Hero sekcia -->
     <UiHero
-      title="Program A: Intenzívne zrýchlenie"
-      description="Dynamický 3-mesačný program pre študentov a začínajúcich profesionálov. Získaj skúsenosti, mentoring a sieť kontaktov."
+      :title="banner?.hero_banner_translations?.[0]?.title"
+      :description="banner?.hero_banner_translations?.[0]?.description"
     />
 
     <!-- Čo je Program A -->
@@ -15,17 +15,9 @@
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <UiInfoCard
-            title="3 mesiace"
-            description="Intenzívny program s týždenným mentorstvom a workshopmi."
-          />
-          <UiInfoCard
-            title="Tímová práca"
-            description="Pracuješ v multidisciplinárnom tíme s vlastnými ideami."
-          />
-          <UiInfoCard
-            title="Reálne projekty"
-            description="Vypracovávate reálne výzvy s dopadom na komunitu."
+          <UiInfoCard v-for = "(item,index) in tm('program-a.benefits')" :key = "index"
+            :title="rt(item.title)"
+            :description="rt(item.description)"
           />
         </div>
       </div>
@@ -40,21 +32,9 @@
           <div>
             <h3 class="text-xl font-bold text-blue-600 mb-4">{{ $t('program-a.signup_students.title') }}</h3>
             <ul class="space-y-3 text-gray-700">
-              <li class="flex items-start gap-3">
+              <li class="flex items-start gap-3" v-for = "(item, i) in tm('program-a.signup_students.list')" :key = "i">
                 <CheckCircle class="w-5 h-5 text-success-500 flex-shrink-0 mt-1" />
-                <span>Vysokoškoláci všetkých ročníkov</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <CheckCircle class="w-5 h-5 text-success-500 flex-shrink-0 mt-1" />
-                <span>Základná znalosť aspoň jednej technológie</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <CheckCircle class="w-5 h-5 text-success-500 flex-shrink-0 mt-1" />
-                <span>Možnosť venovať 15-20 hodín týždne</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <CheckCircle class="w-5 h-5 text-success-500 flex-shrink-0 mt-1" />
-                <span>Motivácia a ochota učiť sa</span>
+                 <span>{{ rt(item) }}</span>
               </li>
             </ul>
           </div>
@@ -62,22 +42,10 @@
           <div>
             <h3 class="text-xl font-bold text-blue-600 mb-4">{{ $t('program-a.signup_juniors.title') }}</h3>
             <ul class="space-y-3 text-gray-700">
-              <li class="flex items-start gap-3">
+              <li class="flex items-start gap-3" v-for = "(item,i) in tm('program-a.signup_juniors.list')" :key = "i">
                 <CheckCircle class="w-5 h-5 text-success-500 flex-shrink-0 mt-1" />
-                <span>Do 2 rokov pracovnej skúsenosti</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <CheckCircle class="w-5 h-5 text-success-500 flex-shrink-0 mt-1" />
-                <span>Začínajúci alebo samouk vývojári</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <CheckCircle class="w-5 h-5 text-success-500 flex-shrink-0 mt-1" />
-                <span>Ochota venovať čas programu</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <CheckCircle class="w-5 h-5 text-success-500 flex-shrink-0 mt-1" />
-                <span>Otvorený mindsettejšie práci</span>
-              </li>
+                <span>{{ rt(item) }}</span>
+            </li>
             </ul>
           </div>
         </div>
@@ -166,9 +134,10 @@
 
 <script setup>
 import { ref } from 'vue'
-
+import { useBanner } from '../composables/modules/content/banners/fetchBanner'
+import { PageType } from '../composables/modules/content/enum/PageType'
 const localePath = useLocalePath()
-
+const { tm, rt } = useI18n()
 definePageMeta({
   layout: 'default',
 })
@@ -187,6 +156,8 @@ useSeoMeta({
   twitterDescription: 'Dynamický 3-mesačný program pre študentov s mentorstvom a prácou na reálnych projektoch.',
 })
 
+const { banner } = useBanner(PageType.PROGRAM_A)
+const { t } = useI18n() 
 const expandedFaq = ref(null)
 
 const faqs = [

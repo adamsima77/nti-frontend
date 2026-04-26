@@ -15,13 +15,13 @@
             :to="localePath('/auth/login')"
             class="bg-blue-500 cursor-pointer md:shrink-0 text-white py-4 px-8 sm:px-10 rounded-full font-bold shadow-lg hover:bg-blue-400 transition-all duration-300 ease-in-out"
           >
-            Začni teraz
+             {{ $t('home.banner_cta.start_now') }}
           </NuxtLink>
           <NuxtLink
             :to="localePath('/o-nas')"
             class="border-2 bg-white md:shrink-0 text-blue-500 md:bg-transparent cursor-pointer md:border-white md:text-white py-4 px-8 sm:px-10 rounded-full font-bold md:hover:bg-white md:hover:text-blue-500 transition-all"
           >
-            Zisti viac
+            {{ $t('home.banner_cta.learn_more') }}
           </NuxtLink>
         </div>
       </div>

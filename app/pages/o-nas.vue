@@ -10,21 +10,9 @@
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          <UiInfoCard
-            title="Misia"
-            description="Podporujeme inovácie, vzdelávanie a udržateľný technologický rozvoj v regióne."
-          />
-          <UiInfoCard
-            title="Piliere"
-            description="Odbornosť, transparentnosť a spolupráca tvoria základ našej dôveryhodnosti."
-          />
-          <UiInfoCard
-            title="Ekosystém"
-            description="Prepojujeme fakulty, startupy a firmy, aby vznikali reálne inovácie a projekty s dopadom."
-          />
-          <UiInfoCard
-            title="Fakulty"
-            description="Spolupracujeme s fakultami a akademickými partnermi, aby sme prinášali nové projekty, výskum a odborné znalosti do praxe."
+          <UiInfoCard v-for = "(item,index) in tm('about_nti.cards')" :key = "index"
+            :title="rt(item.title)"
+            :description="rt(item.description)"
           />
         </div>
       </div>
@@ -78,4 +66,7 @@ useSeoMeta({
   twitterDescription:
     'NTI je komunita zameraná na dizajn, vývoj a inovácie. Spoznajte nášu historiu a valu, ktorú prinášame.',
 })
+
+const { t } = useI18n() 
+const { tm, rt } = useI18n()
 </script>

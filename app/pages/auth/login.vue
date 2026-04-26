@@ -7,7 +7,7 @@
       >
         <div class="mb-8 text-center">
           <NuxtLink
-            to="/"
+            :to="localePath('/')"
             class="inline-block mb-6"
           />
 

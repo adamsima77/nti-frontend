@@ -11,7 +11,7 @@
 
     <div class="mb-20 mt-10 px-6 md:px-0">
       <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-extrabold text-navy mb-12 text-center md:text-left">
-        Ďalšie články
+        {{ $t('news.more_news') }}
       </h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

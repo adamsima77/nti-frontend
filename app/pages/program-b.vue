@@ -2,8 +2,8 @@
   <div>
     <!-- Hero sekcia -->
     <UiHero
-      title="Program B: Inovácia za firemných výziev"
-      description="Najímte talentované študentov a junioroch vývojárov na riešenie svojich technických problémov. Pozrite si inovatívne riešenia, ktoré vám pomôžu rásť."
+      :title="banner?.hero_banner_translations?.[0]?.title"
+      :description="banner?.hero_banner_translations?.[0]?.description"
     />
 
     <!-- Čo je Program B -->
@@ -14,111 +14,51 @@
         </h2>
 
         <p class="text-lg text-gray-600 leading-relaxed mb-8">
-          Program B spája firmy s talentovanými študentami a juniormi, ktorí riešia reálne technické výzvy. Vaša firma
-          dostane inovatívne riešenia, zatiaľ čo študenti získajú praktické skúsenosti a mentoring od profesionálov.
+           {{ $t('program-b.description') }}
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <UiInfoCard
-            title="Inovatívne riešenia"
-            description="Študenti prinesú čerstvý pohľad na vaše technické problémy."
-          />
-          <UiInfoCard
-            title="Flexibilná angažovanosť"
-            description="Určite sami, ako silno sa chcete angažovať a mentorovat študentov."
-          />
-          <UiInfoCard
-            title="Bez skrytých nákladov"
-            description="Program je bezplatný pre obidve strany — firmy aj študenty."
+          <UiInfoCard v-for = "(item,index) in tm('program-b.benefits')" :key = "index"
+            :title="rt(item.title)"
+            :description="rt(item.description)"
           />
         </div>
       </div>
     </section>
 
     <!-- Ako to funguje -->
-    <section class="mt-16 px-6 md:px-20 py-16 bg-gray-50 rounded-lg">
-      <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-12">
-          {{ $t('program-b.how_it_works_header') }}
-        </h2>
+      <section class="mt-16 px-6 md:px-20 py-16 bg-gray-50 rounded-lg">
+    <div class="max-w-4xl mx-auto">
 
-        <div class="space-y-6">
-          <div class="flex gap-6">
-            <div class="flex-shrink-0">
-              <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-600 text-white font-bold">
-                1
-              </div>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-navy mb-2">Registrácia vašej firmy</h3>
-              <p class="text-gray-700">
-                Zaregistrujte si firemný profil a identifikujte vaše tímové potreby a technické výzvy, ktoré chcete
-                riešiť.
-              </p>
+      <h2 class="text-4xl font-bold text-navy mb-12">
+        {{ $t('program-b.how_it_works_header') }}
+      </h2>
+
+      <div class="space-y-6">
+        <div
+          v-for="(item, index) in Object.values(tm('program-b.how_it_works_items'))"
+          :key="index"
+          class="flex gap-6"
+        >
+          <div class="flex-shrink-0">
+            <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-600 text-white font-bold">
+              {{ index + 1 }}
             </div>
           </div>
 
-          <div class="flex gap-6">
-            <div class="flex-shrink-0">
-              <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-600 text-white font-bold">
-                2
-              </div>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-navy mb-2">Vytvorenie výzvy</h3>
-              <p class="text-gray-700">
-                Definujte svoju výzvu — čo má byť vyriešené, aké sú konečné ciele a akí študenti sú ideálni (junior,
-                senior aj.).
-              </p>
-            </div>
-          </div>
-
-          <div class="flex gap-6">
-            <div class="flex-shrink-0">
-              <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-600 text-white font-bold">
-                3
-              </div>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-navy mb-2">Výber tímu</h3>
-              <p class="text-gray-700">
-                Prezerajte si prihlášenné tímy, budujte si komentáre s potenciálnymi kandidátmi a vyberte najlepší tím
-                pre vašu výzvu.
-              </p>
-            </div>
-          </div>
-
-          <div class="flex gap-6">
-            <div class="flex-shrink-0">
-              <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-600 text-white font-bold">
-                4
-              </div>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-navy mb-2">Implementácia & mentoring</h3>
-              <p class="text-gray-700">
-                Vybraný tím začína s vývojom. Poskytujete feedback a mentorstvo počas 3-mesačného programu.
-              </p>
-            </div>
-          </div>
-
-          <div class="flex gap-6">
-            <div class="flex-shrink-0">
-              <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-600 text-white font-bold">
-                5
-              </div>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-navy mb-2">Prezentácia & nasadenie</h3>
-              <p class="text-gray-700">
-                Tím prezentuje finálne riešenie. Rozhodujete sa, či ho budete ďalej rozvíjať alebo nasadzovať do
-                produkcie.
-              </p>
-            </div>
+          <div>
+            <h3 class="text-xl font-bold text-navy mb-2">
+              {{ rt(item.title) }}
+            </h3>
+            <p class="text-gray-700">
+              {{ rt(item.description) }}
+            </p>
           </div>
         </div>
+
       </div>
-    </section>
+    </div>
+  </section>
 
     <!-- Čo potrebujete odoslať -->
     <section class="mt-20 px-6 md:px-20 py-16">
@@ -129,30 +69,28 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-600">
-            <h3 class="text-lg font-bold text-blue-700 mb-3">Firemný profil</h3>
+            <h3 class="text-lg font-bold text-blue-700 mb-3">{{ $t('program-b.requirements_company_profile.title') }}</h3>
             <ul class="space-y-2 text-gray-700 text-sm">
-              <li>✓ Názov a popis firmy</li>
-              <li>✓ Vaša webová stránka</li>
-              <li>✓ Kontakt (email, telefón)</li>
-              <li>✓ Logo a branding</li>
+              <li v-for = "(item,index) in tm('program-b.requirements_company_profile.items')" :key = index>
+               ✓ {{ rt(item) }}
+              </li>
+             
             </ul>
           </div>
 
           <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-600">
-            <h3 class="text-lg font-bold text-blue-700 mb-3">Technická špecifikácia výzvy</h3>
+            <h3 class="text-lg font-bold text-blue-700 mb-3">{{ $t('program-b.requirements_technical_spec.title') }}</h3>
             <ul class="space-y-2 text-gray-700 text-sm">
-              <li>✓ Jasný popis problému</li>
-              <li>✓ Očakávané technológie</li>
-              <li>✓ Rozpočet času / náročnosť</li>
-              <li>✓ Konečné ciele a kritériá úspechu</li>
+              <li v-for = "(item,index) in tm('program-b.requirements_technical_spec.items')" :key = "index">
+                ✓ {{ rt(item) }}</li>
             </ul>
           </div>
         </div>
 
         <div class="mt-8 bg-yellow-50 p-6 rounded-lg border border-yellow-200">
           <p class="text-gray-700">
-            <strong>Pro tip:</strong> Čím presnejšie a jasnejšie popíšete vašu výzvu, tým lepšie tímy si na ňu budú
-            chcieť prihlásit.
+            <strong>{{ $t('program-b.pro_tip') }}</strong> 
+            {{ $t('program-b.requirements_tip') }}
           </p>
         </div>
       </div>
@@ -222,7 +160,8 @@
 
 <script setup>
 import { ref } from 'vue'
-
+import { useBanner } from '../composables/modules/content/banners/fetchBanner'
+import { PageType } from '../composables/modules/content/enum/PageType'
 const localePath = useLocalePath()
 
 definePageMeta({
@@ -243,6 +182,9 @@ useSeoMeta({
   twitterDescription: 'Spájame firmy s talentovanými študentami na riešenie reálnych technických výziev.',
 })
 
+const { banner } = useBanner(PageType.PROGRAM_B)
+const { tm, rt } = useI18n()
+const { t } = useI18n() 
 const expandedFaq = ref(null)
 
 const faqs = [

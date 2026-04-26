@@ -62,7 +62,7 @@
           </p>
         </div>
         <NuxtLink
-          to="/auth/login"
+          :to="localePath('/auth/login')"
           class="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
         >
           Prejsť na prihlásenie
@@ -145,7 +145,7 @@
         </div>
 
         <NuxtLink
-          to="/auth/login"
+          :to="localePath('/auth/login')"
           class="block text-sm text-gray-500 hover:text-slate-900 transition-colors"
         >
           ← Späť na prihlásenie
@@ -158,7 +158,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const authStore = useAuthStore()
-
+const localePath = useLocalePath()
 definePageMeta({
   layout: 'default',
   middleware: 'guest',

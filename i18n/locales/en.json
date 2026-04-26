@@ -2,7 +2,26 @@
   "home": {
     "program_header": "Our Programs",
     "partners_header": "Our Partners",
-    "news_header": "News"
+    "news_header": "News",
+    "banner_cta":{
+      "start_now": "Start now",
+      "learn_more": "Learn more"
+    },
+
+     "program_cards":{
+      "more_info": "More info",
+      "cards":[
+       {
+        "title": "Program A",
+        "description": "An intensive course for rapid personal growth and new skills."
+       },
+
+       {
+        "title": "Program B",
+        "description": "Mentoring and community for long-term professional development."
+       }
+      ] 
+    }
   },
 
   "news": {
@@ -43,20 +62,20 @@
     "title": "What is Program A",
     "description": "Program A is an intensive program designed for university students and junior professionals who want to quickly gain practical experience, work in teams, and receive mentoring from experienced professionals.",
 
-    "benefits": {
-      "first": {
+    "benefits": [
+      {
         "title": "3 months",
         "description": "Intensive program with weekly mentoring and workshops."
       },
-      "second": {
+      {
         "title": "Team work",
         "description": "You work in a multidisciplinary team with your own ideas."
       },
-      "third": {
+      {
         "title": "Real projects",
         "description": "You develop real challenges with community impact."
       }
-    },
+    ],
 
     "signup_title": "Who can apply?",
     "signup_students": {
@@ -121,44 +140,44 @@
 
     "description": "Program B connects companies with talented students and juniors who solve real technical challenges. Your company gets innovative solutions, while students gain practical experience and mentoring from professionals.",
 
-    "benefits": {
-      "first": {
+    "benefits": [
+     {
         "title": "Innovative solutions",
         "description": "Students bring a fresh perspective to your technical problems."
       },
-      "second": {
+       {
         "title": "Flexible engagement",
         "description": "You decide how strongly you want to engage and mentor students."
       },
-      "third": {
+       {
         "title": "No hidden costs",
         "description": "The program is free for both parties - companies and students."
       }
-    },
+    ],
 
     "how_it_works_header": "How does it work?",
-    "how_it_works_items": {
-      "first": {
+    "how_it_works_items": [
+       {
         "title": "Company registration",
         "description": "Register your company profile and identify your team needs and technical challenges to solve."
       },
-      "second": {
+       {
         "title": "Challenge creation",
         "description": "Define your challenge - what needs to be solved, what are the final goals, and what students are ideal."
       },
-      "third": {
+       {
         "title": "Team selection",
         "description": "Browse registered teams and choose the best fit for your challenge."
       },
-      "fourth": {
+     {
         "title": "Implementation & mentoring",
         "description": "The selected team starts development with your feedback and mentoring."
       },
-      "fifth": {
+      {
         "title": "Presentation & deployment",
         "description": "The team presents the final solution and it can be deployed or further developed."
       }
-    },
+    ],
 
     "requirements_header": "What do we need from your company?",
     "requirements_company_profile": {
@@ -181,6 +200,7 @@
       ]
     },
 
+    "pro_tip": "Pro tip:",
     "requirements_tip": "The more precise your challenge, the better teams you will attract.",
 
     "faq": {
@@ -268,24 +288,24 @@
     "title": "About NTI",
     "description": "The Nitra Technology Incubator is a reliable institution supporting innovation and technological development. We build an ecosystem of collaboration between faculties, companies, and startups.",
 
-    "cards": {
-      "mission": {
+    "cards": [
+      {
         "title": "Mission",
         "description": "We support innovation, education, and sustainable technological development in the region."
       },
-      "pillars": {
+       {
         "title": "Pillars",
         "description": "Expertise, transparency, and collaboration form the foundation of our credibility."
       },
-      "ecosystem": {
+       {
         "title": "Ecosystem",
         "description": "We connect faculties, startups, and companies to create real innovations and impactful projects."
       },
-      "faculties": {
+      {
         "title": "Faculties",
         "description": "We collaborate with faculties and academic partners to bring new projects, research, and expertise into practice."
       }
-    },
+    ],
 
     "team": {
       "title": "Our team"
