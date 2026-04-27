@@ -83,7 +83,7 @@
 
         <div class="space-y-4">
           <div
-            v-for="(faq, idx) in faqs"
+            v-for="(i, idx) in faq"
             :key="idx"
             class="bg-white border border-gray-200 rounded-lg overflow-hidden"
           >
@@ -91,7 +91,7 @@
               class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
               @click="toggleFaq(idx)"
             >
-              <span class="font-bold text-navy text-left">{{ faq.question }}</span>
+              <span class="font-bold text-navy text-left"> {{ i?.frequently_asked_question_translations?.[0]?.question }}</span>
               <ChevronDown
                 :class="{
                   'rotate-180': expandedFaq === idx,
@@ -106,7 +106,7 @@
                 v-if="expandedFaq === idx"
                 class="px-6 py-4 bg-gray-50 border-t text-gray-700"
               >
-                {{ faq.answer }}
+             {{ i?.frequently_asked_question_translations?.[0]?.answer }}
               </div>
             </Transition>
           </div>
@@ -135,12 +135,15 @@
 <script setup>
 import { ref } from 'vue'
 import { useBanner } from '../composables/modules/content/banners/fetchBanner'
+import { useFaq } from '../composables/modules/content/faq/fetchFaq'
 import { PageType } from '../composables/modules/content/enum/PageType'
 const localePath = useLocalePath()
 const { tm, rt } = useI18n()
 definePageMeta({
   layout: 'default',
 })
+
+const { faq } = useFaq(PageType.PROGRAM_A)
 
 useSeoMeta({
   title: 'Program A — Intenzívne zrýchlenie | NTI',
@@ -159,32 +162,6 @@ useSeoMeta({
 const { banner } = useBanner(PageType.PROGRAM_A)
 const { t } = useI18n() 
 const expandedFaq = ref(null)
-
-const faqs = [
-  {
-    question: 'Koľko stojí Program A?',
-    answer:
-      'Program A je úplne bezplatný. Všetci účastníci dostávajú rovnaký prístup k mentorom, workshopom a materiálom, bez skrytých poplatkov.',
-  },
-  {
-    question: 'Máš skúsenosti s prácou mimo školy?',
-    answer:
-      'Nie, nie je to povinné! Väčšina našich účastníkov nemá pracovné skúsenosti. Dôležité je mať vôľu učiť sa a spolupracovať s tímom.',
-  },
-  {
-    question: 'Ako dlho trvá program?',
-    answer: 'Program trvá 3 mesiace, od apríla do júla. Očakávame časovú investíciu 15-20 hodín týždenne.',
-  },
-  {
-    question: 'Môžem sa prihlásiť, ak som zamestnaný?',
-    answer: 'Áno, ale vrúcame vám, aby ste mali aspoň 15 hodín týždenne čistého času na program.',
-  },
-  {
-    question: 'Čo sa stane po skončení programu?',
-    answer:
-      'Po skončení sa tímy prezentujú svojich projektov a výsledkov. Podľa výkonu sa môžu nastaviť ďalšie príležitosti spolupráce alebo práce.',
-  },
-]
 
 const toggleFaq = (idx) => {
   expandedFaq.value = expandedFaq.value === idx ? null : idx

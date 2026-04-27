@@ -8,10 +8,10 @@
 
       <div class="relative max-w-3xl mx-auto text-center text-white py-10 sm:py-12 md:py-16 px-4 md:px-8">
         <h2 class="text-3xl sm:text-4xl md:text-4xl font-extrabold mb-2">
-          {{ $t('partners_page.hero.title') }}
+          {{ banner?.hero_banner_translations?.[0]?.title }}
         </h2>
         <p class="text-sm sm:text-base md:text-lg leading-relaxed">
-          {{ $t('partners_page.hero.description') }}
+          {{ banner?.hero_banner_translations?.[0]?.description }}
         </p>
       </div>
     </div>
@@ -113,6 +113,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useBanner } from '../composables/modules/content/banners/fetchBanner'
+import { PageType } from '../composables/modules/content/enum/PageType'
 
 useSeoMeta({
   title: 'Partneri a mentori | NTI',
@@ -126,6 +128,8 @@ useSeoMeta({
   twitterTitle: 'Partneri a mentori — NTI',
   twitterDescription: 'Spoznajte našich partnerov a mentorov, ktorí podporujú talentov.',
 })
+
+const { banner } = useBanner(PageType.PARTNERS)
 
 const scrollContainer = ref(null)
 

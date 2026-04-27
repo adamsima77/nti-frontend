@@ -105,7 +105,7 @@
 
         <div class="space-y-4">
           <div
-            v-for="(faq, idx) in faqs"
+            v-for="(i, idx) in faq"
             :key="idx"
             class="bg-white border border-gray-200 rounded-lg overflow-hidden"
           >
@@ -113,7 +113,7 @@
               class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
               @click="toggleFaq(idx)"
             >
-              <span class="font-bold text-navy text-left">{{ faq.question }}</span>
+              <span class="font-bold text-navy text-left">{{ i?.frequently_asked_question_translations?.[0]?.question }}</span>
               <ChevronDown
                 :class="{
                   'rotate-180': expandedFaq === idx,
@@ -128,7 +128,7 @@
                 v-if="expandedFaq === idx"
                 class="px-6 py-4 bg-gray-50 border-t text-gray-700"
               >
-                {{ faq.answer }}
+                 {{ i?.frequently_asked_question_translations?.[0]?.answer }}
               </div>
             </Transition>
           </div>
@@ -162,6 +162,7 @@
 import { ref } from 'vue'
 import { useBanner } from '../composables/modules/content/banners/fetchBanner'
 import { PageType } from '../composables/modules/content/enum/PageType'
+import { useFaq } from '../composables/modules/content/faq/fetchFaq'
 const localePath = useLocalePath()
 
 definePageMeta({
@@ -187,35 +188,7 @@ const { tm, rt } = useI18n()
 const { t } = useI18n() 
 const expandedFaq = ref(null)
 
-const faqs = [
-  {
-    question: 'Koľko to bude stáť?',
-    answer: 'Program B je úplne bezplatný pre firmy. Neplatíte nič za výber tímu, mentoring alebo nasadenie riešenia.',
-  },
-  {
-    question: 'Ako dlho trvá program?',
-    answer:
-      'Program B je koncipovaný ako 3-mesačný projekt. Študenti budú pracovať na vašej výzve konsekventne počas tejto doby.',
-  },
-  {
-    question: 'Koľko úsilia budeme musím investovať ako mentori?',
-    answer:
-      'Rôzne — podľa vašich preferenovaní. Minimálne vedenie aj asynchronné feedback, maximálne týždenné stretnutia. Dohoduje sa individuálne.',
-  },
-  {
-    question: 'Budeme si chránit IP našich riešení?',
-    answer:
-      'Áno. IP riešenia ostáva väčšinou vašej fireme. Študenti získajú možnosť zahrnúť projekt do svojho portfolia.',
-  },
-  {
-    question: 'Čo ak sa tím nevysporiadá s výzvou?',
-    answer: 'To je zriedkavé, ale ak sa to stane, pomôžeme vám nájsť iný tím alebo prispôsobiť výzvu.',
-  },
-  {
-    question: 'Môžeme si vybrať tím pred štartom?',
-    answer: 'Áno! Vidíte všetky prihlášenné tímy, komunikujete s nimi a vyberáte si najlepší pre vašu výzvu.',
-  },
-]
+const { faq } = useFaq(PageType.PROGRAM_B)
 
 const toggleFaq = (idx) => {
   expandedFaq.value = expandedFaq.value === idx ? null : idx

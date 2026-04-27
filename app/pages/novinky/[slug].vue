@@ -2,19 +2,19 @@
   <section class="mt-20 bg-white py-16 sm:py-20 md:py-24 px-6 md:px-20 rounded-2xl shadow-xl">
     <div class="mx-auto flex flex-col">
       <div class="mb-6">
-        <UiBreadcrumbs :items="[{ label: 'Novinky', to: '/novinky' }, { label: 'Názov článku' }]" />
+        <UiBreadcrumbs :items="[{ label: 'Novinky', to: '/novinky' }, { label: `${newsDetail?.news_translations?.[0]?.title}` }]" />
       </div>
 
-      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-navy mb-6">Názov článku</h1>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-navy mb-6">{{ newsDetail?.news_translations?.[0]?.title }}</h1>
 
-      <NuxtLink
+      <p
         to=""
         class="text-sm text-blue-600 font-semibold mb-3 inline-block"
       >
-        Kategória
-      </NuxtLink>
+        {{ newsDetail?.category?.slug.charAt(0).toUpperCase() + newsDetail?.category?.slug.slice(1) }}
+    </p>
 
-      <p class="text-sm sm:text-base text-gray-400 mb-8">{{ $t('news.publicated') }}: 12.03.2026</p>
+      <p class="text-sm sm:text-base text-gray-400 mb-8">{{ $t('news.publicated') }}: {{ new Date(newsDetail?.created_at).toLocaleDateString('sk-SK') }}</p>
 
       <div class="w-full max-h-125 lg:max-h-225 overflow-hidden rounded-lg">
         <img
@@ -27,83 +27,7 @@
       <div class="w-full h-1 bg-gray-300 my-6"></div>
 
       <div class="text-justify font-sans text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed">
-        <p class="mb-4">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec erat sed mauris posuere mattis.
-          Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Integer feugiat metus
-          a lacus bibendum, at venenatis eros viverra. Cras congue lorem in magna elementum, a commodo sem tincidunt.
-          Nullam faucibus ligula a quam tempor, ac facilisis metus feugiat. Proin in purus et nunc efficitur consectetur
-          non at erat. Sed vehicula sapien vel urna sagittis, a cursus erat cursus. Pellentesque habitant morbi
-          tristique senectus et netus et malesuada fames ac turpis egestas.
-        </p>
-
-        <p class="mb-4">
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem
-          aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-          Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni
-          dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit
-          amet, consectetur, adipisci velit.
-        </p>
-
-        <p class="mb-4">
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          Fusce quis sapien nec urna fringilla convallis. Suspendisse potenti. Proin eu facilisis libero. Vivamus in
-          libero et ligula laoreet feugiat nec non orci. Integer non nulla a enim fermentum aliquet.
-        </p>
-
-        <p class="mb-4">
-          Curabitur sed sapien id libero tempus mattis. Donec auctor, mauris id malesuada bibendum, orci sapien gravida
-          justo, vitae pharetra ligula purus sed urna. Cras a vulputate turpis, in scelerisque erat. Ut ullamcorper, est
-          non tincidunt gravida, justo nulla dictum augue, in dignissim justo eros at arcu. Sed non augue vitae tortor
-          efficitur sodales. Quisque eget urna efficitur, vehicula lorem sed, tempor elit. Aliquam erat volutpat.
-          Suspendisse et bibendum elit.
-        </p>
-
-        <p class="mb-4">
-          Mauris a tincidunt sem. Donec eget risus id justo dictum dictum. Pellentesque habitant morbi tristique
-          senectus et netus et malesuada fames ac turpis egestas. Nam vel porta elit. Proin gravida ultricies lacus, vel
-          mollis sapien hendrerit ac. Vivamus tincidunt purus at nibh volutpat, vel consequat orci malesuada. Sed id
-          nibh a urna mollis dictum. Nulla facilisi. In quis tincidunt risus. Morbi a ligula id enim fringilla lacinia.
-        </p>
-
-        <p class="mb-4">
-          Integer sed metus sit amet sapien malesuada congue. Vestibulum ac elit vitae lacus suscipit ultricies. Proin
-          sit amet eros sit amet urna bibendum faucibus. Nam a erat in lacus commodo ultrices. Quisque non nisi a erat
-          viverra blandit a nec velit. Fusce non risus sapien. Vivamus consectetur ante et suscipit elementum. Phasellus
-          in fermentum nulla. Donec sed turpis sed sem feugiat malesuada non vel elit. Sed a dignissim ex. Maecenas
-          congue felis sed libero malesuada, vitae fermentum mi placerat.
-        </p>
-
-        <p class="mb-4">
-          Sed sit amet dignissim magna. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia
-          curae; Aenean eget bibendum ligula, non gravida velit. Nam sollicitudin, sem vel pharetra dictum, ligula ex
-          efficitur metus, at dictum leo turpis eget lacus. Curabitur blandit nisl in diam vulputate, non hendrerit nibh
-          hendrerit. Suspendisse vitae sapien ac leo imperdiet gravida. Integer nec lectus ut urna porttitor facilisis.
-          Morbi at nisi id libero eleifend iaculis. In hac habitasse platea dictumst.
-        </p>
-
-        <p class="mb-4">
-          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed volutpat,
-          magna eget efficitur volutpat, justo sapien dapibus justo, et aliquet sem nibh vel magna. Donec posuere velit
-          nec massa porttitor, vel tincidunt orci laoreet. Maecenas sodales, libero ut malesuada volutpat, dolor lectus
-          pulvinar mauris, nec fermentum ligula nisl a libero. Cras efficitur magna id arcu fermentum, ut accumsan
-          mauris pretium. Nam auctor ligula sed ipsum volutpat, ut lacinia lacus bibendum.
-        </p>
-
-        <p class="mb-4">
-          Nullam ut nisi eget libero faucibus vulputate. Vivamus vel sapien nec lorem laoreet imperdiet. Quisque ut
-          dictum magna, id rutrum orci. Suspendisse potenti. Praesent sit amet tincidunt libero. In sit amet magna non
-          purus efficitur varius. Proin efficitur, nunc nec finibus sagittis, justo est tincidunt nulla, at congue justo
-          nisl id lectus. Phasellus porttitor ligula in libero tincidunt, sed tincidunt nisl laoreet.
-        </p>
-
-        <p class="mb-4">
-          Donec vehicula libero a tellus dapibus, ac hendrerit justo scelerisque. Integer convallis lacus in nibh
-          scelerisque, nec ultrices nisi fermentum. Etiam ac elementum libero, at fringilla lorem. Morbi imperdiet
-          turpis a nisl tincidunt, at laoreet neque lacinia. Fusce posuere, eros in facilisis tempus, augue augue
-          viverra purus, nec bibendum nisl augue et nunc. Vivamus eu tellus in mauris luctus sagittis. Cras porttitor
-          purus nec mi dictum, at tempus purus varius.
-        </p>
+         {{ newsDetail?.news_translations?.[0].description }}
       </div>
 
       <div class="w-full h-1 bg-gray-300 my-6"></div>
@@ -152,6 +76,7 @@
 </template>
 
 <script setup>
+import { fetchBySlug } from '../../composables/modules/content/news/fetchBySlug';
 useSeoMeta({
   title: 'Novinky a články | NTI',
   description: 'Čítajte najnovšie články a novinky z komunity NTI.',
@@ -163,4 +88,7 @@ useSeoMeta({
   twitterTitle: 'Novinky — NTI',
   twitterDescription: 'Čítajte novinky a články z komunity NTI.',
 })
+const route = useRoute()
+const slug = route.params.slug
+const { newsDetail } = fetchBySlug(slug)
 </script>

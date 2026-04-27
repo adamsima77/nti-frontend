@@ -4,10 +4,10 @@
     <div class="bg-gradient-to-br from-navy via-blue-900 to-blue-800 text-white py-20 px-6">
       <div class="max-w-7xl mx-auto">
         <h1 class="text-5xl font-bold mb-4">
-          {{ $t('calls.vyzvy_terminy.hero.title') }}
+          {{ banner?.hero_banner_translations?.[0]?.title }}
         </h1>
         <p class="text-xl text-blue-100">
-          {{ $t('calls.vyzvy_terminy.hero.subtitle') }}
+          {{ banner?.hero_banner_translations?.[0]?.description }}
         </p>
       </div>
     </div>
@@ -115,10 +115,13 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { Calendar, Users, Megaphone, ChevronRight } from 'lucide-vue-next'
-
+import { useBanner } from '../../composables/modules/content/banners/fetchBanner'
+import { PageType } from '../../composables/modules/content/enum/PageType'
 definePageMeta({
   layout: 'default',
 })
+
+const { banner } = useBanner(PageType.CALLS_AND_DEADLINES)
 
 useSeoMeta({
   title: 'Výzvy a termíny | NTI',

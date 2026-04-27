@@ -1,14 +1,14 @@
-export const useBanner = (pageId: number) => {
+export const useMembers = () => {
   const { locale, fallbackLocale } = useI18n()
   const { get } = useApi()
   const fb = () => typeof fallbackLocale.value === 'string' ? fallbackLocale.value : 'en'
   const nuxtApp = useNuxtApp()
 
-  const { data: banner } = useAsyncData(
-    `banner-${pageId}`,  // pageId makes it stable per page, no locale needed
-    () => get(`/pages/${pageId}/hero-banner/${locale.value}`)
+  const { data: members } = useAsyncData(
+    `members`,  
+    () => get(`/site-members/lang/${locale.value}`)
       .catch((e: any) => e?.response?.status === 404
-        ? get(`/pages/${pageId}/hero-banner/${fb()}`)
+        ? get(`/site-members/lang/${fb()}`)
         : Promise.reject(e)),
     {
       server: true,
@@ -19,11 +19,11 @@ export const useBanner = (pageId: number) => {
   )
 
   watch(locale, async (newLocale) => {
-    banner.value = await get(`/pages/${pageId}/hero-banner/${newLocale}`)
+    members.value = await get(`/site-members/lang/${newLocale}`)
       .catch((e: any) => e?.response?.status === 404
-        ? get(`/pages/${pageId}/hero-banner/${fb()}`)
+        ? get(`/site-members/lang/${fb()}`)
         : Promise.reject(e))
   }, { flush: 'post' })
 
-  return { banner }
+  return { members }
 }

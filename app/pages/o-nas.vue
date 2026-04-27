@@ -20,38 +20,20 @@
       <div class="flex flex-col mt-10">
         <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy mb-8">{{ $t('about_nti.team.title') }}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          <UiTeamCard
+          <UiTeamCard v-for = "(item,index) in members" :key = "index"
             image=""
             alt="John Doe"
-            name="John Doe"
-            role="CEO"
+            :name="item?.name"
+            :role="item?.site_member_translations?.[0].job_position"
           />
-          <UiTeamCard
-            image="/team/person2.jpg"
-            alt="Jane Smith"
-            name="Jane Smith"
-            role="CTO"
-          />
-          <UiTeamCard
-            image=""
-            alt="Alex Novak"
-            name="Alex Novak"
-            role="Lead Designer"
-          />
-
-          <UiTeamCard
-            image=""
-            alt="Alex Novak"
-            name="Alex Novak"
-            role="Lead Designer"
-          />
-        </div>
       </div>
+     </div>
     </div>
   </section>
 </template>
 
 <script setup>
+import { useMembers } from '../composables/modules/content/site_members/fetchSiteMembers'
 useSeoMeta({
   title: 'O nás | NTI',
   description:
@@ -69,4 +51,5 @@ useSeoMeta({
 
 const { t } = useI18n() 
 const { tm, rt } = useI18n()
+const { members } = useMembers()
 </script>
