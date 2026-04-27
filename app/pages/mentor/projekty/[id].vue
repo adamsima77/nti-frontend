@@ -457,6 +457,7 @@ import {
 } from 'lucide-vue-next'
 
 const localePath = useLocalePath()
+const route = useRoute()
 
 useHead({ title: 'Detail projektu | NTI Mentor' })
 

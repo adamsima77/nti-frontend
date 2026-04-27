@@ -411,6 +411,8 @@ import {
 } from 'lucide-vue-next'
 
 const localePath = useLocalePath()
+const api = useApi()
+const authStore = useAuthStore()
 
 if (!authStore.user) {
   authStore.user = {

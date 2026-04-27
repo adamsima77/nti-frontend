@@ -146,6 +146,12 @@ import { ChevronRight, AlertTriangle, Star, ClipboardCheck, Eye } from 'lucide-v
 
 const localePath = useLocalePath()
 
+definePageMeta({
+  layout: 'portal',
+  //middleware: 'auth',
+  roles: ['company'],
+})
+
 useHead({ title: 'Dashboard | NTI Komisia' })
 
 const authStore = useAuthStore()
