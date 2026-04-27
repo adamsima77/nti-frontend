@@ -7,10 +7,7 @@
 
       <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-navy mb-6">{{ newsDetail?.news_translations?.[0]?.title }}</h1>
 
-      <p
-        to=""
-        class="text-sm text-blue-600 font-semibold mb-3 inline-block"
-      >
+      <p class="text-sm text-blue-600 font-semibold mb-3 inline-block">
         {{ newsDetail?.category?.slug.charAt(0).toUpperCase() + newsDetail?.category?.slug.slice(1) }}
     </p>
 
@@ -18,9 +15,9 @@
 
       <div class="w-full max-h-125 lg:max-h-225 overflow-hidden rounded-lg">
         <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtCPPG6t3B_QJL27tTMJnTn6fyCPvoL53GFQ&s"
+          :image="newsDetail?.image_url"
           class="w-full h-full object-cover rounded-lg"
-          alt=""
+          :alt="newsDetail?.news_translations?.[0]?.title"
         />
       </div>
 
@@ -43,39 +40,13 @@
           alt="Novinka #1"
           link="#"
         />
-
-        <UiItem
-          title="Novinka #2"
-          description="Zaujímavé aktuality a tipy pre tvoj profesionálny rast."
-          category="Tipy & Novinky"
-          image="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
-          alt="Novinka #2"
-          link="#"
-        />
-
-        <UiItem
-          title="Novinka #3"
-          description="Zaujímavé aktuality a tipy pre tvoj profesionálny rast."
-          category="Tipy & Novinky"
-          image="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
-          alt="Novinka #3"
-          link="#"
-        />
-
-        <UiItem
-          title="Novinka #4"
-          description="Zaujímavé aktuality a tipy pre tvoj profesionálny rast."
-          category="Tipy & Novinky"
-          image="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
-          alt="Novinka #4"
-          link="#"
-        />
       </div>
     </div>
   </section>
 </template>
 
 <script setup>
+import { fetchInfinite } from '../../composables/modules/content/news/fetchInfinite';
 import { fetchBySlug } from '../../composables/modules/content/news/fetchBySlug';
 useSeoMeta({
   title: 'Novinky a články | NTI',
@@ -91,4 +62,6 @@ useSeoMeta({
 const route = useRoute()
 const slug = route.params.slug
 const { newsDetail } = fetchBySlug(slug)
+
+  const { articles, loading, hasMore, loadMore, refresh } = fetchInfinite()
 </script>

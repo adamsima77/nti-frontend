@@ -1,7 +1,7 @@
 <template>
   <section class="mt-20 bg-white py-16 sm:py-20 md:py-24 px-6 md:px-20 rounded-2xl shadow-xl">
     <UiMainArticle
-      image="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
+      :image="article?.image_url"
       :alt="main_article?.news_translations?.[0]?.title"
       :title="main_article?.news_translations?.[0]?.title"
       :category="main_article?.category?.slug.charAt(0).toUpperCase() + main_article?.category?.slug.slice(1)"
@@ -18,10 +18,10 @@
        <UiItem
           v-for="article in other_articles"
           :key="article.id"
-          :title="article.news_translations?.[0]?.title"
-          :description="article.news_translations?.[0]?.description"
-          :category="article.category?.slug.charAt(0).toUpperCase() + article.category?.slug.slice(1)"
-          image="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
+          :title="article?.news_translations?.[0]?.title"
+          :description="article?.news_translations?.[0]?.description"
+          :category="article?.category?.slug.charAt(0).toUpperCase() + article.category?.slug.slice(1)"
+          :image="article?.image_url"
           :alt="article.news_translations?.[0]?.title"
           :link="`/novinky/${article.slug}`"
         />

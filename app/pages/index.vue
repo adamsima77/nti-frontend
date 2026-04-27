@@ -22,19 +22,52 @@
   </div>
 
   <!-- PARTNERS -->
-  <section class="mt-16 mb-20 px-6 md:px-0">
-    <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy mb-12 text-center md:text-left">
+<section class="mt-16 mb-20 px-6 md:px-0">
+
+  <!-- HEADER -->
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy">
       {{ $t('home.partners_header') }}
     </h2>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
-      <img src="/test_logo.png" class="h-16 md:h-20 grayscale hover:grayscale-0 transition" />
-      <img src="/test_logo.png" class="h-16 md:h-20 grayscale hover:grayscale-0 transition" />
-      <img src="/test_logo.png" class="h-16 md:h-20 grayscale hover:grayscale-0 transition" />
-      <img src="/test_logo.png" class="h-16 md:h-20 grayscale hover:grayscale-0 transition" />
-    </div>
-  </section>
+    <div class="flex items-center gap-2">
+      <button
+        @click="partnersScrollLeft"
+        :disabled="!partnersCanScrollLeft"
+        class="w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm disabled:opacity-40"
+      >
+        <LucideChevronLeft class="w-5 h-5" />
+      </button>
 
+      <button
+        @click="partnersScrollRight"
+        :disabled="!partnersCanScrollRight"
+        class="w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm disabled:opacity-40"
+      >
+        <LucideChevronRight class="w-5 h-5" />
+      </button>
+    </div>
+  </div>
+
+  <!-- SCROLLER -->
+  <div
+    ref="partnersScrollContainer"
+    class="flex flex-nowrap gap-8 overflow-x-auto scroll-smooth no-scrollbar"
+    @scroll="onPartnersScroll"
+  >
+    <div
+      v-for="(item, index) in partners"
+      :key="index"
+      class="min-w-[140px] flex-shrink-0 flex justify-center"
+    >
+      <img
+        :src="item.image_url"
+        class="h-16 md:h-20 grayscale hover:grayscale-0 transition"
+      />
+    </div>
+  </div>
+
+</section>
   <!-- NEWS -->
   <div class="mb-12">
 
@@ -48,7 +81,7 @@
         <button
           @click="scrollLeft"
           :disabled="!canScrollLeft"
-          class="w-9 h-9 flex items-center justify-center rounded-full border bg-white shadow-sm disabled:opacity-40"
+          class="w-9 h-9 flex items-center justify-center rounded-full  bg-white shadow-sm disabled:opacity-40"
         >
           <LucideChevronLeft class="w-5 h-5" />
         </button>
@@ -56,7 +89,7 @@
         <button
           @click="scrollRight"
           :disabled="!canScrollRight"
-          class="w-9 h-9 flex items-center justify-center rounded-full border bg-white shadow-sm disabled:opacity-40"
+          class="w-9 h-9 flex items-center justify-center rounded-full  bg-white shadow-sm disabled:opacity-40"
         >
           <LucideChevronRight class="w-5 h-5" />
         </button>
@@ -78,7 +111,7 @@
           :title="article.news_translations?.[0]?.title"
           :description="article.news_translations?.[0]?.description"
           :category="article.category?.slug ? capitalize(article.category.slug) : ''"
-          image="https://www.vegmania.sk/wp-content/uploads/2022/01/ovocie-750x750.jpg"
+          :image="article.news_translations?.[0]?.image_url"
           :alt="article.news_translations?.[0]?.title"
           :link="`/novinky/${article.slug}`"
         />
@@ -95,6 +128,20 @@
 import { useBanner } from '../composables/modules/content/banners/fetchBanner'
 import { PageType } from '../composables/modules/content/enum/PageType'
 import { fetchInfinite } from '../composables/modules/content/news/fetchInfinite'
+import { fetchPartners } from '../composables/modules/content/partners/fetchPartners'
+
+useSeoMeta({
+  title: 'Domov | NTI',
+  description:
+    'Spoznajte našich partnerov a mentorov, ktorí podporujú náš projekt a pomáhajú rásť talentom v oblasti vývoja.',
+  ogTitle: 'Partneri a mentori — NTI',
+  ogDescription: 'Spoznajte našich partnerov a mentorov. Firmy, učitelia a odbornosti, ktoré tvoria komunitu NTI.',
+  ogType: 'website',
+  ogUrl: 'https://nti.sk/partneri-mentori',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Partneri a mentori — NTI',
+  twitterDescription: 'Spoznajte našich partnerov a mentorov, ktorí podporujú talentov.',
+})
 
 const localePath = useLocalePath()
 const { tm, rt } = useI18n()
@@ -102,16 +149,26 @@ const { tm, rt } = useI18n()
 const { banner } = useBanner(PageType.HOME)
 const programLinks = ['/program-a', '/program-b']
 
+const { partners } = fetchPartners()
+
 const { articles, loading, hasMore, loadMore } = fetchInfinite()
 
 const scrollContainer = ref(null)
+const partnersScrollContainer = ref(null)
 
 const home_articles = computed(() => articles.value ?? [])
 
 const scrollAmount = 320
 
+// NEWS
 const canScrollLeft = ref(false)
 const canScrollRight = ref(true)
+
+// PARTNERS
+const partnersCanScrollLeft = ref(false)
+const partnersCanScrollRight = ref(true)
+
+/* ---------------- NEWS ---------------- */
 
 const updateScrollButtons = () => {
   const el = scrollContainer.value
@@ -124,11 +181,6 @@ const updateScrollButtons = () => {
   canScrollLeft.value = left > 0
   canScrollRight.value = right < max - 1
 }
-
-watch(home_articles, async () => {
-  await nextTick()
-  updateScrollButtons()
-})
 
 const onScroll = () => {
   const el = scrollContainer.value
@@ -145,12 +197,42 @@ const onScroll = () => {
 
 const scrollLeft = () => {
   scrollContainer.value?.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
-  setTimeout(updateScrollButtons, 200)
 }
 
 const scrollRight = () => {
   scrollContainer.value?.scrollBy({ left: scrollAmount, behavior: 'smooth' })
-  setTimeout(updateScrollButtons, 200)
+}
+
+/* ---------------- PARTNERS ---------------- */
+
+const updatePartnersButtons = () => {
+  const el = partnersScrollContainer.value
+  if (!el) return
+
+  const left = el.scrollLeft
+  const right = el.scrollLeft + el.clientWidth
+  const max = el.scrollWidth
+
+  partnersCanScrollLeft.value = left > 0
+  partnersCanScrollRight.value = right < max - 1
+}
+
+const onPartnersScroll = () => {
+  updatePartnersButtons()
+}
+
+const partnersScrollLeft = () => {
+  partnersScrollContainer.value?.scrollBy({
+    left: -scrollAmount,
+    behavior: 'smooth'
+  })
+}
+
+const partnersScrollRight = () => {
+  partnersScrollContainer.value?.scrollBy({
+    left: scrollAmount,
+    behavior: 'smooth'
+  })
 }
 
 const capitalize = (s = '') => s.charAt(0).toUpperCase() + s.slice(1)
@@ -158,8 +240,10 @@ const capitalize = (s = '') => s.charAt(0).toUpperCase() + s.slice(1)
 onMounted(async () => {
   await nextTick()
   updateScrollButtons()
+  updatePartnersButtons()
 })
 </script>
+
 <style scoped>
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -170,4 +254,3 @@ onMounted(async () => {
   scrollbar-width: none;
 }
 </style>
-
