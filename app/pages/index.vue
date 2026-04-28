@@ -61,11 +61,13 @@
       class="min-w-[140px] flex-shrink-0 flex justify-center"
     >
       <img
-        :src="item.image_url"
-        class="h-16 md:h-20 grayscale hover:grayscale-0 transition"
+         :src="item?.image_url"
+         :alt="item?.name ?? 'Partner'"
+         class="h-16 md:h-20 grayscale hover:grayscale-0 transition"
       />
     </div>
   </div>
+
 
 </section>
   <!-- NEWS -->
@@ -93,6 +95,10 @@
         >
           <LucideChevronRight class="w-5 h-5" />
         </button>
+
+        <div v-if = "partnersPending">
+              <UiLoader />
+        </div>
       </div>
     </div>
 
@@ -118,7 +124,7 @@
       </div>
 
       <div v-if="loading" class="min-w-[280px] flex items-center justify-center">
-        <span class="text-gray-400 text-sm">Načítavam...</span>
+        <UILoader />
       </div>
     </div>
 
@@ -149,7 +155,7 @@ const { tm, rt } = useI18n()
 const { banner } = useBanner(PageType.HOME)
 const programLinks = ['/program-a', '/program-b']
 
-const { partners } = fetchPartners()
+const { partners, pending: partnersPending } = fetchPartners()
 
 const { articles, loading, hasMore, loadMore } = fetchInfinite()
 

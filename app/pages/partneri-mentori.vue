@@ -16,26 +16,60 @@
       </div>
     </div>
 
-    <!-- PARTNERS -->
-    <section>
-      <div class="flex items-center justify-between mb-10">
-        <h2 class="text-3xl font-bold text-navy">
-          {{ $t('partners_page.partners.title') }}
-        </h2>
+   <section>
+  <div class="flex items-center justify-between mb-10">
+    <h2 class="text-3xl font-bold text-navy">
+      {{ $t('partners_page.partners.title') }}
+    </h2>
 
-        <span class="text-sm text-gray-400 hidden md:block">
-          {{ $t('partners_page.partners.subtitle') }}
-        </span>
-      </div>
+    <div class="flex items-center gap-2">
+      <button
+        @click="scrollPartnersLeft"
+        :disabled="!canScrollPartnersLeft"
+        class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        <LucideChevronLeft class="w-5 h-5" />
+      </button>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <UiPartnerCard
-          v-for="(p, i) in partners"
+      <button
+        @click="scrollPartnersRight"
+        :disabled="!canScrollPartnersRight"
+        class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        <LucideChevronRight class="w-5 h-5" />
+      </button>
+    </div>
+  </div>
+
+  <div class="relative">
+    <div class="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent z-10"></div>
+    <div class="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent z-10"></div>
+
+    <div class="overflow-hidden">
+      <div
+        ref="partnersContainer"
+        class="flex gap-6 overflow-x-auto pb-2 scroll-smooth snap-x snap-mandatory no-scrollbar"
+      >
+        <div
+          v-for="(p, i) in partnersList"
           :key="i"
-          v-bind="p"
-        />
+          class="min-w-[280px] max-w-[320px] snap-start"
+        >
+          <UiPartnerCard
+            :name="p?.partner_translations?.[0]?.name"
+            :alt="p?.partner_translations?.[0]?.name"
+            :image="p?.image_url"
+            :description="p?.partner_translations?.[0]?.description"
+          />
+        </div>
+
+       <div v-if="isFetching" class="min-w-[280px] max-w-[320px] flex items-center justify-center">
+            <UiLoader />
       </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</section>
 
     <!-- MENTORS -->
     <section>
@@ -59,67 +93,70 @@
     </section>
 
     <!-- REFERENCES -->
-    <section>
-      <div class="flex items-center justify-between mb-10">
-        <h2 class="text-3xl font-bold text-navy">
-          {{ $t('partners_page.references.title') }}
-        </h2>
+  <section>
+  <div class="flex items-center justify-between mb-10">
+    <h2 class="text-3xl font-bold text-navy">
+      {{ $t('partners_page.references.title') }}
+    </h2>
+    <div class="flex items-center gap-2">
+      <button
+        @click="scrollLeft"
+        :disabled="!canScrollLeft"
+        class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        <LucideChevronLeft class="w-5 h-5" />
+      </button>
+      <button
+        @click="scrollRight"
+        :disabled="!canScrollRight"
+        class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        <LucideChevronRight class="w-5 h-5" />
+      </button>
+    </div>
+  </div>
 
-        <div class="flex items-center gap-2">
-          <button
-            @click="scrollLeft"
-            :disabled="!canScrollLeft"
-            class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <LucideChevronLeft class="w-5 h-5" />
-          </button>
+  <div class="relative">
+    <div class="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent z-10"></div>
+    <div class="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent z-10"></div>
 
-          <button
-            @click="scrollRight"
-            :disabled="!canScrollRight"
-            class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <LucideChevronRight class="w-5 h-5" />
-          </button>
+    <div class="overflow-hidden">
+      <div
+        ref="scrollContainer"
+       class="flex items-stretch gap-6 overflow-x-auto pb-2 scroll-smooth snap-x snap-mandatory no-scrollbar"
+      >
+        <div
+          v-for="(r, i) in referencesList"
+          :key="i"
+          class="min-w-[280px] max-w-[320px] snap-start flex flex-col"
+        >
+          <UiReferenceCard 
+             class="h-full"
+            :name="r?.partner_reference_translations?.[0]?.name"
+            :job_position="r?.partner_reference_translations?.[0]?.job_position"
+            :quote="r?.partner_reference_translations?.[0]?.description"
+            :image="r?.image_url"/>
+        </div>
+
+        <div v-if="referencesFetching" class="min-w-[280px] max-w-[320px] flex items-center justify-center">
+          <UiLoader />
         </div>
       </div>
-
-      <div class="relative">
-        <div
-          class="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent z-10"
-        ></div>
-        <div
-          class="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent z-10"
-        ></div>
-
-        <div class="overflow-hidden">
-          <div
-            ref="scrollContainer"
-            class="flex gap-6 overflow-x-auto pb-2 scroll-smooth snap-x snap-mandatory no-scrollbar"
-          >
-            <div
-              v-for="(r, i) in references"
-              :key="i"
-              class="min-w-[280px] max-w-[320px] snap-start"
-            >
-              <UiReferenceCard v-bind="r" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    </div>
+  </div>
+</section>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import{ ref, onMounted, onUnmounted } from 'vue'
 import { useBanner } from '../composables/modules/content/banners/fetchBanner'
 import { PageType } from '../composables/modules/content/enum/PageType'
-
+import { fetchPartnersi } from '../composables/modules/content/partners/fetchPartnersi'
+import { fetchReferences } from '../composables/modules/content/references/fethReferences'
 useSeoMeta({
   title: 'Partneri a mentori | NTI',
-  description:
-    'Spoznajte našich partnerov a mentorov, ktorí podporujú náš projekt a pomáhajú rásť talentom v oblasti vývoja.',
+  description: 'Spoznajte našich partnerov a mentorov, ktorí podporujú náš projekt a pomáhajú rásť talentom v oblasti vývoja.',
   ogTitle: 'Partneri a mentori — NTI',
   ogDescription: 'Spoznajte našich partnerov a mentorov. Firmy, učitelia a odbornosti, ktoré tvoria komunitu NTI.',
   ogType: 'website',
@@ -130,11 +167,26 @@ useSeoMeta({
 })
 
 const { banner } = useBanner(PageType.PARTNERS)
-
-const scrollContainer = ref(null)
-
+const { partnersList, isFetching, fetchNextPage } = fetchPartnersi()
+const { referencesList, isFetching: referencesFetching, fetchNextPage: fetchNextReference } = fetchReferences()
+// ── partners slider ──────────────────────────────────────
+const partnersContainer = ref(null)
+const canScrollPartnersLeft = ref(false)
+const canScrollPartnersRight = ref(true)
 const scrollAmount = 320
 
+const updatePartnersScroll = () => {
+  if (!partnersContainer.value) return
+  const { scrollLeft, scrollWidth, clientWidth } = partnersContainer.value
+  canScrollPartnersLeft.value = scrollLeft > 0
+  canScrollPartnersRight.value = scrollLeft + clientWidth < scrollWidth - 1
+  if (scrollWidth - scrollLeft - clientWidth < 100) fetchNextPage()
+}
+
+const scrollPartnersLeft = () => partnersContainer.value?.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+const scrollPartnersRight = () => partnersContainer.value?.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+
+const scrollContainer = ref(null)
 const canScrollLeft = ref(false)
 const canScrollRight = ref(true)
 
@@ -143,109 +195,23 @@ const updateScrollButtons = () => {
   const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.value
   canScrollLeft.value = scrollLeft > 0
   canScrollRight.value = scrollLeft + clientWidth < scrollWidth - 1
+  if (scrollWidth - scrollLeft - clientWidth < 100) fetchNextReference()
 }
 
-const scrollLeft = () => {
-  scrollContainer.value?.scrollBy({
-    left: -scrollAmount,
-    behavior: 'smooth',
-  })
-}
-
-const scrollRight = () => {
-  scrollContainer.value?.scrollBy({
-    left: scrollAmount,
-    behavior: 'smooth',
-  })
-}
+const scrollLeft = () => scrollContainer.value?.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+const scrollRight = () => scrollContainer.value?.scrollBy({ left: scrollAmount, behavior: 'smooth' })
 
 onMounted(() => {
   updateScrollButtons()
   scrollContainer.value?.addEventListener('scroll', updateScrollButtons)
+  updatePartnersScroll()
+  partnersContainer.value?.addEventListener('scroll', updatePartnersScroll)
 })
 
 onUnmounted(() => {
   scrollContainer.value?.removeEventListener('scroll', updateScrollButtons)
+  partnersContainer.value?.removeEventListener('scroll', updatePartnersScroll)
 })
-
-const partners = [
-  {
-    image: '/test_logo.png',
-    alt: 'Partner 1',
-    name: 'Partner Firm 1',
-    description: 'Leading company in digital solutions helping startups grow globally.',
-  },
-  {
-    image: '/test_logo.png',
-    alt: 'Partner 2',
-    name: 'Partner Firm 2',
-    description: 'Experts in design and marketing strategies.',
-  },
-  {
-    image: '/test_logo.png',
-    alt: 'Partner 3',
-    name: 'Partner Firm 3',
-    description: 'Software development company delivering scalable solutions.',
-  },
-  {
-    image: '/test_logo.png',
-    alt: 'Partner 4',
-    name: 'Partner Firm 4',
-    description: 'Consulting firm focused on growth.',
-  },
-]
-
-const mentors = [
-  { image: '/team/person1.jpg', name: 'Alex Novak', role: 'Lead Designer' },
-  { image: '/team/person2.jpg', name: 'Jane Doe', role: 'Frontend Developer' },
-  { image: '/team/person3.jpg', name: 'John Smith', role: 'Project Manager' },
-  { image: '/team/person4.jpg', name: 'Maria Ivanova', role: 'UX Designer' },
-]
-
-const references = [
-  {
-    image: '/team/person1.jpg',
-    name: 'Peter Horváth',
-    role: 'CEO Partner Firm 1',
-    quote: 'NTI nám pomohlo nájsť talentovaných dizajnérov.',
-  },
-  {
-    image: '/team/person2.jpg',
-    name: 'Mária Nováková',
-    role: 'Lead Designer',
-    quote: 'Spolupráca s mentorom bola veľmi prínosná.',
-  },
-  {
-    image: '/team/person3.jpg',
-    name: 'Ján Kováč',
-    role: 'Project Manager',
-    quote: 'Odporúčam NTI ako spoľahlivú platformu.',
-  },
-  {
-    image: '/team/person3.jpg',
-    name: 'Ján Kováč',
-    role: 'Project Manager',
-    quote: 'Odporúčam NTI ako spoľahlivú platformu.',
-  },
-  {
-    image: '/team/person3.jpg',
-    name: 'Ján Kováč',
-    role: 'Project Manager',
-    quote: 'Odporúčam NTI ako spoľahlivú platformu.',
-  },
-  {
-    image: '/team/person3.jpg',
-    name: 'Ján Kováč',
-    role: 'Project Manager',
-    quote: 'Odporúčam NTI ako spoľahlivú platformu.',
-  },
-  {
-    image: '/team/person3.jpg',
-    name: 'Ján Kováč',
-    role: 'Project Manager',
-    quote: 'Odporúčam NTI ako spoľahlivú platformu.',
-  },
-]
 </script>
 
 <style scoped>
