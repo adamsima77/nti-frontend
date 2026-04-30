@@ -124,13 +124,13 @@
       </div>
 
       <div v-if="loading" class="min-w-[280px] flex items-center justify-center">
-        <UILoader />
+        <UiLoader />
       </div>
     </div>
 
   </div>
 </template>
-<script setup>
+<script setup lang = "ts">
 import { useBanner } from '../composables/modules/content/banners/fetchBanner'
 import { PageType } from '../composables/modules/content/enum/PageType'
 import { fetchInfinite } from '../composables/modules/content/news/fetchInfinite'
@@ -243,9 +243,59 @@ const partnersScrollRight = () => {
 
 const capitalize = (s = '') => s.charAt(0).toUpperCase() + s.slice(1)
 
+const waitForImages = async (el: HTMLElement) => {
+  const images = [...el.querySelectorAll('img')]
+  await Promise.all(
+    images
+      .filter(img => !img.complete)
+      .map(img => new Promise(resolve => {
+        img.onload = resolve
+        img.onerror = resolve
+      }))
+  )
+}
+
 onMounted(async () => {
   await nextTick()
+  
+  if (scrollContainer.value) {
+    await waitForImages(scrollContainer.value)
+    updateScrollButtons()
+  }
+  
+  if (partnersScrollContainer.value) {
+    await waitForImages(partnersScrollContainer.value)
+    updatePartnersButtons()
+  }
+})
+
+watch(home_articles, async () => {
+  await nextTick()
+  if (scrollContainer.value) {
+    await waitForImages(scrollContainer.value)
+    updateScrollButtons()
+  }
+})
+
+watch(partners, async () => {
+  await nextTick()
+  if (partnersScrollContainer.value) {
+    await waitForImages(partnersScrollContainer.value)
+    updatePartnersButtons()
+  }
+})
+
+watch(scrollContainer, async (el) => {
+  if (!el) return
+  await nextTick()
+  await waitForImages(el)
   updateScrollButtons()
+})
+
+watch(partnersScrollContainer, async (el) => {
+  if (!el) return
+  await nextTick()
+  await waitForImages(el)
   updatePartnersButtons()
 })
 </script>

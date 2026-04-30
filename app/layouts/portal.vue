@@ -41,7 +41,7 @@ const authStore = useAuthStore()
 const navItems = computed(() => {
   const role = authStore.userRole
 
-  if (role === 'student' || role === 'team_lead') {
+  if (role === 'student') {
     return [
       { label: 'Dashboard', to: '/student', icon: LayoutDashboard },
       { label: 'Moje prihlášky', to: '/student/prihlasky', icon: FileText },

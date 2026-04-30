@@ -74,7 +74,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive } from 'vue'
 
 const localePath = useLocalePath()
@@ -129,7 +129,6 @@ const validateForm = () => {
 
   return isValid
 }
-
 const handleLogin = async () => {
   if (!validateForm()) return
 
@@ -138,11 +137,28 @@ const handleLogin = async () => {
   try {
     await authStore.login(formData.email, formData.password)
 
-    // Presmeruj na dashboard alebo na redirection URL z query
-    const redirectUrl = route.query.redirect || '/dashboard'
-    await router.push(redirectUrl)
-  } catch (error) {
-    addToast({ message: error.message || 'Chyba pri prihlasovaní. Skúste neskôr.', type: 'error' })
+    const redirectQuery = route.query.redirect
+    const redirectUrl = Array.isArray(redirectQuery)
+      ? redirectQuery[0]
+      : redirectQuery
+
+    if (redirectUrl && redirectUrl.startsWith('/')) {
+      await router.push(redirectUrl)
+    } else {
+      await router.push(
+        authStore.redirectUser(authStore.user!)
+      )
+    }
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Chyba pri prihlasovaní'
+
+    addToast({
+      message,
+      type: 'error'
+    })
   } finally {
     isLoading.value = false
   }

@@ -1,8 +1,12 @@
-export default defineNuxtPlugin(async (nuxtApp) => {
-  const authStore = useAuthStore()
-
-  // Hydratovať auth store pri Load  z sessionStorage
-  if (import.meta.client) {
-    authStore.hydrate()
+export default defineNuxtPlugin(async () => {
+  const auth = useAuthStore()
+  const token = useCookie('auth_token')
+ 
+  if (token.value) {
+    try {
+      await auth.getCurrentUser()
+    } catch {
+      token.value = null
+    }
   }
 })

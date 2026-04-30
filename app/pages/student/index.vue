@@ -257,7 +257,7 @@ const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'portal',
-  // middleware: 'auth' // TODO: re-enable when backend is available
+  middleware: ['auth'],
 })
 
 useHead({
@@ -266,28 +266,11 @@ useHead({
 
 const authStore = useAuthStore()
 
-// TODO: remove mock data when backend is available
-if (!authStore.user) {
-  authStore.user = {
-    id: 1,
-    email: 'jan.novak@example.com',
-    first_name: 'Ján',
-    last_name: 'Novák',
-    role: 'student',
-  }
-  authStore.token = 'mock-token'
-}
 
 const userDisplayName = computed(() => {
   const user = authStore.user
   if (!user) return 'Užívateľ'
-  if (user.first_name && user.last_name) {
-    return `${user.first_name} ${user.last_name}`
-  }
-  if (user.organization_name) {
-    return user.organization_name
-  }
-  return user.email || 'Užívateľ'
+  return `${user.name} ${user.surname}`.trim() || user.email || 'Užívateľ'
 })
 
 // Mock data

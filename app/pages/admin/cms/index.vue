@@ -117,7 +117,7 @@ const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'admin',
-  // middleware: ['auth'],
+  middleware: ['auth'],
 })
 
 useHead({ title: 'CMS — Admin | NTI' })

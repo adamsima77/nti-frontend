@@ -11,7 +11,7 @@ export const fetchPartnersi = () => {
   const initialized = ref(false)
 
   const { data: partners } = useAsyncData(
-    `partners`,
+    `partners-${locale.value}`,
     () => get(`/partners/lang/${locale.value}?page=1`)
       .catch((e: any) => e?.response?.status === 404
         ? get(`/partners/lang/${fb()}?page=1`)

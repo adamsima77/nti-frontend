@@ -1,216 +1,123 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-
-// User interface
-interface User {
-  id?: number
-  email: string
-  first_name?: string
-  last_name?: string
-  organization_name?: string
-  role: string
+ 
+interface Role {
+  id: number
+  name: string
 }
-
+ 
+interface User {
+  id: number
+  name: string
+  surname: string
+  email: string
+  roles: Role[]
+  status_id: number
+  avatar_url: string | null
+}
+ 
 export const useAuthStore = defineStore('auth', () => {
   const api = useApi()
-
-  // State
+ 
   const user = ref<User | null>(null)
-  const token = ref<string | null>(null)
-  const isLoading = ref<boolean>(false)
+  const isLoading = ref(false)
   const error = ref<string | null>(null)
+ 
+  
+  const token = useCookie<string | null>('auth_token', {
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+    path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production'
+  })
+ 
+  const isAuthenticated = computed(() => !!user.value)
+ 
+  const userRoles = computed(() =>
+    user.value?.roles?.map(r => r.name) ?? []
+  )
 
-  // Computed
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
+  const ROLE_MAP: Record<string, string> = {
+  'nti_admin': 'admin',
+  'nti_superadmin': 'admin',
+  'student': 'student',
+  'team_lead': 'student',
+  'partner': 'company',
+  'mentor': 'mentor',
+  'evaluator': 'evaluator',
+}
 
-  const userRole = computed(() => user.value?.role || null)
-
-  const hasRole = (role: string | string[]): boolean => {
-    if (!userRole.value) return false
-    if (Array.isArray(role)) {
-      return role.includes(userRole.value)
-    }
-    return userRole.value === role
+const userRole = computed(() => {
+  for (const role of userRoles.value) {
+    if (ROLE_MAP[role]) return ROLE_MAP[role]
   }
-
-  // Actions
-  const login = async (email: string, password: string): Promise<any> => {
+  return null
+})
+ 
+  const hasRole = (roles: string | string[]): boolean => {
+    if (!userRoles.value.length) return false
+    return Array.isArray(roles)
+      ? roles.some(r => userRoles.value.includes(r))
+      : userRoles.value.includes(roles)
+  }
+ 
+ const redirectUser = (u: User): string => {
+  const role = userRole.value  
+  if (role === 'admin')     return '/admin'
+  if (role === 'evaluator') return '/hodnotenie'
+  if (role === 'company')   return '/firma'
+  if (role === 'mentor')    return '/mentor'
+  if (role === 'student')   return '/student'
+  return '/'
+}
+ 
+  const login = async (email: string, password: string): Promise<void> => {
     isLoading.value = true
     error.value = null
-
+ 
     try {
-      const response = await api.post('/auth/login', {
-        email,
-        password,
-      })
-
-      token.value = response.token
-      user.value = response.user
-
-      // Uložiť do sessionStorage (voliteľné)
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('auth_token', response.token)
-      }
-
-      return response
-    } catch (err) {
-      error.value = (err as Error).message
-      throw err
+      const res = await api.post('/auth/login', { email, password }) as { token: string; user: User }
+ 
+      
+      token.value = res.token
+      user.value = res.user
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Chyba pri prihlasovaní'
+      error.value = message
+      throw new Error(message)
     } finally {
       isLoading.value = false
     }
   }
-
-  const register = async (userData: any): Promise<any> => {
-    isLoading.value = true
-    error.value = null
-
-    try {
-      const response = await api.post('/auth/register', userData)
-
-      // registration môže automaticky prihlásiť alebo vyžaduje email verification
-      if (response.token) {
-        token.value = response.token
-        user.value = response.user
-      }
-
-      return response
-    } catch (err) {
-      error.value = (err as Error).message
-      throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
+ 
   const logout = async (): Promise<void> => {
-    isLoading.value = true
-    error.value = null
-
     try {
-      // Backend logout (voliteľné)
-      if (token.value) {
-        await api.post('/auth/logout', {})
-      }
-    } catch (err) {
-      console.error('Logout error:', err)
+      await api.post('/auth/logout')
+    } catch {
+      
     } finally {
-      // Vždy vyčistiť state
-      token.value = null
       user.value = null
-      isLoading.value = false
-
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('auth_token')
-      }
+      token.value = null 
     }
   }
-
-  const verifyEmail = async (verificationPath: string): Promise<any> => {
-    isLoading.value = true
-    error.value = null
-    try {
-      // verificationPath bude napr: "12/abcde...hash?expires=123&signature=xyz"
-      const response = await api.post(`/auth/verify-email/${verificationPath}`, {})
-
-      // Ak backend po overení vráti aj usera a token, prihlásime ho
-      if (response.token && response.user) {
-        token.value = response.token
-        user.value = response.user
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('auth_token', response.token)
-        }
-      }
-      return response
-    } catch (err: any) {
-      error.value = err.message || 'Overenie zlyhalo'
-      throw err
-    } finally {
-      isLoading.value = false
-    }
+ 
+  const getCurrentUser = async (): Promise<User> => {
+    const res = await api.get('/auth/me') as User
+    user.value = res
+    return res
   }
-
-  const resendVerificationEmail = async (email: string): Promise<any> => {
-    isLoading.value = true
-    try {
-      return await api.post('/auth/email/resend', { email })
-    } catch (err: any) {
-      error.value = err.message
-      throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const requestPasswordReset = async (email: string): Promise<any> => {
-    try {
-      return await api.post('/auth/forgot-password', { email })
-    } catch (err) {
-      error.value = (err as Error).message
-      throw err
-    }
-  }
-
-  const resetPassword = async (token: string, password: string, password_confirmation: string): Promise<any> => {
-    try {
-      return await api.post('/auth/reset-password', {
-        token,
-        password,
-        password_confirmation,
-      })
-    } catch (err) {
-      error.value = (err as Error).message
-      throw err
-    }
-  }
-
-  const getCurrentUser = async (): Promise<any> => {
-    try {
-      const response = await api.get('/auth/me')
-      user.value = response.user
-      return response
-    } catch (err) {
-      token.value = null
-      user.value = null
-      throw err
-    }
-  }
-
-  // Hydrate z sessionStorage (na page load)
-  const hydrate = (): void => {
-    if (typeof window !== 'undefined') {
-      const savedToken = sessionStorage.getItem('auth_token')
-      if (savedToken) {
-        token.value = savedToken
-        // Zload aktuálneho usera z backendu
-        getCurrentUser().catch(() => {
-          token.value = null
-        })
-      }
-    }
-  }
-
+ 
   return {
-    // State
     user,
-    token,
     isLoading,
     error,
-
-    // Computed
     isAuthenticated,
-    userRole,
-
-    // Methods
-    login,
-    register,
-    logout,
-    verifyEmail,
-    resendVerificationEmail,
-    requestPasswordReset,
-    resetPassword,
-    getCurrentUser,
+    userRoles,
+    userRole, 
     hasRole,
-    hydrate,
+    redirectUser,
+    login,
+    logout,
+    getCurrentUser,
   }
 })

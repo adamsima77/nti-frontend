@@ -75,7 +75,8 @@ import { FileText, Users, UserPlus, CheckCircle, AlertCircle } from 'lucide-vue-
 
 definePageMeta({
   layout: 'admin',
-  // middleware: ['auth'], // TODO: re-enable when backend is available
+  middleware: ['auth'],
+  roles: ['nti_admin']
 })
 
 useHead({ title: 'Dashboard — Admin | NTI' })
