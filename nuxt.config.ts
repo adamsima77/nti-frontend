@@ -58,11 +58,11 @@ export default defineNuxtConfig({
       { code: 'sk', name: 'Slovak',  lang: 'sk-SK', file: 'sk.json' }
     ],
   },
-  runtimeConfig: {
-    apiBase: 'http://backend:8000/api',
-  public: {
-    apiBase: 'http://localhost/backend',
-  },
+ runtimeConfig: {
+    apiBase: process.env.NUXT_API_BASE || 'http://backend:8000/api',
+    public: {
+        apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost/api',
+    },
 },
   vite: {
     plugins: [tailwindcss()],
