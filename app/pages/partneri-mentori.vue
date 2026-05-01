@@ -173,19 +173,23 @@
 import { ref, watch, onMounted, nextTick } from 'vue'
 import { useBanner } from '../composables/modules/content/banners/fetchBanner'
 import { PageType } from '../composables/modules/content/enum/PageType'
+import { fetchMeta } from '../composables/modules/content/meta_tags/fetchMetaByPageLang'
 import { fetchPartnersi } from '../composables/modules/content/partners/fetchPartnersi'
 import { fetchReferences } from '../composables/modules/content/references/fethReferences'
 
+const { metaTags } = fetchMeta(PageType.PARTNERS)
+const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
+
 useSeoMeta({
-  title: 'Partneri a mentori | NTI',
-  description: 'Spoznajte našich partnerov a mentorov, ktorí podporujú náš projekt a pomáhajú rásť talentom v oblasti vývoja.',
-  ogTitle: 'Partneri a mentori — NTI',
-  ogDescription: 'Spoznajte našich partnerov a mentorov. Firmy, učitelia a odbornosti, ktoré tvoria komunitu NTI.',
-  ogType: 'website',
-  ogUrl: 'https://nti.sk/partneri-mentori',
-  twitterCard: 'summary_large_image',
-  twitterTitle: 'Partneri a mentori — NTI',
-  twitterDescription: 'Spoznajte našich partnerov a mentorov, ktorí podporujú talentov.',
+  title: computed(() => meta.value?.title),
+  description: computed(() => meta.value?.description),
+  ogTitle: computed(() => meta.value?.og_title),
+  ogDescription: computed(() => meta.value?.og_description),
+  ogType: computed(() => meta.value?.og_type),
+  ogUrl: computed(() => meta.value?.og_url),
+  twitterCard: computed(() => meta.value?.twitter_card),
+  twitterTitle: computed(() => meta.value?.twitter_title),
+  twitterDescription: computed(() => meta.value?.twitter_description),
 })
 
 const { banner } = useBanner(PageType.PARTNERS)

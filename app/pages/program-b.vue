@@ -162,6 +162,7 @@
 import { ref } from 'vue'
 import { useBanner } from '../composables/modules/content/banners/fetchBanner'
 import { PageType } from '../composables/modules/content/enum/PageType'
+import { fetchMeta } from '../composables/modules/content/meta_tags/fetchMetaByPageLang'
 import { useFaq } from '../composables/modules/content/faq/fetchFaq'
 const localePath = useLocalePath()
 
@@ -169,18 +170,19 @@ definePageMeta({
   layout: 'default',
 })
 
+const { metaTags } = fetchMeta(PageType.PROGRAM_B)
+const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
+
 useSeoMeta({
-  title: 'Program B — Inovácia za firemných výziev | NTI',
-  description:
-    'Program B spája firmy s talentovanými študentami a juniormi vývojármi. Riešte technické výzvy s inovatívnymi riešeniami.',
-  ogTitle: 'Program B — Inovácia za firemných výziev',
-  ogDescription:
-    'Najímte talentované študentov a juniorov na riešenie svojich technických problémov. Pozrite si inovatívne riešenia.',
-  ogType: 'website',
-  ogUrl: 'https://nti.sk/program-b',
-  twitterCard: 'summary_large_image',
-  twitterTitle: 'Program B — Inovácia za firemných výziev | NTI',
-  twitterDescription: 'Spájame firmy s talentovanými študentami na riešenie reálnych technických výziev.',
+  title: computed(() => meta.value?.title),
+  description: computed(() => meta.value?.description),
+  ogTitle: computed(() => meta.value?.og_title),
+  ogDescription: computed(() => meta.value?.og_description),
+  ogType: computed(() => meta.value?.og_type),
+  ogUrl: computed(() => meta.value?.og_url),
+  twitterCard: computed(() => meta.value?.twitter_card),
+  twitterTitle: computed(() => meta.value?.twitter_title),
+  twitterDescription: computed(() => meta.value?.twitter_description),
 })
 
 const { banner } = useBanner(PageType.PROGRAM_B)

@@ -5,5 +5,6 @@ export enum PageType {
   PROGRAM_A = 4,
   PROGRAM_B = 5,
   CONTACT = 6,
-  PARTNERS = 7
+  PARTNERS = 7,
+  NEWS = 8
 }

@@ -39,14 +39,36 @@
 
 <script setup>
 import { useNews } from '../../composables/modules/content/news/fetchNews'
+import { PageType } from '../../composables/modules/content/enum/PageType'
+import { fetchMeta } from '../../composables/modules/content/meta_tags/fetchMetaByPageLang'
+
+const { metaTags } = fetchMeta(PageType.NEWS)
+const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
+
 useSeoMeta({
-  title: 'Novinky | NTI',
-  description:
-    'Sleduj najnovšie novinky, udalosti a aktuality z komunity NTI. Objav nové príležitosti, projekty a inšpirácie zo sveta dizajnu, vývoja a podnikania.',
+  title: computed(() => meta.value?.title),
+  description: computed(() => meta.value?.description),
+  ogTitle: computed(() => meta.value?.og_title),
+  ogDescription: computed(() => meta.value?.og_description),
+  ogType: computed(() => meta.value?.og_type),
+  ogUrl: computed(() => meta.value?.og_url),
+  twitterCard: computed(() => meta.value?.twitter_card),
+  twitterTitle: computed(() => meta.value?.twitter_title),
+  twitterDescription: computed(() => meta.value?.twitter_description),
 })
+
 
 const { news, currentPage } = useNews()
 const main_article = computed(() => news.value?.data?.[0] ?? null)
 const other_articles = computed(() => news.value?.data?.slice(1) ?? [])
 const totalPages = computed(() => news.value?.last_page ?? 1)
+
+watch(currentPage, async () => {
+  await nextTick()
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+})
 </script>

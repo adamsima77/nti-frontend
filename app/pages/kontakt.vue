@@ -103,17 +103,22 @@
 <script setup>
 import { createSubmission } from '../composables/modules/content/contact/createContactSubmission'
 import { useToast } from '../composables/useToast'
+import { fetchMeta } from '../composables/modules/content/meta_tags/fetchMetaByPageLang'
+import { PageType } from '../composables/modules/content/enum/PageType'
+
+const { metaTags } = fetchMeta(PageType.CONTACT)
+const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
 
 useSeoMeta({
-  title: 'Kontakt | NTI',
-  description: 'Kontaktuj tím NTI. Máš otázky, návrhy alebo záujem o spoluprácu? Spoj sa s nami a radi ti pomôžeme.',
-  ogTitle: 'Kontakt — NTI',
-  ogDescription: 'Spoj sa s tímom NTI. Máš otázky? Chceš spolupracošvať? Napíš nám a odpovieme čo 24 hodín.',
-  ogType: 'website',
-  ogUrl: 'https://nti.sk/kontakt',
-  twitterCard: 'summary_large_image',
-  twitterTitle: 'Kontakt — NTI',
-  twitterDescription: 'Kontaktuj tím NTI. Máš otázky alebo záujem o spoluprácu?',
+  title: computed(() => meta.value?.title),
+  description: computed(() => meta.value?.description),
+  ogTitle: computed(() => meta.value?.og_title),
+  ogDescription: computed(() => meta.value?.og_description),
+  ogType: computed(() => meta.value?.og_type),
+  ogUrl: computed(() => meta.value?.og_url),
+  twitterCard: computed(() => meta.value?.twitter_card),
+  twitterTitle: computed(() => meta.value?.twitter_title),
+  twitterDescription: computed(() => meta.value?.twitter_description),
 })
 
 const { addToast } = useToast()

@@ -34,19 +34,22 @@
 
 <script setup>
 import { useMembers } from '../composables/modules/content/site_members/fetchSiteMembers'
+import { fetchMeta } from '../composables/modules/content/meta_tags/fetchMetaByPageLang'
+import { PageType } from '../composables/modules/content/enum/PageType'
+
+const { metaTags } = fetchMeta(PageType.ABOUT)
+const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
+
 useSeoMeta({
-  title: 'O nás | NTI',
-  description:
-    'NTI je komunita zamerená na dizajn, vývoj a inovácie. Podporujeme talentovaných ľudí, mentorov a partnerov a poskytujeme príležitosti na rast a spoluprácu.',
-  ogTitle: 'O nás — NTI',
-  ogDescription:
-    'Spoznajte NTI komunitu, našu misíu a viziú. Ako podporujeme talentov v oblasti vývoja, dizajnu a podnikania.',
-  ogType: 'website',
-  ogUrl: 'https://nti.sk/o-nas',
-  twitterCard: 'summary_large_image',
-  twitterTitle: 'O nás — NTI Komunita',
-  twitterDescription:
-    'NTI je komunita zameraná na dizajn, vývoj a inovácie. Spoznajte nášu historiu a valu, ktorú prinášame.',
+  title: computed(() => meta.value?.title),
+  description: computed(() => meta.value?.description),
+  ogTitle: computed(() => meta.value?.og_title),
+  ogDescription: computed(() => meta.value?.og_description),
+  ogType: computed(() => meta.value?.og_type),
+  ogUrl: computed(() => meta.value?.og_url),
+  twitterCard: computed(() => meta.value?.twitter_card),
+  twitterTitle: computed(() => meta.value?.twitter_title),
+  twitterDescription: computed(() => meta.value?.twitter_description),
 })
 
 const { t } = useI18n() 

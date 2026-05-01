@@ -137,6 +137,7 @@ import { ref } from 'vue'
 import { useBanner } from '../composables/modules/content/banners/fetchBanner'
 import { useFaq } from '../composables/modules/content/faq/fetchFaq'
 import { PageType } from '../composables/modules/content/enum/PageType'
+import { fetchMeta } from '../composables/modules/content/meta_tags/fetchMetaByPageLang'
 const localePath = useLocalePath()
 const { tm, rt } = useI18n()
 definePageMeta({
@@ -145,18 +146,20 @@ definePageMeta({
 
 const { faq } = useFaq(PageType.PROGRAM_A)
 
+
+const { metaTags } = fetchMeta(PageType.PROGRAM_A)
+const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
+
 useSeoMeta({
-  title: 'Program A — Intenzívne zrýchlenie | NTI',
-  description:
-    'Program A je 3-mesačný intenzívny program pre študentov vysokých škôl s mentorstvom, tímovou prácou a reálnymi projektmi.',
-  ogTitle: 'Program A — Intenzívne zrýchlenie',
-  ogDescription:
-    'Dynamický 3-mesačný program pre študentov a začínajúcich profesionálov. Získaj skúsenosti, mentoring a sieť kontaktov.',
-  ogType: 'website',
-  ogUrl: 'https://nti.sk/program-a',
-  twitterCard: 'summary_large_image',
-  twitterTitle: 'Program A — Intenzívne zrýchlenie | NTI',
-  twitterDescription: 'Dynamický 3-mesačný program pre študentov s mentorstvom a prácou na reálnych projektoch.',
+  title: computed(() => meta.value?.title),
+  description: computed(() => meta.value?.description),
+  ogTitle: computed(() => meta.value?.og_title),
+  ogDescription: computed(() => meta.value?.og_description),
+  ogType: computed(() => meta.value?.og_type),
+  ogUrl: computed(() => meta.value?.og_url),
+  twitterCard: computed(() => meta.value?.twitter_card),
+  twitterTitle: computed(() => meta.value?.twitter_title),
+  twitterDescription: computed(() => meta.value?.twitter_description),
 })
 
 const { banner } = useBanner(PageType.PROGRAM_A)

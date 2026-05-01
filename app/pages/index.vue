@@ -12,11 +12,11 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <UiProgramCard
-        v-for="(item, index) in tm('home.program_cards.cards')"
+        v-for="(item, index) in programs"
         :key="index"
-        :title="rt(item.title)"
-        :description="rt(item.description)"
-        :link="localePath(programLinks[index])"
+        :title="item?.program_translations?.[0].name"
+        :description="item?.program_translations?.[0].description"
+        :link="localePath(item.type_of_program_id === 1 ? '/program-a' : '/program-b')"
       />
     </div>
   </div>
@@ -135,18 +135,25 @@ import { useBanner } from '../composables/modules/content/banners/fetchBanner'
 import { PageType } from '../composables/modules/content/enum/PageType'
 import { fetchInfinite } from '../composables/modules/content/news/fetchInfinite'
 import { fetchPartners } from '../composables/modules/content/partners/fetchPartners'
+import { fetchMeta } from '../composables/modules/content/meta_tags/fetchMetaByPageLang'
+import { fetchProgramsByLang } from '../composables/modules/programs/fetchProgramsByLang'
+
+const { programs } = fetchProgramsByLang()
+
+const { metaTags } = fetchMeta(PageType.HOME)
+
+const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
 
 useSeoMeta({
-  title: 'Domov | NTI',
-  description:
-    'Spoznajte našich partnerov a mentorov, ktorí podporujú náš projekt a pomáhajú rásť talentom v oblasti vývoja.',
-  ogTitle: 'Partneri a mentori — NTI',
-  ogDescription: 'Spoznajte našich partnerov a mentorov. Firmy, učitelia a odbornosti, ktoré tvoria komunitu NTI.',
-  ogType: 'website',
-  ogUrl: 'https://nti.sk/partneri-mentori',
-  twitterCard: 'summary_large_image',
-  twitterTitle: 'Partneri a mentori — NTI',
-  twitterDescription: 'Spoznajte našich partnerov a mentorov, ktorí podporujú talentov.',
+  title: computed(() => meta.value?.title),
+  description: computed(() => meta.value?.description),
+  ogTitle: computed(() => meta.value?.og_title),
+  ogDescription: computed(() => meta.value?.og_description),
+  ogType: computed(() => meta.value?.og_type),
+  ogUrl: computed(() => meta.value?.og_url),
+  twitterCard: computed(() => meta.value?.twitter_card),
+  twitterTitle: computed(() => meta.value?.twitter_title),
+  twitterDescription: computed(() => meta.value?.twitter_description),
 })
 
 const localePath = useLocalePath()

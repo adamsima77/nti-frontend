@@ -117,22 +117,26 @@ import { onMounted } from 'vue'
 import { Calendar, Users, Megaphone, ChevronRight } from 'lucide-vue-next'
 import { useBanner } from '../../composables/modules/content/banners/fetchBanner'
 import { PageType } from '../../composables/modules/content/enum/PageType'
+import { fetchMeta } from '../../composables/modules/content/meta_tags/fetchMetaByPageLang'
 definePageMeta({
   layout: 'default',
 })
 
 const { banner } = useBanner(PageType.CALLS_AND_DEADLINES)
 
+const { metaTags } = fetchMeta(PageType.CALLS_AND_DEADLINES)
+const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
+
 useSeoMeta({
-  title: 'Výzvy a termíny | NTI',
-  description: 'Prezerajte si dostupné výzvy a termíny prihlášok pre Nitriansky technický inkubátor.',
-  ogTitle: 'Výzvy a termíny — NTI',
-  ogDescription: 'Prijavlňujúce sa výzvy na Program A a Program B. Zistite termíny prihlášok a požiadavky.',
-  ogType: 'website',
-  ogUrl: 'https://nti.sk/vyzvy',
-  twitterCard: 'summary_large_image',
-  twitterTitle: 'Výzvy a termíny — NTI',
-  twitterDescription: 'Prezerajte si dostupné výzvy a termíny prihlášok.',
+  title: computed(() => meta.value?.title),
+  description: computed(() => meta.value?.description),
+  ogTitle: computed(() => meta.value?.og_title),
+  ogDescription: computed(() => meta.value?.og_description),
+  ogType: computed(() => meta.value?.og_type),
+  ogUrl: computed(() => meta.value?.og_url),
+  twitterCard: computed(() => meta.value?.twitter_card),
+  twitterTitle: computed(() => meta.value?.twitter_title),
+  twitterDescription: computed(() => meta.value?.twitter_description),
 })
 
 const callsStore = useCallsStore()

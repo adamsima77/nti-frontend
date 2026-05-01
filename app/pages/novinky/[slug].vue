@@ -69,8 +69,14 @@
 import { fetchInfinite } from '../../composables/modules/content/news/fetchInfinite'
 import { fetchBySlug } from '../../composables/modules/content/news/fetchBySlug'
 
+const route = useRoute()
+const slug = route.params.slug
+const { newsDetail } = fetchBySlug(slug)
+const title = computed(() =>
+  newsDetail.value?.news_translations?.[0]?.title || 'Novinky'
+)
 useSeoMeta({
-  title: 'Novinky a články | NTI',
+  title: title,
   description: 'Čítajte najnovšie články a novinky z komunity NTI.',
   ogTitle: 'Novinky — NTI',
   ogDescription: 'Najnovšie články a novinky z komunity Nitrianského technického inkubátora.',
@@ -81,9 +87,7 @@ useSeoMeta({
   twitterDescription: 'Čítajte novinky a články z komunity NTI.',
 })
 
-const route = useRoute()
-const slug = route.params.slug
-const { newsDetail } = fetchBySlug(slug)
+
 
 const { articles, loading, hasMore, loadMore } = fetchInfinite()
 
