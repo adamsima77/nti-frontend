@@ -3,8 +3,8 @@ export const useFaq = (pageId: number) => {
   const { locale, fallbackLocale } = useI18n()
   const { get } = useApi()
   const fb = () => typeof fallbackLocale.value === 'string' ? fallbackLocale.value : 'en'
-
   const key = `faq-${pageId}`
+  const faq_pending = ref(false)
 
   const { data: faq } = useAsyncData(
     key,
@@ -21,11 +21,17 @@ export const useFaq = (pageId: number) => {
   )
 
   watch(locale, async (newLocale) => {
-    faq.value = await get(`/pages/${pageId}/faq/${newLocale}`)
-      .catch((e: any) => e?.response?.status === 404
-        ? get(`/pages/${pageId}/faq/${fb()}`)
-        : Promise.reject(e))
+    faq_pending.value = true
+    faq.value = null
+    try {
+      faq.value = await get(`/pages/${pageId}/faq/${newLocale}`)
+        .catch((e: any) => e?.response?.status === 404
+          ? get(`/pages/${pageId}/faq/${fb()}`)
+          : Promise.reject(e))
+    } finally {
+      faq_pending.value = false
+    }
   }, { flush: 'post' })
 
-  return { faq }
+  return { faq, faq_pending }
 }

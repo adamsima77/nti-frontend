@@ -4,7 +4,7 @@ export const useMembers = () => {
   const fb = () => typeof fallbackLocale.value === 'string' ? fallbackLocale.value : 'en'
   const nuxtApp = useNuxtApp()
 
-  const { data: members } = useAsyncData(
+  const { data: members, pending } = useAsyncData(
     `members`,  
     () => get(`/site-members/lang/${locale.value}`)
       .catch((e: any) => e?.response?.status === 404
@@ -25,5 +25,5 @@ export const useMembers = () => {
         : Promise.reject(e))
   }, { flush: 'post' })
 
-  return { members }
+  return { members, pending }
 }

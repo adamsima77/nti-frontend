@@ -5,9 +5,7 @@
       :key="i"
       class="skeleton"
       :style="{
-        width: variant === 'circle'
-          ? computedHeight
-          : (i === count && variant === 'text' ? '75%' : width),
+        width: width,
         height: computedHeight,
         borderRadius: variant === 'circle' ? '9999px' : '10px',
         marginBottom: count > 1 && i < count ? '10px' : undefined,
@@ -41,10 +39,8 @@ const computedHeight = computed(() => {
 <style scoped>
 .skeleton {
   display: block;
-  width: 100%;
   min-height: 16px;
 
-  /* slightly more gray, still soft */
   background: linear-gradient(
     90deg,
     #dfe3e8 0%,

@@ -1,12 +1,6 @@
 <template>
   <!-- HERO -->
-  <template v-if="banner && !pending">
-    <UiHero
-      :title="banner?.hero_banner_translations?.[0]?.title"
-      :description="banner?.hero_banner_translations?.[0]?.description"
-    />
-  </template>
- <template v-else>
+  <template v-if="pending || !banner">
   <div
     class="relative mt-30 bg-blue-500 text-white py-24 sm:py-28 md:py-32 px-6 md:px-20 overflow-hidden rounded-lg shadow-2xl"
   >
@@ -15,13 +9,11 @@
       <!-- LEFT -->
       <div class="md:w-1/2 space-y-6">
         <UiSkeleton height="3.5rem" width="90%" />
-
         <div class="space-y-3">
           <UiSkeleton height="1.2rem" width="95%" />
           <UiSkeleton height="1.2rem" width="90%" />
           <UiSkeleton height="1.2rem" width="85%" />
         </div>
-
         <div class="flex flex-col md:flex-row gap-4 mt-6 sm:mt-8">
           <UiSkeleton variant="rect" height="3.5rem" width="160px" />
           <UiSkeleton variant="rect" height="3.5rem" width="160px" />
@@ -38,6 +30,13 @@
 
     </div>
   </div>
+</template>
+
+<template v-else>
+  <UiHero
+    :title="banner?.hero_banner_translations?.[0]?.title"
+    :description="banner?.hero_banner_translations?.[0]?.description"
+  />
 </template>
 
   <!-- PROGRAMS -->
@@ -339,7 +338,6 @@ const partnersScrollLeft = () => {
     left: -scrollAmount,
     behavior: 'smooth'
   })
-   setTimeout(updatePartnersButtons, 150)
 }
 
 const partnersScrollRight = () => {
@@ -347,7 +345,6 @@ const partnersScrollRight = () => {
     left: scrollAmount,
     behavior: 'smooth'
   })
-   setTimeout(updatePartnersButtons, 150)
 }
 
 const capitalize = (s = '') => s.charAt(0).toUpperCase() + s.slice(1)

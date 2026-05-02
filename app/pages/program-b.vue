@@ -1,10 +1,32 @@
 <template>
   <div>
-    <!-- Hero sekcia -->
-    <UiHero
-      :title="banner?.hero_banner_translations?.[0]?.title"
-      :description="banner?.hero_banner_translations?.[0]?.description"
-    />
+   <template v-if="banner_pending || !banner">
+  <div class="relative mt-30 bg-blue-500 text-white py-24 sm:py-28 md:py-32 px-6 md:px-20 overflow-hidden rounded-lg shadow-2xl">
+    <div class="relative z-10 md:flex md:items-center md:justify-between gap-12">
+      <div class="md:w-1/2 space-y-6">
+        <UiSkeleton height="3.5rem" width="90%" />
+        <div class="space-y-3">
+          <UiSkeleton height="1.2rem" width="95%" />
+          <UiSkeleton height="1.2rem" width="90%" />
+          <UiSkeleton height="1.2rem" width="85%" />
+        </div>
+        <div class="flex flex-col md:flex-row gap-4 mt-6 sm:mt-8">
+          <UiSkeleton variant="rect" height="3.5rem" width="160px" />
+          <UiSkeleton variant="rect" height="3.5rem" width="160px" />
+        </div>
+      </div>
+      <div class="md:w-1/2 relative flex justify-center md:justify-end mt-10 md:mt-0">
+        <UiSkeleton variant="rect" class="w-64 sm:w-80 md:w-96 h-64 sm:h-80 md:h-96 rounded-full" />
+      </div>
+    </div>
+  </div>
+</template>
+<template v-else>
+  <UiHero
+    :title="banner?.hero_banner_translations?.[0]?.title"
+    :description="banner?.hero_banner_translations?.[0]?.description"
+  />
+</template>
 
     <!-- Čo je Program B -->
     <section class="mt-20 px-6 md:px-20 py-16">
@@ -98,43 +120,61 @@
 
     <!-- FAQ -->
     <section class="mt-20 px-6 md:px-20 py-16 bg-gray-50 rounded-lg">
-      <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-12">
-          {{ $t('program-b.faq.header') }}
-        </h2>
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-4xl font-bold text-navy mb-12">
+      {{ $t('program-b.faq.header') }}
+    </h2>
 
-        <div class="space-y-4">
-          <div
-            v-for="(i, idx) in faq"
-            :key="idx"
-            class="bg-white border border-gray-200 rounded-lg overflow-hidden"
-          >
-            <button
-              class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-              @click="toggleFaq(idx)"
-            >
-              <span class="font-bold text-navy text-left">{{ i?.frequently_asked_question_translations?.[0]?.question }}</span>
-              <ChevronDown
-                :class="{
-                  'rotate-180': expandedFaq === idx,
-                  'transition-transform duration-300': true,
-                }"
-                class="w-5 h-5 text-gray-500"
-              />
-            </button>
-
-            <Transition name="fade">
-              <div
-                v-if="expandedFaq === idx"
-                class="px-6 py-4 bg-gray-50 border-t text-gray-700"
-              >
-                 {{ i?.frequently_asked_question_translations?.[0]?.answer }}
-              </div>
-            </Transition>
-          </div>
+    <template v-if="faq_pending || !faq">
+      <div class="space-y-4">
+        <div
+          v-for="i in 5"
+          :key="'faq-skeleton-' + i"
+          class="bg-white border border-gray-200 rounded-lg px-6 py-4 flex items-center justify-between"
+        >
+          <UiSkeleton height="1.2rem" :width="`${60 + (i % 3) * 10}%`" />
+          <UiSkeleton variant="rect" height="1.2rem" width="1.2rem" class="ml-4 flex-shrink-0" />
         </div>
       </div>
-    </section>
+    </template>
+
+    <template v-else>
+      <div class="space-y-4">
+        <div
+          v-for="(i, idx) in faq"
+          :key="idx"
+          class="bg-white border border-gray-200 rounded-lg overflow-hidden"
+        >
+          <button
+            class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            @click="toggleFaq(idx)"
+          >
+            <span class="font-bold text-navy text-left">
+              {{ i?.frequently_asked_question_translations?.[0]?.question }}
+            </span>
+            <ChevronDown
+              :class="{
+                'rotate-180': expandedFaq === idx,
+                'transition-transform duration-300': true,
+              }"
+              class="w-5 h-5 text-gray-500"
+            />
+          </button>
+
+          <Transition name="fade">
+            <div
+              v-if="expandedFaq === idx"
+              class="px-6 py-4 bg-gray-50 border-t text-gray-700"
+            >
+              {{ i?.frequently_asked_question_translations?.[0]?.answer }}
+            </div>
+          </Transition>
+        </div>
+      </div>
+    </template>
+
+  </div>
+</section>
 
     <!-- CTA -->
     <section class="mt-20 mb-20 px-6 md:px-20 py-16">
@@ -185,12 +225,12 @@ useSeoMeta({
   twitterDescription: computed(() => meta.value?.twitter_description),
 })
 
-const { banner } = useBanner(PageType.PROGRAM_B)
+const { banner, pending: banner_pending } = useBanner(PageType.PROGRAM_B)
 const { tm, rt } = useI18n()
 const { t } = useI18n() 
 const expandedFaq = ref(null)
 
-const { faq } = useFaq(PageType.PROGRAM_B)
+const { faq, faq_pending } = useFaq(PageType.PROGRAM_B)
 
 const toggleFaq = (idx) => {
   expandedFaq.value = expandedFaq.value === idx ? null : idx

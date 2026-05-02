@@ -5,6 +5,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['./app/assets/main.css'],
   modules: ['@pinia/nuxt', '@nuxt/eslint', '@nuxtjs/i18n','@nuxtjs/sitemap'],
+
+
   sitemap: {
     //siteurl: 'https://nti.sk',
     //Not indexed

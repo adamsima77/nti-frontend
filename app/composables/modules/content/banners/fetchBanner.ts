@@ -5,10 +5,8 @@ export const useBanner = (pageId: number) => {
   const nuxtApp = useNuxtApp()
   const pending = ref(false)
 
-  const key = `banner-${pageId}-${locale.value}` // locale IN the key now
-
   const { data: banner } = useAsyncData(
-    key,
+    `banner-${pageId}`,
     () => get(`/pages/${pageId}/hero-banner/${locale.value}`)
       .catch((e: any) => e?.response?.status === 404
         ? get(`/pages/${pageId}/hero-banner/${fb()}`)
@@ -21,11 +19,12 @@ export const useBanner = (pageId: number) => {
     }
   )
 
-  watch(locale, async () => {
+  watch(locale, async (newLocale) => {
     pending.value = true
-    banner.value = null // triggers skeleton immediately
+    banner.value = null
+
     try {
-      banner.value = await get(`/pages/${pageId}/hero-banner/${locale.value}`)
+      banner.value = await get(`/pages/${pageId}/hero-banner/${newLocale}`)
         .catch((e: any) => e?.response?.status === 404
           ? get(`/pages/${pageId}/hero-banner/${fb()}`)
           : Promise.reject(e))
