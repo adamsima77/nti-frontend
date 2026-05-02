@@ -4,7 +4,7 @@ export const fetchProgramsByLang = () => {
   const fb = () => typeof fallbackLocale.value === 'string' ? fallbackLocale.value : 'en'
   const nuxtApp = useNuxtApp()
 
-  const { data: programs } = useAsyncData(
+  const { data: programs, programs_pending } = useAsyncData(
     `programs-${locale.value}`,  
     () => get(`/programs/lang/${locale.value}`)
       .catch((e: any) => e?.response?.status === 404
@@ -25,6 +25,6 @@ export const fetchProgramsByLang = () => {
         : Promise.reject(e))
   }, { flush: 'post' })
 
-  return { programs }
+  return { programs, programs_pending }
 
 }

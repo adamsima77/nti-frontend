@@ -1,8 +1,44 @@
 <template>
-  <UiHero
-    :title="banner?.hero_banner_translations?.[0]?.title"
-    :description="banner?.hero_banner_translations?.[0]?.description"
-  />
+  <!-- HERO -->
+  <template v-if="banner && !pending">
+    <UiHero
+      :title="banner?.hero_banner_translations?.[0]?.title"
+      :description="banner?.hero_banner_translations?.[0]?.description"
+    />
+  </template>
+ <template v-else>
+  <div
+    class="relative mt-30 bg-blue-500 text-white py-24 sm:py-28 md:py-32 px-6 md:px-20 overflow-hidden rounded-lg shadow-2xl"
+  >
+    <div class="relative z-10 md:flex md:items-center md:justify-between gap-12">
+      
+      <!-- LEFT -->
+      <div class="md:w-1/2 space-y-6">
+        <UiSkeleton height="3.5rem" width="90%" />
+
+        <div class="space-y-3">
+          <UiSkeleton height="1.2rem" width="95%" />
+          <UiSkeleton height="1.2rem" width="90%" />
+          <UiSkeleton height="1.2rem" width="85%" />
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-4 mt-6 sm:mt-8">
+          <UiSkeleton variant="rect" height="3.5rem" width="160px" />
+          <UiSkeleton variant="rect" height="3.5rem" width="160px" />
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="md:w-1/2 relative flex justify-center md:justify-end mt-10 md:mt-0">
+        <UiSkeleton
+          variant="rect"
+          class="w-64 sm:w-80 md:w-96 h-64 sm:h-80 md:h-96 rounded-full"
+        />
+      </div>
+
+    </div>
+  </div>
+</template>
 
   <!-- PROGRAMS -->
   <div id="programs" class="mt-20 px-6 md:px-0 flex flex-col">
@@ -11,20 +47,37 @@
     </h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <UiProgramCard
-        v-for="(item, index) in programs"
-        :key="index"
-        :title="item?.program_translations?.[0].name"
-        :description="item?.program_translations?.[0].description"
-        :link="localePath(item.type_of_program_id === 1 ? '/program-a' : '/program-b')"
-      />
+      <template v-if="programs?.length && !programs_pending">
+        <UiProgramCard
+          v-for="(item, index) in programs"
+          :key="index"
+          :title="item?.program_translations?.[0].name"
+          :description="item?.program_translations?.[0].description"
+          :link="localePath(item.type_of_program_id === 1 ? '/program-a' : '/program-b')"
+        />
+      </template>
+     <template v-else>
+  <div
+    v-for="i in 2"
+    :key="'skeleton-program-' + i"
+    class="bg-white rounded-2xl shadow-xl p-8 sm:p-10 flex flex-col h-full gap-4"
+  >
+    <UiSkeleton height="1.75rem" width="60%" />
+
+    <div class="flex flex-col gap-2 flex-1">
+      <UiSkeleton height="1rem" width="95%" />
+      <UiSkeleton height="1rem" width="90%" />
+      <UiSkeleton height="1rem" width="85%" />
+    </div>
+
+    <UiSkeleton variant="rect" height="2.5rem" width="140px" />
+  </div>
+</template>
     </div>
   </div>
 
   <!-- PARTNERS -->
-<section class="mt-16 mb-20 px-6 md:px-0">
-
-  <!-- HEADER -->
+  <section class="mt-16 mb-20 px-6 md:px-0">
   <div class="flex items-center justify-between mb-6">
     <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy">
       {{ $t('home.partners_header') }}
@@ -49,61 +102,77 @@
     </div>
   </div>
 
-  <!-- SCROLLER -->
+  <!-- LOADED -->
   <div
+    v-if="partners?.data?.length && !partner_pending"
     ref="partnersScrollContainer"
     class="flex flex-nowrap gap-8 overflow-x-auto scroll-smooth no-scrollbar"
     @scroll="onPartnersScroll"
   >
     <div
-      v-for="(item, index) in partners"
+      v-for="(item, index) in partners.data"
       :key="index"
-      class="min-w-[140px] flex-shrink-0 flex justify-center"
+      class="min-w-[140px] flex-shrink-0 flex justify-center items-center"
     >
       <img
-         :src="item?.image_url"
-         :alt="item?.name ?? 'Partner'"
-         class="h-16 md:h-20 grayscale hover:grayscale-0 transition"
+        v-if="item?.image_url"
+        :src="item.image_url"
+        :alt="item?.partner_translations?.[0]?.name ?? 'Partner'"
+        class="h-16 md:h-20 grayscale hover:grayscale-0 transition"
       />
+
+      <div
+        v-else
+        class="h-16 md:h-20 w-32 flex items-center justify-center text-sm text-gray-400 font-medium"
+      >
+        {{ item?.partner_translations?.[0]?.name ?? 'No name' }}
+      </div>
     </div>
   </div>
 
-
+  <!-- SKELETON -->
+  <ClientOnly v-else>
+    <div class="flex gap-8 overflow-x-auto no-scrollbar items-center py-2">
+      <div
+        v-for="i in 8"
+        :key="'skeleton-partner-' + i"
+        class="flex-shrink-0"
+      >
+        <div
+          class="w-28 h-16 md:w-32 md:h-20 rounded-xl bg-gray-100 animate-pulse flex items-center justify-center"
+        />
+      </div>
+    </div>
+  </ClientOnly>
 </section>
+
   <!-- NEWS -->
   <div class="mb-12">
-
-    <!-- HEADER -->
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy">
         {{ $t('news.more_news') }}
       </h2>
-
       <div class="flex items-center gap-2">
         <button
           @click="scrollLeft"
           :disabled="!canScrollLeft"
-          class="w-9 h-9 flex items-center justify-center rounded-full  bg-white shadow-sm disabled:opacity-40"
+          class="w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm disabled:opacity-40"
         >
           <LucideChevronLeft class="w-5 h-5" />
         </button>
-
         <button
           @click="scrollRight"
           :disabled="!canScrollRight"
-          class="w-9 h-9 flex items-center justify-center rounded-full  bg-white shadow-sm disabled:opacity-40"
+          class="w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm disabled:opacity-40"
         >
           <LucideChevronRight class="w-5 h-5" />
         </button>
-
-        <div v-if = "partnersPending">
-              <UiLoader />
-        </div>
       </div>
     </div>
 
-    <!-- SCROLLER -->
+    <!-- articles loaded -->
     <div
+      v-if="home_articles.length"
       ref="scrollContainer"
       class="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory no-scrollbar"
       @scroll="onScroll"
@@ -122,12 +191,43 @@
           :link="`/novinky/${article.slug}`"
         />
       </div>
-
       <div v-if="loading" class="min-w-[280px] flex items-center justify-center">
         <UiLoader />
       </div>
     </div>
 
+    <!-- articles skeleton — ClientOnly avoids hydration mismatch -->
+    <ClientOnly v-else>
+  <div class="flex gap-6 overflow-x-auto no-scrollbar">
+    <div
+      v-for="i in 4"
+      :key="'skeleton-article-' + i"
+      class="min-w-[280px] max-w-[320px] flex-shrink-0"
+    >
+      <div class="bg-gray-50 rounded-2xl shadow-[0_-8px_20px_rgba(0,0,0,0.06),0_8px_20px_rgba(0,0,0,0.06)] p-6 sm:p-8 flex flex-col gap-4">
+
+        <!-- IMAGE -->
+        <UiSkeleton variant="rect" height="11rem" class="rounded-lg" />
+
+        <!-- CATEGORY -->
+        <UiSkeleton height="0.9rem" width="40%" />
+
+        <!-- TITLE -->
+        <UiSkeleton height="1.3rem" width="85%" />
+
+        <!-- DESCRIPTION -->
+        <div class="flex flex-col gap-2">
+          <UiSkeleton height="0.9rem" width="95%" />
+          <UiSkeleton height="0.9rem" width="90%" />
+        </div>
+
+        <!-- CTA -->
+        <UiSkeleton height="1rem" width="40%" />
+
+      </div>
+    </div>
+  </div>
+</ClientOnly>
   </div>
 </template>
 <script setup lang = "ts">
@@ -138,7 +238,7 @@ import { fetchPartners } from '../composables/modules/content/partners/fetchPart
 import { fetchMeta } from '../composables/modules/content/meta_tags/fetchMetaByPageLang'
 import { fetchProgramsByLang } from '../composables/modules/programs/fetchProgramsByLang'
 
-const { programs } = fetchProgramsByLang()
+const { programs, programs_pending } = fetchProgramsByLang()
 
 const { metaTags } = fetchMeta(PageType.HOME)
 
@@ -159,10 +259,10 @@ useSeoMeta({
 const localePath = useLocalePath()
 const { tm, rt } = useI18n()
 
-const { banner } = useBanner(PageType.HOME)
+const { banner, pending } = useBanner(PageType.HOME)
 const programLinks = ['/program-a', '/program-b']
 
-const { partners, pending: partnersPending } = fetchPartners()
+const { partners, currentPage, partner_pending } = fetchPartners()
 
 const { articles, loading, hasMore, loadMore } = fetchInfinite()
 
@@ -239,6 +339,7 @@ const partnersScrollLeft = () => {
     left: -scrollAmount,
     behavior: 'smooth'
   })
+   setTimeout(updatePartnersButtons, 150)
 }
 
 const partnersScrollRight = () => {
@@ -246,6 +347,7 @@ const partnersScrollRight = () => {
     left: scrollAmount,
     behavior: 'smooth'
   })
+   setTimeout(updatePartnersButtons, 150)
 }
 
 const capitalize = (s = '') => s.charAt(0).toUpperCase() + s.slice(1)

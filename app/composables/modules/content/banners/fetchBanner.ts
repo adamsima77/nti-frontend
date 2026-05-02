@@ -3,9 +3,12 @@ export const useBanner = (pageId: number) => {
   const { get } = useApi()
   const fb = () => typeof fallbackLocale.value === 'string' ? fallbackLocale.value : 'en'
   const nuxtApp = useNuxtApp()
+  const pending = ref(false)
+
+  const key = `banner-${pageId}-${locale.value}` // locale IN the key now
 
   const { data: banner } = useAsyncData(
-    `banner-${pageId}`,  // pageId makes it stable per page, no locale needed
+    key,
     () => get(`/pages/${pageId}/hero-banner/${locale.value}`)
       .catch((e: any) => e?.response?.status === 404
         ? get(`/pages/${pageId}/hero-banner/${fb()}`)
@@ -18,12 +21,18 @@ export const useBanner = (pageId: number) => {
     }
   )
 
-  watch(locale, async (newLocale) => {
-    banner.value = await get(`/pages/${pageId}/hero-banner/${newLocale}`)
-      .catch((e: any) => e?.response?.status === 404
-        ? get(`/pages/${pageId}/hero-banner/${fb()}`)
-        : Promise.reject(e))
+  watch(locale, async () => {
+    pending.value = true
+    banner.value = null // triggers skeleton immediately
+    try {
+      banner.value = await get(`/pages/${pageId}/hero-banner/${locale.value}`)
+        .catch((e: any) => e?.response?.status === 404
+          ? get(`/pages/${pageId}/hero-banner/${fb()}`)
+          : Promise.reject(e))
+    } finally {
+      pending.value = false
+    }
   }, { flush: 'post' })
 
-  return { banner }
+  return { banner, pending }
 }
