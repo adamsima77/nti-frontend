@@ -1,205 +1,308 @@
 <template>
-  <div class="onboarding-card">
+  <div class="bg-white rounded-2xl shadow-2xl shadow-slate-200/80 overflow-hidden w-full max-w-md mx-auto">
 
-    <!-- HEADER -->
-    <div class="card-header">
-      <div class="step-badge">Step {{ step }} of 3</div>
-      <h1 class="card-title">Company onboarding</h1>
-      <p class="card-subtitle">Let's set your organization up</p>
-    </div>
+    <!-- Top accent bar -->
+    <div class="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
 
-    <!-- PROGRESS -->
-    <div class="progress-track">
-      <div class="progress-fill" :style="{ width: progress + '%' }" />
-      <div class="progress-dots">
-        <div
-          v-for="s in 3"
-          :key="s"
-          class="progress-dot"
-          :class="{ active: s <= step, current: s === step }"
-        />
-      </div>
-    </div>
-
-    <!-- STEPS -->
-    <transition name="slide" mode="out-in">
-
-      <!-- STEP 1 — Company info -->
-      <div v-if="step === 1" key="s1" class="step-body">
-        <div class="step-icon-row">
-          <span class="step-icon">🏢</span>
-          <div>
-            <h2 class="step-title">Company info</h2>
-            <p class="step-desc">Basic company details</p>
-          </div>
-        </div>
-        <div class="field-group">
-          <div class="field">
-            <label class="field-label">Company name</label>
-            <div class="input-wrap" :class="fieldState('name')">
-              <input v-model="form.name" @input="touch('name')" placeholder="e.g. Acme s.r.o." class="field-input" />
-              <span class="field-icon">{{ touched.name ? (isValid('name') ? '✓' : '✗') : '' }}</span>
-            </div>
-            <p v-if="touched.name && !isValid('name')" class="field-error">Minimum 2 characters</p>
-          </div>
-
-          <div class="field">
-            <label class="field-label">Phone</label>
-            <div class="input-wrap" :class="fieldState('phone')">
-              <input v-model="form.phone" @input="touch('phone')" placeholder="+421 900 000 000" class="field-input" />
-              <span class="field-icon">{{ touched.phone ? (isValid('phone') ? '✓' : '✗') : '' }}</span>
-            </div>
-            <p v-if="touched.phone && !isValid('phone')" class="field-error">Minimum 6 characters</p>
-          </div>
-
-          <div class="field">
-            <label class="field-label">IČO <span class="field-hint">(8 digits)</span></label>
-            <div class="input-wrap" :class="fieldState('ico')">
-              <input v-model="form.ico" @input="touch('ico')" placeholder="12345678" maxlength="8" class="field-input" />
-              <span class="field-icon">{{ touched.ico ? (isValid('ico') ? '✓' : '✗') : '' }}</span>
-            </div>
-            <p v-if="touched.ico && !isValid('ico')" class="field-error">Must be exactly 8 digits</p>
-          </div>
-
-          <div class="field">
-            <label class="field-label">Website <span class="field-hint">(optional)</span></label>
-            <div class="input-wrap" :class="fieldState('web_url')">
-              <input v-model="form.web_url" @input="touch('web_url')" placeholder="https://acme.sk" class="field-input" />
-              <span class="field-icon">{{ touched.web_url && form.web_url ? (isValid('web_url') ? '✓' : '✗') : '' }}</span>
-            </div>
-            <p v-if="touched.web_url && form.web_url && !isValid('web_url')" class="field-error">Must start with https://</p>
-          </div>
-        </div>
+    <div class="p-8">
+      <!-- Header -->
+      <div class="text-center mb-7">
+        <span class="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-full tracking-wide mb-3">
+          Step {{ step }} of 3
+        </span>
+        <h1 class="text-xl font-bold text-slate-900 mb-1">Company Onboarding</h1>
+        <p class="text-sm text-slate-400">Let's set your organisation up for success</p>
       </div>
 
-      <!-- STEP 2 — Address -->
-      <div v-else-if="step === 2" key="s2" class="step-body">
-        <div class="step-icon-row">
-          <span class="step-icon">📍</span>
-          <div>
-            <h2 class="step-title">Address</h2>
-            <p class="step-desc">Company location</p>
-          </div>
-        </div>
-        <div class="field-group">
-          <div class="two-col">
-            <div class="field">
-              <label class="field-label">City</label>
-              <div class="input-wrap" :class="fieldState('city')">
-                <input v-model="form.city" @input="touch('city')" placeholder="Bratislava" class="field-input" />
-                <span class="field-icon">{{ touched.city ? (isValid('city') ? '✓' : '✗') : '' }}</span>
-              </div>
-            </div>
-            <div class="field">
-              <label class="field-label">Postal code</label>
-              <div class="input-wrap" :class="fieldState('postal_code')">
-                <input v-model="form.postal_code" @input="touch('postal_code')" placeholder="811 01" class="field-input" />
-                <span class="field-icon">{{ touched.postal_code ? (isValid('postal_code') ? '✓' : '✗') : '' }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="field">
-            <label class="field-label">Street</label>
-            <div class="input-wrap" :class="fieldState('street')">
-              <input v-model="form.street" @input="touch('street')" placeholder="Hlavná 1" class="field-input" />
-              <span class="field-icon">{{ touched.street ? (isValid('street') ? '✓' : '✗') : '' }}</span>
-            </div>
-          </div>
-
-          <div class="field">
-            <label class="field-label">Country</label>
-            <div class="input-wrap" :class="fieldState('country')">
-              <input v-model="form.country" @input="touch('country')" placeholder="Slovakia" class="field-input" />
-              <span class="field-icon">{{ touched.country ? (isValid('country') ? '✓' : '✗') : '' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- STEP 3 — Sectors -->
-      <div v-else key="s3" class="step-body">
-  <div class="step-icon-row">
-    <span class="step-icon">⚙️</span>
-    <div>
-      <h2 class="step-title">Sector</h2>
-      <p class="step-desc">What industry does your company operate in?</p>
-    </div>
-  </div>
-
- <div class="field-group">
-  <div class="field">
-    <label class="field-label">
-      Sectors <span class="field-hint">(select one or more)</span>
-    </label>
-
-    <div class="input-wrap" :class="fieldState('sector')">
-      
-      <!-- CHECKBOX LIST (replaces select) -->
-      <div class="checkbox-list">
-        <label
-          v-for="s in sectors"
-          :key="s.id"
-          class="checkbox-item"
-        >
-          <input
-            type="checkbox"
-            :value="s.id"
-            v-model="form.sector"
-            @change="touch('sector')"
+      <!-- Progress -->
+      <div class="relative mb-8">
+        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500 ease-out"
+            :style="{ width: progress + '%' }"
           />
-          <span>{{ s.name }}</span>
-        </label>
+        </div>
+        <div class="absolute inset-0 flex items-center justify-between px-0.5 pointer-events-none">
+          <div
+            v-for="s in 3" :key="s"
+            class="w-3.5 h-3.5 rounded-full border-2 border-white transition-all duration-300"
+            :class="{
+              'bg-blue-500': s < step,
+              'bg-white ring-2 ring-blue-500': s === step,
+              'bg-slate-200': s > step,
+            }"
+          />
+        </div>
       </div>
 
-      <span class="field-icon">
-        {{ touched.sector ? (form.sector.length ? '✓' : '✗') : '' }}
-      </span>
+      <!-- Steps -->
+      <transition name="slide" mode="out-in">
 
+        <!-- STEP 1 — Company info -->
+        <div v-if="step === 1" key="s1">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-xl">🏢</div>
+            <div>
+              <h2 class="text-base font-bold text-slate-800">Company Info</h2>
+              <p class="text-xs text-slate-400">Basic company details</p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <UiFormField
+              v-model="form.name"
+              label="Company name"
+              placeholder="e.g. Acme s.r.o."
+              field="name"
+              :touched="touched"
+              :is-valid="isValid"
+              error="Minimum 2 characters"
+              @touch="touch"
+            />
+            <UiFormField
+              v-model="form.phone"
+              label="Phone"
+              placeholder="+421 900 000 000"
+              type="tel"
+              field="phone"
+              :touched="touched"
+              :is-valid="isValid"
+              error="Minimum 6 characters"
+              @touch="touch"
+            />
+            <div class="grid grid-cols-2 gap-3">
+              <UiFormField
+                v-model="form.ico"
+                label="IČO"
+                hint="8 digits"
+                placeholder="12345678"
+                field="ico"
+                maxlength="8"
+                mono
+                :touched="touched"
+                :is-valid="isValid"
+                error="Exactly 8 digits"
+                @touch="touch"
+              />
+              <UiFormField
+                v-model="form.web_url"
+                label="Website"
+                hint="optional"
+                placeholder="https://acme.sk"
+                type="url"
+                field="web_url"
+                :touched="touched"
+                :is-valid="isValid"
+                error="Must start with https://"
+                @touch="touch"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2 — Address -->
+        <div v-else-if="step === 2" key="s2">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-xl">📍</div>
+            <div>
+              <h2 class="text-base font-bold text-slate-800">Address</h2>
+              <p class="text-xs text-slate-400">Your company location</p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <UiFormField
+                v-model="form.city"
+                label="City"
+                placeholder="Bratislava"
+                field="city"
+                :touched="touched"
+                :is-valid="isValid"
+                @touch="touch"
+              />
+              <UiFormField
+                v-model="form.postal_code"
+                label="Postal code"
+                hint="5 digits"
+                placeholder="81101"
+                field="postal_code"
+                maxlength="5"
+                mono
+                :touched="touched"
+                :is-valid="isValid"
+                error="Exactly 5 digits"
+                @touch="touch"
+              />
+            </div>
+            <UiFormField
+              v-model="form.street"
+              label="Street"
+              placeholder="Hlavná 1"
+              field="street"
+              :touched="touched"
+              :is-valid="isValid"
+              @touch="touch"
+            />
+            <UiFormField
+              v-model="form.country"
+              label="Country"
+              placeholder="Slovakia"
+              field="country"
+              :touched="touched"
+              :is-valid="isValid"
+              @touch="touch"
+            />
+          </div>
+        </div>
+
+        <!-- STEP 3 — Sectors -->
+        <div v-else key="s3">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-xl">⚙️</div>
+            <div>
+              <h2 class="text-base font-bold text-slate-800">Sector</h2>
+              <p class="text-xs text-slate-400">Pick all industries that apply</p>
+            </div>
+          </div>
+
+          <!-- Search filter -->
+          <div class="relative mb-3">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input
+              v-model="sectorSearch"
+              type="text"
+              placeholder="Filter sectors…"
+              class="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50 text-slate-700 focus:bg-white focus:border-blue-400 focus:outline-none transition-all duration-200"
+            />
+          </div>
+
+          <!-- Chips -->
+          <div
+            class="flex flex-wrap gap-2 max-h-52 overflow-y-auto pr-1 pb-1 rounded-xl"
+            :class="{
+              'ring-2 ring-red-200': touched.sector && !form.sector.length,
+              'ring-2 ring-green-200': touched.sector && form.sector.length,
+            }"
+          >
+            <label
+              v-for="s in filteredSectors"
+              :key="s.id"
+              class="cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                :value="s.id"
+                v-model="form.sector"
+                class="sr-only"
+                @change="touch('sector')"
+              />
+              <span
+                class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-1.5 border text-xs font-medium transition-all duration-150 select-none"
+                :class="form.sector.includes(s.id)
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-200'
+                  : 'bg-white text-slate-500 border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50'"
+              >
+                <svg v-if="form.sector.includes(s.id)" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+                {{ s.name }}
+              </span>
+            </label>
+
+            <p v-if="filteredSectors.length === 0" class="text-xs text-slate-400 p-2">No sectors match your search</p>
+          </div>
+
+          <p v-if="touched.sector && !form.sector.length" class="text-xs text-red-500 mt-2">
+            Select at least one sector
+          </p>
+
+          <!-- Selected summary tags -->
+          <div v-if="form.sector.length" class="mt-3">
+            <p class="text-xs font-semibold text-slate-400 mb-1.5">Selected ({{ form.sector.length }})</p>
+            <div class="flex flex-wrap gap-1.5">
+              <span
+                v-for="id in form.sector"
+                :key="id"
+                class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full"
+              >
+                {{ sectors.find(s => s.id === id)?.name }}
+                <button
+                  type="button"
+                  class="hover:text-red-500 transition-colors leading-none"
+                  @click="form.sector = form.sector.filter(x => x !== id)"
+                >×</button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </transition>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-between mt-7 gap-3">
+        <button
+          v-if="step > 1"
+          type="button"
+          class="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-slate-700 transition-colors duration-200"
+          @click="step--"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Back
+        </button>
+        <div v-else />
+
+        <button
+          v-if="step < 3"
+          type="button"
+          :disabled="!isStepValid"
+          class="ml-auto flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150"
+          :class="isStepValid
+            ? 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 shadow-sm shadow-blue-200'
+            : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
+          @click="nextStep"
+        >
+          Continue
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+
+        <button
+          v-else
+          type="button"
+          :disabled="loading || !isStepValid"
+          class="ml-auto flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150"
+          :class="isStepValid && !loading
+            ? 'bg-emerald-500 text-white hover:bg-emerald-600 active:scale-95 shadow-sm shadow-emerald-200'
+            : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
+          @click="submit"
+        >
+          <template v-if="!loading">
+            Finish
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          </template>
+          <template v-else>
+            Saving<span class="animate-pulse">...</span>
+          </template>
+        </button>
+      </div>
     </div>
-
-    <p v-if="touched.sector && !form.sector.length" class="field-error">
-      Select at least one sector
-    </p>
-  </div>
-</div></div>
-    </transition>
-
-    <!-- ACTIONS -->
-    <div class="actions">
-      <button v-if="step > 1" @click="step--" class="btn-back">← Back</button>
-
-      <button
-        v-if="step < 3"
-        @click="nextStep"
-        :disabled="!isStepValid"
-        class="btn-next"
-        :class="{ disabled: !isStepValid }"
-      >
-        Continue →
-      </button>
-
-      <button
-        v-else
-        @click="submit"
-        :disabled="loading || !isStepValid"
-        class="btn-submit"
-        :class="{ loading }"
-      >
-        <span v-if="!loading">Finish ✓</span>
-        <span v-else class="loading-dots">Saving<span>.</span><span>.</span><span>.</span></span>
-      </button>
-    </div>
-
   </div>
 </template>
-
 <script setup lang="ts">
 const emit = defineEmits(['success'])
 const api = useApi()
+
 const step = ref(1)
 const loading = ref(false)
-const sectorInput = ref('')
+const sectorSearch = ref('')
 
 const form = reactive({
   name: '',
@@ -213,74 +316,138 @@ const form = reactive({
   sector: [] as number[],
 })
 
-const sectors = ref([])
+const sectors = ref<{ id: number; name: string }[]>([])
 
 onMounted(async () => {
   sectors.value = await api.get('/sectors')
 })
 
+/**
+ * Track touched fields
+ */
 const touched = reactive<Record<string, boolean>>({})
-
-const progress = computed(() => (step.value / 3) * 100)
-
-const rules: Record<string, (v: any) => boolean> = {
-  name: v => v?.length >= 2,
-  phone: v => v?.length >= 6,
-  ico: v => /^\d{8}$/.test(v),
-  web_url: v => !v || v.startsWith('https://') || v.startsWith('http://'),
-  city: v => !!v,
-  street: v => !!v,
-  postal_code: v => !!v,
-  country: v => !!v,
+const touch = (field: string) => {
+  touched[field] = true
 }
 
-const touch = (field: string) => { touched[field] = true }
+/**
+ * Progress bar
+ */
+const progress = computed(() => (step.value / 3) * 100)
 
+/**
+ * Filter sectors
+ */
+const filteredSectors = computed(() =>
+  sectors.value.filter(s =>
+    s.name.toLowerCase().includes(sectorSearch.value.toLowerCase())
+  )
+)
+
+/**
+ * STRICT validation rules (aligned with Laravel backend)
+ */
+const rules: Record<string, (v: any) => boolean> = {
+  name: v =>
+    typeof v === 'string' &&
+    v.trim().length >= 2 &&
+    v.trim().length <= 255,
+
+  phone: v => {
+    if (typeof v !== 'string') return false
+
+    // Closest frontend equivalent to propaganistas/laravel-phone strict mode
+    // Accepts: +421..., +420..., etc.
+    return /^\+?[1-9]\d{7,14}$/.test(v.trim())
+  },
+
+  ico: v =>
+    typeof v === 'string' && /^\d{8}$/.test(v),
+
+  web_url: v => {
+    if (!v) return true
+
+    try {
+      const url = new URL(v)
+      return url.protocol === 'http:' || url.protocol === 'https:'
+    } catch {
+      return false
+    }
+  },
+
+  city: v =>
+    typeof v === 'string' &&
+    v.trim().length > 0 &&
+    v.trim().length <= 255,
+
+  street: v =>
+    typeof v === 'string' &&
+    v.trim().length > 0 &&
+    v.trim().length <= 255,
+
+  postal_code: v =>
+    typeof v === 'string' && /^\d{5}$/.test(v),
+
+  country: v =>
+    typeof v === 'string' &&
+    v.trim().length > 0 &&
+    v.trim().length <= 255,
+}
+
+/**
+ * Validate single field
+ */
 const isValid = (field: string) => {
   const rule = rules[field]
   return rule ? rule((form as any)[field]) : true
 }
 
-const isSectorValid = computed(() => sectorInput.value.trim().length > 0)
+/**
+ * Strict sector validation (backend aligned)
+ */
+const isSectorValid = computed(() => {
+  return (
+    Array.isArray(form.sector) &&
+    form.sector.length > 0 &&
+    form.sector.every(id => Number.isInteger(id) && id > 0)
+  )
+})
 
-const fieldState = (field: string) => {
-  if (field === 'sector') {
-    if (!touched.sector) return 'state-neutral'
-    return isSectorValid.value ? 'state-valid' : 'state-invalid'
-  }
-  if (!touched[field]) return 'state-neutral'
-  return isValid(field) ? 'state-valid' : 'state-invalid'
-}
-
+/**
+ * Step validation
+ */
 const isStepValid = computed(() => {
-  if (step.value === 1) return isValid('name') && isValid('phone') && isValid('ico')
-  if (step.value === 2) return ['city', 'street', 'postal_code', 'country'].every(isValid)
+  if (step.value === 1) {
+    return ['name', 'phone', 'ico', 'web_url'].every(isValid)
+  }
+
+  if (step.value === 2) {
+    return ['city', 'street', 'postal_code', 'country'].every(isValid)
+  }
+
   return isSectorValid.value
 })
 
+/**
+ * Next step handler
+ */
 function nextStep() {
   if (!isStepValid.value) return
   step.value++
 }
 
+/**
+ * Submit onboarding
+ */
 async function submit() {
+  touch('sector')
+
+  if (!isStepValid.value) return
+
   loading.value = true
 
-  form.sector = sectorInput.value
-    .split(',')
-    .map(v => Number(v.trim()))
-    .filter(v => !Number.isNaN(v) && v > 0)
-
   try {
-    await $fetch('/api/organization/onboarding', {
-      method: 'POST',
-      body: form,
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${import.meta.client ? localStorage.getItem('_t') ?? '' : ''}`,
-      },
-    })
+    await api.post('/auth/organization-onboarding', form)
     emit('success')
   } finally {
     loading.value = false
@@ -289,180 +456,7 @@ async function submit() {
 </script>
 
 <style scoped>
-.onboarding-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 36px 40px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / .06), 0 24px 48px -8px rgb(0 0 0 / .10);
-  font-family: 'DM Sans', system-ui, sans-serif;
-}
-.checkbox-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px 14px;
-  width: 100%;
-}
-
-.checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #0f172a;
-  cursor: pointer;
-}
-
-.checkbox-item input {
-  accent-color: #3b82f6;
-  width: 14px;
-  height: 14px;
-}
-.card-header { text-align: center; margin-bottom: 28px; }
-.step-badge {
-  display: inline-block;
-  padding: 3px 12px;
-  background: #eff6ff;
-  color: #3b82f6;
-  border-radius: 99px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  margin-bottom: 10px;
-}
-.card-title { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 4px; }
-.card-subtitle { font-size: 14px; color: #94a3b8; margin: 0; }
-
-.progress-track {
-  position: relative;
-  height: 6px;
-  background: #f1f5f9;
-  border-radius: 99px;
-  margin-bottom: 32px;
-  overflow: visible;
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #6366f1);
-  border-radius: 99px;
-  transition: width 0.4s cubic-bezier(.4,0,.2,1);
-}
-.progress-dots {
-  position: absolute;
-  top: 50%;
-  left: 0; right: 0;
-  transform: translateY(-50%);
-  display: flex;
-  justify-content: space-between;
-  padding: 0 2px;
-}
-.progress-dot {
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: #e2e8f0;
-  border: 2px solid #fff;
-  transition: all .3s;
-}
-.progress-dot.active { background: #3b82f6; }
-.progress-dot.current {
-  background: #fff;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px #bfdbfe;
-}
-
-.step-body { padding: 4px 0; }
-.step-icon-row { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-.step-icon { font-size: 28px; line-height: 1; }
-.step-title { font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 2px; }
-.step-desc { font-size: 13px; color: #94a3b8; margin: 0; }
-
-.field-group { display: flex; flex-direction: column; gap: 16px; }
-.field { display: flex; flex-direction: column; gap: 6px; }
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.field-label { font-size: 13px; font-weight: 600; color: #475569; }
-.field-hint { font-weight: 400; color: #94a3b8; }
-
-.input-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  background: #fff;
-  transition: border-color .2s, background .2s, box-shadow .2s;
-}
-.input-wrap.state-valid {
-  border-color: #22c55e;
-  background: #f0fdf4;
-  box-shadow: 0 0 0 3px #bbf7d0;
-}
-.input-wrap.state-invalid {
-  border-color: #ef4444;
-  background: #fef2f2;
-  box-shadow: 0 0 0 3px #fecaca;
-}
-
-.field-input {
-  flex: 1;
-  padding: 10px 14px;
-  font-size: 14px;
-  color: #0f172a;
-  background: transparent;
-  border: none;
-  outline: none;
-  border-radius: 10px;
-}
-
-.field-icon {
-  padding-right: 12px;
-  font-size: 14px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-.state-valid .field-icon { color: #16a34a; }
-.state-invalid .field-icon { color: #dc2626; }
-
-.field-error { font-size: 12px; color: #ef4444; margin: 0; }
-
-.actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 32px;
-  gap: 10px;
-}
-
-.btn-back {
-  font-size: 14px; font-weight: 500; color: #94a3b8;
-  background: none; border: none; cursor: pointer; padding: 0;
-  transition: color .2s;
-}
-.btn-back:hover { color: #334155; }
-
-.btn-next, .btn-submit {
-  margin-left: auto;
-  padding: 10px 24px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all .2s;
-}
-.btn-next { background: #3b82f6; color: #fff; }
-.btn-next:hover:not(.disabled) { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px #3b82f640; }
-.btn-next.disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
-
-.btn-submit { background: #22c55e; color: #fff; }
-.btn-submit:hover:not(.loading):not(:disabled) { background: #16a34a; transform: translateY(-1px); box-shadow: 0 4px 12px #22c55e40; }
-.btn-submit:disabled { opacity: .7; cursor: not-allowed; }
-
-.loading-dots span { animation: blink 1.2s infinite; }
-.loading-dots span:nth-child(2) { animation-delay: .2s; }
-.loading-dots span:nth-child(3) { animation-delay: .4s; }
-@keyframes blink { 0%, 80%, 100% { opacity: 0 } 40% { opacity: 1 } }
-
 .slide-enter-active, .slide-leave-active { transition: all .22s ease; }
-.slide-enter-from { opacity: 0; transform: translateX(16px); }
-.slide-leave-to { opacity: 0; transform: translateX(-16px); }
+.slide-enter-from { opacity: 0; transform: translateX(18px); }
+.slide-leave-to   { opacity: 0; transform: translateX(-18px); }
 </style>

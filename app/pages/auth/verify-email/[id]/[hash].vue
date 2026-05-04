@@ -158,6 +158,8 @@ onMounted(async () => {
   }
 })
 
+const api = useApi()
+
 const goToOnboarding = () => {
   router.push(localePath('/auth/onboarding'))
 }
@@ -171,18 +173,18 @@ const handleResend = async () => {
   }
 
   isResending.value = true
-  try {
-    await $fetch('/auth/resend-verification', {
-      baseURL: config.public.apiBase,
-      method:  'POST',
-      body:    { email: resendEmail.value },
-      headers: { 'Content-Type': 'application/json' },
-    })
-    resendSuccess.value = true
-  } catch (err: any) {
-    resendError.value = err?.data?.message ?? 'Nepodarilo sa odoslať e-mail.'
-  } finally {
-    isResending.value = false
-  }
+ try {
+  await api.post('/auth/resend-verification', {
+    email: resendEmail.value,
+  })
+
+  resendSuccess.value = true
+} catch (err: any) {
+  resendError.value =
+    err?.response?._data?.message ??
+    'Nepodarilo sa odoslať e-mail.'
+} finally {
+  isResending.value = false
+}
 }
 </script>

@@ -200,95 +200,177 @@
 
 <script setup lang="ts">
 const emit = defineEmits(['success'])
-
 const api = useApi()
 
 const step = ref(1)
 const loading = ref(false)
 const fileError = ref('')
 
+/**
+ * FORM (matches backend types exactly)
+ */
 const form = reactive({
   name: '',
   surname: '',
-  university: '',
-  study_program: '',
-  study_field: '',
-  year_of_study: '',
+  university: null as number | null,
+  study_program: null as number | null,
+  study_field: null as number | null,
+  year_of_study: null as number | null,
+  portfolio_url: '',
   cv: null as File | null,
 })
 
+/**
+ * touched state
+ */
 const touched = reactive<Record<string, boolean>>({})
+const touch = (field: string) => {
+  touched[field] = true
+}
 
+/**
+ * loaded dropdowns
+ */
 const universities = ref<any[]>([])
 const studyPrograms = ref<any[]>([])
 const studyFields = ref<any[]>([])
 
 onMounted(async () => {
-  ;[universities.value, studyPrograms.value, studyFields.value] = await Promise.all([
-    api.get('/university'),
-    api.get('/study-program'),
-    api.get('/study-field'),
-  ])
+  ;[universities.value, studyPrograms.value, studyFields.value] =
+    await Promise.all([
+      api.get('/university'),
+      api.get('/study-program'),
+      api.get('/study-field'),
+    ])
 })
 
-const progress = computed(() => (step.value / 3) * 100)
-
+/**
+ * STRICT backend-matching rules
+ */
 const rules: Record<string, (v: any) => boolean> = {
-  name: v => v?.length >= 2,
-  surname: v => v?.length >= 2,
-  university: v => !!v,
-  study_program: v => !!v,
-  study_field: v => !!v,
-  year_of_study: v => Number(v) >= 1 && Number(v) <= 6,
-  cv: v => !!v,
+  name: v =>
+    typeof v === 'string' &&
+    v.trim().length >= 2 &&
+    v.trim().length <= 255,
+
+  surname: v =>
+    typeof v === 'string' &&
+    v.trim().length >= 2 &&
+    v.trim().length <= 255,
+
+  university: v =>
+    Number.isInteger(v) && v > 0,
+
+  study_program: v =>
+    Number.isInteger(v) && v > 0,
+
+  study_field: v =>
+    Number.isInteger(v) && v > 0,
+
+  year_of_study: v =>
+    Number.isInteger(v) &&
+    v >= 1 &&
+    v <= 6,
+
+  portfolio_url: v => {
+    if (!v) return true
+
+    try {
+      const url = new URL(v)
+      return url.protocol === 'http:' || url.protocol === 'https:'
+    } catch {
+      return false
+    }
+  },
+
+  cv: v =>
+    v instanceof File &&
+    (
+      v.type === 'application/pdf' ||
+      v.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ),
 }
 
+/**
+ * validation helper
+ */
 const isValid = (field: string) => {
   const rule = rules[field]
   return rule ? rule((form as any)[field]) : true
 }
 
-const touch = (field: string) => { touched[field] = true }
-
+/**
+ * field UI state
+ */
 const fieldState = (field: string) => {
   if (!touched[field]) return 'state-neutral'
   return isValid(field) ? 'state-valid' : 'state-invalid'
 }
 
+/**
+ * STEP validation (backend aligned)
+ */
 const isStepValid = computed(() => {
-  if (step.value === 1) return isValid('name') && isValid('surname')
-  if (step.value === 2) return ['university', 'study_program', 'study_field', 'year_of_study'].every(isValid)
+  if (step.value === 1) {
+    return isValid('name') && isValid('surname')
+  }
+
+  if (step.value === 2) {
+    return (
+      isValid('university') &&
+      isValid('study_program') &&
+      isValid('study_field') &&
+      isValid('year_of_study')
+    )
+  }
+
   return isValid('cv')
 })
 
+/**
+ * next step
+ */
 function nextStep() {
   if (!isStepValid.value) return
   step.value++
 }
 
+/**
+ * submit
+ */
 async function submit() {
+  touch('cv')
+
+  if (!isStepValid.value) return
+
   loading.value = true
   fileError.value = ''
 
-  const data = new FormData()
-  Object.entries(form).forEach(([k, v]) => {
-    if (v !== null && v !== '') data.append(k, v as any)
-  })
+  try {
+    const data = new FormData()
 
-const token = import.meta.client ? localStorage.getItem('_t') : null
-try {
-  const res = await api.post('/auth/student-onboarding', data)
+    Object.entries(form).forEach(([k, v]) => {
+      if (v !== null && v !== '' && v !== undefined) {
+        data.append(k, v as any)
+      }
+    })
 
-  console.log('Response:', res) // 👈 print here
+    const res = await api.post('/auth/student-onboarding', data)
 
-  emit('success')
-} catch (e) {
+    console.log('Response:', res)
+
+    emit('success')
+  } catch (e: any) {
     console.error('FULL ERROR:', e)
-  console.error('STATUS:', e?.response?.status)
-  console.error('DATA:', e?.response?._data)
-} finally {
-  loading.value = false
-}
+    console.error('STATUS:', e?.response?.status)
+    console.error('DATA:', e?.response?._data)
+
+    if (e?.response?.status === 422) {
+      fileError.value = 'Validation failed. Please check your inputs.'
+    }
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 

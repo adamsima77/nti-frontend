@@ -202,7 +202,37 @@
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700 text-left">
           E-mail môže trvať niekoľko minút. Skontrolujte aj priečinok spam.
         </div>
-        <button @click = "resendEmail(formData.email)">Poslať znova</button>
+    <button
+  @click="resendEmail(formData.email)"
+  :disabled="isResending"
+  class="w-full bg-slate-900 text-white py-3 px-4 rounded-lg font-medium text-sm
+         hover:bg-slate-800 transition-colors
+         disabled:opacity-50 disabled:cursor-not-allowed
+         flex items-center justify-center gap-2"
+>
+  <svg
+    v-if="isResending"
+    class="animate-spin w-4 h-4"
+    fill="none"
+    viewBox="0 0 24 24"
+  >
+    <circle
+      class="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      stroke-width="4"
+    />
+    <path
+      class="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+    />
+  </svg>
+
+  {{ isResending ? 'Odosielam...' : 'Poslať znova' }}
+</button>
         <NuxtLink :to="localePath('/auth/login')" class="block text-sm text-gray-500 hover:text-slate-900 transition-colors">
           ← Späť na prihlásenie
         </NuxtLink>
@@ -346,10 +376,17 @@ const submitRegistration = async () => {
   }
 }
 
+const isResending = ref(false)
+
 const resendEmail = async (email: string) => {
-  await $fetch('/auth/resend-verification', {
-    method: 'POST',
-    body: { email },
-  })
+  isResending.value = true
+
+  try {
+    await api.post('/auth/resend-verification', {
+      email,
+    })
+  } finally {
+    isResending.value = false
+  }
 }
 </script>
