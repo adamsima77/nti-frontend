@@ -2,19 +2,15 @@
   <div class="flex flex-col gap-1.5">
     <label
       v-if="label"
-      :for="`input-${id}`"
+      :for="id"
       class="text-sm font-medium text-gray-700"
     >
       {{ label }}
-      <span
-        v-if="required"
-        class="text-danger-500"
-        >*</span
-      >
+      <span v-if="required" class="text-danger-500">*</span>
     </label>
 
     <input
-      :id="`input-${id}`"
+      :id="id"
       :type="type"
       :value="modelValue"
       :placeholder="placeholder"
@@ -32,17 +28,14 @@
       @blur="validateInput"
     />
 
-    <span
-      v-if="hasError"
-      class="text-xs text-danger-600"
-    >
+    <span v-if="hasError" class="text-xs text-danger-600">
       {{ error || 'Chyba pri vyplnení' }}
     </span>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, useId } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -59,12 +52,12 @@ const props = defineProps({
   disabled: Boolean,
   required: Boolean,
   error: String,
-  validate: Function, // Custom validation function
+  validate: Function,
 })
 
 const emit = defineEmits(['update:modelValue', 'error'])
 
-const id = Math.random().toString(36).substr(2, 9)
+const id = useId() 
 const validationError = ref(null)
 
 const hasError = computed(() => !!props.error || !!validationError.value)

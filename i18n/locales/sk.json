@@ -428,5 +428,12 @@
       "link": "Prihláste sa"
     }
   }
-}
+},
+
+    "error_page":{
+            "err_message": "Stránka neexistuje alebo bola presunutá.",
+            "home_button": "Späť na domov",
+            "err_desc_1": "Ak si myslíš, že ide o chybu,",
+            "err_desc_2": "kontaktuj nás"
+    }
 }

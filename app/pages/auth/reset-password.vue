@@ -244,7 +244,9 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+
 const localePath = useLocalePath()
+
 definePageMeta({
   layout: 'default',
   middleware: 'guest',
@@ -261,7 +263,6 @@ useHead({
 })
 
 const route = useRoute()
-const router = useRouter()
 const authStore = useAuthStore()
 
 const isLoading = ref(false)
@@ -279,11 +280,12 @@ const errors = reactive({
   password_confirmation: null,
 })
 
-// Token from query param (?token=xxx)
+// ── TOKEN + EMAIL from URL ──
 const resetToken = computed(() => route.query.token || '')
+const resetEmail = computed(() => route.query.email || '')
 
 onMounted(() => {
-  if (!resetToken.value) {
+  if (!resetToken.value || !resetEmail.value) {
     tokenInvalid.value = true
   }
 })
@@ -296,17 +298,22 @@ const passwordRequirements = computed(() => [
   { label: 'Aspoň jeden špeciálny znak', met: /[^A-Za-z0-9]/.test(formData.password) },
 ])
 
-const strengthScore = computed(() => passwordRequirements.value.filter((r) => r.met).length)
+const strengthScore = computed(() =>
+  passwordRequirements.value.filter(r => r.met).length
+)
 
 const strengthBarColor = (i) => {
-  if (formData.password.length === 0) return 'bg-gray-200'
+  if (!formData.password) return 'bg-gray-200'
+
   const s = strengthScore.value
+
   if (i <= s) {
     if (s <= 1) return 'bg-danger-500'
     if (s === 2) return 'bg-warning-500'
     if (s === 3) return 'bg-blue-500'
     return 'bg-success-500'
   }
+
   return 'bg-gray-200'
 }
 
@@ -330,6 +337,7 @@ const strengthTextColor = computed(() => {
 const validate = () => {
   errors.password = null
   errors.password_confirmation = null
+
   let valid = true
 
   if (!formData.password) {
@@ -359,14 +367,22 @@ const handleResetPassword = async () => {
   serverError.value = null
 
   try {
-    await authStore.resetPassword(resetToken.value, formData.password, formData.password_confirmation)
+    await authStore.resetPassword(
+      resetToken.value,
+      resetEmail.value,
+      formData.password,
+      formData.password_confirmation
+    )
+
     resetSuccess.value = true
   } catch (err) {
     const msg = err?.message || ''
+
     if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('expired')) {
       tokenInvalid.value = true
     } else {
-      serverError.value = msg || 'Nastala chyba. Skúste znova alebo požiadajte o nový odkaz.'
+      serverError.value =
+        msg || 'Nastala chyba. Skúste znova alebo požiadajte o nový odkaz.'
     }
   } finally {
     isLoading.value = false

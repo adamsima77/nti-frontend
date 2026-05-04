@@ -9,6 +9,7 @@ export const fetchReferences = () => {
   const meta = ref<any>(null)
   const isFetching = ref(false)
   const initialized = ref(false)
+  const pending = ref(false)
 
   const { data: references } = useAsyncData(
     `references-${locale.value}`,
@@ -33,18 +34,23 @@ export const fetchReferences = () => {
   }, { immediate: true })
 
   watch(locale, async (newLocale) => {
+    pending.value = true
     currentPage.value = 1
     referencesList.value = []
     meta.value = null
     initialized.value = false
-    const res = await get(`/partner-references/lang/${newLocale}?page=1`)
-      .catch((e: any) => e?.response?.status === 404
-        ? get(`/partner-references/lang/${fb()}?page=1`)
-        : Promise.reject(e))
-    if (res?.data) {
-      referencesList.value = res.data
-      meta.value = res.meta
-      initialized.value = true
+    try {
+      const res = await get(`/partner-references/lang/${newLocale}?page=1`)
+        .catch((e: any) => e?.response?.status === 404
+          ? get(`/partner-references/lang/${fb()}?page=1`)
+          : Promise.reject(e))
+      if (res?.data) {
+        referencesList.value = res.data
+        meta.value = res.meta
+        initialized.value = true
+      }
+    } finally {
+      pending.value = false
     }
   }, { flush: 'post' })
 
@@ -55,19 +61,20 @@ export const fetchReferences = () => {
     isFetching.value = true
     const nextPage = currentPage.value + 1
 
-    const res = await get(`/partner-references/lang/${locale.value}?page=${nextPage}`)
-      .catch((e: any) => e?.response?.status === 404
-        ? get(`/partner-references/lang/${fb()}?page=${nextPage}`)
-        : Promise.reject(e))
-
-    if (res?.data) {
-      referencesList.value = [...referencesList.value, ...res.data]
-      meta.value = res.meta
-      currentPage.value = nextPage
+    try {
+      const res = await get(`/partner-references/lang/${locale.value}?page=${nextPage}`)
+        .catch((e: any) => e?.response?.status === 404
+          ? get(`/partner-references/lang/${fb()}?page=${nextPage}`)
+          : Promise.reject(e))
+      if (res?.data) {
+        referencesList.value = [...referencesList.value, ...res.data]
+        meta.value = res.meta
+        currentPage.value = nextPage
+      }
+    } finally {
+      isFetching.value = false
     }
-
-    isFetching.value = false
   }
 
-  return { referencesList, meta, isFetching, fetchNextPage }
+  return { referencesList, meta, isFetching, fetchNextPage, pending }
 }

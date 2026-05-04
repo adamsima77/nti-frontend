@@ -1,43 +1,86 @@
 <template>
   <section class="mt-20 bg-white py-16 sm:py-20 md:py-24 px-6 md:px-20 rounded-2xl shadow-xl">
     <div class="mx-auto flex flex-col">
-      <div class="mb-6">
-        <UiBreadcrumbs
-          :items="[
-            { label: 'Novinky', to: '/novinky' },
-            { label: `${newsDetail?.news_translations?.[0]?.title}` },
-          ]"
-        />
-      </div>
 
-      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-navy mb-6">
-        {{ newsDetail?.news_translations?.[0]?.title }}
-      </h1>
+      <!-- SKELETON -->
+      <template v-if="pending || !newsDetail">
 
-      <p class="text-sm text-blue-600 font-semibold mb-3 inline-block">
-        {{ newsDetail?.category?.slug.charAt(0).toUpperCase() + newsDetail?.category?.slug.slice(1) }}
-      </p>
+        <div class="mb-6">
+          <UiSkeleton height="1rem" width="30%" />
+        </div>
 
-      <p class="text-sm sm:text-base text-gray-400 mb-8">
-        {{ $t('news.publicated') }}: {{ new Date(newsDetail?.created_at).toLocaleDateString('sk-SK') }}
-      </p>
+        <!-- title -->
+        <UiSkeleton height="3.5rem" width="80%" class="mb-3" />
+        <UiSkeleton height="3.5rem" width="60%" class="mb-6" />
 
-      <div class="w-full max-h-125 lg:max-h-225 overflow-hidden rounded-lg">
-        <img
-          :src="newsDetail?.image_url"
-          class="w-full h-full object-cover rounded-lg"
-          :alt="newsDetail?.news_translations?.[0]?.title"
-        />
-      </div>
+        <!-- category -->
+        <UiSkeleton height="0.9rem" width="10%" class="mb-3" />
 
-      <div class="w-full h-1 bg-gray-300 my-6"></div>
+        <!-- date -->
+        <UiSkeleton height="0.9rem" width="20%" class="mb-8" />
 
-      <div class="text-justify font-sans text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed">
-        {{ newsDetail?.news_translations?.[0]?.description }}
-      </div>
+        <!-- image -->
+        <UiSkeleton variant="rect" height="28rem" class="w-full rounded-lg" />
 
-      <div class="w-full h-1 bg-gray-300 my-6"></div>
+        <div class="w-full h-1 bg-gray-300 my-6" />
 
+        <!-- body -->
+        <div class="flex flex-col gap-3">
+          <UiSkeleton height="1.2rem" width="100%" />
+          <UiSkeleton height="1.2rem" width="95%" />
+          <UiSkeleton height="1.2rem" width="98%" />
+          <UiSkeleton height="1.2rem" width="90%" />
+          <UiSkeleton height="1.2rem" width="96%" />
+          <UiSkeleton height="1.2rem" width="85%" />
+        </div>
+
+        <div class="w-full h-1 bg-gray-300 my-6" />
+
+      </template>
+
+      <!-- LOADED -->
+      <template v-else>
+
+        <div class="mb-6">
+          <UiBreadcrumbs
+            :items="[
+              { label: 'Novinky', to: '/novinky' },
+              { label: `${newsDetail?.news_translations?.[0]?.title}` },
+            ]"
+          />
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-navy mb-6">
+          {{ newsDetail?.news_translations?.[0]?.title }}
+        </h1>
+
+        <p class="text-sm text-blue-600 font-semibold mb-3 inline-block">
+          {{ newsDetail?.category?.slug.charAt(0).toUpperCase() + newsDetail?.category?.slug.slice(1) }}
+        </p>
+
+        <p class="text-sm sm:text-base text-gray-400 mb-8">
+          {{ $t('news.publicated') }}: {{ new Date(newsDetail?.created_at).toLocaleDateString('sk-SK') }}
+        </p>
+
+        <div class="w-full max-h-125 lg:max-h-225 overflow-hidden rounded-lg">
+          <img
+            :src="newsDetail?.image_url"
+            class="w-full h-full object-cover rounded-lg"
+            :alt="newsDetail?.news_translations?.[0]?.title"
+          />
+        </div>
+
+        <div class="w-full h-1 bg-gray-300 my-6" />
+
+        <div class="text-justify font-sans text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed">
+          {{ newsDetail?.news_translations?.[0]?.description }}
+        </div>
+
+        <div class="w-full h-1 bg-gray-300 my-6" />
+
+      </template>
+
+      <!-- MORE NEWS — always visible -->
       <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy mb-6">
         {{ $t('news.more_news') }}
       </h2>
@@ -55,12 +98,12 @@
         />
       </div>
 
-      <!-- Infinite scroll trigger -->
       <div ref="scrollAnchor" class="mt-10 flex justify-center">
         <span v-if="loading" class="text-gray-400 text-sm animate-pulse">
-             <UiLoader />
+          <UiLoader />
         </span>
       </div>
+
     </div>
   </section>
 </template>
@@ -71,7 +114,7 @@ import { fetchBySlug } from '../../composables/modules/content/news/fetchBySlug'
 
 const route = useRoute()
 const slug = route.params.slug
-const { newsDetail } = fetchBySlug(slug)
+const { newsDetail, pending } = fetchBySlug(slug)
 const title = computed(() =>
   newsDetail.value?.news_translations?.[0]?.title || 'Novinky'
 )

@@ -1,29 +1,20 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  const auth = useAuthStore()
-  const token = useCookie('auth_token')
- 
-  
-  if (!token.value && !auth.user) return
- 
- 
-  if (!auth.user && token.value) {
+  const auth  = useAuthStore()
+  const token = import.meta.client ? localStorage.getItem('_t') : null
+
+  // Definitely a guest — let through
+  if (!token && !auth.user) return
+
+  // Token exists but store not hydrated
+  if (!auth.user && token) {
     try {
       await auth.getCurrentUser()
     } catch {
-      
-      token.value = null
+      auth.$reset()
       return
     }
   }
- 
-  
-  const redirectQuery = to.query.redirect
-  const redirectUrl = Array.isArray(redirectQuery)
-    ? redirectQuery[0]
-    : redirectQuery
- 
-  return navigateTo(
-    (redirectUrl && redirectUrl.startsWith('/') ? redirectUrl : null)
-    ?? auth.redirectUser(auth.user!)
-  )
+
+  // Redirect based on status
+  return navigateTo(auth.redirectUser())
 })

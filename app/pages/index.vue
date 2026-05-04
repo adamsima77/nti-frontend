@@ -50,9 +50,9 @@
         <UiProgramCard
           v-for="(item, index) in programs"
           :key="index"
-          :title="item?.program_translations?.[0].name"
-          :description="item?.program_translations?.[0].description"
-          :link="localePath(item.type_of_program_id === 1 ? '/program-a' : '/program-b')"
+          :title="item?.program_translations?.[0]?.name"
+          :description="item?.program_translations?.[0]?.description"
+          :link="localePath(item?.type_of_program_id === 1 ? '/program-a' : '/program-b')"
         />
       </template>
      <template v-else>

@@ -1,12 +1,18 @@
 export default defineNuxtPlugin(async () => {
+  if (import.meta.server) return
+
   const auth = useAuthStore()
-  const token = useCookie('auth_token')
- 
-  if (token.value) {
+  const token = localStorage.getItem('_t')
+
+  if (!token) return
+
+  if (!auth.user) {
     try {
       await auth.getCurrentUser()
     } catch {
-      token.value = null
+      auth.$reset()
     }
   }
+
+  auth.hydrated = true
 })

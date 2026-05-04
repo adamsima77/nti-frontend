@@ -429,5 +429,12 @@
     }
   }
 
+},
+
+"error_page": {
+  "err_message": "The page does not exist or has been moved.",
+  "home_button": "Back to home",
+  "err_desc_1": "If you think this is an error,",
+  "err_desc_2": "contact us"
 }
 }
