@@ -1,45 +1,27 @@
+import { mapCall } from './fetchCalls'
 import type { Call } from './fetchCalls'
-
-const mapCall = (c: any): Call => ({
-  id: c.id,
-
-  programId: c.program?.id,
-  programName: c.program?.name ?? '',
-
-  organization: c.organization?.name ?? '',
-
-  title: c.name,
-  description: c.description,
-
-
-  applicationStart: c.application_start,
-  applicationDeadline: c.application_deadline,
-
-  startDate: c.project_start,
-  endDate: c.project_end,
-
-  status: c.is_open ? 'open' : 'closed',
-
-  formSchema: c.form_schema ?? { fields: [] },
-
-  applicantsCount: c.applicants_count ?? 0,
-})
 
 export const useCall = (id: string | number) => {
   const api = useApi()
+  const { locale } = useI18n()
 
   const { data, pending, error, refresh } = useAsyncData(
-    `call-detail-${id}`,
+    () => `call-detail-${id}-${locale.value}`,
     async () => {
-      const res = await api.get(`/calls/${id}`)
-      return mapCall(res.data) 
+      // raw json response, no CallResource wrapper, same as fetchCallByLang
+      const res = await api.get(`/calls/${id}/lang/${locale.value}`) as any
+      return mapCall(res)
     },
     {
+      watch: [() => locale.value],
       default: () => null as Call | null,
     }
   )
 
-  const call = computed(() => data.value ?? null)
-
-  return { call, pending, error, refresh }
+  return {
+    call: computed(() => data.value ?? null),
+    pending,
+    error,
+    refresh,
+  }
 }

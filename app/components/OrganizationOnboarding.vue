@@ -62,12 +62,13 @@
             <UiFormField
               v-model="form.phone"
               label="Phone"
-              placeholder="+421 900 000 000"
+              placeholder="+421900000000"
+              hint="Include country code, e.g. +421900000000"
               type="tel"
               field="phone"
               :touched="touched"
               :is-valid="isValid"
-              error="Minimum 6 characters"
+              error="Must be a valid international number starting with +"
               @touch="touch"
             />
             <div class="grid grid-cols-2 gap-3">
@@ -77,7 +78,7 @@
                 hint="8 digits"
                 placeholder="12345678"
                 field="ico"
-                maxlength="8"
+                :maxlength="8"
                 mono
                 :touched="touched"
                 :is-valid="isValid"
@@ -127,7 +128,7 @@
                 hint="5 digits"
                 placeholder="81101"
                 field="postal_code"
-                maxlength="5"
+                :maxlength="5"
                 mono
                 :touched="touched"
                 :is-valid="isValid"
@@ -296,7 +297,10 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
+import { isValidPhoneNumber } from 'libphonenumber-js/max' // ✅ /max for full metadata
+
 const emit = defineEmits(['success'])
 const api = useApi()
 
@@ -322,31 +326,19 @@ onMounted(async () => {
   sectors.value = await api.get('/sectors')
 })
 
-/**
- * Track touched fields
- */
 const touched = reactive<Record<string, boolean>>({})
 const touch = (field: string) => {
   touched[field] = true
 }
 
-/**
- * Progress bar
- */
 const progress = computed(() => (step.value / 3) * 100)
 
-/**
- * Filter sectors
- */
 const filteredSectors = computed(() =>
   sectors.value.filter(s =>
     s.name.toLowerCase().includes(sectorSearch.value.toLowerCase())
   )
 )
 
-/**
- * STRICT validation rules (aligned with Laravel backend)
- */
 const rules: Record<string, (v: any) => boolean> = {
   name: v =>
     typeof v === 'string' &&
@@ -354,11 +346,17 @@ const rules: Record<string, (v: any) => boolean> = {
     v.trim().length <= 255,
 
   phone: v => {
-    if (typeof v !== 'string') return false
-
-    // Closest frontend equivalent to propaganistas/laravel-phone strict mode
-    // Accepts: +421..., +420..., etc.
-    return /^\+?[1-9]\d{7,14}$/.test(v.trim())
+    if (typeof v !== 'string' || !v.trim()) return false
+    const cleaned = v.trim().replace(/[\s\-().]/g, '')
+    // ✅ must start with + so libphonenumber knows the country
+    if (!cleaned.startsWith('+')) return false
+    try {
+      // ✅ isValidPhoneNumber from /max uses full Google metadata —
+      //    rejects +421394922 (too short for SK), accepts +421900000000
+      return isValidPhoneNumber(cleaned)
+    } catch {
+      return false
+    }
   },
 
   ico: v =>
@@ -366,7 +364,6 @@ const rules: Record<string, (v: any) => boolean> = {
 
   web_url: v => {
     if (!v) return true
-
     try {
       const url = new URL(v)
       return url.protocol === 'http:' || url.protocol === 'https:'
@@ -394,60 +391,39 @@ const rules: Record<string, (v: any) => boolean> = {
     v.trim().length <= 255,
 }
 
-/**
- * Validate single field
- */
 const isValid = (field: string) => {
   const rule = rules[field]
   return rule ? rule((form as any)[field]) : true
 }
 
-/**
- * Strict sector validation (backend aligned)
- */
-const isSectorValid = computed(() => {
-  return (
-    Array.isArray(form.sector) &&
-    form.sector.length > 0 &&
-    form.sector.every(id => Number.isInteger(id) && id > 0)
-  )
-})
+const isSectorValid = computed(() =>
+  Array.isArray(form.sector) &&
+  form.sector.length > 0 &&
+  form.sector.every(id => Number.isInteger(id) && id > 0)
+)
 
-/**
- * Step validation
- */
 const isStepValid = computed(() => {
-  if (step.value === 1) {
-    return ['name', 'phone', 'ico', 'web_url'].every(isValid)
-  }
-
-  if (step.value === 2) {
-    return ['city', 'street', 'postal_code', 'country'].every(isValid)
-  }
-
+  if (step.value === 1) return ['name', 'phone', 'ico', 'web_url'].every(isValid)
+  if (step.value === 2) return ['city', 'street', 'postal_code', 'country'].every(isValid)
   return isSectorValid.value
 })
 
-/**
- * Next step handler
- */
 function nextStep() {
   if (!isStepValid.value) return
   step.value++
 }
 
-/**
- * Submit onboarding
- */
 async function submit() {
   touch('sector')
-
   if (!isStepValid.value) return
 
   loading.value = true
-
   try {
-    await api.post('/auth/organization-onboarding', form)
+    await api.post('/auth/organization-onboarding', {
+      ...form,
+      // ✅ send clean number without spaces/dashes to backend
+      phone: form.phone.trim().replace(/[\s\-().]/g, ''),
+    })
     emit('success')
   } finally {
     loading.value = false
