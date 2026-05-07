@@ -68,7 +68,7 @@
             <NuxtLink
               v-for="call in calls"
               :key="call.id"
-              :to="`/vyzvy/${call.id}`"
+              :to="localePath(`/vyzvy/${call.id}`)"
               class="group"
             >
               <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6 h-full hover:shadow-xl hover:border-blue-400 transition-all flex flex-col">
@@ -155,6 +155,7 @@ import { fetchMeta } from '../../composables/modules/content/meta_tags/fetchMeta
 import { useCalls } from '../../composables/modules/programs/fetchCalls'
 
 definePageMeta({ layout: 'default' })
+const localePath = useLocalePath()
 
 // --------------------
 // STATE

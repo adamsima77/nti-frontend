@@ -44,7 +44,7 @@
         <div class="mb-6">
           <UiBreadcrumbs
             :items="[
-              { label: 'Novinky', to: '/novinky' },
+              { label: 'Novinky', to: localePath('/novinky') },
               { label: `${newsDetail?.news_translations?.[0]?.title}` },
             ]"
           />
@@ -94,7 +94,7 @@
           :category="article?.category?.slug.charAt(0).toUpperCase() + article?.category?.slug.slice(1)"
           :image="article?.image_url"
           :alt="article?.news_translations?.[0]?.title"
-          :link="`/novinky/${article.slug}`"
+          :link="localePath(`/novinky/${article.slug}`)"
         />
       </div>
 
@@ -111,7 +111,7 @@
 <script setup>
 import { fetchInfinite } from '../../composables/modules/content/news/fetchInfinite'
 import { fetchBySlug } from '../../composables/modules/content/news/fetchBySlug'
-
+const localePath = useLocalePath()
 const route = useRoute()
 const slug = route.params.slug
 const { newsDetail, pending } = fetchBySlug(slug)

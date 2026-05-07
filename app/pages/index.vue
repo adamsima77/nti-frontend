@@ -187,7 +187,7 @@
           :category="article.category?.slug ? capitalize(article.category.slug) : ''"
           :image="article.news_translations?.[0]?.image_url"
           :alt="article.news_translations?.[0]?.title"
-          :link="`/novinky/${article.slug}`"
+          :link="localePath(`/novinky/${article.slug}`)"
         />
       </div>
       <div v-if="loading" class="min-w-[280px] flex items-center justify-center">

@@ -1,25 +1,31 @@
 <template>
-  <div class="onboarding-card">
+  <div class="bg-white rounded-2xl p-10 shadow-[0_4px_6px_-1px_rgb(0,0,0,0.06),0_24px_48px_-8px_rgb(0,0,0,0.10)] font-sans">
 
     <!-- HEADER -->
-    <div class="card-header">
-      <div class="step-badge">Step {{ step }} of 3</div>
-      <h1 class="card-title">Complete your profile</h1>
-      <p class="card-subtitle">Let's get you set up in under a minute</p>
+    <div class="text-center mb-7">
+      <div class="inline-block px-3 py-0.5 bg-blue-50 text-blue-500 rounded-full text-xs font-semibold tracking-wide mb-2.5">
+        Step {{ step }} of 3
+      </div>
+      <h1 class="text-[22px] font-bold text-slate-900 mb-1">Complete your profile</h1>
+      <p class="text-sm text-slate-400">Let's get you set up in under a minute</p>
     </div>
 
     <!-- PROGRESS -->
-    <div class="progress-track">
+    <div class="relative h-1.5 bg-slate-100 rounded-full mb-8 overflow-visible">
       <div
-        class="progress-fill"
+        class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-[width] duration-400 ease-[cubic-bezier(.4,0,.2,1)]"
         :style="{ width: progress + '%' }"
       />
-      <div class="progress-dots">
+      <div class="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-0.5">
         <div
           v-for="s in 3"
           :key="s"
-          class="progress-dot"
-          :class="{ active: s <= step, current: s === step }"
+          class="w-3 h-3 rounded-full border-2 border-white transition-all duration-300"
+          :class="{
+            'bg-blue-500': s <= step && s !== step,
+            'bg-white border-blue-500 shadow-[0_0_0_3px_#bfdbfe]': s === step,
+            'bg-slate-200': s > step,
+          }"
         />
       </div>
     </div>
@@ -28,125 +34,120 @@
     <transition name="slide" mode="out-in">
 
       <!-- STEP 1 — Personal info -->
-      <div v-if="step === 1" key="s1" class="step-body">
-        <div class="step-icon-row">
-          <span class="step-icon">👤</span>
+      <div v-if="step === 1" key="s1" class="py-1">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="text-[28px] leading-none">👤</span>
           <div>
-            <h2 class="step-title">Personal info</h2>
-            <p class="step-desc">Basic identity details</p>
+            <h2 class="text-[17px] font-bold text-slate-900 mb-0.5">Personal info</h2>
+            <p class="text-[13px] text-slate-400">Basic identity details</p>
           </div>
         </div>
 
-        <div class="field-group">
-          <div class="field">
-            <label class="field-label">First name</label>
-            <div class="input-wrap" :class="fieldState('name')">
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[13px] font-semibold text-slate-600">First name</label>
+            <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
+              :class="inputWrapClass('name')">
               <input
                 v-model="form.name"
                 @input="touch('name')"
                 placeholder="e.g. Marek"
-                class="field-input"
+                class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl"
               />
-              <span class="field-icon">{{ touched.name ? (isValid('name') ? '✓' : '✗') : '' }}</span>
+              <span class="pr-3 text-sm font-bold shrink-0" :class="iconClass('name')">
+                {{ touched.name ? (isValid('name') ? '✓' : '✗') : '' }}
+              </span>
             </div>
-            <p v-if="touched.name && !isValid('name')" class="field-error">Minimum 2 characters</p>
+            <p v-if="touched.name && !isValid('name')" class="text-xs text-red-500">Minimum 2 characters</p>
           </div>
 
-          <div class="field">
-            <label class="field-label">Surname</label>
-            <div class="input-wrap" :class="fieldState('surname')">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[13px] font-semibold text-slate-600">Surname</label>
+            <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
+              :class="inputWrapClass('surname')">
               <input
                 v-model="form.surname"
                 @input="touch('surname')"
                 placeholder="e.g. Novák"
-                class="field-input"
+                class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl"
               />
-              <span class="field-icon">{{ touched.surname ? (isValid('surname') ? '✓' : '✗') : '' }}</span>
+              <span class="pr-3 text-sm font-bold shrink-0" :class="iconClass('surname')">
+                {{ touched.surname ? (isValid('surname') ? '✓' : '✗') : '' }}
+              </span>
             </div>
-            <p v-if="touched.surname && !isValid('surname')" class="field-error">Minimum 2 characters</p>
+            <p v-if="touched.surname && !isValid('surname')" class="text-xs text-red-500">Minimum 2 characters</p>
           </div>
         </div>
       </div>
 
       <!-- STEP 2 — Study details -->
-      <div v-else-if="step === 2" key="s2" class="step-body">
-        <div class="step-icon-row">
-          <span class="step-icon">🎓</span>
+      <div v-else-if="step === 2" key="s2" class="py-1">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="text-[28px] leading-none">🎓</span>
           <div>
-            <h2 class="step-title">Study details</h2>
-            <p class="step-desc">Your academic background</p>
+            <h2 class="text-[17px] font-bold text-slate-900 mb-0.5">Study details</h2>
+            <p class="text-[13px] text-slate-400">Your academic background</p>
           </div>
         </div>
 
-        <div class="field-group">
-          <div class="field">
-            <label class="field-label">University</label>
-            <div class="input-wrap" :class="fieldState('university')">
-              <select
-                v-model="form.university"
-                @change="touch('university')"
-                class="field-input field-select"
-              >
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[13px] font-semibold text-slate-600">University</label>
+            <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
+              :class="inputWrapClass('university')">
+              <select v-model="form.university" @change="touch('university')"
+                class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
                 <option value="">Select university</option>
                 <option v-for="u in universities" :key="u.id" :value="u.id">{{ u.name }}</option>
               </select>
             </div>
           </div>
 
-          <div class="field">
-            <label class="field-label">Study program</label>
-            <div class="input-wrap" :class="fieldState('study_program')">
-              <select
-                v-model="form.study_program"
-                @change="touch('study_program')"
-                class="field-input field-select"
-              >
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[13px] font-semibold text-slate-600">Study program</label>
+            <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
+              :class="inputWrapClass('study_program')">
+              <select v-model="form.study_program" @change="touch('study_program')"
+                class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
                 <option value="">Select program</option>
                 <option v-for="p in studyPrograms" :key="p.id" :value="p.id">{{ p.name }}</option>
               </select>
             </div>
           </div>
 
-          <div class="field">
-            <label class="field-label">Study field</label>
-            <div class="input-wrap" :class="fieldState('study_field')">
-              <select
-                v-model="form.study_field"
-                @change="touch('study_field')"
-                class="field-input field-select"
-              >
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[13px] font-semibold text-slate-600">Study field</label>
+            <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
+              :class="inputWrapClass('study_field')">
+              <select v-model="form.study_field" @change="touch('study_field')"
+                class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
                 <option value="">Select field</option>
                 <option v-for="f in studyFields" :key="f.id" :value="f.id">{{ f.name }}</option>
               </select>
             </div>
           </div>
 
-          <div class="field">
-            <label class="field-label">Year of study</label>
-            <div class="input-wrap" :class="fieldState('year_of_study')">
-              <input
-                v-model="form.year_of_study"
-                @input="touch('year_of_study')"
-                placeholder="1 – 6"
-                type="number"
-                min="1"
-                max="6"
-                class="field-input"
-              />
-              <span class="field-icon">{{ touched.year_of_study ? (isValid('year_of_study') ? '✓' : '✗') : '' }}</span>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[13px] font-semibold text-slate-600">Year of study</label>
+            <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
+              :class="inputWrapClass('year_of_study')">
+              <select v-model="form.year_of_study" @change="touch('year_of_study')"
+                class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
+                <option value="">Select year</option>
+                <option v-for="y in studyYears" :key="y.id" :value="y.id">{{ y.name }}</option>
+              </select>
             </div>
-            <p v-if="touched.year_of_study && !isValid('year_of_study')" class="field-error">Enter a value between 1 and 6</p>
           </div>
         </div>
       </div>
 
       <!-- STEP 3 — CV upload -->
-      <div v-else key="s3" class="step-body">
-        <div class="step-icon-row">
-          <span class="step-icon">📄</span>
+      <div v-else key="s3" class="py-1">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="text-[28px] leading-none">📄</span>
           <div>
-            <h2 class="step-title">Upload your CV</h2>
-            <p class="step-desc">PDF or DOCX, max 10 MB</p>
+            <h2 class="text-[17px] font-bold text-slate-900 mb-0.5">Upload your CV</h2>
+            <p class="text-[13px] text-slate-400">PDF or DOCX, max 10 MB</p>
           </div>
         </div>
 
@@ -157,18 +158,18 @@
           @error="fileError = $event"
         />
 
-        <p v-if="fileError" class="field-error mt-2">{{ fileError }}</p>
-        <p v-if="touched.cv && !isValid('cv')" class="field-error mt-2">Please upload your CV to continue</p>
+        <p v-if="fileError" class="text-xs text-red-500 mt-2">{{ fileError }}</p>
+        <p v-if="touched.cv && !isValid('cv')" class="text-xs text-red-500 mt-2">Please upload your CV to continue</p>
       </div>
 
     </transition>
 
     <!-- ACTIONS -->
-    <div class="actions">
+    <div class="flex justify-between items-center mt-8 gap-2.5">
       <button
         v-if="step > 1"
         @click="step--"
-        class="btn-back"
+        class="text-sm font-medium text-slate-400 bg-transparent border-none cursor-pointer p-0 hover:text-slate-700 transition-colors duration-200"
       >
         ← Back
       </button>
@@ -177,8 +178,10 @@
         v-if="step < 3"
         @click="nextStep"
         :disabled="!isStepValid"
-        class="btn-next"
-        :class="{ disabled: !isStepValid }"
+        class="ml-auto px-6 py-2.5 rounded-xl text-sm font-semibold border-none cursor-pointer transition-all duration-200"
+        :class="isStepValid
+          ? 'bg-blue-500 text-white hover:-translate-y-px hover:bg-blue-600 hover:shadow-[0_4px_12px_#3b82f640]'
+          : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
       >
         Continue →
       </button>
@@ -187,8 +190,7 @@
         v-else
         @click="submit"
         :disabled="loading || !isStepValid"
-        class="btn-submit"
-        :class="{ loading }"
+        class="ml-auto px-6 py-2.5 rounded-xl text-sm font-semibold border-none cursor-pointer transition-all duration-200 bg-green-500 text-white disabled:opacity-70 disabled:cursor-not-allowed hover:enabled:bg-green-600 hover:enabled:-translate-y-px hover:enabled:shadow-[0_4px_12px_#22c55e40]"
       >
         <span v-if="!loading">Finish ✓</span>
         <span v-else class="loading-dots">Uploading<span>.</span><span>.</span><span>.</span></span>
@@ -197,8 +199,6 @@
 
   </div>
 </template>
-
-
 
 <script setup lang="ts">
 const api = useApi()
@@ -231,66 +231,55 @@ const touch = (field: string) => {
 const universities = ref<any[]>([])
 const studyPrograms = ref<any[]>([])
 const studyFields = ref<any[]>([])
+const studyYears = ref<any[]>([])
 
 onMounted(async () => {
-  ;[universities.value, studyPrograms.value, studyFields.value] =
+  ;[universities.value, studyPrograms.value, studyFields.value, studyYears.value] =
     await Promise.all([
       api.get('/university'),
       api.get('/study-program'),
       api.get('/study-field'),
+      api.get('/study-years'),
     ])
 })
 
 const rules: Record<string, (v: any) => boolean> = {
-  name: v =>
-    typeof v === 'string' &&
-    v.trim().length >= 2 &&
-    v.trim().length <= 255,
-
-  surname: v =>
-    typeof v === 'string' &&
-    v.trim().length >= 2 &&
-    v.trim().length <= 255,
-
-  university: v =>
-    Number.isInteger(v) && v > 0,
-
-  study_program: v =>
-    Number.isInteger(v) && v > 0,
-
-  study_field: v =>
-    Number.isInteger(v) && v > 0,
-
-  year_of_study: v =>
-    Number.isInteger(v) &&
-    v >= 1 &&
-    v <= 6,
-
+  name: v => typeof v === 'string' && v.trim().length >= 2 && v.trim().length <= 255,
+  surname: v => typeof v === 'string' && v.trim().length >= 2 && v.trim().length <= 255,
+  university: v => Number.isInteger(v) && v > 0,
+  study_program: v => Number.isInteger(v) && v > 0,
+  study_field: v => Number.isInteger(v) && v > 0,
+  year_of_study: v => Number.isInteger(v) && v > 0,
   portfolio_url: v => {
     if (!v) return true
     try {
       const url = new URL(v)
-      return (
-        (url.protocol === 'http:' || url.protocol === 'https:') &&
-        url.hostname.length > 0 &&
-        url.hostname.includes('.')
-      )
-    } catch {
-      return false
-    }
+      return (url.protocol === 'http:' || url.protocol === 'https:') && url.hostname.includes('.')
+    } catch { return false }
   },
-
   cv: v =>
     v instanceof File &&
-    (
-      v.type === 'application/pdf' ||
-      v.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    ),
+    (v.type === 'application/pdf' ||
+      v.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
 }
 
 const isValid = (field: string) => {
   const rule = rules[field]
   return rule ? rule((form as any)[field]) : true
+}
+
+// Returns border/bg/shadow classes for the input wrapper
+const inputWrapClass = (field: string) => {
+  if (!touched[field]) return 'border-slate-200'
+  return isValid(field)
+    ? 'border-green-500 bg-green-50 shadow-[0_0_0_3px_#bbf7d0]'
+    : 'border-red-500 bg-red-50 shadow-[0_0_0_3px_#fecaca]'
+}
+
+// Returns text color class for the ✓/✗ icon
+const iconClass = (field: string) => {
+  if (!touched[field]) return ''
+  return isValid(field) ? 'text-green-600' : 'text-red-600'
 }
 
 const fieldState = (field: string) => {
@@ -318,23 +307,15 @@ function nextStep() {
 
 async function submit() {
   touch('cv')
-
   if (!isStepValid.value) return
-
   loading.value = true
   fileError.value = ''
-
   try {
     const data = new FormData()
-
     Object.entries(form).forEach(([k, v]) => {
-      if (v !== null && v !== '' && v !== undefined) {
-        data.append(k, v as any)
-      }
+      if (v !== null && v !== '' && v !== undefined) data.append(k, v as any)
     })
-
     await api.post('/auth/student-onboarding', data)
-
     emit('completed')
   } catch (e: any) {
     if (e?.response?.status === 422) {
@@ -345,178 +326,13 @@ async function submit() {
   }
 }
 </script>
+
 <style scoped>
-/* ── Card shell ── */
-.onboarding-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 36px 40px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / .06), 0 24px 48px -8px rgb(0 0 0 / .10);
-  font-family: 'DM Sans', system-ui, sans-serif;
-}
-
-/* ── Header ── */
-.card-header { text-align: center; margin-bottom: 28px; }
-.step-badge {
-  display: inline-block;
-  padding: 3px 12px;
-  background: #eff6ff;
-  color: #3b82f6;
-  border-radius: 99px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  margin-bottom: 10px;
-}
-.card-title { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 4px; }
-.card-subtitle { font-size: 14px; color: #94a3b8; margin: 0; }
-
-/* ── Progress ── */
-.progress-track {
-  position: relative;
-  height: 6px;
-  background: #f1f5f9;
-  border-radius: 99px;
-  margin-bottom: 32px;
-  overflow: visible;
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #6366f1);
-  border-radius: 99px;
-  transition: width 0.4s cubic-bezier(.4,0,.2,1);
-}
-.progress-dots {
-  position: absolute;
-  top: 50%;
-  left: 0; right: 0;
-  transform: translateY(-50%);
-  display: flex;
-  justify-content: space-between;
-  padding: 0 2px;
-}
-.progress-dot {
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: #e2e8f0;
-  border: 2px solid #fff;
-  transition: all .3s;
-}
-.progress-dot.active { background: #3b82f6; }
-.progress-dot.current {
-  background: #fff;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px #bfdbfe;
-}
-
-/* ── Step body ── */
-.step-body { padding: 4px 0; }
-.step-icon-row { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-.step-icon { font-size: 28px; line-height: 1; }
-.step-title { font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 2px; }
-.step-desc { font-size: 13px; color: #94a3b8; margin: 0; }
-
-/* ── Fields ── */
-.field-group { display: flex; flex-direction: column; gap: 16px; }
-.field { display: flex; flex-direction: column; gap: 6px; }
-.field-label { font-size: 13px; font-weight: 600; color: #475569; }
-
-.input-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  background: #fff;
-  transition: border-color .2s, background .2s, box-shadow .2s;
-}
-.input-wrap.state-valid {
-  border-color: #22c55e;
-  background: #f0fdf4;
-  box-shadow: 0 0 0 3px #bbf7d0;
-}
-.input-wrap.state-invalid {
-  border-color: #ef4444;
-  background: #fef2f2;
-  box-shadow: 0 0 0 3px #fecaca;
-}
-
-.field-input {
-  flex: 1;
-  padding: 10px 14px;
-  font-size: 14px;
-  color: #0f172a;
-  background: transparent;
-  border: none;
-  outline: none;
-  border-radius: 10px;
-}
-.field-select { appearance: none; cursor: pointer; }
-
-.field-icon {
-  padding-right: 12px;
-  font-size: 14px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-.state-valid .field-icon { color: #16a34a; }
-.state-invalid .field-icon { color: #dc2626; }
-
-.field-error { font-size: 12px; color: #ef4444; margin: 0; }
-
-/* ── Actions ── */
-.actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 32px;
-  gap: 10px;
-}
-
-.btn-back {
-  font-size: 14px;
-  font-weight: 500;
-  color: #94a3b8;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  transition: color .2s;
-}
-.btn-back:hover { color: #334155; }
-
-.btn-next, .btn-submit {
-  margin-left: auto;
-  padding: 10px 24px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all .2s;
-}
-
-.btn-next {
-  background: #3b82f6;
-  color: #fff;
-}
-.btn-next:hover:not(.disabled) { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px #3b82f640; }
-.btn-next.disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
-
-.btn-submit {
-  background: #22c55e;
-  color: #fff;
-}
-.btn-submit:hover:not(.loading):not(:disabled) { background: #16a34a; transform: translateY(-1px); box-shadow: 0 4px 12px #22c55e40; }
-.btn-submit:disabled { opacity: .7; cursor: not-allowed; }
-
-/* ── Loading dots ── */
 .loading-dots span { animation: blink 1.2s infinite; }
 .loading-dots span:nth-child(2) { animation-delay: .2s; }
 .loading-dots span:nth-child(3) { animation-delay: .4s; }
 @keyframes blink { 0%, 80%, 100% { opacity: 0 } 40% { opacity: 1 } }
 
-/* ── Transitions ── */
 .slide-enter-active, .slide-leave-active { transition: all .22s ease; }
 .slide-enter-from { opacity: 0; transform: translateX(16px); }
 .slide-leave-to { opacity: 0; transform: translateX(-16px); }

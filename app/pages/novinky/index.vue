@@ -11,7 +11,7 @@
           ? main_article?.category?.slug.charAt(0).toUpperCase() + main_article?.category?.slug.slice(1)
           : ''"
         :description="main_article?.news_translations?.[0]?.description"
-        :link="`/novinky/${main_article?.slug}`"
+        :link="localePath(`/novinky/${main_article?.slug}`)"
       />
     </template>
 
@@ -72,7 +72,7 @@
               : ''"
             :image="article?.image_url"
             :alt="article?.news_translations?.[0]?.title"
-            :link="`/novinky/${article.slug}`"
+            :link="localePath(`/novinky/${article.slug}`)"
           />
         </template>
 
@@ -113,7 +113,7 @@ import { fetchMeta } from '../../composables/modules/content/meta_tags/fetchMeta
 
 const { metaTags } = fetchMeta(PageType.NEWS)
 const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
-
+const localePath = useLocalePath()
 useSeoMeta({
   title: computed(() => meta.value?.title),
   description: computed(() => meta.value?.description),
