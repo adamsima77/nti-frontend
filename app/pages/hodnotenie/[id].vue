@@ -410,6 +410,13 @@ import {
   RotateCcw,
 } from 'lucide-vue-next'
 
+definePageMeta({
+  layout: 'portal',
+  middleware: 'auth',
+  roles: ['evaluator'],
+})
+
+
 const localePath = useLocalePath()
 const api = useApi()
 const authStore = useAuthStore()

@@ -298,12 +298,15 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
-import { isValidPhoneNumber } from 'libphonenumber-js/max' // ✅ /max for full metadata
+import { isValidPhoneNumber } from 'libphonenumber-js/max'
 
-const emit = defineEmits(['success'])
 const api = useApi()
-
+const authStore = useAuthStore()
+const emit = defineEmits<{
+  completed: []
+}>()
 const step = ref(1)
 const loading = ref(false)
 const sectorSearch = ref('')
@@ -331,7 +334,7 @@ const touch = (field: string) => {
   touched[field] = true
 }
 
-const progress = computed(() => (step.value / 3) * 100)
+const progress = computed(() => ((step.value - 1) / 2) * 100)
 
 const filteredSectors = computed(() =>
   sectors.value.filter(s =>
@@ -348,11 +351,8 @@ const rules: Record<string, (v: any) => boolean> = {
   phone: v => {
     if (typeof v !== 'string' || !v.trim()) return false
     const cleaned = v.trim().replace(/[\s\-().]/g, '')
-    // ✅ must start with + so libphonenumber knows the country
     if (!cleaned.startsWith('+')) return false
     try {
-      // ✅ isValidPhoneNumber from /max uses full Google metadata —
-      //    rejects +421394922 (too short for SK), accepts +421900000000
       return isValidPhoneNumber(cleaned)
     } catch {
       return false
@@ -366,7 +366,11 @@ const rules: Record<string, (v: any) => boolean> = {
     if (!v) return true
     try {
       const url = new URL(v)
-      return url.protocol === 'http:' || url.protocol === 'https:'
+      return (
+        (url.protocol === 'http:' || url.protocol === 'https:') &&
+        url.hostname.length > 0 &&
+        url.hostname.includes('.')
+      )
     } catch {
       return false
     }
@@ -415,16 +419,17 @@ function nextStep() {
 
 async function submit() {
   touch('sector')
+
   if (!isStepValid.value) return
 
   loading.value = true
+
   try {
     await api.post('/auth/organization-onboarding', {
       ...form,
-      // ✅ send clean number without spaces/dashes to backend
       phone: form.phone.trim().replace(/[\s\-().]/g, ''),
     })
-    emit('success')
+    emit('completed')
   } finally {
     loading.value = false
   }

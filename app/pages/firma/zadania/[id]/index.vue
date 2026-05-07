@@ -177,8 +177,8 @@ import { ChevronLeft, ChevronRight, Pencil, Send, CheckCircle, Users } from 'luc
 
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth',
-  roles: ['company'],
+  middleware: 'auth',
+  roles: ['partner'],
 })
 
 const route = useRoute()

@@ -86,8 +86,8 @@ import ZadanieForm from '~/components/ui/ZadanieForm.vue'
 
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth',
-  roles: ['company'],
+  middleware: 'auth',
+  roles: ['partner'],
 })
 
 useHead({ title: 'Upraviť zadanie | NTI Firma' })

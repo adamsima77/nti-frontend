@@ -242,7 +242,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang = "ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 
 const localePath = useLocalePath()

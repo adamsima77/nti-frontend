@@ -103,9 +103,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang= "ts">
 import { ref } from 'vue'
 const localePath = useLocalePath()
+const route = useRoute()
 definePageMeta({
   layout: 'default',
   middleware: 'guest',
@@ -190,5 +191,33 @@ const handleResend = async () => {
 
 onUnmounted(() => {
   clearInterval(cooldownInterval)
+})
+
+
+const checkTokenAndRedirect = async () => {
+  const token = localStorage.getItem('_t')
+
+  if (!token) return
+  if (route.path !== '/auth/forgot-password') return
+
+
+  await authStore.getCurrentUser()
+
+  await navigateTo(authStore.redirectUser(authStore.user))
+}
+
+const handleStorage = (e: StorageEvent) => {
+  if (e.key === '_t' && e.newValue) {
+    checkTokenAndRedirect()
+  }
+}
+
+onMounted(() => {
+  checkTokenAndRedirect()
+  window.addEventListener('storage', handleStorage)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', handleStorage)
 })
 </script>

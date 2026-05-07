@@ -198,17 +198,20 @@
   </div>
 </template>
 
-<script setup lang="ts">
-const emit = defineEmits(['success'])
-const api = useApi()
 
+
+<script setup lang="ts">
+const api = useApi()
+const authStore = useAuthStore()
+const emit = defineEmits<{
+  completed: []
+}>()
 const step = ref(1)
 const loading = ref(false)
 const fileError = ref('')
 
-/**
- * FORM (matches backend types exactly)
- */
+const progress = computed(() => ((step.value - 1) / 2) * 100)
+
 const form = reactive({
   name: '',
   surname: '',
@@ -220,17 +223,11 @@ const form = reactive({
   cv: null as File | null,
 })
 
-/**
- * touched state
- */
 const touched = reactive<Record<string, boolean>>({})
 const touch = (field: string) => {
   touched[field] = true
 }
 
-/**
- * loaded dropdowns
- */
 const universities = ref<any[]>([])
 const studyPrograms = ref<any[]>([])
 const studyFields = ref<any[]>([])
@@ -244,9 +241,6 @@ onMounted(async () => {
     ])
 })
 
-/**
- * STRICT backend-matching rules
- */
 const rules: Record<string, (v: any) => boolean> = {
   name: v =>
     typeof v === 'string' &&
@@ -274,10 +268,13 @@ const rules: Record<string, (v: any) => boolean> = {
 
   portfolio_url: v => {
     if (!v) return true
-
     try {
       const url = new URL(v)
-      return url.protocol === 'http:' || url.protocol === 'https:'
+      return (
+        (url.protocol === 'http:' || url.protocol === 'https:') &&
+        url.hostname.length > 0 &&
+        url.hostname.includes('.')
+      )
     } catch {
       return false
     }
@@ -291,30 +288,18 @@ const rules: Record<string, (v: any) => boolean> = {
     ),
 }
 
-/**
- * validation helper
- */
 const isValid = (field: string) => {
   const rule = rules[field]
   return rule ? rule((form as any)[field]) : true
 }
 
-/**
- * field UI state
- */
 const fieldState = (field: string) => {
   if (!touched[field]) return 'state-neutral'
   return isValid(field) ? 'state-valid' : 'state-invalid'
 }
 
-/**
- * STEP validation (backend aligned)
- */
 const isStepValid = computed(() => {
-  if (step.value === 1) {
-    return isValid('name') && isValid('surname')
-  }
-
+  if (step.value === 1) return isValid('name') && isValid('surname')
   if (step.value === 2) {
     return (
       isValid('university') &&
@@ -323,21 +308,14 @@ const isStepValid = computed(() => {
       isValid('year_of_study')
     )
   }
-
   return isValid('cv')
 })
 
-/**
- * next step
- */
 function nextStep() {
   if (!isStepValid.value) return
   step.value++
 }
 
-/**
- * submit
- */
 async function submit() {
   touch('cv')
 
@@ -355,16 +333,10 @@ async function submit() {
       }
     })
 
-    const res = await api.post('/auth/student-onboarding', data)
+    await api.post('/auth/student-onboarding', data)
 
-    console.log('Response:', res)
-
-    emit('success')
+    emit('completed')
   } catch (e: any) {
-    console.error('FULL ERROR:', e)
-    console.error('STATUS:', e?.response?.status)
-    console.error('DATA:', e?.response?._data)
-
     if (e?.response?.status === 422) {
       fileError.value = 'Validation failed. Please check your inputs.'
     }
@@ -373,7 +345,6 @@ async function submit() {
   }
 }
 </script>
-
 <style scoped>
 /* ── Card shell ── */
 .onboarding-card {

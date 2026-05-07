@@ -177,8 +177,8 @@ import { CheckCircle, AlertCircle } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth',
-  roles: ['company'],
+  middleware: 'auth',
+  roles: ['partner'],
 })
 
 useHead({

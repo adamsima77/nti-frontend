@@ -202,37 +202,20 @@
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700 text-left">
           E-mail môže trvať niekoľko minút. Skontrolujte aj priečinok spam.
         </div>
-    <button
-  @click="resendEmail(formData.email)"
-  :disabled="isResending"
-  class="w-full bg-slate-900 text-white py-3 px-4 rounded-lg font-medium text-sm
-         hover:bg-slate-800 transition-colors
-         disabled:opacity-50 disabled:cursor-not-allowed
-         flex items-center justify-center gap-2"
->
-  <svg
-    v-if="isResending"
-    class="animate-spin w-4 h-4"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
-    <circle
-      class="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      stroke-width="4"
-    />
-    <path
-      class="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
-    />
-  </svg>
-
-  {{ isResending ? 'Odosielam...' : 'Poslať znova' }}
-</button>
+        <button
+          @click="resendEmail(formData.email)"
+          :disabled="isResending || resendSuccess"
+          class="w-full bg-slate-900 text-white py-3 px-4 rounded-lg font-medium text-sm
+                 hover:bg-slate-800 transition-colors
+                 disabled:opacity-50 disabled:cursor-not-allowed
+                 flex items-center justify-center gap-2"
+        >
+          <svg v-if="isResending" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
+          </svg>
+          {{ isResending ? 'Odosielam...' : resendSuccess ? 'E-mail odoslaný ✓' : 'Poslať znova' }}
+        </button>
         <NuxtLink :to="localePath('/auth/login')" class="block text-sm text-gray-500 hover:text-slate-900 transition-colors">
           ← Späť na prihlásenie
         </NuxtLink>
@@ -255,13 +238,16 @@ useHead({
   meta: [{ name: 'description', content: 'Zaregistrujte sa v NTI a začnite s nami vašu cestu!' }],
 })
 
+const authStore    = useAuthStore()
 const api          = useApi()
 const localePath   = useLocalePath()
 const { addToast } = useToast()
 
-const step         = ref<'type-selection' | 'register' | 'success'>('type-selection')
-const accountType  = ref<'student' | 'partner' | null>(null)
-const isSubmitting = ref(false)
+const step          = ref<'type-selection' | 'register' | 'success'>('type-selection')
+const accountType   = ref<'student' | 'partner' | null>(null)
+const isSubmitting  = ref(false)
+const isResending   = ref(false)
+const resendSuccess = ref(false)
 
 const formData = reactive({
   email:                 '',
@@ -277,6 +263,21 @@ const errors = reactive({
   terms:                 '',
 })
 
+const handleStorageChange = async (e: StorageEvent) => {
+  if (e.key === '_t' && e.newValue) {
+    await authStore.getCurrentUser()
+    await navigateTo(authStore.redirectUser())
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('storage', handleStorageChange)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', handleStorageChange)
+})
+
 const selectAccountType = (type: 'student' | 'partner') => {
   accountType.value = type
   step.value = 'register'
@@ -286,39 +287,39 @@ const passwordStrength = computed(() => {
   const p = formData.password
   if (!p) return 0
   let score = 0
-  if (p.length >= 8)             score++
-  if (/[A-Z]/.test(p))           score++
-  if (/[0-9]/.test(p))           score++
-  if (/[^A-Za-z0-9]/.test(p))   score++
+  if (p.length >= 8)           score++
+  if (/[A-Z]/.test(p))         score++
+  if (/[0-9]/.test(p))         score++
+  if (/[^A-Za-z0-9]/.test(p)) score++
   return score
 })
 
 const strengthColor = computed(() => {
-  if (passwordStrength.value <= 1) return 'bg-red-400'
+  if (passwordStrength.value <= 1)  return 'bg-red-400'
   if (passwordStrength.value === 2) return 'bg-amber-400'
   if (passwordStrength.value === 3) return 'bg-blue-400'
   return 'bg-green-500'
 })
 
 const strengthTextColor = computed(() => {
-  if (passwordStrength.value <= 1) return 'text-red-500'
+  if (passwordStrength.value <= 1)  return 'text-red-500'
   if (passwordStrength.value === 2) return 'text-amber-500'
   if (passwordStrength.value === 3) return 'text-blue-500'
   return 'text-green-600'
 })
 
 const strengthLabel = computed(() => {
-  if (passwordStrength.value <= 1) return 'Slabé heslo'
+  if (passwordStrength.value <= 1)  return 'Slabé heslo'
   if (passwordStrength.value === 2) return 'Primerané heslo'
   if (passwordStrength.value === 3) return 'Dobré heslo'
   return 'Silné heslo'
 })
 
 const validatePassword = (password: string) => {
-  if (password.length < 8)              return 'Heslo musí mať aspoň 8 znakov'
-  if (!/[A-Z]/.test(password))          return 'Heslo musí obsahovať veľké písmeno'
-  if (!/[0-9]/.test(password))          return 'Heslo musí obsahovať číslicu'
-  if (!/[^A-Za-z0-9]/.test(password))  return 'Heslo musí obsahovať špeciálny znak'
+  if (password.length < 8)             return 'Heslo musí mať aspoň 8 znakov'
+  if (!/[A-Z]/.test(password))         return 'Heslo musí obsahovať veľké písmeno'
+  if (!/[0-9]/.test(password))         return 'Heslo musí obsahovať číslicu'
+  if (!/[^A-Za-z0-9]/.test(password)) return 'Heslo musí obsahovať špeciálny znak'
   return null
 }
 
@@ -364,7 +365,7 @@ const submitRegistration = async () => {
       email:                 formData.email,
       password:              formData.password,
       password_confirmation: formData.password_confirmation,
-      role:                  accountType.value, 
+      role:                  accountType.value,
     })
 
     step.value = 'success'
@@ -376,15 +377,12 @@ const submitRegistration = async () => {
   }
 }
 
-const isResending = ref(false)
-
 const resendEmail = async (email: string) => {
   isResending.value = true
 
   try {
-    await api.post('/auth/resend-verification', {
-      email,
-    })
+    await api.post('/auth/resend-verification', { email })
+    resendSuccess.value = true
   } finally {
     isResending.value = false
   }

@@ -19,4 +19,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (auth.isPendingOnboarding && to.path !== '/auth/onboarding') {
     return navigateTo('/auth/onboarding')
   }
+
+   if (auth.isActive && to.path === '/auth/onboarding') {
+    return navigateTo(auth.redirectUser())
+  }
 })

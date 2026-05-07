@@ -4,12 +4,12 @@
 
       <StudentOnboarding
         v-if="userRole === 'student'"
-        @success="handleSuccess"
+         @completed="handleCompleted"
       />
 
       <OrganizationOnboarding
         v-else-if="userRole === 'company'"
-        @success="handleSuccess"
+         @completed="handleCompleted"
       />
 
     
@@ -20,25 +20,50 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import OrganizationOnboarding from '~/components/OrganizationOnboarding.vue'
 import StudentOnboarding from '~/components/StudentOnboarding.vue'
-
-const auth   = useAuthStore()
-const router = useRouter()
 
 definePageMeta({
   middleware: 'onboarding',
 })
 
-
+const auth = useAuthStore()
 const userRole = computed(() => auth.userRole)
 
-const handleSuccess = () => {
+const syncAndRedirect = async () => {
+  const user = await auth.getCurrentUser()
 
-  auth.getCurrentUser().then(() => {
-    router.push(auth.redirectUser())
-  })
+  await nextTick()
+
+  
+  if (user?.status_id === 3) {
+    await navigateTo(auth.redirectUser(user))
+  }
 }
+
+const handleCompleted = async () => {
+  await syncAndRedirect()
+}
+
+const handleStorageChange = async (e: StorageEvent) => {
+  if (e.key === '_t' && e.newValue) {
+    await syncAndRedirect()
+  }
+}
+
+
+const handleFocus = async () => {
+  await syncAndRedirect()
+}
+
+onMounted(() => {
+  window.addEventListener('storage', handleStorageChange)
+  window.addEventListener('focus', handleFocus)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', handleStorageChange)
+  window.removeEventListener('focus', handleFocus)
+})
 </script>

@@ -163,4 +163,33 @@ const handleLogin = async () => {
     isLoading.value = false
   }
 }
+
+
+
+const checkTokenAndRedirect = async () => {
+  const token = localStorage.getItem('_t')
+
+  if (!token) return
+  if (route.path !== '/auth/login') return
+
+
+  await authStore.getCurrentUser()
+
+  await navigateTo(authStore.redirectUser(authStore.user))
+}
+
+const handleStorage = (e: StorageEvent) => {
+  if (e.key === '_t' && e.newValue) {
+    checkTokenAndRedirect()
+  }
+}
+
+onMounted(() => {
+  checkTokenAndRedirect()
+  window.addEventListener('storage', handleStorage)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', handleStorage)
+})
 </script>

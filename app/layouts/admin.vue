@@ -19,12 +19,34 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang = "ts">
 import { ref } from 'vue'
 import { LayoutDashboard, Users, Megaphone, FileText, FileCode, Mail, Download, Shield } from 'lucide-vue-next'
 
 const mobileSidebarOpen = ref(false)
 const sidebarCollapsed = ref(false)
+
+const handleStorageChange = async (e: StorageEvent) => {
+  
+  if (e.key === '_t' && e.newValue) {
+    await authStore.getCurrentUser()
+    return
+  }
+
+  
+  if (e.key === '_t' && e.newValue === null) {
+    authStore.$reset()
+    await navigateTo('/auth/login')
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('storage', handleStorageChange)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', handleStorageChange)
+})
 
 const navItems = [
   { label: 'Dashboard', to: '/admin', icon: LayoutDashboard, section: 'Správa' },

@@ -34,7 +34,7 @@
         <div>
           <h1 class="text-2xl font-bold text-slate-900 mb-2">E-mail overený</h1>
           <p class="text-sm text-gray-500 leading-relaxed">
-            Váš e-mail bol úspešne overený. Pokračujte nastavením profilu.
+            Váš e-mail bol úspešne overený. Presmerúvame vás...
           </p>
         </div>
         <button
@@ -103,17 +103,20 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 const route      = useRoute()
-const router     = useRouter()
 const authStore  = useAuthStore()
 const localePath = useLocalePath()
 const config     = useRuntimeConfig()
+const api        = useApi()
 
 definePageMeta({
   layout: 'default',
-  middleware: 'guest',
+  middleware: 'guest'
+})
+
+useHead({
+  title: 'Overenie e-mailu | NTI',
 })
 
 const status        = ref<'loading' | 'success' | 'error'>('loading')
@@ -122,12 +125,27 @@ const resendError   = ref('')
 const isResending   = ref(false)
 const resendSuccess = ref(false)
 
-onMounted(async () => {
-  // id and hash come from route path segments
-  const id   = route.params.id as string
-  const hash = route.params.hash as string
+const goToOnboarding = async () => {
+  await authStore.getCurrentUser()
+  await nextTick()
+  await navigateTo(authStore.redirectUser())
+}
 
-  // expires and signature come from query string
+
+const handleAuthSyncAndRedirect = async () => {
+  await authStore.getCurrentUser()
+
+  
+  await nextTick()
+
+  const target = authStore.redirectUser()
+
+  await navigateTo(target, { replace: true })
+}
+
+onMounted(async () => {
+  const id        = route.params.id as string
+  const hash      = route.params.hash as string
   const expires   = route.query.expires as string
   const signature = route.query.signature as string
 
@@ -141,28 +159,28 @@ onMounted(async () => {
       `/auth/verify-email/${id}/${hash}`,
       {
         baseURL: config.public.apiBase,
-        method:  'GET',
+        method: 'GET',
         params: {
           expires,
-          // decode in case email client re-encoded the signature
           signature: decodeURIComponent(signature),
         },
       }
     )
 
-    localStorage.setItem('_t', res.token)
-    authStore.user = res.user
+   
+    if (import.meta.client) {
+      localStorage.setItem('_t', res.token)
+    }
+
     status.value = 'success'
-  } catch {
+
+    
+    await handleAuthSyncAndRedirect()
+
+  } catch (e) {
     status.value = 'error'
   }
 })
-
-const api = useApi()
-
-const goToOnboarding = () => {
-  router.push(localePath('/auth/onboarding'))
-}
 
 const handleResend = async () => {
   resendError.value = ''
@@ -173,18 +191,18 @@ const handleResend = async () => {
   }
 
   isResending.value = true
- try {
-  await api.post('/auth/resend-verification', {
-    email: resendEmail.value,
-  })
 
-  resendSuccess.value = true
-} catch (err: any) {
-  resendError.value =
-    err?.response?._data?.message ??
-    'Nepodarilo sa odoslať e-mail.'
-} finally {
-  isResending.value = false
-}
+  try {
+    await api.post('/auth/resend-verification', {
+      email: resendEmail.value,
+    })
+    resendSuccess.value = true
+  } catch (err: any) {
+    resendError.value =
+      err?.response?._data?.message ??
+      'Nepodarilo sa odoslať e-mail.'
+  } finally {
+    isResending.value = false
+  }
 }
 </script>

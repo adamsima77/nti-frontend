@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang = "ts">
 import { ref, computed } from 'vue'
 import {
   LayoutDashboard,
@@ -37,6 +37,29 @@ const mobileSidebarOpen = ref(false)
 const sidebarCollapsed = ref(false)
 
 const authStore = useAuthStore()
+
+
+const handleStorageChange = async (e: StorageEvent) => {
+  
+  if (e.key === '_t' && e.newValue) {
+    await authStore.getCurrentUser()
+    return
+  }
+
+  
+  if (e.key === '_t' && e.newValue === null) {
+    authStore.$reset()
+    await navigateTo('/auth/login')
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('storage', handleStorageChange)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', handleStorageChange)
+})
 
 const navItems = computed(() => {
   const role = authStore.userRole

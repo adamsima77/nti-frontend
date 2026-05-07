@@ -233,11 +233,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Users, Calendar, AlertTriangle, ChevronRight } from 'lucide-vue-next'
-
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth',
-  roles: ['company'],
+  middleware: 'auth',
+  roles: ['partner'],
 })
 
 useHead({
@@ -246,21 +245,10 @@ useHead({
 
 const authStore = useAuthStore()
 
-// TODO: remove when backend is available
-if (!authStore.user) {
-  authStore.user = {
-    id: 2,
-    email: 'info@techfirma.sk',
-    organization_name: 'TechFirma s.r.o.',
-    role: 'company',
-  }
-  authStore.token = 'mock-token'
-}
-
 const userDisplayName = computed(() => {
   const u = authStore.user
   if (!u) return 'Organizácia'
-  return u.organization_name || u.first_name || u.email || 'Organizácia'
+  return u.organization_name || u.email || 'Organizácia'
 })
 
 // ── Mock data ──────────────────────────────────────────────

@@ -127,8 +127,8 @@ import { Users, FileText, Calendar, ChevronRight, Plus, ClipboardList } from 'lu
 
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth',
-  roles: ['company'],
+  middleware: 'auth',
+  roles: ['partner'],
 })
 
 useHead({

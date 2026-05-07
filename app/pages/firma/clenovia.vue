@@ -308,8 +308,8 @@ import { UserPlus, Info, Trash2, RefreshCw, Clock, X, CheckCircle, AlertCircle }
 
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth',
-  roles: ['company'],
+  middleware: 'auth',
+  roles: ['partner'],
 })
 
 useHead({ title: 'Správa členov | NTI Firma' })

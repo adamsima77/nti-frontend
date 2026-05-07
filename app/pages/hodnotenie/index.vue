@@ -148,8 +148,8 @@ const localePath = useLocalePath()
 
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth',
-  roles: ['company'],
+  middleware: 'auth',
+  roles: ['evaluator'],
 })
 
 useHead({ title: 'Dashboard | NTI Komisia' })

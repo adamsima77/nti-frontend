@@ -145,9 +145,10 @@ import { Star, ClipboardCheck, Eye } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth',
+  middleware: 'auth',
   roles: ['evaluator'],
 })
+
 
 const authStore = useAuthStore()
 

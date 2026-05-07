@@ -6,6 +6,13 @@ export default defineNuxtConfig({
   css: ['./app/assets/main.css'],
   modules: ['@pinia/nuxt', '@nuxt/eslint', '@nuxtjs/i18n','@nuxtjs/sitemap'],
 
+  vite: {
+    server: {
+      watch: {
+        usePolling: true  
+      }
+    }
+  },
 
   sitemap: {
     //siteurl: 'https://nti.sk',
