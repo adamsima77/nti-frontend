@@ -129,17 +129,7 @@ Language detection uses a cookie (`i18n_redirected`) and falls back to English. 
 
 ## State Management
 
-Pinia stores manage all domain data. The `useTeamsStore` is the reference implementation, covering the full CRUD lifecycle for student teams:
-
-```ts
-const teamsStore = useTeamsStore()
-
-await teamsStore.fetchTeams()
-await teamsStore.createTeam({ name, description, members })
-await teamsStore.inviteMember(teamId, { email, role })
-await teamsStore.removeMember(teamId, memberId)
-await teamsStore.updateMemberRole(teamId, memberId, role)
-```
+Pinia stores manage all domain data.
 
 Each store communicates with the backend via a shared `useApi` composable that automatically attaches the auth token to every request.
 
@@ -252,4 +242,3 @@ ESLint is configured via `eslint.config.mjs` using `@nuxt/eslint`. Prettier rule
 ## Related Repositories
 
 - **Backend:** Laravel REST API — https://github.com/adamsima77/nti-backend
----
