@@ -1,6 +1,6 @@
 # NTI Frontend
 
-> **Nitriansky technologický inkubátor** — Centrálny webový informačný systém
+> **Nitriansky technologický inkubátor**
 
 The frontend application for the Nitra Technology Incubator (NTI) platform — a full-featured process portal combining a public-facing presentation website with a role-based internal management system for programs, applications, teams, mentoring, and administration.
 
