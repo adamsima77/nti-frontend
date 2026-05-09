@@ -3,16 +3,15 @@
     <div class="w-full max-w-lg">
 
       <StudentOnboarding
-        v-if="userRole === 'student'"
-         @completed="handleCompleted"
+        v-if="auth.userRole === 'student'"
+        @completed="handleCompleted"
       />
 
       <OrganizationOnboarding
-        v-else-if="userRole === 'company'"
-         @completed="handleCompleted"
+        v-else-if="auth.userRole === 'company'"
+        @completed="handleCompleted"
       />
 
-    
       <div v-else class="text-center text-gray-500 text-sm">
         Načítavam...
       </div>
@@ -20,6 +19,7 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import OrganizationOnboarding from '~/components/OrganizationOnboarding.vue'
 import StudentOnboarding from '~/components/StudentOnboarding.vue'
@@ -29,21 +29,19 @@ definePageMeta({
 })
 
 const auth = useAuthStore()
-const userRole = computed(() => auth.userRole)
+
+const handleCompleted = async () => {
+  const user = await auth.getCurrentUser()
+  await nextTick()
+  if (!user) return
+  await navigateTo(auth.redirectUser(user))
+}
 
 const syncAndRedirect = async () => {
   const user = await auth.getCurrentUser()
-
   await nextTick()
-
-  
-  if (user?.status_id === 3) {
-    await navigateTo(auth.redirectUser(user))
-  }
-}
-
-const handleCompleted = async () => {
-  await syncAndRedirect()
+  if (!user) return
+  await navigateTo(auth.redirectUser(user))
 }
 
 const handleStorageChange = async (e: StorageEvent) => {
@@ -51,7 +49,6 @@ const handleStorageChange = async (e: StorageEvent) => {
     await syncAndRedirect()
   }
 }
-
 
 const handleFocus = async () => {
   await syncAndRedirect()

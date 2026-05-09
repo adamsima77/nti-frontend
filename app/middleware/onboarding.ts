@@ -1,12 +1,11 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuthStore()
-  const token = process.client ? localStorage.getItem('_t') : null
+  const token = import.meta.client ? localStorage.getItem('_t') : null
 
   if (!token && !auth.user) {
     return navigateTo('/auth/login')
   }
 
-  // IMPORTANT: wait for plugin hydration
   if (!auth.hydrated && token) {
     await auth.getCurrentUser().catch(() => {
       auth.$reset()
@@ -16,11 +15,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (!auth.user) return
 
-  if (auth.isPendingOnboarding && to.path !== '/auth/onboarding') {
-    return navigateTo('/auth/onboarding')
+  if (auth.isActive) {
+    return navigateTo(auth.redirectUser())
   }
 
-   if (auth.isActive && to.path === '/auth/onboarding') {
-    return navigateTo(auth.redirectUser())
+  if (auth.isPendingApproval) {
+    return navigateTo('/auth/pending-approval')
+  }
+
+  if (!auth.isPendingOnboarding) {
+    return navigateTo('/')
   }
 })

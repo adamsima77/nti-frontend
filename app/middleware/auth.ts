@@ -22,12 +22,20 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
   }
 
-  // User is still pending onboarding — only allow onboarding routes
+  // Pending onboarding — only allow onboarding routes
   if (auth.isPendingOnboarding) {
     if (!to.path.startsWith('/auth/onboarding')) {
       return navigateTo('/auth/onboarding')
     }
-    return // let them through to onboarding
+    return
+  }
+
+  // Pending approval — only allow pending-approval page
+  if (auth.isPendingApproval) {
+    if (!to.path.startsWith('/auth/pending-approval')) {
+      return navigateTo('/auth/pending-approval')
+    }
+    return
   }
 
   // Role-based access check

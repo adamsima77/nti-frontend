@@ -312,7 +312,7 @@
     }
   },
  "auth": {
-
+  "logout": "Odhlásiť sa",
   "verify-email":{
       "verifying": "Overujem e-mail...",
       "wait": "Prosím čakajte, overujeme platnosť odkazu.",
@@ -567,5 +567,14 @@
         "unsupported": "Nepodporovaný typ súboru:",
         "file": "Súbor",
         "max_err": "presahuje maximálnu veľkosť"
-    }
+    },
+
+  "pending_approval": {
+    "title": "Váš účet čaká na schválenie",
+    "description": "Vaša organizácia bola úspešne zaregistrovaná. Náš tím momentálne overuje vaše údaje. O výsledku vás budeme informovať e-mailom.",
+    "what_next": "Čo sa stane ďalej:",
+    "step_review": "Tím NTI overí údaje vašej organizácie",
+    "step_email": "Dostanete e-mail s potvrdením schválenia",
+    "step_access": "Získate plný prístup do platformy"
+  }
 }

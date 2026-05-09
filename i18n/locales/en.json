@@ -312,7 +312,7 @@
     }
   },
  "auth": {
-
+  "logout": "Log out",
   "verify-email": {
        "verifying": "Verifying email...",
        "wait": "Please wait, we are verifying the validity of the link.",
@@ -568,5 +568,14 @@
         "unsupported": "Unsupported file type:",
         "file": "File",
         "max_err": "exceeds the maximum size"
-    }  
+    },
+
+  "pending_approval": {
+    "title": "Your account is pending approval",
+    "description": "Your organization has been successfully registered. Our team is currently reviewing your details. You will be notified by email once your account is approved.",
+    "what_next": "What happens next:",
+    "step_review": "NTI team reviews your organization details",
+    "step_email": "You will receive a confirmation email once approved",
+    "step_access": "You will get full access to the platform"
+  }
 }

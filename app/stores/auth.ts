@@ -17,28 +17,45 @@ interface User {
   organization_name: string | null
 }
 
-enum UserStatus {
-  PENDING_EMAIL = 1,
+const enum UserStatus {
+  PENDING_EMAIL      = 1,
   PENDING_ONBOARDING = 2,
-  ACTIVE = 3,
-  INACTIVE = 4,
-  BANNED = 5,
+  ACTIVE             = 3,
+  INACTIVE           = 4,
+  BANNED             = 5,
+  PENDING_APPROVAL   = 6,
+}
+
+const ROLE_MAP: Record<string, string> = {
+  'nti_admin':      'admin',
+  'nti_superadmin': 'admin',
+  'cms_editor':     'admin',
+  'student':        'student',
+  'team_leader':    'student',
+  'partner':        'company',
+  'mentor':         'mentor',
+  'evaluator':      'evaluator',
 }
 
 export const useAuthStore = defineStore('auth', () => {
   const api = useApi()
 
-  const user = ref<User | null>(null)
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
-
-  const hydrated = ref(false)
+  const user        = ref<User | null>(null)
+  const isLoading   = ref(false)
+  const error       = ref<string | null>(null)
+  const hydrated    = ref(false)
   const initPromise = ref<Promise<User | null> | null>(null)
+
+  // ---- computed ----
 
   const isAuthenticated = computed(() => !!user.value)
 
   const isPendingOnboarding = computed(() =>
     user.value?.status_id === UserStatus.PENDING_ONBOARDING
+  )
+
+  const isPendingApproval = computed(() =>
+    user.value?.status_id === UserStatus.PENDING_APPROVAL
   )
 
   const isActive = computed(() =>
@@ -49,23 +66,14 @@ export const useAuthStore = defineStore('auth', () => {
     user.value?.roles?.map(r => r.name) ?? []
   )
 
-  const ROLE_MAP: Record<string, string> = {
-    'nti_admin':      'admin',
-    'nti_superadmin': 'admin',
-    'cms_editor':     'admin',
-    'student':        'student',
-    'team_leader':    'student',
-    'partner':        'company',
-    'mentor':         'mentor',
-    'evaluator':      'evaluator',
-  }
-
   const userRole = computed(() => {
     for (const role of userRoles.value) {
       if (ROLE_MAP[role]) return ROLE_MAP[role]
     }
     return null
   })
+
+  // ---- helpers ----
 
   const hasRole = (roles: string | string[]): boolean => {
     if (!userRoles.value.length) return false
@@ -84,6 +92,10 @@ export const useAuthStore = defineStore('auth', () => {
       return localePath('/auth/onboarding')
     }
 
+    if (userRef.status_id === UserStatus.PENDING_APPROVAL) {
+      return localePath('/auth/pending-approval')
+    }
+
     const role = userRef.roles
       ?.map(r => ROLE_MAP[r.name])
       ?.find(Boolean)
@@ -97,6 +109,8 @@ export const useAuthStore = defineStore('auth', () => {
     return localePath('/')
   }
 
+  // ---- actions ----
+
   const getCurrentUser = async (): Promise<User | null> => {
     if (initPromise.value) return initPromise.value
 
@@ -106,7 +120,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = res
         hydrated.value = true
         return res
-      } catch (e) {
+      } catch {
         user.value = null
         hydrated.value = true
         return null
@@ -128,17 +142,16 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      const res = await api.post('/auth/login', {
-        email,
-        password,
-      }) as { token: string; user: User }
+      const res = await api.post('/auth/login', { email, password }) as {
+        token: string
+        user: User
+      }
 
       if (import.meta.client) {
         localStorage.setItem('_t', res.token)
       }
 
       user.value = res.user
-
       await getCurrentUser()
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Login error'
@@ -158,9 +171,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const $reset = () => {
-    user.value = null
+    user.value    = null
     hydrated.value = false
-    error.value = null
+    error.value   = null
 
     if (import.meta.client) {
       localStorage.removeItem('_t')
@@ -193,6 +206,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     isAuthenticated,
     isPendingOnboarding,
+    isPendingApproval,
     isActive,
 
     userRoles,
