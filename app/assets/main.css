@@ -72,6 +72,12 @@
 }
 
 @layer base {
+
+    ::selection {
+  background-color: #1e3a5f; 
+  color: #ffffff;
+}
+
   body {
     font-family: var(--font-sans);
     background-color: var(--color-gray-50);

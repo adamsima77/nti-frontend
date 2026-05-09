@@ -192,15 +192,15 @@
           </div>
         </div>
         <div>
-          <h1 class="text-2xl font-bold text-slate-900 mb-2">Skontrolujte si e-mail</h1>
+          <h1 class="text-2xl font-bold text-slate-900 mb-2">{{ $t('auth.register.check-email') }}</h1>
           <p class="text-sm text-gray-500 leading-relaxed">
-            Poslali sme overovací odkaz na
+            {{ $t('auth.register.we-sent') }}
             <span class="font-medium text-slate-700">{{ formData.email }}</span>.
-            Kliknite na odkaz v e-maile pre dokončenie registrácie.
+            {{ $t('auth.register.click') }}
           </p>
         </div>
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700 text-left">
-          E-mail môže trvať niekoľko minút. Skontrolujte aj priečinok spam.
+          {{ $t('auth.register.several-sec') }}
         </div>
         <button
           @click="resendEmail(formData.email)"
@@ -214,10 +214,10 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
           </svg>
-          {{ isResending ? 'Odosielam...' : resendSuccess ? 'E-mail odoslaný ✓' : 'Poslať znova' }}
+          {{ isResending ? $t('auth.register.sending') : resendSuccess ? $t('auth.register.email-sent') : $t('auth.register.send-again') }}
         </button>
         <NuxtLink :to="localePath('/auth/login')" class="block text-sm text-gray-500 hover:text-slate-900 transition-colors">
-          ← Späť na prihlásenie
+          ← {{ $t('auth.register.back-to-login') }}
         </NuxtLink>
       </div>
 
@@ -233,9 +233,10 @@ definePageMeta({
   middleware: 'guest',
 })
 
+const { t, locale } = useI18n()
+
 useHead({
-  title: 'Registrácia | NTI',
-  meta: [{ name: 'description', content: 'Zaregistrujte sa v NTI a začnite s nami vašu cestu!' }],
+  title: computed(() => t('auth.register.title')),
 })
 
 const authStore    = useAuthStore()
@@ -309,17 +310,17 @@ const strengthTextColor = computed(() => {
 })
 
 const strengthLabel = computed(() => {
-  if (passwordStrength.value <= 1)  return 'Slabé heslo'
-  if (passwordStrength.value === 2) return 'Primerané heslo'
-  if (passwordStrength.value === 3) return 'Dobré heslo'
-  return 'Silné heslo'
+  if (passwordStrength.value <= 1)  return t('auth.forgot.weak')
+  if (passwordStrength.value === 2) return t('auth.forgot.fair')
+  if (passwordStrength.value === 3) return t('auth.forgot.good')
+  return t('auth.forgot.strong')
 })
 
 const validatePassword = (password: string) => {
-  if (password.length < 8)             return 'Heslo musí mať aspoň 8 znakov'
-  if (!/[A-Z]/.test(password))         return 'Heslo musí obsahovať veľké písmeno'
-  if (!/[0-9]/.test(password))         return 'Heslo musí obsahovať číslicu'
-  if (!/[^A-Za-z0-9]/.test(password)) return 'Heslo musí obsahovať špeciálny znak'
+  if (password.length < 8)             return t('auth.forgot.password-length-w')
+  if (!/[A-Z]/.test(password))         return t('auth.forgot.password-letter-w')
+  if (!/[0-9]/.test(password))         return t('auth.forgot.password-number-w')
+  if (!/[^A-Za-z0-9]/.test(password)) return t('auth.forgot.password-special-w')
   return null
 }
 
@@ -331,12 +332,12 @@ const validateForm = (): boolean => {
   let valid = true
 
   if (!formData.email) {
-    errors.email = 'Email je povinný'
+    errors.email = t('auth.forgot.email_warning')
     valid = false
   }
 
   if (!formData.password) {
-    errors.password = 'Heslo je povinné'
+    errors.password = t('auth.forgot.password_warn')
     valid = false
   } else {
     const pwError = validatePassword(formData.password)
@@ -344,12 +345,12 @@ const validateForm = (): boolean => {
   }
 
   if (formData.password !== formData.password_confirmation) {
-    errors.password_confirmation = 'Heslá sa nezhodujú'
+    errors.password_confirmation = t('auth.forgot.pass_not_match')
     valid = false
   }
 
   if (!formData.termsAccepted) {
-    errors.terms = 'Musíte súhlasiť s podmienkami'
+    errors.terms = t('auth.forgot.terms')
     valid = false
   }
 
@@ -366,11 +367,12 @@ const submitRegistration = async () => {
       password:              formData.password,
       password_confirmation: formData.password_confirmation,
       role:                  accountType.value,
+      language:              locale.value,
     })
 
     step.value = 'success'
   } catch (err: any) {
-    const message = err?.data?.message ?? err?.message ?? 'Chyba pri registrácii.'
+    const message = err?.data?.message ?? err?.message ?? t('auth.register.mistake')
     addToast({ message, type: 'error' })
   } finally {
     isSubmitting.value = false
@@ -379,10 +381,12 @@ const submitRegistration = async () => {
 
 const resendEmail = async (email: string) => {
   isResending.value = true
+  resendSuccess.value = false
 
   try {
-    await api.post('/auth/resend-verification', { email })
+    await api.post('/auth/resend-verification', { email, lang: locale.value })
     resendSuccess.value = true
+    setTimeout(() => { resendSuccess.value = false }, 5000)
   } finally {
     isResending.value = false
   }

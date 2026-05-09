@@ -312,6 +312,26 @@
     }
   },
  "auth": {
+
+  "verify-email":{
+      "verifying": "Overujem e-mail...",
+      "wait": "Prosím čakajte, overujeme platnosť odkazu.",
+      "success_e": "E-mail overený",
+      "verified": "Váš e-mail bol úspešne overený. Presmerúvame vás...",
+      "continue": "Pokračovať",
+      "link_expired": "Odkaz vypršal",
+      "link_m": "Overovací odkaz je neplatný alebo jeho platnosť vypršala.",
+      "send_new": "Zaslať nový odkaz:",
+      "em": "Váš registrovaný e-mail",
+      "sending": "Odosielam...",
+      "send_new_email": "Odoslať nový e-mail",
+      "new_link": "Nový overovací e-mail bol odoslaný.",
+      "back_to_login": "Späť na prihlásenie",
+      "email-verification-title": "Overenie e-mailu",
+      "enter-email": "Zadajte e-mail",
+      "em-error": "Nepodarilo sa odoslať e-mail."
+
+  },
    "forgot": {
   "title": "Zabudnuté heslo",
   "subtitle": "Zadajte svoju e-mailovú adresu a pošleme vám odkaz na obnovenie hesla",
@@ -334,7 +354,27 @@
   "resend": "Odoslať znova",
   "resend_wait": "Znova odoslať za",
 
-  "info": "Ak email nenájdete v doručenej pošte, skontrolujte spam."
+  "info": "Ak email nenájdete v doručenej pošte, skontrolujte spam.",
+  "title_seo": "Zabudnuté heslo | NTI",
+  "email_warning": "E-mailová adresa je povinná",
+  "password_warn": "Heslo je povinné",
+  "email_warning_1": "Zadajte platnú e-mailovú adresu",
+  "reset-password": "Obnova Hesla | NTI",
+  "password-length-w": "Heslo musí obsahovať aspoň 8 znakov",
+  "password-letter-w": "Heslo musí obsahovať aspoň jedno veľké písmeno",
+  "password-number-w": "Heslo musí obsahovať aspoň jednu číslicu",
+  "password-special-w": "Heslo musí obsahovať aspoň jeden špeciálny znak",
+  "weak": "Slabé heslo",
+  "fair": "Primerané heslo",
+  "good": "Dobré heslo",
+  "strong": "Silné heslo",
+  "required": "Password is required",
+  "min": "Password must be at least 8 characters",
+  "confirm": "Please confirm your new password",
+  "mismatch": "Passwords do not match",
+  "mistake": "Nastala chyba. Skúste znova alebo požiadajte o nový odkaz.",
+  "pass_not_match": "Heslá sa nezhodujú",
+  "terms": "Musíte súhlasiť s podmienkami"
 },
 "reset": {
   "title": "Nové heslo",
@@ -356,6 +396,7 @@
   "login": {
     "title": "Prihlásenie",
     "subtitle": "Prihláste sa do vášho NTI účtu",
+    "mistake": "Chyba pri prihlasovaní",
 
     "fields": {
       "email": {
@@ -378,6 +419,15 @@
   "register": {
     "title": "Registrácia",
     "subtitle": "Vytvorte si nový účet v NTI",
+    "mistake": "Chyba pri registrácii.",
+    "check-email": "Skontrolujte si e-mail",
+    "we-sent": "Poslali sme overovací odkaz na",
+    "click": "Kliknite na odkaz v e-maile pre dokončenie registrácie.",
+    "several-sec": "E-mail môže trvať niekoľko minút. Skontrolujte aj priečinok spam.",
+    "back-to-login": "Späť na prihlásenie",
+    "sending": "Odosielam...",
+    "email-sent": "E-mail odoslaný ✓",
+    "send-again": "Poslať znova",
 
     "type_selection": {
       "title": "Vyberte si typ vášho účtu",

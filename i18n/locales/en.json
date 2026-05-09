@@ -312,14 +312,35 @@
     }
   },
  "auth": {
+
+  "verify-email": {
+       "verifying": "Verifying email...",
+       "wait": "Please wait, we are verifying the validity of the link.",
+       "success_e": "E-mail verified",
+       "verified": "Your email has been successfully verified. Redirecting you...",
+       "continue": "Continue",
+       "link_expired": "Link expired",
+       "link_m": "The verification link is invalid or has expired.",
+       "send_new": "Send new link:",
+       "em": "Your registered email",
+       "sending": "Sending...",
+       "send_new_email": "Send new email",
+       "new_link": "A new verification email has been sent.",
+       "back_to_login": "Back to login",
+       "email-verification-title": "Email verification",
+       "enter-email": "Enter E-mail",
+       "em-error": "Failed to send email."
+  },
   "forgot": {
   "title": "Forgot password",
   "subtitle": "Enter your email and we will send you a password reset link",
-
+  "pass_not_match": "Passwords do not match",
   "sent_title": "Check your email",
+  "terms": "You must agree to terms and conditions",
   "sent_subtitle": "If the account exists, we sent reset instructions",
 
   "email_label": "Email address",
+  "password_warn": "Password is required",
   "email_placeholder": "your-email.com",
 
   "button_send": "Send reset link",
@@ -334,7 +355,25 @@
   "resend": "Resend email",
   "resend_wait": "Resend in",
 
-  "info": "If you don't see the email, check spam or promotions."
+  "info": "If you don't see the email, check spam or promotions.",
+  "title_seo": "Forgot Password | NTI",
+  "email_warning": "E-mail address is required",
+  "email_warning_1": "Enter valid E-mail address",
+  "reset-password": "Reset Password | NTI",
+  "password-length-w": "Password must contain at least 8 characters",
+  "password-letter-w": "Password must contain at least one capital letter",
+  "password-number-w": "Password must contain at least one number",
+  "password-special-w": "Password must contain at least one special character",
+  "weak": "Weak password",
+  "fair": "Fair password",
+  "good": "Good password",
+  "strong": "Strong password",
+  "required": "Password is required",
+  "min": "Password must be at least 8 characters",
+  "confirm": "Please confirm your new password",
+  "mismatch": "Passwords do not match",
+  "mistake": "An error occurred. Please try again or request a new link."
+  
 },
 "reset": {
   "title": "New password",
@@ -356,6 +395,7 @@
   "login": {
     "title": "Login",
     "subtitle": "Sign in to your NTI account",
+    "mistake": "Unexpected error",
 
     "fields": {
       "email": {
@@ -378,6 +418,15 @@
   "register": {
     "title": "Register",
     "subtitle": "Create a new NTI account",
+    "mistake": "Unexpected error",
+    "check-email": "Check your email",
+    "we-sent": "We sent a verification link to",
+    "click": "Click the link in the email to complete registration.",
+    "several-sec": "The email may take a few minutes. Please also check your spam folder.",
+    "back-to-login": "Back to login",
+    "sending": "Sending...",
+    "email-sent": "Email sent ✓",
+    "send-again": "Send again",
 
     "type_selection": {
       "title": "Choose your account type",
@@ -437,4 +486,7 @@
   "err_desc_1": "If you think this is an error,",
   "err_desc_2": "contact us"
 }
+
+
+  
 }

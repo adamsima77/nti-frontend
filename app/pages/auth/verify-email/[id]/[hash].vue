@@ -15,8 +15,8 @@
             </svg>
           </div>
         </div>
-        <h1 class="text-xl font-bold text-slate-900">Overujem e-mail...</h1>
-        <p class="text-sm text-gray-500">Prosím čakajte, overujeme platnosť odkazu.</p>
+        <h1 class="text-xl font-bold text-slate-900">{{ $t('auth.verify-email.verifying') }}</h1>
+        <p class="text-sm text-gray-500">{{ $t('auth.verify-email.wait') }}</p>
       </div>
 
       <!-- Success -->
@@ -32,16 +32,16 @@
           </div>
         </div>
         <div>
-          <h1 class="text-2xl font-bold text-slate-900 mb-2">E-mail overený</h1>
+          <h1 class="text-2xl font-bold text-slate-900 mb-2">{{ $t('auth.verify-email.success_e') }}</h1>
           <p class="text-sm text-gray-500 leading-relaxed">
-            Váš e-mail bol úspešne overený. Presmerúvame vás...
+            {{ $t('auth.verify-email.verified') }}
           </p>
         </div>
         <button
           class="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
           @click="goToOnboarding"
         >
-          Pokračovať
+           {{ $t('auth.verify-email.continue') }}
         </button>
       </div>
 
@@ -58,18 +58,18 @@
           </div>
         </div>
         <div>
-          <h1 class="text-2xl font-bold text-slate-900 mb-2">Odkaz vypršal</h1>
+          <h1 class="text-2xl font-bold text-slate-900 mb-2">{{ $t('auth.verify-email.link_expired') }}</h1>
           <p class="text-sm text-gray-500 leading-relaxed">
-            Overovací odkaz je neplatný alebo jeho platnosť vypršala.
+            {{ $t('auth.verify-email.link_m') }}
           </p>
         </div>
 
         <div v-if="!resendSuccess" class="space-y-3 pt-4 border-t border-gray-100">
-          <p class="text-xs text-left font-medium text-gray-700">Zaslať nový odkaz:</p>
+          <p class="text-xs text-left font-medium text-gray-700">{{ $t('auth.verify-email.send_new') }}</p>
           <UiInput
             v-model="resendEmail"
             type="email"
-            placeholder="Váš registrovaný e-mail"
+            :placeholder= "$t('auth.verify-email.em')"
             :error="resendError"
           />
           <button
@@ -81,7 +81,7 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
             </svg>
-            {{ isResending ? 'Odosielam...' : 'Odoslať nový e-mail' }}
+            {{ isResending ? $t('auth.verify-email.sending') : $t('auth.verify-email.send_new_email') }}
           </button>
         </div>
 
@@ -89,14 +89,14 @@
           v-else
           class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm"
         >
-          Nový overovací e-mail bol odoslaný.
+          {{ $t('auth.verify-email.new_link') }}
         </div>
 
         <NuxtLink
           :to="localePath('/auth/login')"
           class="block text-sm text-gray-500 hover:text-slate-900 transition-colors"
         >
-          ← Späť na prihlásenie
+          ←  {{ $t('auth.verify-email.back_to_login') }}
         </NuxtLink>
       </div>
 
@@ -109,14 +109,14 @@ const authStore  = useAuthStore()
 const localePath = useLocalePath()
 const config     = useRuntimeConfig()
 const api        = useApi()
-
+const { t, locale } = useI18n()
 definePageMeta({
   layout: 'default',
   middleware: 'guest'
 })
 
 useHead({
-  title: 'Overenie e-mailu | NTI',
+  title: computed(() => t('auth.verify-email.email-verification-title')),
 })
 
 const status        = ref<'loading' | 'success' | 'error'>('loading')
@@ -186,7 +186,7 @@ const handleResend = async () => {
   resendError.value = ''
 
   if (!resendEmail.value) {
-    resendError.value = 'Zadajte e-mail'
+    resendError.value = t('auth.verify-email.enter-email')
     return
   }
 
@@ -200,7 +200,7 @@ const handleResend = async () => {
   } catch (err: any) {
     resendError.value =
       err?.response?._data?.message ??
-      'Nepodarilo sa odoslať e-mail.'
+      t('auth.verify-email.em-error')
   } finally {
     isResending.value = false
   }

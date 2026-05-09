@@ -246,20 +246,14 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 
 const localePath = useLocalePath()
-
+const { t } = useI18n()
 definePageMeta({
   layout: 'default',
   middleware: 'guest',
 })
 
 useHead({
-  title: 'Obnovenie hesla | NTI',
-  meta: [
-    {
-      name: 'description',
-      content: 'Nastavte nové heslo pre váš NTI účet',
-    },
-  ],
+  title: computed(() => t('auth.forgot.reset-password')),
 })
 
 const route = useRoute()
@@ -292,10 +286,10 @@ onMounted(() => {
 
 // ── Password strength ──
 const passwordRequirements = computed(() => [
-  { label: 'Minimálne 8 znakov', met: formData.password.length >= 8 },
-  { label: 'Aspoň jedno veľké písmeno', met: /[A-Z]/.test(formData.password) },
-  { label: 'Aspoň jedna číslica', met: /[0-9]/.test(formData.password) },
-  { label: 'Aspoň jeden špeciálny znak', met: /[^A-Za-z0-9]/.test(formData.password) },
+  { label: t('auth.forgot.password-length-w'), met: formData.password.length >= 8 },
+  { label: t('auth.forgot.password-letter-w'), met: /[A-Z]/.test(formData.password) },
+  { label: t('auth.forgot.password-number-w'), met: /[0-9]/.test(formData.password) },
+  { label: t('auth.forgot.password-special-w'), met: /[^A-Za-z0-9]/.test(formData.password) },
 ])
 
 const strengthScore = computed(() =>
@@ -319,10 +313,10 @@ const strengthBarColor = (i) => {
 
 const strengthLabel = computed(() => {
   const s = strengthScore.value
-  if (s <= 1) return 'Slabé heslo'
-  if (s === 2) return 'Primerané heslo'
-  if (s === 3) return 'Dobré heslo'
-  return 'Silné heslo'
+  if (s <= 1) return t('auth.forgot.weak')
+  if (s === 2) return t('auth.forgot.fair')
+  if (s === 3) return t('auth.forgot.good')
+  return t('auth.forgot.strong')
 })
 
 const strengthTextColor = computed(() => {
@@ -341,18 +335,18 @@ const validate = () => {
   let valid = true
 
   if (!formData.password) {
-    errors.password = 'Heslo je povinné'
+    errors.password = t('auth.forgot.required')
     valid = false
   } else if (formData.password.length < 8) {
-    errors.password = 'Heslo musí mať aspoň 8 znakov'
+    errors.password = t('auth.forgot.min')
     valid = false
   }
 
   if (!formData.password_confirmation) {
-    errors.password_confirmation = 'Potvrďte nové heslo'
+    errors.password_confirmation = t('auth.forgot.confirm')
     valid = false
   } else if (formData.password !== formData.password_confirmation) {
-    errors.password_confirmation = 'Heslá sa nezhodujú'
+    errors.password_confirmation = t('auth.forgot.mismatch')
     valid = false
   }
 
@@ -382,7 +376,7 @@ const handleResetPassword = async () => {
       tokenInvalid.value = true
     } else {
       serverError.value =
-        msg || 'Nastala chyba. Skúste znova alebo požiadajte o nový odkaz.'
+        msg || t('auth.forgot.mistake')
     }
   } finally {
     isLoading.value = false

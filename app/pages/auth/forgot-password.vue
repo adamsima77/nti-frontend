@@ -103,23 +103,21 @@
   </div>
 </template>
 
-<script setup lang= "ts">
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
 const localePath = useLocalePath()
 const route = useRoute()
+
 definePageMeta({
   layout: 'default',
   middleware: 'guest',
 })
 
+const { t, locale } = useI18n()
+
 useHead({
-  title: 'Zabudnuté heslo | NTI',
-  meta: [
-    {
-      name: 'description',
-      content: 'Obnovte prístup do svojho NTI účtu pomocou e-mailu',
-    },
-  ],
+  title: computed(() => t('auth.forgot.title_seo'))
 })
 
 const authStore = useAuthStore()
@@ -136,12 +134,12 @@ let cooldownInterval = null
 const validate = () => {
   emailError.value = null
   if (!email.value) {
-    emailError.value = 'E-mailová adresa je povinná'
+    emailError.value = t('auth.forgot.email_warning')
     return false
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email.value)) {
-    emailError.value = 'Zadajte platnú e-mailovú adresu'
+    emailError.value = t('auth.forgot.email_warning_1')
     return false
   }
   return true
@@ -164,7 +162,7 @@ const handleRequestReset = async () => {
   serverError.value = null
 
   try {
-    await authStore.requestPasswordReset(email.value)
+    await authStore.requestPasswordReset(email.value, locale.value)
     emailSent.value = true
     startCooldown()
   } catch (err) {
@@ -180,7 +178,7 @@ const handleResend = async () => {
   if (resendCooldown.value > 0) return
   isLoading.value = true
   try {
-    await authStore.requestPasswordReset(email.value)
+    await authStore.requestPasswordReset(email.value, locale.value)
   } catch {
     // silent
   } finally {
@@ -189,20 +187,14 @@ const handleResend = async () => {
   }
 }
 
-onUnmounted(() => {
-  clearInterval(cooldownInterval)
-})
-
-
 const checkTokenAndRedirect = async () => {
+  if (import.meta.server) return
   const token = localStorage.getItem('_t')
 
   if (!token) return
   if (route.path !== '/auth/forgot-password') return
 
-
   await authStore.getCurrentUser()
-
   await navigateTo(authStore.redirectUser(authStore.user))
 }
 
@@ -218,6 +210,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  clearInterval(cooldownInterval)
   window.removeEventListener('storage', handleStorage)
 })
 </script>

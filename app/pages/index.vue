@@ -242,7 +242,6 @@ const { programs, programs_pending } = fetchProgramsByLang()
 const { metaTags } = fetchMeta(PageType.HOME)
 
 const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
-
 useSeoMeta({
   title: computed(() => meta.value?.title),
   description: computed(() => meta.value?.description),

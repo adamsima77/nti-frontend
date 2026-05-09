@@ -78,20 +78,14 @@
 import { ref, reactive } from 'vue'
 
 const localePath = useLocalePath()
-
+const { t } = useI18n()
 definePageMeta({
   layout: 'default',
   middleware: 'guest',
 })
 
 useHead({
-  title: 'Prihlásenie | NTI',
-  meta: [
-    {
-      name: 'description',
-      content: 'Prihlaste sa do vášho NTI účtu',
-    },
-  ],
+  title: computed(() => t('auth.login.title')),
 })
 
 const authStore = useAuthStore()
@@ -118,12 +112,12 @@ const validateForm = () => {
   let isValid = true
 
   if (!formData.email) {
-    errors.email = 'Email je povinný'
+    errors.email = t('auth.forgot.email_warning')
     isValid = false
   }
 
   if (!formData.password) {
-    errors.password = 'Heslo je povinné'
+    errors.password = t('auth.forgot.password_warn')
     isValid = false
   }
 
@@ -153,7 +147,7 @@ const handleLogin = async () => {
     const message =
       error instanceof Error
         ? error.message
-        : 'Chyba pri prihlasovaní'
+        : t('auth.login.mistake')
 
     addToast({
       message,

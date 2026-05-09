@@ -46,7 +46,6 @@
         <div class="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent z-10" />
         <div class="overflow-hidden">
           <ClientOnly>
-            <!-- SKELETON or LOADED — both in default slot -->
             <template #default>
               <template v-if="partners_pending || !partnersList.length">
                 <div class="flex gap-6 overflow-x-auto no-scrollbar">
@@ -87,7 +86,6 @@
               </template>
             </template>
 
-            <!-- SSR fallback -->
             <template #fallback>
               <div class="flex gap-6 overflow-x-auto no-scrollbar">
                 <div
@@ -113,16 +111,82 @@
         <h2 class="text-3xl font-bold text-navy">
           {{ $t('partners_page.mentors.title') }}
         </h2>
-        <span class="text-sm text-gray-400 hidden md:block">
-          {{ $t('partners_page.mentors.subtitle') }}
-        </span>
+        <div class="flex items-center gap-2">
+          <button
+            @click="scrollMentorsLeft"
+            :disabled="!canScrollMentorsLeft"
+            class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <LucideChevronLeft class="w-5 h-5" />
+          </button>
+          <button
+            @click="scrollMentorsRight"
+            :disabled="!canScrollMentorsRight"
+            class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <LucideChevronRight class="w-5 h-5" />
+          </button>
+        </div>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <UiTeamCard
-          v-for="(m, i) in mentors"
-          :key="i"
-          v-bind="m"
-        />
+
+      <div class="relative">
+        <div class="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent z-10" />
+        <div class="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent z-10" />
+        <div class="overflow-hidden">
+          <ClientOnly>
+            <template #default>
+              <template v-if="mentors_pending || !mentorsList.length">
+                <div class="flex gap-6 overflow-x-auto no-scrollbar">
+                  <div
+                    v-for="n in 4"
+                    :key="'mentor-skeleton-' + n"
+                    class="min-w-[220px] max-w-[260px] flex-shrink-0 bg-white rounded-2xl shadow p-6 flex flex-col items-center gap-4"
+                  >
+                    <UiSkeleton variant="rect" class="w-20 h-20 rounded-full" />
+                    <UiSkeleton height="1rem" width="70%" />
+                    <UiSkeleton height="0.85rem" width="50%" />
+                  </div>
+                </div>
+              </template>
+              <template v-else>
+                <div
+                  ref="mentorsContainer"
+                  class="flex gap-6 overflow-x-auto pb-2 scroll-smooth snap-x snap-mandatory no-scrollbar"
+                  @scroll="updateMentorsScroll"
+                >
+                  <div
+                    v-for="(m, i) in mentorsList"
+                    :key="i"
+                    class="min-w-[220px] max-w-[260px] snap-start"
+                  >
+                    <UiTeamCard
+                      :image="m?.avatar_url"
+                      :name="m?.name + ' ' + m?.surname"
+                      :role="m?.job_position"
+                    />
+                  </div>
+                  <div v-if="isFetchingMentors" class="min-w-[220px] max-w-[260px] flex items-center justify-center">
+                    <UiLoader />
+                  </div>
+                </div>
+              </template>
+            </template>
+
+            <template #fallback>
+              <div class="flex gap-6 overflow-x-auto no-scrollbar">
+                <div
+                  v-for="n in 4"
+                  :key="n"
+                  class="min-w-[220px] max-w-[260px] flex-shrink-0 bg-white rounded-2xl shadow p-6 flex flex-col items-center gap-4"
+                >
+                  <UiSkeleton variant="rect" class="w-20 h-20 rounded-full" />
+                  <UiSkeleton height="1rem" width="70%" />
+                  <UiSkeleton height="0.85rem" width="50%" />
+                </div>
+              </div>
+            </template>
+          </ClientOnly>
+        </div>
       </div>
     </section>
 
@@ -221,9 +285,8 @@
 
   </div>
 </template>
-
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import { useBanner } from '../composables/modules/content/banners/fetchBanner'
 import { PageType } from '../composables/modules/content/enum/PageType'
 import { fetchMeta } from '../composables/modules/content/meta_tags/fetchMetaByPageLang'
@@ -231,6 +294,7 @@ import { fetchPartnersi } from '../composables/modules/content/partners/fetchPar
 import { fetchReferences } from '../composables/modules/content/references/fethReferences'
 import { fetchMentors } from '../composables/modules/content/mentors/fetchMentors'
 
+// ── SEO ───────────────────────────────────────────────────
 const { metaTags } = fetchMeta(PageType.PARTNERS)
 const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
 
@@ -246,25 +310,28 @@ useSeoMeta({
   twitterDescription: computed(() => meta.value?.twitter_description),
 })
 
+// ── data ──────────────────────────────────────────────────
 const { banner } = useBanner(PageType.PARTNERS)
 const { partnersList, isFetching, fetchNextPage, pending: partners_pending } = fetchPartnersi()
 const { referencesList, isFetching: referencesFetching, fetchNextPage: fetchNextReference, pending: references_pending } = fetchReferences()
-
-
-const { mentors, pending: mentors_pending } = fetchMentors()
+const { mentorsList, isFetching: isFetchingMentors, fetchNextPage: fetchNextMentor, pending: mentors_pending } = fetchMentors()
 
 // ── refs ──────────────────────────────────────────────────
 const partnersContainer = ref<HTMLElement | null>(null)
+const mentorsContainer = ref<HTMLElement | null>(null)
 const scrollContainer = ref<HTMLElement | null>(null)
+const resizeObserver = ref<ResizeObserver | null>(null)
 const scrollAmount = 320
 
 // ── scroll state ──────────────────────────────────────────
 const canScrollPartnersLeft = ref(false)
 const canScrollPartnersRight = ref(false)
+const canScrollMentorsLeft = ref(false)
+const canScrollMentorsRight = ref(false)
 const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
 
-// ── wait for images before measuring scrollWidth ──────────
+// ── shared helper ─────────────────────────────────────────
 const waitForImages = (el: HTMLElement): Promise<void[]> => {
   const imgs = [...el.querySelectorAll<HTMLImageElement>('img')]
   return Promise.all(
@@ -290,6 +357,33 @@ const updatePartnersScroll = () => {
 const scrollPartnersLeft = () => partnersContainer.value?.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
 const scrollPartnersRight = () => partnersContainer.value?.scrollBy({ left: scrollAmount, behavior: 'smooth' })
 
+const initPartners = async () => {
+  await nextTick()
+  if (!partnersContainer.value) return
+  await waitForImages(partnersContainer.value)
+  updatePartnersScroll()
+}
+
+// ── mentors ───────────────────────────────────────────────
+const updateMentorsScroll = () => {
+  const el = mentorsContainer.value
+  if (!el) return
+  const { scrollLeft, scrollWidth, clientWidth } = el
+  canScrollMentorsLeft.value = scrollLeft > 0
+  canScrollMentorsRight.value = scrollLeft + clientWidth < scrollWidth - 1
+  if (scrollWidth - scrollLeft - clientWidth < 100) fetchNextMentor()
+}
+
+const scrollMentorsLeft = () => mentorsContainer.value?.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+const scrollMentorsRight = () => mentorsContainer.value?.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+
+const initMentors = async () => {
+  await nextTick()
+  if (!mentorsContainer.value) return
+  await waitForImages(mentorsContainer.value)
+  updateMentorsScroll()
+}
+
 // ── references ────────────────────────────────────────────
 const updateScrollButtons = () => {
   const el = scrollContainer.value
@@ -303,14 +397,6 @@ const updateScrollButtons = () => {
 const scrollLeft = () => scrollContainer.value?.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
 const scrollRight = () => scrollContainer.value?.scrollBy({ left: scrollAmount, behavior: 'smooth' })
 
-// ── init helpers ──────────────────────────────────────────
-const initPartners = async () => {
-  await nextTick()
-  if (!partnersContainer.value) return
-  await waitForImages(partnersContainer.value)
-  updatePartnersScroll()
-}
-
 const initReferences = async () => {
   await nextTick()
   if (!scrollContainer.value) return
@@ -318,17 +404,51 @@ const initReferences = async () => {
   updateScrollButtons()
 }
 
-// re-init when data arrives (SSR hydration or locale change)
+// ── watchers ──────────────────────────────────────────────
 watch(partnersList, initPartners)
+watch(mentorsList, initMentors)
 watch(referencesList, initReferences)
 
-// re-init when container ref attaches after ClientOnly mounts
-watch(partnersContainer, (el) => { if (el) initPartners() })
-watch(scrollContainer, (el) => { if (el) initReferences() })
+watch(partnersContainer, (el) => {
+  if (el) {
+    initPartners()
+    resizeObserver.value?.observe(el)
+  }
+})
 
+watch(mentorsContainer, (el) => {
+  if (el) {
+    initMentors()
+    resizeObserver.value?.observe(el)
+  }
+})
+
+watch(scrollContainer, (el) => {
+  if (el) {
+    initReferences()
+    resizeObserver.value?.observe(el)
+  }
+})
+
+// ── init ──────────────────────────────────────────────────
 onMounted(async () => {
   await initPartners()
+  await initMentors()
   await initReferences()
+
+  resizeObserver.value = new ResizeObserver(() => {
+    updatePartnersScroll()
+    updateMentorsScroll()
+    updateScrollButtons()
+  })
+
+  if (partnersContainer.value) resizeObserver.value.observe(partnersContainer.value)
+  if (mentorsContainer.value) resizeObserver.value.observe(mentorsContainer.value)
+  if (scrollContainer.value) resizeObserver.value.observe(scrollContainer.value)
+})
+
+onUnmounted(() => {
+  resizeObserver.value?.disconnect()
 })
 </script>
 
