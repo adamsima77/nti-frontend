@@ -8,10 +8,10 @@
       <!-- Header -->
       <div class="text-center mb-7">
         <span class="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-full tracking-wide mb-3">
-          Step {{ step }} of 3
+          {{ $t('auth.organization-onboarding.step') }} {{ step }} {{ $t('auth.organization-onboarding.of') }} 3
         </span>
-        <h1 class="text-xl font-bold text-slate-900 mb-1">Company Onboarding</h1>
-        <p class="text-sm text-slate-400">Let's set your organisation up for success</p>
+        <h1 class="text-xl font-bold text-slate-900 mb-1">{{ $t('auth.organization-onboarding.company_onboard') }}</h1>
+        <p class="text-sm text-slate-400">{{ $t('auth.organization-onboarding.setup_message') }}</p>
       </div>
 
       <!-- Progress -->
@@ -41,60 +41,56 @@
         <!-- STEP 1 — Company info -->
         <div v-if="step === 1" key="s1">
           <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-xl">🏢</div>
             <div>
-              <h2 class="text-base font-bold text-slate-800">Company Info</h2>
-              <p class="text-xs text-slate-400">Basic company details</p>
+              <h2 class="text-base font-bold text-slate-800">{{ $t('auth.organization-onboarding.comp_info') }}</h2>
+              <p class="text-xs text-slate-400">{{ $t('auth.organization-onboarding.basic_info') }}</p>
             </div>
           </div>
 
           <div class="space-y-4">
             <UiFormField
               v-model="form.name"
-              label="Company name"
-              placeholder="e.g. Acme s.r.o."
+              :label="$t('auth.organization-onboarding.comp_name')"
+              :placeholder="$t('auth.organization-onboarding.com_eg')"
               field="name"
               :touched="touched"
               :is-valid="isValid"
-              error="Minimum 2 characters"
+              :error="$t('auth.organization-onboarding.min_ch')"
               @touch="touch"
             />
             <UiFormField
               v-model="form.phone"
-              label="Phone"
+              :label="$t('auth.organization-onboarding.phone')"
               placeholder="+421900000000"
-              hint="Include country code, e.g. +421900000000"
               type="tel"
               field="phone"
               :touched="touched"
               :is-valid="isValid"
-              error="Must be a valid international number starting with +"
+              :error="$t('auth.organization-onboarding.phone_err')"
               @touch="touch"
             />
             <div class="grid grid-cols-2 gap-3">
               <UiFormField
                 v-model="form.ico"
-                label="IČO"
-                hint="8 digits"
+                :label="$t('auth.organization-onboarding.ico')"
                 placeholder="12345678"
                 field="ico"
                 :maxlength="8"
                 mono
                 :touched="touched"
                 :is-valid="isValid"
-                error="Exactly 8 digits"
+                :error="$t('auth.organization-onboarding.ico_err')"
                 @touch="touch"
               />
               <UiFormField
                 v-model="form.web_url"
-                label="Website"
-                hint="optional"
-                placeholder="https://acme.sk"
+                :label="$t('auth.organization-onboarding.web')"
+                placeholder="https://acme.com"
                 type="url"
                 field="web_url"
                 :touched="touched"
                 :is-valid="isValid"
-                error="Must start with https://"
+                :error="$t('auth.organization-onboarding.web_err')"
                 @touch="touch"
               />
             </div>
@@ -104,10 +100,9 @@
         <!-- STEP 2 — Address -->
         <div v-else-if="step === 2" key="s2">
           <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-xl">📍</div>
             <div>
-              <h2 class="text-base font-bold text-slate-800">Address</h2>
-              <p class="text-xs text-slate-400">Your company location</p>
+              <h2 class="text-base font-bold text-slate-800">{{ $t('auth.organization-onboarding.address') }}</h2>
+              <p class="text-xs text-slate-400">{{ $t('auth.organization-onboarding.comp_loc') }}</p>
             </div>
           </div>
 
@@ -115,7 +110,7 @@
             <div class="grid grid-cols-2 gap-3">
               <UiFormField
                 v-model="form.city"
-                label="City"
+                :label="$t('auth.organization-onboarding.city')"
                 placeholder="Bratislava"
                 field="city"
                 :touched="touched"
@@ -124,22 +119,21 @@
               />
               <UiFormField
                 v-model="form.postal_code"
-                label="Postal code"
-                hint="5 digits"
+                :label="$t('auth.organization-onboarding.postal_code')"
                 placeholder="81101"
                 field="postal_code"
                 :maxlength="5"
                 mono
                 :touched="touched"
                 :is-valid="isValid"
-                error="Exactly 5 digits"
+                :error="$t('auth.organization-onboarding.pos_err')"
                 @touch="touch"
               />
             </div>
             <UiFormField
               v-model="form.street"
-              label="Street"
-              placeholder="Hlavná 1"
+              :label="$t('auth.organization-onboarding.street')"
+              :placeholder="$t('auth.organization-onboarding.street_placeholder')"
               field="street"
               :touched="touched"
               :is-valid="isValid"
@@ -147,8 +141,8 @@
             />
             <UiFormField
               v-model="form.country"
-              label="Country"
-              placeholder="Slovakia"
+              :label="$t('auth.organization-onboarding.state')"
+              :placeholder="$t('auth.organization-onboarding.state_placeholder')"
               field="country"
               :touched="touched"
               :is-valid="isValid"
@@ -160,10 +154,9 @@
         <!-- STEP 3 — Sectors -->
         <div v-else key="s3">
           <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-xl">⚙️</div>
             <div>
-              <h2 class="text-base font-bold text-slate-800">Sector</h2>
-              <p class="text-xs text-slate-400">Pick all industries that apply</p>
+              <h2 class="text-base font-bold text-slate-800">{{ $t('auth.organization-onboarding.sector') }}</h2>
+              <p class="text-xs text-slate-400">{{ $t('auth.organization-onboarding.sector_desc') }}</p>
             </div>
           </div>
 
@@ -175,7 +168,7 @@
             <input
               v-model="sectorSearch"
               type="text"
-              placeholder="Filter sectors…"
+              :placeholder="$t('auth.organization-onboarding.filter')"
               class="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50 text-slate-700 focus:bg-white focus:border-blue-400 focus:outline-none transition-all duration-200"
             />
           </div>
@@ -213,16 +206,16 @@
               </span>
             </label>
 
-            <p v-if="filteredSectors.length === 0" class="text-xs text-slate-400 p-2">No sectors match your search</p>
+            <p v-if="filteredSectors.length === 0" class="text-xs text-slate-400 p-2">{{ $t('auth.organization-onboarding.sec_m') }}</p>
           </div>
 
           <p v-if="touched.sector && !form.sector.length" class="text-xs text-red-500 mt-2">
-            Select at least one sector
+            {{ $t('auth.organization-onboarding.sec_f') }}
           </p>
 
           <!-- Selected summary tags -->
           <div v-if="form.sector.length" class="mt-3">
-            <p class="text-xs font-semibold text-slate-400 mb-1.5">Selected ({{ form.sector.length }})</p>
+            <p class="text-xs font-semibold text-slate-400 mb-1.5">{{ $t('auth.organization-onboarding.selected') }} ({{ form.sector.length }})</p>
             <div class="flex flex-wrap gap-1.5">
               <span
                 v-for="id in form.sector"
@@ -253,7 +246,7 @@
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
-          Back
+          {{ $t('auth.organization-onboarding.back') }}
         </button>
         <div v-else />
 
@@ -267,7 +260,7 @@
             : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
           @click="nextStep"
         >
-          Continue
+           {{ $t('auth.organization-onboarding.continue') }}
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
           </svg>
@@ -284,13 +277,13 @@
           @click="submit"
         >
           <template v-if="!loading">
-            Finish
+             {{ $t('auth.organization-onboarding.finish') }}
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
           </template>
           <template v-else>
-            Saving<span class="animate-pulse">...</span>
+           {{ $t('auth.organization-onboarding.saving') }}<span class="animate-pulse">...</span>
           </template>
         </button>
       </div>
@@ -301,7 +294,7 @@
 
 <script setup lang="ts">
 import { isValidPhoneNumber } from 'libphonenumber-js/max'
-
+const { t } = useI18n()
 const api = useApi()
 const authStore = useAuthStore()
 const emit = defineEmits<{

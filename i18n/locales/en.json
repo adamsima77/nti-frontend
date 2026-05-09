@@ -415,6 +415,82 @@
     "register": "Sign up"
   },
 
+  "organization-onboarding":{
+      "step": "Step",
+      "of": "of",
+      "company_onboard": "Company Onboarding",
+      "setup_message": "Organisation setup",
+      "comp_info": "Company Info",
+      "basic_info": "Basic company details",
+      "com_eg": "e.g. Acme s.r.o.",
+      "min_ch": "Company name must contain at least two characters",
+      "comp_name": "Company name",
+      "phone": "Phone",
+      "phone_hint": "Include country code, e.g. +421900000000",
+      "phone_err": "Must be a valid international number starting with +",
+      "postal_code": "Postal Code",
+      "pos_hint": "5 digits",
+      "pos_err": "Postal Code must contain exactly 5 digits",
+      "web": "Website",
+      "optional": "optional",
+      "web_err": "Must start with https://",
+      "address": "Address",
+      "comp_loc": "Your commpany location",
+      "city": "City",
+      "ico": "Company ID",
+      "ico_hint": "Company ID should contain 8 digits",
+      "ico_err": "Company ID must contain 8 digits",
+      "street": "Street",
+      "street_placeholder": "Main Street 1",
+      "state": "Country",
+      "state_placeholder": "Slovakia",
+      "sector": "Sector",
+      "sector_desc": "Pick all industries that apply",
+      "filter": "Filter sectors…",
+      "sec_m": "No sectors match your search",
+      "sec_f": "Select at least one sector",
+      "selected": "Selected",
+      "back": "Back",
+      "continue": "Continue",
+      "finish": "Finish",
+      "saving": "Saving"
+
+  },
+
+   "student-onboarding":{
+      "step": "Step",
+      "of": "of",
+      "complete_profile": "Complete your profile",
+      "setup_message": "Let's set your profile in under a minute",
+      "personal_info": "Personal info",
+      "personal_desc": "Basic identity details",
+      "first_name": "First name",
+      "eg_f": "e.g. Marek",
+      "min_f": "Name must contain at least 2 characters",
+      "surname": "Surname",
+      "eg_s": "e.g. Novák",
+      "min_s": "Surname must contain at least 2 characters",
+      "study-detail": "Study details",
+      "academic-background": "Your academic background",
+      "university": "University",
+      "select_u": "Select university",
+      "study_pr": "Study program",
+      "select_program": "Select program",
+      "study_field": "Study field",
+      "select_field": "Select field",
+      "study_year": "Year of study",
+      "select_year": "Select year",
+      "upload_cv": "Upload your CV",
+      "cv_req": "PDF or DOCX, max 10 MB",
+      "cv": "CV document",
+      "cv_err": "Please upload your CV to continue",
+      "back": "Back",
+      "continue": "Continue",
+      "finish": "Finish",
+      "uploading": "Uploading",
+      "validation_err": "Validation failed. Please check your inputs."
+  },
+
   "register": {
     "title": "Register",
     "subtitle": "Create a new NTI account",
@@ -485,8 +561,12 @@
   "home_button": "Back to home",
   "err_desc_1": "If you think this is an error,",
   "err_desc_2": "contact us"
-}
+},
 
-
-  
+ "file-upload-comp":{
+        "file_upload": "Drag and drop a file here or click to upload",
+        "unsupported": "Unsupported file type:",
+        "file": "File",
+        "max_err": "exceeds the maximum size"
+    }  
 }

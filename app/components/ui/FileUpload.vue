@@ -21,7 +21,7 @@
       @drop.prevent="onDrop"
     >
       <Upload class="w-10 h-10 text-gray-300 mx-auto mb-3" />
-      <p class="text-sm text-gray-500 mb-1">{{ description }}</p>
+      <p class="text-sm text-gray-500 mb-1">{{ displayDescription  }}</p>
       <p class="text-xs text-gray-400">{{ accept }}</p>
     </div>
     <input
@@ -64,7 +64,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Upload, File as FileIcon, X } from 'lucide-vue-next'
-
+const { t } = useI18n()
 const props = withDefaults(
   defineProps<{
     modelValue: File | File[] | null
@@ -80,10 +80,12 @@ const props = withDefaults(
     maxSize: 10,
     multiple: false,
     label: undefined,
-    description: 'Presuňte súbor sem alebo kliknite',
+    description: undefined,
     disabled: false,
   },
 )
+
+const displayDescription = computed(() => props.description ?? t('file-upload-comp.file_upload'))
 
 const emit = defineEmits<{
   'update:modelValue': [value: File | File[] | null]
@@ -130,12 +132,12 @@ function handleFiles(files: File[]) {
     })
 
     if (!matchesExt) {
-      emit('error', `Nepodporovaný typ súboru: ${file.name}`)
+      emit('error', `${t('file-upload-comp.unsupported')} ${file.name}`)
       continue
     }
 
     if (file.size > props.maxSize * 1024 * 1024) {
-      emit('error', `Súbor ${file.name} presahuje maximálnu veľkosť ${props.maxSize} MB`)
+      emit('error', `${t('file-upload-comp.file')} ${file.name} ${t('file-upload-comp.max_err')} ${props.maxSize} MB`)
       continue
     }
 

@@ -4,10 +4,10 @@
     <!-- HEADER -->
     <div class="text-center mb-7">
       <div class="inline-block px-3 py-0.5 bg-blue-50 text-blue-500 rounded-full text-xs font-semibold tracking-wide mb-2.5">
-        Step {{ step }} of 3
+        {{ $t('auth.student-onboarding.step') }} {{ step }} {{ $t('auth.student-onboarding.of') }} 3
       </div>
-      <h1 class="text-[22px] font-bold text-slate-900 mb-1">Complete your profile</h1>
-      <p class="text-sm text-slate-400">Let's get you set up in under a minute</p>
+      <h1 class="text-[22px] font-bold text-slate-900 mb-1">{{ $t('auth.student-onboarding.complete_profile') }}</h1>
+      <p class="text-sm text-slate-400">{{ $t('auth.student-onboarding.setup_message') }}</p>
     </div>
 
     <!-- PROGRESS -->
@@ -36,46 +36,45 @@
       <!-- STEP 1 — Personal info -->
       <div v-if="step === 1" key="s1" class="py-1">
         <div class="flex items-center gap-3 mb-6">
-          <span class="text-[28px] leading-none">👤</span>
           <div>
-            <h2 class="text-[17px] font-bold text-slate-900 mb-0.5">Personal info</h2>
-            <p class="text-[13px] text-slate-400">Basic identity details</p>
+            <h2 class="text-[17px] font-bold text-slate-900 mb-0.5">{{ $t('auth.student-onboarding.personal_info') }}</h2>
+            <p class="text-[13px] text-slate-400">{{ $t('auth.student-onboarding.personal_desc') }}</p>
           </div>
         </div>
 
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] font-semibold text-slate-600">First name</label>
+            <label class="text-[13px] font-semibold text-slate-600">{{ $t('auth.student-onboarding.first_name') }}</label>
             <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
               :class="inputWrapClass('name')">
               <input
                 v-model="form.name"
                 @input="touch('name')"
-                placeholder="e.g. Marek"
+                :placeholder="$t('auth.student-onboarding.eg_f')"
                 class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl"
               />
               <span class="pr-3 text-sm font-bold shrink-0" :class="iconClass('name')">
                 {{ touched.name ? (isValid('name') ? '✓' : '✗') : '' }}
               </span>
             </div>
-            <p v-if="touched.name && !isValid('name')" class="text-xs text-red-500">Minimum 2 characters</p>
+            <p v-if="touched.name && !isValid('name')" class="text-xs text-red-500">{{ $t('auth.student-onboarding.min_f') }}</p>
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] font-semibold text-slate-600">Surname</label>
+            <label class="text-[13px] font-semibold text-slate-600">{{ $t('auth.student-onboarding.surname') }}</label>
             <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
               :class="inputWrapClass('surname')">
               <input
                 v-model="form.surname"
                 @input="touch('surname')"
-                placeholder="e.g. Novák"
+                :placeholder="$t('auth.student-onboarding.eg_s')"
                 class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl"
               />
               <span class="pr-3 text-sm font-bold shrink-0" :class="iconClass('surname')">
                 {{ touched.surname ? (isValid('surname') ? '✓' : '✗') : '' }}
               </span>
             </div>
-            <p v-if="touched.surname && !isValid('surname')" class="text-xs text-red-500">Minimum 2 characters</p>
+            <p v-if="touched.surname && !isValid('surname')" class="text-xs text-red-500">{{ $t('auth.student-onboarding.min_s') }}</p>
           </div>
         </div>
       </div>
@@ -83,57 +82,56 @@
       <!-- STEP 2 — Study details -->
       <div v-else-if="step === 2" key="s2" class="py-1">
         <div class="flex items-center gap-3 mb-6">
-          <span class="text-[28px] leading-none">🎓</span>
           <div>
-            <h2 class="text-[17px] font-bold text-slate-900 mb-0.5">Study details</h2>
-            <p class="text-[13px] text-slate-400">Your academic background</p>
+            <h2 class="text-[17px] font-bold text-slate-900 mb-0.5">{{ $t('auth.student-onboarding.study-detail') }}</h2>
+            <p class="text-[13px] text-slate-400">{{ $t('auth.student-onboarding.academic-background') }}</p>
           </div>
         </div>
 
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] font-semibold text-slate-600">University</label>
+            <label class="text-[13px] font-semibold text-slate-600">{{ $t('auth.student-onboarding.university') }}</label>
             <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
               :class="inputWrapClass('university')">
               <select v-model="form.university" @change="touch('university')"
                 class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
-                <option value="">Select university</option>
+                <option value="">{{ $t('auth.student-onboarding.select_u') }}</option>
                 <option v-for="u in universities" :key="u.id" :value="u.id">{{ u.name }}</option>
               </select>
             </div>
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] font-semibold text-slate-600">Study program</label>
+            <label class="text-[13px] font-semibold text-slate-600">{{ $t('auth.student-onboarding.study_pr') }}</label>
             <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
               :class="inputWrapClass('study_program')">
               <select v-model="form.study_program" @change="touch('study_program')"
                 class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
-                <option value="">Select program</option>
+                <option value="">{{ $t('auth.student-onboarding.select_program') }}</option>
                 <option v-for="p in studyPrograms" :key="p.id" :value="p.id">{{ p.name }}</option>
               </select>
             </div>
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] font-semibold text-slate-600">Study field</label>
+            <label class="text-[13px] font-semibold text-slate-600">{{ $t('auth.student-onboarding.study_field') }}</label>
             <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
               :class="inputWrapClass('study_field')">
               <select v-model="form.study_field" @change="touch('study_field')"
                 class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
-                <option value="">Select field</option>
+                <option value="">{{ $t('auth.student-onboarding.select_field') }}</option>
                 <option v-for="f in studyFields" :key="f.id" :value="f.id">{{ f.name }}</option>
               </select>
             </div>
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label class="text-[13px] font-semibold text-slate-600">Year of study</label>
+            <label class="text-[13px] font-semibold text-slate-600">{{ $t('auth.student-onboarding.study_year') }}</label>
             <div class="relative flex items-center border-[1.5px] rounded-xl bg-white transition-all duration-200"
               :class="inputWrapClass('year_of_study')">
               <select v-model="form.year_of_study" @change="touch('year_of_study')"
                 class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
-                <option value="">Select year</option>
+                <option value="">{{ $t('auth.student-onboarding.select_year') }}</option>
                 <option v-for="y in studyYears" :key="y.id" :value="y.id">{{ y.name }}</option>
               </select>
             </div>
@@ -146,20 +144,20 @@
         <div class="flex items-center gap-3 mb-6">
           <span class="text-[28px] leading-none">📄</span>
           <div>
-            <h2 class="text-[17px] font-bold text-slate-900 mb-0.5">Upload your CV</h2>
-            <p class="text-[13px] text-slate-400">PDF or DOCX, max 10 MB</p>
+            <h2 class="text-[17px] font-bold text-slate-900 mb-0.5">{{ $t('auth.student-onboarding.upload_cv') }}</h2>
+            <p class="text-[13px] text-slate-400">{{ $t('auth.student-onboarding.cv_req') }}</p>
           </div>
         </div>
 
         <UiFileUpload
           v-model="form.cv"
-          label="CV document"
+          :label="$t('auth.student-onboarding.cv') "
           accept=".pdf,.docx"
           @error="fileError = $event"
         />
 
         <p v-if="fileError" class="text-xs text-red-500 mt-2">{{ fileError }}</p>
-        <p v-if="touched.cv && !isValid('cv')" class="text-xs text-red-500 mt-2">Please upload your CV to continue</p>
+        <p v-if="touched.cv && !isValid('cv')" class="text-xs text-red-500 mt-2">{{ $t('auth.student-onboarding.cv_err') }}</p>
       </div>
 
     </transition>
@@ -171,7 +169,7 @@
         @click="step--"
         class="text-sm font-medium text-slate-400 bg-transparent border-none cursor-pointer p-0 hover:text-slate-700 transition-colors duration-200"
       >
-        ← Back
+        ← {{ $t('auth.student-onboarding.back') }}
       </button>
 
       <button
@@ -183,7 +181,7 @@
           ? 'bg-blue-500 text-white hover:-translate-y-px hover:bg-blue-600 hover:shadow-[0_4px_12px_#3b82f640]'
           : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
       >
-        Continue →
+        {{ $t('auth.student-onboarding.continue') }} →
       </button>
 
       <button
@@ -192,8 +190,8 @@
         :disabled="loading || !isStepValid"
         class="ml-auto px-6 py-2.5 rounded-xl text-sm font-semibold border-none cursor-pointer transition-all duration-200 bg-green-500 text-white disabled:opacity-70 disabled:cursor-not-allowed hover:enabled:bg-green-600 hover:enabled:-translate-y-px hover:enabled:shadow-[0_4px_12px_#22c55e40]"
       >
-        <span v-if="!loading">Finish ✓</span>
-        <span v-else class="loading-dots">Uploading<span>.</span><span>.</span><span>.</span></span>
+        <span v-if="!loading">{{ $t('auth.student-onboarding.finish') }} ✓</span>
+        <span v-else class="loading-dots">{{ $t('auth.student-onboarding.uploading') }}<span>.</span><span>.</span><span>.</span></span>
       </button>
     </div>
 
@@ -209,7 +207,7 @@ const emit = defineEmits<{
 const step = ref(1)
 const loading = ref(false)
 const fileError = ref('')
-
+const { t } = useI18n()
 const progress = computed(() => ((step.value - 1) / 2) * 100)
 
 const form = reactive({
@@ -319,7 +317,7 @@ async function submit() {
     emit('completed')
   } catch (e: any) {
     if (e?.response?.status === 422) {
-      fileError.value = 'Validation failed. Please check your inputs.'
+      fileError.value = t('auth.student-onboarding.validation_err')
     }
   } finally {
     loading.value = false

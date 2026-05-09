@@ -32,7 +32,6 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-
   const hydrated = ref(false)
   const initPromise = ref<Promise<User | null> | null>(null)
 
@@ -51,13 +50,14 @@ export const useAuthStore = defineStore('auth', () => {
   )
 
   const ROLE_MAP: Record<string, string> = {
-    nti_admin: 'admin',
-    nti_superadmin: 'admin',
-    student: 'student',
-    team_lead: 'student',
-    partner: 'company',
-    mentor: 'mentor',
-    evaluator: 'evaluator',
+    'nti_admin':      'admin',
+    'nti_superadmin': 'admin',
+    'cms_editor':     'admin',
+    'student':        'student',
+    'team_leader':    'student',
+    'partner':        'company',
+    'mentor':         'mentor',
+    'evaluator':      'evaluator',
   }
 
   const userRole = computed(() => {
@@ -74,30 +74,29 @@ export const useAuthStore = defineStore('auth', () => {
       : userRoles.value.includes(roles)
   }
 
-  
   const redirectUser = (u: User | null = null): string => {
+    const localePath = useLocalePath()
     const userRef = u ?? user.value
 
-    if (!userRef) return '/auth/login'
+    if (!userRef) return localePath('/auth/login')
 
     if (userRef.status_id === UserStatus.PENDING_ONBOARDING) {
-      return '/auth/onboarding'
+      return localePath('/auth/onboarding')
     }
 
     const role = userRef.roles
       ?.map(r => ROLE_MAP[r.name])
       ?.find(Boolean)
 
-    if (role === 'admin') return '/admin'
-    if (role === 'evaluator') return '/hodnotenie'
-    if (role === 'company') return '/firma'
-    if (role === 'mentor') return '/mentor'
-    if (role === 'student') return '/student'
+    if (role === 'admin')     return localePath('/admin')
+    if (role === 'evaluator') return localePath('/hodnotenie')
+    if (role === 'company')   return localePath('/firma')
+    if (role === 'mentor')    return localePath('/mentor')
+    if (role === 'student')   return localePath('/student')
 
-    return '/'
+    return localePath('/')
   }
 
-  
   const getCurrentUser = async (): Promise<User | null> => {
     if (initPromise.value) return initPromise.value
 
@@ -119,7 +118,6 @@ export const useAuthStore = defineStore('auth', () => {
     return initPromise.value
   }
 
-  
   const syncUser = async () => {
     if (!import.meta.client) return
     return await getCurrentUser()
