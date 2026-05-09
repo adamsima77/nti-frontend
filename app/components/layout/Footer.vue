@@ -43,14 +43,21 @@
           <Facebook class="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
         </a>
 
-        <a
+         <a
+          href="#"
+          class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
+        >
+          <Instagram class="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
+        </a>
+
+         <a
           href="#"
           class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
         >
           <Twitter class="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
         </a>
 
-        <a
+         <a
           href="#"
           class="text-blue-50 hover:text-blue-500 transition-colors duration-300"
         >
@@ -62,6 +69,8 @@
 </template>
 
 <script setup>
+import { Facebook, Instagram, Twitter, Linkedin } from 'lucide-vue-next'
+
 const logo = '/nti-logo.svg'
 const localePath = useLocalePath()
 </script>
