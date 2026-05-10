@@ -1,9 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
+interface Permission {
+  id: number
+  name: string
+}
+
 interface Role {
   id: number
   name: string
+  permissions: Permission[]
 }
 
 interface User {
@@ -27,14 +33,15 @@ const enum UserStatus {
 }
 
 const ROLE_MAP: Record<string, string> = {
+  'nti_superadmin': 'superadmin',
   'nti_admin':      'admin',
-  'nti_superadmin': 'admin',
-  'cms_editor':     'admin',
+  'cms_editor':     'cms_editor',
   'student':        'student',
   'team_leader':    'student',
   'partner':        'company',
   'mentor':         'mentor',
   'evaluator':      'evaluator',
+  'guest':          'guest',
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -73,6 +80,10 @@ export const useAuthStore = defineStore('auth', () => {
     return null
   })
 
+  const userPermissions = computed(() =>
+    user.value?.roles?.flatMap(r => r.permissions?.map(p => p.name) ?? []) ?? []
+  )
+
   // ---- helpers ----
 
   const hasRole = (roles: string | string[]): boolean => {
@@ -80,6 +91,12 @@ export const useAuthStore = defineStore('auth', () => {
     return Array.isArray(roles)
       ? roles.some(r => userRoles.value.includes(r))
       : userRoles.value.includes(roles)
+  }
+
+  const hasPermission = (permission: string): boolean => {
+    // mirror backend before() hook — superadmin and admin bypass everything
+    if (hasRole(['nti_superadmin', 'nti_admin'])) return true
+    return userPermissions.value.includes(permission)
   }
 
   const redirectUser = (u: User | null = null): string => {
@@ -100,11 +117,13 @@ export const useAuthStore = defineStore('auth', () => {
       ?.map(r => ROLE_MAP[r.name])
       ?.find(Boolean)
 
-    if (role === 'admin')     return localePath('/admin')
-    if (role === 'evaluator') return localePath('/hodnotenie')
-    if (role === 'company')   return localePath('/firma')
-    if (role === 'mentor')    return localePath('/mentor')
-    if (role === 'student')   return localePath('/student')
+    if (role === 'superadmin') return localePath('/super-admin')
+    if (role === 'admin')      return localePath('/admin')
+    if (role === 'cms_editor') return localePath('/content-manager')
+    if (role === 'evaluator')  return localePath('/hodnotenie')
+    if (role === 'company')    return localePath('/firma')
+    if (role === 'mentor')     return localePath('/mentor')
+    if (role === 'student')    return localePath('/student')
 
     return localePath('/')
   }
@@ -171,9 +190,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const $reset = () => {
-    user.value    = null
+    user.value     = null
     hydrated.value = false
-    error.value   = null
+    error.value    = null
 
     if (import.meta.client) {
       localStorage.removeItem('_t')
@@ -211,8 +230,10 @@ export const useAuthStore = defineStore('auth', () => {
 
     userRoles,
     userRole,
+    userPermissions,
 
     hasRole,
+    hasPermission,
     redirectUser,
 
     login,

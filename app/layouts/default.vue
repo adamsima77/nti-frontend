@@ -9,7 +9,6 @@
       :is-open="sidebarOpen"
       @close-sidebar="sidebarOpen = false"
     />
-
     <main class="p-5 md:p-15">
       <slot />
     </main>

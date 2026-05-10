@@ -47,4 +47,19 @@ const handleLogout = async () => {
   await auth.logout()
   await navigateTo('/auth/login')
 }
+
+const handleStorageChange = async (e: StorageEvent) => {
+  if (e.key === '_t' && e.newValue) {
+    await auth.getCurrentUser()
+    await navigateTo(auth.redirectUser())
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('storage', handleStorageChange)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', handleStorageChange)
+})
 </script>

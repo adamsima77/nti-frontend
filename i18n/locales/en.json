@@ -273,6 +273,20 @@
       },
 
       "form": {
+        "submitting": "Sending...",
+        "success": "Message sent successfully!",
+        "error": "Something went wrong, please try again.",
+        "consent": {
+          "text": "I agree to the processing of my personal data in accordance with the",
+          "link": "Privacy Policy"
+        },
+        "errors": {
+          "min_2": "Minimum 2 characters",
+          "min_10": "Minimum 10 characters",
+          "invalid_email": "Invalid email address",
+          "consent_required": "Consent to data processing is required",
+          "fill_all": "Please fill in all fields correctly."
+        },
         "title": "Write to us",
         "fields": {
           "first_name": "First name",
@@ -416,6 +430,8 @@
   },
 
   "organization-onboarding":{
+     "consent_notice": "By completing your registration you agree to the processing of your company data in accordance with our",
+      "privacy_link": "Privacy Policy",
       "step": "Step",
       "of": "of",
       "company_onboard": "Company Onboarding",
@@ -458,6 +474,8 @@
   },
 
    "student-onboarding":{
+     "consent_notice": "By completing your profile you agree to the processing of your personal data and CV in accordance with our",
+      "privacy_link": "Privacy Policy",
       "step": "Step",
       "of": "of",
       "complete_profile": "Complete your profile",

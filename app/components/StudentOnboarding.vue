@@ -158,6 +158,13 @@
 
         <p v-if="fileError" class="text-xs text-red-500 mt-2">{{ fileError }}</p>
         <p v-if="touched.cv && !isValid('cv')" class="text-xs text-red-500 mt-2">{{ $t('auth.student-onboarding.cv_err') }}</p>
+        <p class="text-xs text-slate-400 mt-4 leading-relaxed">
+  {{ $t('auth.student-onboarding.consent_notice') }}
+  <NuxtLink to="/privacy-policy" class="text-blue-500 hover:underline">
+    {{ $t('auth.student-onboarding.privacy_link') }}
+  </NuxtLink>
+</p>
+      
       </div>
 
     </transition>

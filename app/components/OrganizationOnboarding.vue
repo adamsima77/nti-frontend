@@ -231,10 +231,15 @@
               </span>
             </div>
           </div>
+           <p class="text-xs text-slate-400 mt-4 leading-relaxed">
+  {{ $t('auth.organization-onboarding.consent_notice') }}
+  <NuxtLink to="/privacy-policy" class="text-blue-500 hover:underline">
+    {{ $t('auth.organization-onboarding.privacy_link') }}
+  </NuxtLink>
+</p>
         </div>
-
       </transition>
-
+        
       <!-- Actions -->
       <div class="flex items-center justify-between mt-7 gap-3">
         <button

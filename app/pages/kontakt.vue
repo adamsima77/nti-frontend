@@ -1,5 +1,5 @@
 <template>
-  <UiToast />
+   <UiToast />
   <section class="bg-white py-16 px-4 mt-30 shadow-2xl rounded-lg">
     <div class="max-w-6xl mx-auto">
       <div class="mb-12 text-center">
@@ -10,6 +10,8 @@
       </div>
 
       <div class="flex flex-col lg:flex-row gap-8">
+
+        <!-- Contact info -->
         <div class="flex-1 bg-gray-50 p-8 rounded-lg border border-gray-200">
           <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-navy mb-6">{{ $t('contact.page.info.title') }}</h2>
           <div class="mb-4">
@@ -32,6 +34,7 @@
           </div>
         </div>
 
+        <!-- Contact form -->
         <div class="flex-1 bg-white p-8 rounded-lg border border-gray-200">
           <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-navy mb-6">{{ $t('contact.page.form.title') }}</h2>
 
@@ -46,7 +49,9 @@
                 :class="inputClass(name, 2)"
                 @blur="touched.name = true"
               />
-              <span v-if="touched.name && name.length < 2" class="text-xs text-red-500">Minimálne 2 znaky</span>
+              <span v-if="touched.name && name.length < 2" class="text-xs text-red-500">
+                {{ $t('contact.page.form.errors.min_2') }}
+              </span>
             </div>
 
             <div class="flex flex-col gap-1">
@@ -58,7 +63,9 @@
                 :class="inputClass(surname, 2)"
                 @blur="touched.surname = true"
               />
-              <span v-if="touched.surname && surname.length < 2" class="text-xs text-red-500">Minimálne 2 znaky</span>
+              <span v-if="touched.surname && surname.length < 2" class="text-xs text-red-500">
+                {{ $t('contact.page.form.errors.min_2') }}
+              </span>
             </div>
 
             <div class="flex flex-col gap-1">
@@ -70,7 +77,9 @@
                 :class="inputClass(email, 1, true)"
                 @blur="touched.email = true"
               />
-              <span v-if="touched.email && !isValidEmail(email)" class="text-xs text-red-500">Neplatný e-mail</span>
+              <span v-if="touched.email && !isValidEmail(email)" class="text-xs text-red-500">
+                {{ $t('contact.page.form.errors.invalid_email') }}
+              </span>
             </div>
 
             <div class="flex flex-col gap-1">
@@ -82,7 +91,44 @@
                 class="h-32"
                 @blur="touched.description = true"
               />
-              <span v-if="touched.description && description.length < 10" class="text-xs text-red-500">Minimálne 10 znakov</span>
+              <span v-if="touched.description && description.length < 10" class="text-xs text-red-500">
+                {{ $t('contact.page.form.errors.min_10') }}
+              </span>
+            </div>
+
+            <!-- GDPR Consent -->
+            <div class="flex flex-col gap-1">
+              <label class="flex items-start gap-3 cursor-pointer group">
+                <div class="relative mt-0.5 flex-shrink-0">
+                  <input
+                    v-model="consentAccepted"
+                    type="checkbox"
+                    class="sr-only peer"
+                    @change="touched.consent = true"
+                  />
+                  <div
+                    class="w-4 h-4 rounded border-2 transition-colors flex items-center justify-center"
+                    :class="consentAccepted
+                      ? 'bg-blue-600 border-blue-600'
+                      : touched.consent
+                        ? 'border-red-400'
+                        : 'border-gray-300 group-hover:border-blue-400'"
+                  >
+                    <svg v-if="consentAccepted" class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-sm text-gray-600 leading-snug">
+                  {{ $t('contact.page.form.consent.text') }}
+                  <NuxtLink to="/privacy-policy" class="text-blue-600 hover:underline">
+                    {{ $t('contact.page.form.consent.link') }}
+                  </NuxtLink>
+                </span>
+              </label>
+              <span v-if="touched.consent && !consentAccepted" class="text-xs text-red-500">
+                {{ $t('contact.page.form.errors.consent_required') }}
+              </span>
             </div>
 
             <button
@@ -90,11 +136,12 @@
               :disabled="submitting"
               class="bg-blue-600 cursor-pointer hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm sm:text-base md:text-lg py-3 rounded-md transition"
             >
-              {{ submitting ? 'Odosielam...' : $t('contact.page.form.button') }}
+              {{ submitting ? $t('contact.page.form.submitting') : $t('contact.page.form.button') }}
             </button>
 
           </form>
         </div>
+
       </div>
     </div>
   </section>
@@ -109,31 +156,38 @@ import { PageType } from '../composables/modules/content/enum/PageType'
 const { metaTags } = fetchMeta(PageType.CONTACT)
 const meta = computed(() => metaTags.value?.meta_tag_translations?.[0])
 
+definePageMeta({
+  layout: 'default'
+})
+
 useSeoMeta({
-  title: computed(() => meta.value?.title),
-  description: computed(() => meta.value?.description),
-  ogTitle: computed(() => meta.value?.og_title),
-  ogDescription: computed(() => meta.value?.og_description),
-  ogType: computed(() => meta.value?.og_type),
-  ogUrl: computed(() => meta.value?.og_url),
-  twitterCard: computed(() => meta.value?.twitter_card),
-  twitterTitle: computed(() => meta.value?.twitter_title),
-  twitterDescription: computed(() => meta.value?.twitter_description),
+  title:               computed(() => meta.value?.title),
+  description:         computed(() => meta.value?.description),
+  ogTitle:             computed(() => meta.value?.og_title),
+  ogDescription:       computed(() => meta.value?.og_description),
+  ogType:              computed(() => meta.value?.og_type),
+  ogUrl:               computed(() => meta.value?.og_url),
+  twitterCard:         computed(() => meta.value?.twitter_card),
+  twitterTitle:        computed(() => meta.value?.twitter_title),
+  twitterDescription:  computed(() => meta.value?.twitter_description),
 })
 
 const { addToast } = useToast()
+const { t } = useI18n()
 
-const name = ref('')
-const surname = ref('')
-const email = ref('')
-const description = ref('')
-const submitting = ref(false)
+const name            = ref('')
+const surname         = ref('')
+const email           = ref('')
+const description     = ref('')
+const consentAccepted = ref(false)
+const submitting      = ref(false)
 
 const touched = reactive({
-  name: false,
-  surname: false,
-  email: false,
+  name:        false,
+  surname:     false,
+  email:       false,
   description: false,
+  consent:     false,
 })
 
 const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
@@ -149,23 +203,38 @@ const inputClass = (val, min = 1, isEmail = false) => [
     ? 'border-gray-200 focus:border-blue-500'
     : isValid(val, min, isEmail)
       ? 'border-green-400 focus:border-green-500 bg-green-50'
-      : 'border-red-400 focus:border-red-500 bg-red-50'
+      : 'border-red-400 focus:border-red-500 bg-red-50',
 ]
 
 const isFormValid = () =>
   isValid(name.value, 2) &&
   isValid(surname.value, 2) &&
   isValidEmail(email.value) &&
-  isValid(description.value, 10)
+  isValid(description.value, 10) &&
+  consentAccepted.value
+
+const resetForm = () => {
+  name.value            = ''
+  surname.value         = ''
+  email.value           = ''
+  description.value     = ''
+  consentAccepted.value = false
+  touched.name          = false
+  touched.surname       = false
+  touched.email         = false
+  touched.description   = false
+  touched.consent       = false
+}
 
 const handleSubmit = async () => {
-  touched.name = true
-  touched.surname = true
-  touched.email = true
+  touched.name        = true
+  touched.surname     = true
+  touched.email       = true
   touched.description = true
+  touched.consent     = true
 
   if (!isFormValid()) {
-    addToast({ message: 'Vyplňte správne všetky polia.', type: 'warning' })
+    addToast({ message: t('contact.page.form.errors.fill_all'), type: 'warning' })
     return
   }
 
@@ -173,22 +242,17 @@ const handleSubmit = async () => {
 
   try {
     await createSubmission({
-      name: name.value,
-      surname: surname.value,
-      email: email.value,
+      name:        name.value,
+      surname:     surname.value,
+      email:       email.value,
       description: description.value,
+      consent:     consentAccepted.value,
     })
-    addToast({ message: 'Správa bola odoslaná!', type: 'success' })
-    name.value = ''
-    surname.value = ''
-    email.value = ''
-    description.value = ''
-    touched.name = false
-    touched.surname = false
-    touched.email = false
-    touched.description = false
+
+    addToast({ message: t('contact.page.form.success'), type: 'success' })
+    resetForm()
   } catch (e) {
-    addToast({ message: 'Nastala chyba, skúste znova.', type: 'error' })
+    addToast({ message: t('contact.page.form.error'), type: 'error' })
   } finally {
     submitting.value = false
   }

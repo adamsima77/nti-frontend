@@ -382,4 +382,20 @@ const handleResetPassword = async () => {
     isLoading.value = false
   }
 }
+
+
+const handleStorageChange = async (e: StorageEvent) => {
+  if (e.key === '_t' && e.newValue) {
+    await authStore.getCurrentUser()
+    await navigateTo(authStore.redirectUser())
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('storage', handleStorageChange)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', handleStorageChange)
+})
 </script>

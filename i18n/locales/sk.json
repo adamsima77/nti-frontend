@@ -273,6 +273,20 @@
       },
 
       "form": {
+        "submitting": "Odosielam...",
+        "success": "Správa bola odoslaná!",
+        "error": "Nastala chyba, skúste znova.",
+        "consent": {
+          "text": "Súhlasím so spracovaním mojich osobných údajov v súlade s",
+          "link": "Zásadami ochrany osobných údajov"
+        },
+        "errors": {
+          "min_2": "Minimálne 2 znaky",
+          "min_10": "Minimálne 10 znakov",
+          "invalid_email": "Neplatný e-mail",
+          "consent_required": "Súhlas so spracovaním údajov je povinný",
+          "fill_all": "Vyplňte správne všetky polia."
+        },
         "title": "Napíšte nám",
         "fields": {
           "first_name": "Meno",
@@ -417,6 +431,8 @@
   },
 
   "organization-onboarding":{
+      "consent_notice": "Dokončením registrácie súhlasíte so spracovaním údajov vašej spoločnosti v súlade s našimi",
+      "privacy_link": "Zásady ochrany osobných údajov",
       "step": "Krok",
       "of": "z",
       "company_onboard": "Registrácia spoločnosti",
@@ -458,6 +474,8 @@
   },
 
   "student-onboarding":{
+      "consent_notice": "Vyplnením vášho profilu súhlasíte so spracovaním vašich osobných údajov a životopisu v súlade s našimi",
+      "privacy_link": "Zásady ochrany osobných údajov",
       "step": "Krok",
       "of": "z",
       "complete_profile": "Dokončite svoj profil",
