@@ -2,15 +2,13 @@
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
 
-      <!-- Type selection -->
+      <!-- Type selection — no Turnstile here -->
       <div v-if="step === 'type-selection'">
         <div class="mb-8 text-center">
           <h1 class="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
             {{ $t('auth.register.title') }}
           </h1>
-          <p class="text-gray-500 text-sm">
-            {{ $t('auth.register.subtitle') }}
-          </p>
+          <p class="text-gray-500 text-sm">{{ $t('auth.register.subtitle') }}</p>
         </div>
 
         <div class="space-y-3">
@@ -24,14 +22,10 @@
               </div>
               <div class="flex-1">
                 <div class="flex items-center justify-between">
-                  <h3 class="font-semibold text-slate-900 text-sm">
-                    {{ $t('auth.register.type_selection.student.title') }}
-                  </h3>
+                  <h3 class="font-semibold text-slate-900 text-sm">{{ $t('auth.register.type_selection.student.title') }}</h3>
                   <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
                 </div>
-                <p class="text-xs text-gray-500 mt-0.5">
-                  {{ $t('auth.register.type_selection.student.description') }}
-                </p>
+                <p class="text-xs text-gray-500 mt-0.5">{{ $t('auth.register.type_selection.student.description') }}</p>
               </div>
             </div>
           </button>
@@ -46,14 +40,10 @@
               </div>
               <div class="flex-1">
                 <div class="flex items-center justify-between">
-                  <h3 class="font-semibold text-slate-900 text-sm">
-                    {{ $t('auth.register.type_selection.organization.title') }}
-                  </h3>
+                  <h3 class="font-semibold text-slate-900 text-sm">{{ $t('auth.register.type_selection.organization.title') }}</h3>
                   <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
                 </div>
-                <p class="text-xs text-gray-500 mt-0.5">
-                  {{ $t('auth.register.type_selection.organization.description') }}
-                </p>
+                <p class="text-xs text-gray-500 mt-0.5">{{ $t('auth.register.type_selection.organization.description') }}</p>
               </div>
             </div>
           </button>
@@ -67,7 +57,7 @@
         </p>
       </div>
 
-      <!-- Registration form -->
+      <!-- Registration form — Turnstile is here -->
       <div v-else-if="step === 'register'">
         <div class="mb-8">
           <button
@@ -91,12 +81,8 @@
             </div>
           </div>
 
-          <h1 class="text-2xl font-bold text-slate-900 mb-1">
-            {{ $t('auth.register.title') }}
-          </h1>
-          <p class="text-sm text-gray-500">
-            {{ $t('auth.register.subtitle') }}
-          </p>
+          <h1 class="text-2xl font-bold text-slate-900 mb-1">{{ $t('auth.register.title') }}</h1>
+          <p class="text-sm text-gray-500">{{ $t('auth.register.subtitle') }}</p>
         </div>
 
         <form class="space-y-4" @submit.prevent="submitRegistration">
@@ -158,9 +144,20 @@
           </label>
           <p v-if="errors.terms" class="text-xs text-red-600">{{ errors.terms }}</p>
 
+          <!-- Turnstile -->
+         <div class="turnstile-wrapper">
+  <NuxtTurnstile
+    ref="turnstile"
+    v-model="turnstileToken"
+    :options="{ theme: 'light' }"
+    @error="resetTurnstile"
+    @expired="resetTurnstile"
+  />
+</div>
+
           <button
             type="submit"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || !turnstileToken"
             class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <svg v-if="isSubmitting" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
@@ -179,11 +176,8 @@
         </form>
       </div>
 
-      <!-- Success -->
-      <div
-        v-else-if="step === 'success'"
-        class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-5"
-      >
+      <!-- Success — no Turnstile here -->
+      <div v-else-if="step === 'success'" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-5">
         <div class="flex justify-center">
           <div class="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center">
             <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -205,10 +199,7 @@
         <button
           @click="resendEmail(formData.email)"
           :disabled="isResending || resendSuccess"
-          class="w-full bg-slate-900 text-white py-3 px-4 rounded-lg font-medium text-sm
-                 hover:bg-slate-800 transition-colors
-                 disabled:opacity-50 disabled:cursor-not-allowed
-                 flex items-center justify-center gap-2"
+          class="w-full bg-slate-900 text-white py-3 px-4 rounded-lg font-medium text-sm hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <svg v-if="isResending" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
@@ -239,16 +230,18 @@ useHead({
   title: computed(() => t('auth.register.title')),
 })
 
-const authStore    = useAuthStore()
-const api          = useApi()
-const localePath   = useLocalePath()
-const { addToast } = useToast()
+const authStore     = useAuthStore()
+const api           = useApi()
+const localePath    = useLocalePath()
+const { addToast }  = useToast()
 
-const step          = ref<'type-selection' | 'register' | 'success'>('type-selection')
-const accountType   = ref<'student' | 'partner' | null>(null)
-const isSubmitting  = ref(false)
-const isResending   = ref(false)
-const resendSuccess = ref(false)
+const step           = ref<'type-selection' | 'register' | 'success'>('type-selection')
+const accountType    = ref<'student' | 'partner' | null>(null)
+const isSubmitting   = ref(false)
+const isResending    = ref(false)
+const resendSuccess  = ref(false)
+const turnstileToken = ref('')
+const turnstile      = ref(null) // ref to widget
 
 const formData = reactive({
   email:                 '',
@@ -264,6 +257,13 @@ const errors = reactive({
   terms:                 '',
 })
 
+const resetTurnstile = () => {
+  turnstileToken.value = ''
+  nextTick(() => {
+    turnstile.value?.reset?.()
+  })
+}
+
 const handleStorageChange = async (e: StorageEvent) => {
   if (e.key === '_t' && e.newValue) {
     await authStore.getCurrentUser()
@@ -271,13 +271,8 @@ const handleStorageChange = async (e: StorageEvent) => {
   }
 }
 
-onMounted(() => {
-  window.addEventListener('storage', handleStorageChange)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('storage', handleStorageChange)
-})
+onMounted(() => window.addEventListener('storage', handleStorageChange))
+onUnmounted(() => window.removeEventListener('storage', handleStorageChange))
 
 const selectAccountType = (type: 'student' | 'partner') => {
   accountType.value = type
@@ -295,26 +290,9 @@ const passwordStrength = computed(() => {
   return score
 })
 
-const strengthColor = computed(() => {
-  if (passwordStrength.value <= 1)  return 'bg-red-400'
-  if (passwordStrength.value === 2) return 'bg-amber-400'
-  if (passwordStrength.value === 3) return 'bg-blue-400'
-  return 'bg-green-500'
-})
-
-const strengthTextColor = computed(() => {
-  if (passwordStrength.value <= 1)  return 'text-red-500'
-  if (passwordStrength.value === 2) return 'text-amber-500'
-  if (passwordStrength.value === 3) return 'text-blue-500'
-  return 'text-green-600'
-})
-
-const strengthLabel = computed(() => {
-  if (passwordStrength.value <= 1)  return t('auth.forgot.weak')
-  if (passwordStrength.value === 2) return t('auth.forgot.fair')
-  if (passwordStrength.value === 3) return t('auth.forgot.good')
-  return t('auth.forgot.strong')
-})
+const strengthColor     = computed(() => ['bg-red-400','bg-red-400','bg-amber-400','bg-blue-400','bg-green-500'][passwordStrength.value])
+const strengthTextColor = computed(() => ['text-red-500','text-red-500','text-amber-500','text-blue-500','text-green-600'][passwordStrength.value])
+const strengthLabel     = computed(() => [t('auth.forgot.weak'),t('auth.forgot.weak'),t('auth.forgot.fair'),t('auth.forgot.good'),t('auth.forgot.strong')][passwordStrength.value])
 
 const validatePassword = (password: string) => {
   if (password.length < 8)             return t('auth.forgot.password-length-w')
@@ -325,40 +303,28 @@ const validatePassword = (password: string) => {
 }
 
 const validateForm = (): boolean => {
-  errors.email                 = ''
-  errors.password              = ''
-  errors.password_confirmation = ''
-  errors.terms                 = ''
+  errors.email = errors.password = errors.password_confirmation = errors.terms = ''
   let valid = true
 
-  if (!formData.email) {
-    errors.email = t('auth.forgot.email_warning')
-    valid = false
-  }
-
+  if (!formData.email) { errors.email = t('auth.forgot.email_warning'); valid = false }
   if (!formData.password) {
-    errors.password = t('auth.forgot.password_warn')
-    valid = false
+    errors.password = t('auth.forgot.password_warn'); valid = false
   } else {
     const pwError = validatePassword(formData.password)
     if (pwError) { errors.password = pwError; valid = false }
   }
-
   if (formData.password !== formData.password_confirmation) {
-    errors.password_confirmation = t('auth.forgot.pass_not_match')
-    valid = false
+    errors.password_confirmation = t('auth.forgot.pass_not_match'); valid = false
   }
-
-  if (!formData.termsAccepted) {
-    errors.terms = t('auth.forgot.terms')
-    valid = false
-  }
+  if (!formData.termsAccepted) { errors.terms = t('auth.forgot.terms'); valid = false }
 
   return valid
 }
 
 const submitRegistration = async () => {
   if (!validateForm()) return
+  if (!turnstileToken.value) return
+
   isSubmitting.value = true
 
   try {
@@ -368,10 +334,12 @@ const submitRegistration = async () => {
       password_confirmation: formData.password_confirmation,
       role:                  accountType.value,
       language:              locale.value,
+      cf_turnstile_response: turnstileToken.value,
     })
 
     step.value = 'success'
   } catch (err: any) {
+    resetTurnstile() // reset properly instead of just clearing token
     const message = err?.data?.message ?? err?.message ?? t('auth.register.mistake')
     addToast({ message, type: 'error' })
   } finally {
@@ -382,7 +350,6 @@ const submitRegistration = async () => {
 const resendEmail = async (email: string) => {
   isResending.value = true
   resendSuccess.value = false
-
   try {
     await api.post('/auth/resend-verification', { email, lang: locale.value })
     resendSuccess.value = true
@@ -392,3 +359,16 @@ const resendEmail = async (email: string) => {
   }
 }
 </script>
+
+<style scoped>
+    .turnstile-wrapper {
+  width: 100%;
+  max-width: 330px; /* adjust as needed */
+  overflow: hidden;
+}
+
+/* Optional: center it */
+.turnstile-wrapper iframe {
+  max-width: 100%;
+}
+</style>

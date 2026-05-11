@@ -94,39 +94,37 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const hasPermission = (permission: string): boolean => {
-    // mirror backend before() hook — superadmin and admin bypass everything
     if (hasRole(['nti_superadmin', 'nti_admin'])) return true
     return userPermissions.value.includes(permission)
   }
 
-  const redirectUser = (u: User | null = null): string => {
-    const localePath = useLocalePath()
-    const userRef = u ?? user.value
+ const redirectUser = (u: User | null = null): string => {
+  const userRef = u ?? user.value
 
-    if (!userRef) return localePath('/auth/login')
+  if (!userRef) return '/auth/login'
 
-    if (userRef.status_id === UserStatus.PENDING_ONBOARDING) {
-      return localePath('/auth/onboarding')
-    }
-
-    if (userRef.status_id === UserStatus.PENDING_APPROVAL) {
-      return localePath('/auth/pending-approval')
-    }
-
-    const role = userRef.roles
-      ?.map(r => ROLE_MAP[r.name])
-      ?.find(Boolean)
-
-    if (role === 'superadmin') return localePath('/super-admin')
-    if (role === 'admin')      return localePath('/admin')
-    if (role === 'cms_editor') return localePath('/content-manager')
-    if (role === 'evaluator')  return localePath('/hodnotenie')
-    if (role === 'company')    return localePath('/firma')
-    if (role === 'mentor')     return localePath('/mentor')
-    if (role === 'student')    return localePath('/student')
-
-    return localePath('/')
+  if (userRef.status_id === UserStatus.PENDING_ONBOARDING) {
+    return '/auth/onboarding'
   }
+
+  if (userRef.status_id === UserStatus.PENDING_APPROVAL) {
+    return '/auth/pending-approval'
+  }
+
+  const role = userRef.roles
+    ?.map(r => ROLE_MAP[r.name])
+    ?.find(Boolean)
+
+  if (role === 'superadmin') return '/super-admin'
+  if (role === 'admin')      return '/admin'
+  if (role === 'cms_editor') return '/content-manager'
+  if (role === 'evaluator')  return '/hodnotenie'
+  if (role === 'company')    return '/firma'
+  if (role === 'mentor')     return '/mentor'
+  if (role === 'student')    return '/student'
+
+  return '/'
+}
 
   // ---- actions ----
 
@@ -156,15 +154,16 @@ export const useAuthStore = defineStore('auth', () => {
     return await getCurrentUser()
   }
 
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = async (email: string, password: string, cfTurnstileResponse: string): Promise<void> => {
     isLoading.value = true
     error.value = null
 
     try {
-      const res = await api.post('/auth/login', { email, password }) as {
-        token: string
-        user: User
-      }
+      const res = await api.post('/auth/login', {
+        email,
+        password,
+        cf_turnstile_response: cfTurnstileResponse,
+      }) as { token: string; user: User }
 
       if (import.meta.client) {
         localStorage.setItem('_t', res.token)
@@ -172,8 +171,8 @@ export const useAuthStore = defineStore('auth', () => {
 
       user.value = res.user
       await getCurrentUser()
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Login error'
+    } catch (err: any) {
+      const message = err?.data?.message ?? err?.response?.data?.message ?? err?.message ?? 'Login error'
       error.value = message
       throw new Error(message)
     } finally {
@@ -199,8 +198,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const requestPasswordReset = async (email: string, lang: string) => {
-    return await api.post('/auth/forgot-password', { email, lang })
+  const requestPasswordReset = async (email: string, lang: string, cfTurnstileResponse: string) => {
+    return await api.post('/auth/forgot-password', {
+      email,
+      lang,
+      cf_turnstile_response: cfTurnstileResponse,
+    })
   }
 
   const resetPassword = async (

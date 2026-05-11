@@ -1,22 +1,33 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   css: ['./app/assets/main.css'],
-  modules: ['@pinia/nuxt', '@nuxt/eslint', '@nuxtjs/i18n','@nuxtjs/sitemap'],
+  modules: ['@pinia/nuxt', '@nuxt/eslint', '@nuxtjs/i18n', '@nuxtjs/sitemap', '@nuxtjs/turnstile'],
 
   vite: {
+    plugins: [tailwindcss()],
     server: {
       watch: {
-        usePolling: true  
+        usePolling: true
       }
     }
   },
 
+  turnstile: {
+    siteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY,
+  },
+
+  runtimeConfig: {
+    apiBase: process.env.NUXT_API_BASE || 'http://backend:8000/api',
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost/api',
+    },
+  },
+
   sitemap: {
-    //siteurl: 'https://nti.sk',
-    //Not indexed
     exclude: [
       '/auth/**',
       '/student/**',
@@ -26,7 +37,6 @@ export default defineNuxtConfig({
       '/admin/**',
       '/notifikacie/**'
     ],
-    //Indexed routes
     urls: [
       '/',
       '/kontakt',
@@ -38,6 +48,7 @@ export default defineNuxtConfig({
       '/vyzvy'
     ]
   },
+
   routeRules: {
     '/auth/**': { ssr: false },
     '/student/**': { ssr: false },
@@ -49,31 +60,21 @@ export default defineNuxtConfig({
     '/admin/**': { ssr: false },
     '/notifikacie/**': { ssr: false }
   },
-     i18n: {
+
+  i18n: {
     strategy: 'prefix_except_default',
     defaultLocale: 'sk',
     fallbackLocale: 'en',
- 
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
       fallbackLocale: 'en',
       alwaysRedirect: false,
     },
-
     langDir: 'locales/',
     locales: [
       { code: 'en', name: 'English', lang: 'en-US', file: 'en.json' },
-      { code: 'sk', name: 'Slovak',  lang: 'sk-SK', file: 'sk.json' }
+      { code: 'sk', name: 'Slovak', lang: 'sk-SK', file: 'sk.json' }
     ],
-  },
- runtimeConfig: {
-    apiBase: process.env.NUXT_API_BASE || 'http://backend:8000/api',
-    public: {
-        apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost/api',
-    },
-},
-  vite: {
-    plugins: [tailwindcss()],
   },
 })

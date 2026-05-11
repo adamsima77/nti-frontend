@@ -407,6 +407,16 @@
   "request_new_link": "Request new link"
 },
   "login": {
+
+     "errors": {
+      "invalid_credentials": "Incorrect email or password.",
+      "unverified_email": "Please verify your email before logging in.",
+      "pending_email": "Your account is pending email verification.",
+      "inactive": "Your account has been deactivated.",
+      "banned": "Your account has been blocked. Contact support.",
+      "turnstile": "Verification failed. Please try again.",
+      "generic": "Login failed. Please try again."
+    },
     "title": "Login",
     "subtitle": "Sign in to your NTI account",
     "mistake": "Unexpected error",

@@ -1,25 +1,24 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
+  <div class="min-h-screen w-full flex items-center justify-center bg-gray-50 px-3">
     <div class="w-full max-w-md">
+
       <form
-        class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-5"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 sm:p-6 space-y-4"
         @submit.prevent="handleLogin"
       >
-        <div class="mb-8 text-center">
-          <NuxtLink
-            :to="localePath('/')"
-            class="inline-block mb-6"
-          />
 
+        <!-- Header -->
+        <div class="mb-5 text-center">
+          <NuxtLink :to="localePath('/')" class="inline-block mb-4" />
           <h1 class="text-2xl md:text-3xl font-bold text-navy mb-2">
             {{ $t('auth.login.title') }}
           </h1>
-
-          <p class="text-gray-600">
+          <p class="text-gray-600 text-sm sm:text-base">
             {{ $t('auth.login.subtitle') }}
           </p>
         </div>
 
+        <!-- Email -->
         <UiInput
           v-model="formData.email"
           type="email"
@@ -29,6 +28,7 @@
           :error="errors.email"
         />
 
+        <!-- Password -->
         <UiInput
           v-model="formData.password"
           type="password"
@@ -38,6 +38,7 @@
           :error="errors.password"
         />
 
+        <!-- Forgot -->
         <div class="flex justify-end">
           <NuxtLink
             :to="localePath('/auth/forgot-password')"
@@ -47,19 +48,31 @@
           </NuxtLink>
         </div>
 
+        <!-- Turnstile -->
+        <div class="turnstile-wrapper">
+          <NuxtTurnstile
+            ref="turnstile"
+            v-model="turnstileToken"
+            :options="{
+              theme: 'light',
+              size: 'flexible'
+            }"
+            @error="resetTurnstile"
+            @expired="resetTurnstile"
+          />
+        </div>
+
+        <!-- Submit -->
         <button
           type="submit"
-          :disabled="isLoading"
+          :disabled="isLoading || !turnstileToken"
           class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span v-if="!isLoading">
-            {{ $t('auth.login.submit') }}
-          </span>
-          <span v-else>
-            {{ $t('auth.login.loading') }}
-          </span>
+          <span v-if="!isLoading">{{ $t('auth.login.submit') }}</span>
+          <span v-else>{{ $t('auth.login.loading') }}</span>
         </button>
 
+        <!-- Register -->
         <p class="text-center text-gray-600 text-sm">
           {{ $t('auth.login.no_account') }}
           <NuxtLink
@@ -69,16 +82,18 @@
             {{ $t('auth.login.register') }}
           </NuxtLink>
         </p>
+
       </form>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, nextTick, onMounted, onUnmounted } from 'vue'
 
-const localePath = useLocalePath()
-const { t } = useI18n()
+const localePath   = useLocalePath()
+const { t }        = useI18n()
+
 definePageMeta({
   layout: 'default',
   middleware: 'guest',
@@ -88,12 +103,13 @@ useHead({
   title: computed(() => t('auth.login.title')),
 })
 
-const authStore = useAuthStore()
-const router = useRouter()
-const route = useRoute()
-
+const authStore    = useAuthStore()
+const route        = useRoute()
 const { addToast } = useToast()
-const isLoading = ref(false)
+
+const turnstile      = ref(null)
+const isLoading      = ref(false)
+const turnstileToken = ref('')
 
 const formData = reactive({
   email: '',
@@ -101,9 +117,45 @@ const formData = reactive({
 })
 
 const errors = reactive({
-  email: null,
-  password: null,
+  email: null as string | null,
+  password: null as string | null,
 })
+
+const resetTurnstile = () => {
+  turnstileToken.value = ''
+
+  nextTick(() => {
+    turnstile.value?.reset?.()
+  })
+}
+
+/**
+ * Return translation KEYS instead of translated text.
+ * This prevents wrong-language issues after redirects.
+ */
+const getLocalizedLoginErrorKey = (backendMessage: string): string => {
+  const map: Record<string, string> = {
+    'The provided credentials are incorrect.':
+      'auth.login.errors.invalid_credentials',
+
+    'Please verify your email before logging in.':
+      'auth.login.errors.unverified_email',
+
+    'Your account is pending email approval.':
+      'auth.login.errors.pending_email',
+
+    'Your account has been deactivated.':
+      'auth.login.errors.inactive',
+
+    'Your account has been blocked. Contact support.':
+      'auth.login.errors.banned',
+
+    'Human verification failed. Please try again.':
+      'auth.login.errors.turnstile',
+  }
+
+  return map[backendMessage] ?? 'auth.login.errors.generic'
+}
 
 const validateForm = () => {
   errors.email = null
@@ -123,53 +175,74 @@ const validateForm = () => {
 
   return isValid
 }
+
 const handleLogin = async () => {
   if (!validateForm()) return
+  if (!turnstileToken.value) return
 
   isLoading.value = true
 
   try {
-    await authStore.login(formData.email, formData.password)
+    await authStore.login(
+      formData.email,
+      formData.password,
+      turnstileToken.value
+    )
 
     const redirectQuery = route.query.redirect
     const redirectUrl = Array.isArray(redirectQuery)
       ? redirectQuery[0]
       : redirectQuery
 
+    resetTurnstile()
+
+    /**
+     * IMPORTANT:
+     * Always preserve locale in redirects.
+     */
     if (redirectUrl && redirectUrl.startsWith('/')) {
-      await router.push(redirectUrl)
+      await navigateTo(localePath(redirectUrl))
     } else {
-      await router.push(
-        authStore.redirectUser(authStore.user!)
-      )
+      await navigateTo(localePath(authStore.redirectUser()))
     }
+
   } catch (error: unknown) {
-    const message =
+    resetTurnstile()
+
+    const raw =
       error instanceof Error
         ? error.message
-        : t('auth.login.mistake')
+        : ''
+
+    /**
+     * Translate only at render time.
+     */
+    const message = t(getLocalizedLoginErrorKey(raw))
 
     addToast({
       message,
-      type: 'error'
+      type: 'error',
     })
+
   } finally {
     isLoading.value = false
   }
 }
 
-
-
 const checkTokenAndRedirect = async () => {
   const token = localStorage.getItem('_t')
-
   if (!token) return
-  if (route.path !== '/auth/login') return
 
+  /**
+   * Safer than comparing localized paths directly.
+   */
+  if (!route.path.includes('/auth/login')) return
 
   await authStore.getCurrentUser()
 
-  await navigateTo(authStore.redirectUser(authStore.user))
+  await navigateTo(
+    localePath(authStore.redirectUser())
+  )
 }
 
 const handleStorage = (e: StorageEvent) => {
@@ -180,6 +253,7 @@ const handleStorage = (e: StorageEvent) => {
 
 onMounted(() => {
   checkTokenAndRedirect()
+
   window.addEventListener('storage', handleStorage)
 })
 
@@ -187,3 +261,15 @@ onUnmounted(() => {
   window.removeEventListener('storage', handleStorage)
 })
 </script>
+
+<style scoped>
+.turnstile-wrapper {
+  width: 100%;
+  max-width: 330px;
+  overflow: hidden;
+}
+
+.turnstile-wrapper :deep(iframe) {
+  max-width: 100%;
+}
+</style>

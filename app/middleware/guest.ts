@@ -1,7 +1,8 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  const auth  = useAuthStore()
-  const token = import.meta.client ? localStorage.getItem('_t') : null
-
+  const auth       = useAuthStore()
+  const localePath = useLocalePath()
+  const token      = import.meta.client ? localStorage.getItem('_t') : null
+ 
   if (!token && !auth.user) return
 
   if (!auth.user && token) {
@@ -13,5 +14,5 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
   }
 
-  return navigateTo(auth.redirectUser())
+  return navigateTo(localePath(auth.redirectUser()))
 })

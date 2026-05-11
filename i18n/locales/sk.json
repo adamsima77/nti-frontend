@@ -408,6 +408,16 @@
   "request_new_link": "Požiadať o nový odkaz"
 },
   "login": {
+
+     "errors": {
+      "invalid_credentials": "Nesprávny email alebo heslo.",
+      "unverified_email": "Prosím, overte svoj email pred prihlásením.",
+      "pending_email": "Váš účet čaká na overenie emailu.",
+      "inactive": "Váš účet bol deaktivovaný.",
+      "banned": "Váš účet bol zablokovaný. Kontaktujte podporu.",
+      "turnstile": "Overenie zlyhalo. Skúste to znova.",
+      "generic": "Prihlásenie zlyhalo. Skúste to znova."
+    },
     "title": "Prihlásenie",
     "subtitle": "Prihláste sa do vášho NTI účtu",
     "mistake": "Chyba pri prihlasovaní",

@@ -51,7 +51,10 @@ const handleLogout = async () => {
 const handleStorageChange = async (e: StorageEvent) => {
   if (e.key === '_t' && e.newValue) {
     await auth.getCurrentUser()
-    await navigateTo(auth.redirectUser())
+
+    if (auth.user && !auth.isPendingApproval) {
+      await navigateTo(auth.redirectUser())
+    }
   }
 }
 
