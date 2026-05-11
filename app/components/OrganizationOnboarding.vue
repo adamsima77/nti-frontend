@@ -202,7 +202,7 @@
                 <svg v-if="form.sector.includes(s.id)" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                 </svg>
-                {{ s.name }}
+               {{ s.name }}
               </span>
             </label>
 
@@ -323,10 +323,16 @@ const form = reactive({
 
 const sectors = ref<{ id: number; name: string }[]>([])
 
+const { locale } = useI18n()
 onMounted(async () => {
-  sectors.value = await api.get('/sectors')
-})
+    const response = await api.get(`/sectors/lang/${locale.value}`)
 
+  sectors.value = response.map((s: any) => ({
+    id: s.id,
+    name:
+      s.sector_translations?.[0]?.name ?? '' 
+  }))
+})
 const touched = reactive<Record<string, boolean>>({})
 const touch = (field: string) => {
   touched[field] = true
@@ -336,7 +342,9 @@ const progress = computed(() => ((step.value - 1) / 2) * 100)
 
 const filteredSectors = computed(() =>
   sectors.value.filter(s =>
-    s.name.toLowerCase().includes(sectorSearch.value.toLowerCase())
+    (s.name ?? '')
+      .toLowerCase()
+      .includes(sectorSearch.value.toLowerCase())
   )
 )
 
