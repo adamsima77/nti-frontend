@@ -119,20 +119,6 @@ function normalizeTeamFromApi(
   }
 }
 
-// Mock test team for development
-const TEST_TEAM: Team = {
-  id: 999,
-  name: 'Test Team',
-  description: 'Testovací tím na testovanie aplikácie',
-  myRole: 'Team Lead',
-  createdAt: '2026-03-01',
-  members: [
-    { id: 1, name: 'Jana Testová', email: 'jana@test.local', role: 'Team Lead' },
-    { id: 2, name: 'Marko Tester', email: 'marko@test.local', role: 'Developer' },
-  ],
-  applications: [],
-}
-
 export const useTeamsStore = defineStore('teams', () => {
   const api = useApi()
   const auth = useAuthStore()
@@ -158,8 +144,7 @@ export const useTeamsStore = defineStore('teams', () => {
         .filter((t): t is Team => t != null)
       return teams.value
     } catch (err) {
-      // Fallback to test team for development
-      teams.value = [TEST_TEAM]
+      teams.value = []
       return teams.value
     } finally {
       isLoading.value = false

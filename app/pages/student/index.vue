@@ -1,5 +1,11 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
+    <div
+      v-if="pending"
+      class="mb-10 h-40 rounded-lg bg-gray-100 animate-pulse"
+    />
+
+    <template v-else>
     <!-- Header -->
     <div class="mb-10">
       <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
@@ -43,7 +49,7 @@
         >
           <span class="text-sm text-amber-700">{{ action.message }}</span>
           <NuxtLink
-            :to="action.link"
+            :to="localePath(action.link)"
             class="text-sm font-medium text-amber-700 hover:text-amber-900 flex items-center gap-1"
           >
             Vyriešiť
@@ -115,7 +121,7 @@
               </span>
             </div>
             <NuxtLink
-              :to="`/student/prihlasky/${app.id}`"
+              :to="localePath(`/student/prihlasky/${app.id}`)"
               class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
             >
               Zobraziť detail
@@ -193,7 +199,7 @@
           </div>
 
           <NuxtLink
-            :to="`/student/prihlasky/${project.id}`"
+            :to="localePath(`/student/prihlasky/${project.id}`)"
             class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 mt-3"
           >
             Zobraziť detail
@@ -245,6 +251,7 @@
         message="Zatiaľ ste členom žiadneho tímu"
       />
     </div>
+    </template>
   </div>
 </template>
 
@@ -261,6 +268,7 @@ import {
   Circle,
 } from 'lucide-vue-next'
 import { useDashboard } from '../../composables/modules/student/useDashboard'
+
 
 const localePath = useLocalePath()
 

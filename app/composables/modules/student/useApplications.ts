@@ -1,10 +1,38 @@
-import type { Application, Milestone } from './types'
+import { computed } from 'vue'
+import type {
+  Application,
+  ApplicationComment,
+  ApplicationDocumentRow,
+  ApplicationHistoryEntry,
+  ApplicationStatus,
+  Milestone,
+} from './types'
 
-interface ApiMilestone {
+interface ApiMilestoneRaw {
   id: number
-  title: string
-  due_date: string
-  status: 'completed' | 'in_progress' | 'pending'
+  title?: string
+  name?: string
+  due_date?: string
+  dueDate?: string
+  status?: string
+  description?: string | null
+  comments?: string | null
+  completed_at?: string | null
+  completedAt?: string | null
+}
+
+interface ApiStatusHistoryItem {
+  id?: number
+  status?: { id?: number; name?: string }
+  note?: string | null
+  created_at?: string
+}
+
+interface ApiDocumentItem {
+  id: number
+  name?: string
+  size?: string | null
+  uploaded_at?: string | null
 }
 
 interface ApiApplication {
@@ -17,6 +45,7 @@ interface ApiApplication {
     }
   }
   team?: {
+    id?: number
     name: string
   }
   team_id?: number
@@ -24,8 +53,10 @@ interface ApiApplication {
   submitted_at: string | null
   team_members_count?: number
   documents_count?: number
-  documents?: { id: number }[]
-  milestones?: ApiMilestone[]
+  documents?: ApiDocumentItem[]
+  milestones?: ApiMilestoneRaw[]
+  status_history?: ApiStatusHistoryItem[]
+  description?: string | null
 }
 
 function extractApplicationsList(res: unknown): ApiApplication[] {
@@ -47,7 +78,12 @@ function extractSingleApplication(res: unknown): ApiApplication | null {
   return null
 }
 
-function mapStatusFromApi(status: ApiApplication['status']): Application['status'] {
+function formatApiDate(iso: string | null | undefined): string {
+  if (!iso) return ''
+  return String(iso).slice(0, 10)
+}
+
+export function mapStatusFromApi(status: ApiApplication['status']): ApplicationStatus {
   const name = typeof status === 'string' ? status : (status?.name ?? '')
   const n = name.toLowerCase()
   if (n.includes('draft')) return 'draft'
@@ -59,25 +95,68 @@ function mapStatusFromApi(status: ApiApplication['status']): Application['status
   return 'draft'
 }
 
-/**
- * Map API response to Application interface
- */
-export const mapApplication = (app: ApiApplication): Application => ({
-  id: app.id,
-  title: app.name ?? app.call?.name ?? `Prihláška #${app.id}`,
-  program: app.call?.program?.name ?? app.call?.name ?? 'Program',
-  team: app.team?.name ?? (app.team_id != null ? `Tím #${app.team_id}` : 'Tím'),
-  status: mapStatusFromApi(app.status),
-  submittedAt: app.submitted_at,
-  members: app.team_members_count ?? 0,
-  documents: app.documents_count ?? (Array.isArray(app.documents) ? app.documents.length : 0),
-  milestones: (app.milestones ?? []).map((m: ApiMilestone) => ({
+function mapMilestoneStatus(s: unknown): Milestone['status'] {
+  const v = String(s ?? '')
+  if (v === 'completed' || v === 'in_progress' || v === 'pending') return v
+  return 'pending'
+}
+
+function mapHistory(app: ApiApplication): ApplicationHistoryEntry[] {
+  const raw = app.status_history ?? []
+  return [...raw]
+    .filter((h) => h?.created_at)
+    .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)))
+    .map((h) => ({
+      status: mapStatusFromApi(h.status),
+      date: formatApiDate(h.created_at),
+      note: h.note ?? null,
+    }))
+}
+
+function mapDocumentRows(app: ApiApplication): ApplicationDocumentRow[] {
+  const docs = app.documents ?? []
+  return docs.map((d) => ({
+    id: d.id,
+    name: d.name ?? `Dokument #${d.id}`,
+    size: d.size ?? null,
+    uploadedAt: d.uploaded_at ? formatApiDate(d.uploaded_at) : null,
+  }))
+}
+
+function mapMilestones(app: ApiApplication): Milestone[] {
+  return (app.milestones ?? []).map((m: ApiMilestoneRaw) => ({
     id: m.id,
-    title: m.title,
-    dueDate: m.due_date,
-    status: m.status,
-  })),
-})
+    title: m.title ?? m.name ?? 'Míľnik',
+    dueDate: m.due_date ?? m.dueDate ?? '',
+    status: mapMilestoneStatus(m.status),
+    description: m.description ?? m.comments ?? null,
+    completedAt: m.completed_at ?? m.completedAt ?? null,
+  }))
+}
+
+/**
+ * Map API response to Application interface (zoznam aj detail).
+ */
+export const mapApplication = (app: ApiApplication): Application => {
+  const documentRows = mapDocumentRows(app)
+  const docCount = app.documents_count ?? documentRows.length
+
+  return {
+    id: app.id,
+    title: app.name ?? app.call?.name ?? `Prihláška #${app.id}`,
+    program: app.call?.program?.name ?? app.call?.name ?? 'Program',
+    team: app.team?.name ?? (app.team_id != null ? `Tím #${app.team_id}` : 'Tím'),
+    status: mapStatusFromApi(app.status),
+    submittedAt: app.submitted_at,
+    members: app.team_members_count ?? 0,
+    documents: docCount,
+    milestones: mapMilestones(app),
+    description: app.description ?? '',
+    documentRows,
+    history: mapHistory(app),
+    comments: [] as ApplicationComment[],
+  }
+}
 
 /**
  * Fetch all applications for the current user
@@ -95,7 +174,7 @@ export const useApplications = () => {
         return apps.map(mapApplication)
       } catch (err) {
         console.error('Failed to fetch applications:', err)
-        return [] // Return empty array on error
+        return []
       }
     },
     {
@@ -114,26 +193,30 @@ export const useApplications = () => {
 }
 
 /**
- * Fetch single application by ID
+ * Fetch single application by ID (reaktívne pri zmene route).
  */
-export const useApplication = (id: string | number) => {
+export const useApplication = (getId: () => string | number) => {
   const api = useApi()
   const { locale } = useI18n()
 
+  const key = computed(() => `application-${getId()}-${locale.value}`)
+
   const { data, pending, error, refresh } = useAsyncData(
-    () => `application-${id}-${locale.value}`,
+    key,
     async () => {
+      const id = getId()
+      if (id === '' || id === undefined || id === null) return null
       try {
         const res = await api.get(`/applications/${id}`) as unknown
         const raw = extractSingleApplication(res)
         return raw ? mapApplication(raw) : null
       } catch (err) {
         console.error(`Failed to fetch application ${id}:`, err)
-        return null // Return null on error
+        return null
       }
     },
     {
-      watch: [() => locale.value],
+      watch: [key],
       default: () => null as Application | null,
     }
   )

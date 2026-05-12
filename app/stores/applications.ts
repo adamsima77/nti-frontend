@@ -69,7 +69,14 @@ export const useApplicationsStore = defineStore('applications', () => {
 
     try {
       const response = await api.get('/applications')
-      applications.value = response.data || response
+      const list = Array.isArray((response as any)?.data?.data)
+        ? (response as any).data.data
+        : Array.isArray((response as any)?.data)
+          ? (response as any).data
+          : Array.isArray(response)
+            ? response
+            : []
+      applications.value = list
       return applications.value
     } finally {
       isLoading.value = false
@@ -81,25 +88,37 @@ export const useApplicationsStore = defineStore('applications', () => {
 
     try {
       const response = await api.get(`/applications/${id}`)
-      currentApplication.value = response.data || response
+      const raw = (response as any)?.data ?? response
+      currentApplication.value = raw
       return currentApplication.value
     } finally {
       isLoading.value = false
     }
   }
 
-  const createApplication = async (appData: Partial<Application>) => {
+  const createApplication = async (payload: {
+    callId: number
+    teamId: number
+    documentIds: number[]
+  }) => {
     isLoading.value = true
 
     try {
-      const response = await api.post('/applications', appData)
-      const newApp = response.data || response
+      const response = await api.post('/applications', {
+        call_id: payload.callId,
+        team_id: payload.teamId,
+        document_ids: payload.documentIds,
+      }) as { data?: { id: number }; id?: number }
 
+      const raw = response?.data ?? response
+      const id = raw?.id
+      if (id == null) throw new Error('Neplatná odpoveď servera')
+
+      const newApp = { id, teamId: payload.teamId, callId: payload.callId } as Application
       applications.value.push(newApp)
       currentApplication.value = newApp
 
-      // Clear draft if exists
-      const draftKey = `${newApp.teamId}_${newApp.callId}`
+      const draftKey = `${payload.teamId}_${payload.callId}`
       applicationDrafts.value.delete(draftKey)
 
       return newApp

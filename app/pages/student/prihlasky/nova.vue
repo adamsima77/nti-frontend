@@ -2,7 +2,12 @@
   <div class="max-w-4xl mx-auto px-6 py-10">
     <!-- Breadcrumbs -->
     <div class="mb-8">
-      <UiBreadcrumbs :items="[{ label: 'Prihlášky', to: '/prihlasky' }, { label: 'Nová prihláška' }]" />
+      <UiBreadcrumbs
+        :items="[
+          { label: 'Prihlášky', to: localePath('/student/prihlasky') },
+          { label: 'Nová prihláška' },
+        ]"
+      />
     </div>
 
     <!-- Header -->
@@ -76,7 +81,7 @@
           title="Žiadne otvorené výzvy"
           description="V tomto momente nie sú dostupné žiadne otvorené výzvy. Skúste neskôr."
         >
-          <NuxtLink to="/prihlasky">
+          <NuxtLink :to="localePath('/student/prihlasky')">
             <UiButton variant="outline">Späť na prihlášky</UiButton>
           </NuxtLink>
         </UiEmptyState>
@@ -107,7 +112,7 @@
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Tím</label>
           <select
-            v-model="selectedTeamId"
+            v-model.number="selectedTeamId"
             class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option
@@ -136,6 +141,13 @@
         @save-draft="handleSaveDraft"
         @submit="handleSubmit"
       />
+      <div
+        v-else
+        class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+      >
+        Táto výzva zatiaľ neobsahuje schému dynamického formulára z API. Prihlášku je možné dokončiť po doplnení backendu
+        (napr. definícia polí a nahrávanie dokumentov s vrátením <code class="text-xs">document_ids</code>).
+      </div>
     </div>
   </div>
 </template>
@@ -147,12 +159,13 @@ import type { Call } from '~/stores/calls'
 
 definePageMeta({
   layout: 'portal',
-  // middleware: 'auth', // TODO: re-enable when backend is available
+  middleware: ['auth'],
 })
 
 useHead({ title: 'Nová prihláška | NTI' })
 
 const router = useRouter()
+const localePath = useLocalePath()
 const callsStore = useCallsStore()
 const teamsStore = useTeamsStore()
 const applicationsStore = useApplicationsStore()
@@ -178,7 +191,7 @@ const selectCall = async (call: Call) => {
     if (draft) {
       draftData.value = draft.data
       addToast({
-        message: 'Načítam rozpracovaná prihláška',
+        message: 'Načítavam rozpracovanú prihlášku',
         type: 'info',
       })
     }
@@ -201,39 +214,42 @@ const handleSubmit = async (data: Record<string, any>) => {
     return
   }
 
+  const rawIds = (data as { document_ids?: unknown }).document_ids
+  const documentIds = Array.isArray(rawIds)
+    ? rawIds.map((x) => Number(x)).filter((n) => Number.isFinite(n) && n > 0)
+    : []
+
   isSubmitting.value = true
 
   try {
     const application = await applicationsStore.createApplication({
-      teamId: selectedTeamId.value,
       callId: selectedCall.value.id,
-      title: selectedCall.value.title,
-      description: selectedCall.value.description,
-      status: 'draft',
-      data,
+      teamId: Number(selectedTeamId.value),
+      documentIds,
     })
 
     addToast({
-      message: 'Prihláška vytvorená. Môžete ju teraz editovať alebo odoslať.',
+      message: 'Prihláška bola vytvorená.',
       type: 'success',
     })
 
-    // Clear draft
-    applicationsStore.clearDraft(selectedTeamId.value, selectedCall.value.id)
+    applicationsStore.clearDraft(Number(selectedTeamId.value), selectedCall.value.id)
 
-    // Redirect to application detail
-    await router.push(`/student/prihlasky/${application.id}`)
+    await router.push(localePath(`/student/prihlasky/${application.id}`))
+  } catch (err: any) {
+    const msg = err?.data?.message ?? err?.message ?? 'Odoslanie zlyhalo'
+    addToast({ message: msg, type: 'error' })
   } finally {
     isSubmitting.value = false
   }
 }
 
 const handleCancel = () => {
-  if (confirm('Skrátite rozpracovanú prihlášku bez uloženia?')) {
+  if (confirm('Zrušiť rozpracovanú prihlášku bez uloženia?')) {
     selectedCall.value = null
     selectedTeamId.value = null
     draftData.value = {}
-    router.push('/prihlasky')
+    router.push(localePath('/student/prihlasky'))
   }
 }
 
