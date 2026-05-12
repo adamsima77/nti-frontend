@@ -28,7 +28,7 @@
 
     <!-- Required actions -->
     <div
-      v-if="mockActions.length"
+      v-if="actions && actions.length"
       class="mb-8 bg-amber-50 border border-amber-200 rounded-lg p-5"
     >
       <div class="flex items-center gap-2 mb-3">
@@ -37,7 +37,7 @@
       </div>
       <ul class="space-y-2">
         <li
-          v-for="action in mockActions"
+          v-for="action in actions"
           :key="action.id"
           class="flex items-center justify-between"
         >
@@ -54,11 +54,11 @@
     </div>
 
     <!-- Upcoming deadlines -->
-    <div class="mb-8">
+    <div v-if="deadlines && deadlines.length" class="mb-8">
       <h2 class="text-xl font-bold text-navy mb-4">Blížiace sa termíny</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div
-          v-for="d in mockDeadlines"
+          v-for="d in deadlines"
           :key="d.id"
           class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 flex items-center gap-4"
         >
@@ -89,9 +89,9 @@
           <ChevronRight class="w-4 h-4" />
         </NuxtLink>
       </div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div v-if="applications && applications.length" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div
-          v-for="app in mockApplications"
+          v-for="app in applications.slice(0, 4)"
           :key="app.id"
           class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow"
         >
@@ -115,7 +115,7 @@
               </span>
             </div>
             <NuxtLink
-              :to="`/prihlasky/${app.id}`"
+              :to="`/student/prihlasky/${app.id}`"
               class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
             >
               Zobraziť detail
@@ -124,6 +124,11 @@
           </div>
         </div>
       </div>
+      <UiEmptyState
+        v-else
+        title="Žiadne prihlášky"
+        message="Zatiaľ ste nepodali žiadne prihlášky"
+      />
     </div>
 
     <!-- Active projects milestones -->
@@ -132,7 +137,7 @@
         <h2 class="text-xl font-bold text-navy">Aktívne projekty — Míľníky</h2>
       </div>
       <div
-        v-if="activeProjectsWithMilestones.length"
+        v-if="activeProjectsWithMilestones && activeProjectsWithMilestones.length"
         class="grid grid-cols-1 gap-4"
       >
         <div
@@ -188,7 +193,7 @@
           </div>
 
           <NuxtLink
-            :to="`/prihlasky/${project.id}`"
+            :to="`/student/prihlasky/${project.id}`"
             class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 mt-3"
           >
             Zobraziť detail
@@ -214,9 +219,9 @@
           <ChevronRight class="w-4 h-4" />
         </NuxtLink>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div v-if="teams && teams.length" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div
-          v-for="team in mockTeams"
+          v-for="team in teams"
           :key="team.id"
           class="bg-white rounded-lg shadow-sm border border-gray-100 p-5"
         >
@@ -234,6 +239,11 @@
           </div>
         </div>
       </div>
+      <UiEmptyState
+        v-else
+        title="Žiadne tímy"
+        message="Zatiaľ ste členom žiadneho tímu"
+      />
     </div>
   </div>
 </template>
@@ -241,9 +251,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import {
-  FileText,
   Users,
-  User,
   Calendar,
   AlertTriangle,
   Clock,
@@ -252,6 +260,7 @@ import {
   CheckCircle,
   Circle,
 } from 'lucide-vue-next'
+import { useDashboard } from '../../composables/modules/student/useDashboard'
 
 const localePath = useLocalePath()
 
@@ -266,113 +275,21 @@ useHead({
 
 const authStore = useAuthStore()
 
+// Fetch dashboard data from API
+const {
+  applications,
+  teams,
+  deadlines,
+  actions,
+  stats,
+  activeProjectsWithMilestones,
+  pending,
+} = useDashboard()
 
 const userDisplayName = computed(() => {
   const user = authStore.user
   if (!user) return 'Užívateľ'
   return `${user.name} ${user.surname}`.trim() || user.email || 'Užívateľ'
-})
-
-// Mock data
-const mockApplications = [
-  {
-    id: 1,
-    title: 'EcoTrack - Sledovanie uhlíkovej stopy',
-    program: 'Program A',
-    team: 'GreenTech tím',
-    status: 'approved',
-    submittedAt: '2026-02-15',
-    members: 4,
-    documents: 6,
-    milestones: [
-      { id: 1, title: 'MVP vývoj', dueDate: '2026-04-30', status: 'completed' },
-      { id: 2, title: 'Pilotný test', dueDate: '2026-05-31', status: 'in_progress' },
-      { id: 3, title: 'Beta launch', dueDate: '2026-06-30', status: 'pending' },
-    ],
-  },
-  {
-    id: 2,
-    title: 'StudyBuddy - AI asistent pre študentov',
-    program: 'Program A',
-    team: 'AI Innovators',
-    status: 'evaluating',
-    submittedAt: '2026-03-10',
-    members: 3,
-    documents: 4,
-    milestones: [],
-  },
-  {
-    id: 3,
-    title: 'FitConnect - Fitness platforma',
-    program: 'Program B',
-    team: 'HealthTech',
-    status: 'submitted',
-    submittedAt: '2026-03-25',
-    members: 5,
-    documents: 3,
-    milestones: [],
-  },
-  {
-    id: 4,
-    title: 'LocalMarket - Farmársky marketplace',
-    program: 'Program A',
-    team: 'AgriDigital',
-    status: 'draft',
-    submittedAt: null,
-    members: 3,
-    documents: 1,
-    milestones: [],
-  },
-  {
-    id: 5,
-    title: 'SmartPark - Inteligentné parkovanie',
-    program: 'Program B',
-    team: 'UrbanTech',
-    status: 'rejected',
-    submittedAt: '2026-01-20',
-    members: 4,
-    documents: 5,
-    milestones: [],
-  },
-]
-
-const mockTeams = [
-  { id: 1, name: 'GreenTech tím', members: 4, role: 'Team Lead' },
-  { id: 2, name: 'AI Innovators', members: 3, role: 'Člen' },
-  { id: 3, name: 'HealthTech', members: 5, role: 'Člen' },
-]
-
-const mockDeadlines = [
-  { id: 1, title: 'Program A — Jarná výzva 2026', deadline: '2026-04-15', daysLeft: 16 },
-  { id: 2, title: 'Program B — Firemné výzvy Q2', deadline: '2026-04-30', daysLeft: 31 },
-]
-
-const mockActions = [
-  { id: 1, type: 'draft', message: 'Dokončite rozpracovanú prihlášku "LocalMarket"', link: '/prihlasky/4' },
-  {
-    id: 2,
-    type: 'supplement',
-    message: 'Doplňte dokumenty k prihláške "FitConnect"',
-    link: '/prihlasky/3',
-    deadline: '2026-04-05',
-  },
-]
-
-const stats = computed(() => ({
-  total: mockApplications.length,
-  approved: mockApplications.filter((a) => a.status === 'approved').length,
-  inProcess: mockApplications.filter((a) => ['submitted', 'evaluating'].includes(a.status)).length,
-  rejected: mockApplications.filter((a) => a.status === 'rejected').length,
-}))
-
-// Compute active projects with milestones (approved with milestones)
-const activeProjectsWithMilestones = computed(() => {
-  return mockApplications
-    .filter((a) => a.status === 'approved' && a.milestones && a.milestones.length > 0)
-    .map((app) => ({
-      ...app,
-      completedMilestones: app.milestones.filter((m) => m.status === 'completed').length,
-    }))
 })
 
 function milestoneProgress(project: any): number {

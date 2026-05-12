@@ -19,6 +19,106 @@ interface Team {
   applications: any[]
 }
 
+/** Align backend team role labels with UI permission checks (see timy/[id].vue). */
+function mapTeamRoleName(name: string | undefined): string {
+  if (!name) return 'Člen tímu'
+  if (name === 'Vedúci tímu') return 'Team Lead'
+  return name
+}
+
+function memberDisplayName(m: Record<string, unknown>): string {
+  const name = typeof m.name === 'string' ? m.name : ''
+  const surname = typeof m.surname === 'string' ? m.surname : ''
+  const combined = [name, surname].filter(Boolean).join(' ').trim()
+  if (combined) return combined
+  const email = typeof m.email === 'string' ? m.email : ''
+  return email || 'Neznámy'
+}
+
+function extractTeamsList(response: unknown): Record<string, unknown>[] {
+  if (!response || typeof response !== 'object') return []
+  if (Array.isArray(response)) return response as Record<string, unknown>[]
+  const r = response as Record<string, unknown>
+  if (Array.isArray(r.data)) return r.data as Record<string, unknown>[]
+  if (Array.isArray(r.teams)) return r.teams as Record<string, unknown>[]
+  return []
+}
+
+function extractSingleTeam(response: unknown): Record<string, unknown> | null {
+  if (!response || typeof response !== 'object') return null
+  const r = response as Record<string, unknown>
+  const raw = r.team ?? r.data ?? r
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) return raw as Record<string, unknown>
+  return null
+}
+
+function mapApiMember(m: Record<string, unknown>): TeamMember {
+  const pivot = (m.pivot && typeof m.pivot === 'object' ? m.pivot : {}) as Record<string, unknown>
+  const roleFromPivot = pivot.role && typeof pivot.role === 'object'
+    ? (pivot.role as { name?: string }).name
+    : undefined
+  const rawRole =
+    typeof m.role === 'string'
+      ? m.role
+      : typeof roleFromPivot === 'string'
+        ? roleFromPivot
+        : undefined
+
+  return {
+    id: Number(m.id),
+    name: memberDisplayName(m),
+    email: typeof m.email === 'string' ? m.email : '',
+    role: mapTeamRoleName(rawRole),
+  }
+}
+
+function normalizeTeamFromApi(
+  raw: Record<string, unknown> | null | undefined,
+  currentUserId: number | null,
+): Team | null {
+  if (!raw || typeof raw.id === 'undefined') return null
+
+  const membersRaw = raw.members
+  let members: TeamMember[] = []
+  if (Array.isArray(membersRaw)) {
+    members = membersRaw.map((m) => mapApiMember(m as Record<string, unknown>))
+  }
+
+  let myRole =
+    typeof raw.myRole === 'string'
+      ? raw.myRole
+      : typeof raw.my_role === 'string'
+        ? raw.my_role
+        : undefined
+
+  if (!myRole && currentUserId != null && Array.isArray(membersRaw)) {
+    const me = (membersRaw as Record<string, unknown>[]).find((m) => Number(m.id) === currentUserId)
+    if (me) myRole = mapApiMember(me).role
+  }
+
+  myRole = mapTeamRoleName(myRole ?? 'Člen tímu')
+
+  const createdRaw = raw.createdAt ?? raw.created_at
+  const createdAt =
+    typeof createdRaw === 'string'
+      ? createdRaw.slice(0, 10)
+      : createdRaw != null
+        ? String(createdRaw).slice(0, 10)
+        : ''
+
+  const applications = Array.isArray(raw.applications) ? raw.applications : []
+
+  return {
+    id: Number(raw.id),
+    name: typeof raw.name === 'string' ? raw.name : '',
+    description: typeof raw.description === 'string' ? raw.description : undefined,
+    myRole,
+    createdAt,
+    members,
+    applications,
+  }
+}
+
 // Mock test team for development
 const TEST_TEAM: Team = {
   id: 999,
@@ -35,6 +135,7 @@ const TEST_TEAM: Team = {
 
 export const useTeamsStore = defineStore('teams', () => {
   const api = useApi()
+  const auth = useAuthStore()
 
   // State
   const teams = ref<Team[]>([])
@@ -50,7 +151,11 @@ export const useTeamsStore = defineStore('teams', () => {
 
     try {
       const response = await api.get('/teams')
-      teams.value = response.data || response
+      const list = extractTeamsList(response)
+      const uid = auth.user?.id ?? null
+      teams.value = list
+        .map((item) => normalizeTeamFromApi(item, uid))
+        .filter((t): t is Team => t != null)
       return teams.value
     } catch (err) {
       // Fallback to test team for development
@@ -66,7 +171,9 @@ export const useTeamsStore = defineStore('teams', () => {
 
     try {
       const response = await api.get(`/teams/${id}`)
-      currentTeam.value = response.data || response
+      const raw = extractSingleTeam(response)
+      const uid = auth.user?.id ?? null
+      currentTeam.value = raw ? normalizeTeamFromApi(raw, uid) : null
       return currentTeam.value
     } finally {
       isLoading.value = false
@@ -82,10 +189,10 @@ export const useTeamsStore = defineStore('teams', () => {
 
     try {
       const response = await api.post('/teams', teamData)
-      const newTeam = response.data || response
-
-      // Pridaj do zoznamu
-      teams.value.push(newTeam)
+      const raw = extractSingleTeam(response)
+      const uid = auth.user?.id ?? null
+      const newTeam = raw ? normalizeTeamFromApi(raw, uid) : null
+      if (newTeam) teams.value.push(newTeam)
       return newTeam
     } finally {
       isLoading.value = false
@@ -97,17 +204,14 @@ export const useTeamsStore = defineStore('teams', () => {
 
     try {
       const response = await api.put(`/teams/${id}`, teamData)
-      const updatedTeam = response.data || response
+      const raw = extractSingleTeam(response)
+      const uid = auth.user?.id ?? null
+      const updatedTeam = raw ? normalizeTeamFromApi(raw, uid) : null
 
-      // Update v zozname
-      const index = teams.value.findIndex((t) => t.id === id)
-      if (index !== -1) {
-        teams.value[index] = updatedTeam
-      }
-
-      // Update currentTeam ak je to ten istý
-      if (currentTeam.value?.id === id) {
-        currentTeam.value = updatedTeam
+      if (updatedTeam) {
+        const index = teams.value.findIndex((t) => t.id === id)
+        if (index !== -1) teams.value[index] = updatedTeam
+        if (currentTeam.value?.id === id) currentTeam.value = updatedTeam
       }
 
       return updatedTeam

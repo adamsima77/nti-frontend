@@ -61,7 +61,7 @@
             </span>
           </div>
           <NuxtLink
-            :to="`/prihlasky/${app.id}`"
+            :to="`/student/prihlasky/${app.id}`"
             class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
           >
             Zobraziť detail

@@ -67,7 +67,7 @@
         <div class="flex items-center gap-1 mb-3">
           <div
             v-for="member in team.members.slice(0, 4)"
-            :key="member.name"
+            :key="member.id"
             class="w-8 h-8 rounded-full bg-navy text-white text-xs font-medium flex items-center justify-center"
             :title="member.name"
           >
@@ -93,7 +93,7 @@
 
         <!-- Detail link -->
         <NuxtLink
-          :to="`/timy/${team.id}`"
+          :to="localePath(`/student/timy/${team.id}`)"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
         >
           Zobraziť detail
@@ -135,9 +135,11 @@ onMounted(async () => {
 })
 
 function getInitials(name: string): string {
+  if (!name?.trim()) return '?'
   return name
     .split(' ')
     .map((n) => n[0])
+    .filter(Boolean)
     .join('')
     .toUpperCase()
     .slice(0, 2)

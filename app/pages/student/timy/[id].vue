@@ -164,7 +164,7 @@
                 Pozvať člena
               </button>
               <NuxtLink
-                to="/prihlasky/nova"
+                to="/student/prihlasky/nova"
                 class="block"
               >
                 <UiButton

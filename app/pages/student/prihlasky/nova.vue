@@ -222,7 +222,7 @@ const handleSubmit = async (data: Record<string, any>) => {
     applicationsStore.clearDraft(selectedTeamId.value, selectedCall.value.id)
 
     // Redirect to application detail
-    await router.push(`/prihlasky/${application.id}`)
+    await router.push(`/student/prihlasky/${application.id}`)
   } finally {
     isSubmitting.value = false
   }
