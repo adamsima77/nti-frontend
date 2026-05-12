@@ -82,7 +82,7 @@
                       : 'bg-gray-100 text-gray-700',
                   ]"
                 >
-                  {{ call.status === 'open' ? '🟢 Otvorené' : '🔒 Zatvorené' }}
+                  {{ call.status === 'open' ? `🟢 ${$t('calls.open')}` : `🔒 ${$t('calls.closed')}` }}
                 </span>
 
                 <!-- TITLE -->

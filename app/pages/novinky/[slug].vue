@@ -44,7 +44,7 @@
         <div class="mb-6">
           <UiBreadcrumbs
             :items="[
-              { label: 'Novinky', to: localePath('/novinky') },
+              { label: $t('news.news'), to: localePath('/novinky') },
               { label: `${newsDetail?.news_translations?.[0]?.title}` },
             ]"
           />

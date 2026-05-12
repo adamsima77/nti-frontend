@@ -1,4 +1,5 @@
 {
+  
   "home": {
     "program_header": "Naše programy",
     "partners_header": "Naši partneri",
@@ -27,7 +28,8 @@
   "news": {
     "read_more": "Čítaj viac",
     "more_news": "Viac noviniek",
-    "publicated": "Publikované"
+    "publicated": "Publikované",
+    "news": "Novinky"
   },
 
   "nav": {
@@ -241,6 +243,9 @@
     }
   },
   "calls": {
+    "open": "Otvorené",
+    "closed": "Uzamknuté",
+    "calls": "Výzvy",
     "vyzvy_terminy": {
       "hero": {
         "title": "Výzvy a termíny",

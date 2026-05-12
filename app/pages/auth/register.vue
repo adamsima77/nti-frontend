@@ -145,15 +145,15 @@
           <p v-if="errors.terms" class="text-xs text-red-600">{{ errors.terms }}</p>
 
           <!-- Turnstile -->
-         <div class="turnstile-wrapper">
-  <NuxtTurnstile
-    ref="turnstile"
-    v-model="turnstileToken"
-    :options="{ theme: 'light' }"
-    @error="resetTurnstile"
-    @expired="resetTurnstile"
-  />
-</div>
+          <div class="turnstile-wrapper">
+            <NuxtTurnstile
+              ref="turnstile"
+              v-model="turnstileToken"
+              :options="{ theme: 'light' }"
+              @error="resetTurnstile"
+              @expired="resetTurnstile"
+            />
+          </div>
 
           <button
             type="submit"
@@ -197,9 +197,9 @@
           {{ $t('auth.register.several-sec') }}
         </div>
         <button
-          @click="resendEmail(formData.email)"
           :disabled="isResending || resendSuccess"
           class="w-full bg-slate-900 text-white py-3 px-4 rounded-lg font-medium text-sm hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          @click="resendEmail(formData.email)"
         >
           <svg v-if="isResending" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
@@ -230,10 +230,10 @@ useHead({
   title: computed(() => t('auth.register.title')),
 })
 
-const authStore     = useAuthStore()
-const api           = useApi()
-const localePath    = useLocalePath()
-const { addToast }  = useToast()
+const authStore    = useAuthStore()
+const api          = useApi()
+const localePath   = useLocalePath()
+const { addToast, flushPendingToast } = useToast()
 
 const step           = ref<'type-selection' | 'register' | 'success'>('type-selection')
 const accountType    = ref<'student' | 'partner' | null>(null)
@@ -241,7 +241,7 @@ const isSubmitting   = ref(false)
 const isResending    = ref(false)
 const resendSuccess  = ref(false)
 const turnstileToken = ref('')
-const turnstile      = ref(null) // ref to widget
+const turnstile      = ref(null)
 
 const formData = reactive({
   email:                 '',
@@ -271,7 +271,13 @@ const handleStorageChange = async (e: StorageEvent) => {
   }
 }
 
-onMounted(() => window.addEventListener('storage', handleStorageChange))
+onMounted(() => {
+  // Show any toast queued from a previous navigation (e.g. forced session expiry).
+  flushPendingToast()
+
+  window.addEventListener('storage', handleStorageChange)
+})
+
 onUnmounted(() => window.removeEventListener('storage', handleStorageChange))
 
 const selectAccountType = (type: 'student' | 'partner') => {
@@ -290,9 +296,9 @@ const passwordStrength = computed(() => {
   return score
 })
 
-const strengthColor     = computed(() => ['bg-red-400','bg-red-400','bg-amber-400','bg-blue-400','bg-green-500'][passwordStrength.value])
-const strengthTextColor = computed(() => ['text-red-500','text-red-500','text-amber-500','text-blue-500','text-green-600'][passwordStrength.value])
-const strengthLabel     = computed(() => [t('auth.forgot.weak'),t('auth.forgot.weak'),t('auth.forgot.fair'),t('auth.forgot.good'),t('auth.forgot.strong')][passwordStrength.value])
+const strengthColor     = computed(() => ['bg-red-400', 'bg-red-400', 'bg-amber-400', 'bg-blue-400', 'bg-green-500'][passwordStrength.value])
+const strengthTextColor = computed(() => ['text-red-500', 'text-red-500', 'text-amber-500', 'text-blue-500', 'text-green-600'][passwordStrength.value])
+const strengthLabel     = computed(() => [t('auth.forgot.weak'), t('auth.forgot.weak'), t('auth.forgot.fair'), t('auth.forgot.good'), t('auth.forgot.strong')][passwordStrength.value])
 
 const validatePassword = (password: string) => {
   if (password.length < 8)             return t('auth.forgot.password-length-w')
@@ -306,17 +312,28 @@ const validateForm = (): boolean => {
   errors.email = errors.password = errors.password_confirmation = errors.terms = ''
   let valid = true
 
-  if (!formData.email) { errors.email = t('auth.forgot.email_warning'); valid = false }
+  if (!formData.email) {
+    errors.email = t('auth.forgot.email_warning')
+    valid = false
+  }
+
   if (!formData.password) {
-    errors.password = t('auth.forgot.password_warn'); valid = false
+    errors.password = t('auth.forgot.password_warn')
+    valid = false
   } else {
     const pwError = validatePassword(formData.password)
     if (pwError) { errors.password = pwError; valid = false }
   }
+
   if (formData.password !== formData.password_confirmation) {
-    errors.password_confirmation = t('auth.forgot.pass_not_match'); valid = false
+    errors.password_confirmation = t('auth.forgot.pass_not_match')
+    valid = false
   }
-  if (!formData.termsAccepted) { errors.terms = t('auth.forgot.terms'); valid = false }
+
+  if (!formData.termsAccepted) {
+    errors.terms = t('auth.forgot.terms')
+    valid = false
+  }
 
   return valid
 }
@@ -337,9 +354,16 @@ const submitRegistration = async () => {
       cf_turnstile_response: turnstileToken.value,
     })
 
+    // Show success toast immediately — we're staying on the same page (step = success).
+    addToast({
+      message: t('auth.register.success_toast') ?? 'Account created! Check your email.',
+      type: 'success',
+    })
+
     step.value = 'success'
+
   } catch (err: any) {
-    resetTurnstile() // reset properly instead of just clearing token
+    resetTurnstile()
     const message = err?.data?.message ?? err?.message ?? t('auth.register.mistake')
     addToast({ message, type: 'error' })
   } finally {
@@ -353,7 +377,16 @@ const resendEmail = async (email: string) => {
   try {
     await api.post('/auth/resend-verification', { email, lang: locale.value })
     resendSuccess.value = true
+
+    addToast({
+      message: t('auth.register.email-sent') ?? 'Verification email resent.',
+      type: 'success',
+    })
+
     setTimeout(() => { resendSuccess.value = false }, 5000)
+  } catch (err: any) {
+    const message = err?.data?.message ?? err?.message ?? t('auth.register.mistake')
+    addToast({ message, type: 'error' })
   } finally {
     isResending.value = false
   }
@@ -361,13 +394,12 @@ const resendEmail = async (email: string) => {
 </script>
 
 <style scoped>
-    .turnstile-wrapper {
+.turnstile-wrapper {
   width: 100%;
-  max-width: 330px; /* adjust as needed */
+  max-width: 330px;
   overflow: hidden;
 }
 
-/* Optional: center it */
 .turnstile-wrapper iframe {
   max-width: 100%;
 }

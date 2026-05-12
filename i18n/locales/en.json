@@ -27,7 +27,8 @@
   "news": {
     "read_more": "Read more",
     "more_news": "More news",
-    "publicated": "Published on"
+    "publicated": "Published on",
+    "news": "News"
   },
 
   "nav": {
@@ -241,6 +242,9 @@
     }
   },
 "calls": {
+  "open": "Open",
+  "closed": "Closed",
+  "calls": "Calls",
     "vyzvy_terminy": {
       "hero": {
         "title": "Challenges and deadlines",

@@ -105,7 +105,7 @@ useHead({
 
 const authStore    = useAuthStore()
 const route        = useRoute()
-const { addToast } = useToast()
+const { addToast, addToastAfterRedirect, flushPendingToast } = useToast()
 
 const turnstile      = ref(null)
 const isLoading      = ref(false)
@@ -123,37 +123,26 @@ const errors = reactive({
 
 const resetTurnstile = () => {
   turnstileToken.value = ''
-
   nextTick(() => {
     turnstile.value?.reset?.()
   })
 }
 
-/**
- * Return translation KEYS instead of translated text.
- * This prevents wrong-language issues after redirects.
- */
 const getLocalizedLoginErrorKey = (backendMessage: string): string => {
   const map: Record<string, string> = {
     'The provided credentials are incorrect.':
       'auth.login.errors.invalid_credentials',
-
     'Please verify your email before logging in.':
       'auth.login.errors.unverified_email',
-
     'Your account is pending email approval.':
       'auth.login.errors.pending_email',
-
     'Your account has been deactivated.':
       'auth.login.errors.inactive',
-
     'Your account has been blocked. Contact support.':
       'auth.login.errors.banned',
-
     'Human verification failed. Please try again.':
       'auth.login.errors.turnstile',
   }
-
   return map[backendMessage] ?? 'auth.login.errors.generic'
 }
 
@@ -186,7 +175,7 @@ const handleLogin = async () => {
     await authStore.login(
       formData.email,
       formData.password,
-      turnstileToken.value
+      turnstileToken.value,
     )
 
     const redirectQuery = route.query.redirect
@@ -196,10 +185,12 @@ const handleLogin = async () => {
 
     resetTurnstile()
 
-    /**
-     * IMPORTANT:
-     * Always preserve locale in redirects.
-     */
+    // Queue a success toast to appear after the redirect lands.
+    addToastAfterRedirect({
+      message: t('auth.login.success') ?? 'Welcome back!',
+      type: 'success',
+    })
+
     if (redirectUrl && redirectUrl.startsWith('/')) {
       await navigateTo(localePath(redirectUrl))
     } else {
@@ -209,18 +200,12 @@ const handleLogin = async () => {
   } catch (error: unknown) {
     resetTurnstile()
 
-    const raw =
-      error instanceof Error
-        ? error.message
-        : ''
+    const raw = error instanceof Error ? error.message : ''
 
-    /**
-     * Translate only at render time.
-     */
-    const message = t(getLocalizedLoginErrorKey(raw))
-
+    // Show the error toast immediately — we are NOT navigating away on failure,
+    // so the component stays mounted and the toast will render correctly.
     addToast({
-      message,
+      message: t(getLocalizedLoginErrorKey(raw)),
       type: 'error',
     })
 
@@ -233,16 +218,10 @@ const checkTokenAndRedirect = async () => {
   const token = localStorage.getItem('_t')
   if (!token) return
 
-  /**
-   * Safer than comparing localized paths directly.
-   */
   if (!route.path.includes('/auth/login')) return
 
   await authStore.getCurrentUser()
-
-  await navigateTo(
-    localePath(authStore.redirectUser())
-  )
+  await navigateTo(localePath(authStore.redirectUser()))
 }
 
 const handleStorage = (e: StorageEvent) => {
@@ -252,8 +231,10 @@ const handleStorage = (e: StorageEvent) => {
 }
 
 onMounted(() => {
-  checkTokenAndRedirect()
+  // Show any toast queued from a previous navigation (e.g. forced logout message).
+  flushPendingToast()
 
+  checkTokenAndRedirect()
   window.addEventListener('storage', handleStorage)
 })
 

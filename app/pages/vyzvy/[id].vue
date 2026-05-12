@@ -27,7 +27,7 @@
                   : 'bg-gray-400/20 text-gray-300'
               ]"
             >
-              {{ call.status === 'open' ? '🟢 Otvorené' : '🔒 Zatvorené' }}
+              {{ call.status === 'open' ? `🟢 ${$t('calls.open')}` : `🔒 ${$t('calls.closed')}` }}
             </span>
             <span class="text-blue-300 text-sm">{{ call.programName }}</span>
           </div>
