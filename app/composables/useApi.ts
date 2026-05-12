@@ -15,6 +15,7 @@ export const useApi = () => {
         ...options.headers,
       }
 
+      // ✅ Attach token only on client
       const token = import.meta.client
         ? localStorage.getItem('_t')
         : null
@@ -26,6 +27,7 @@ export const useApi = () => {
         }
       }
 
+      // ✅ IMPORTANT: DO NOT override multipart requests
       const isFormData = options.body instanceof FormData
 
       if (!isFormData) {
@@ -34,34 +36,24 @@ export const useApi = () => {
           'Content-Type': 'application/json',
         }
       }
+      // If FormData → let browser set Content-Type automatically
     },
 
-    async onResponseError({ response, request }) {
-      const isAuthEndpoint = String(request).includes('/auth/login')
-        || String(request).includes('/auth/register')
-        || String(request).includes('/auth/forgot-password')
-        || String(request).includes('/auth/reset-password')
-        || String(request).includes('/auth/resend-verification')
-        || String(request).includes('/auth/verify-email')
+   async onResponseError({ response, request }) {
+  if (response.status === 401) {
+    // Don't redirect if this is the login request itself
+    const isLoginRequest = String(request).includes('/auth/login')
+    if (isLoginRequest) return
 
-      // Treat both 401 and 500 on protected endpoints as session loss.
-      // Laravel can return 500 instead of 401 when Sanctum middleware crashes
-      // on a missing/revoked token before the auth check completes.
-      const isSessionLoss =
-        response.status === 401 ||
-        (response.status === 500 && !isAuthEndpoint)
+    if (import.meta.client) {
+      localStorage.removeItem('_t')
+    }
+    auth.user = null
 
-      if (isSessionLoss && !isAuthEndpoint) {
-        // $reset() clears user AND removes the token from localStorage,
-        // preventing the next request from sending a dead token.
-        auth.$reset()
-
-        if (import.meta.client) {
-          const localePath = useLocalePath()
-          await navigateTo(localePath('/auth/login'))
-        }
-      }
-    },
+    const localePath = useLocalePath()
+    await navigateTo(localePath('/auth/login'))
+  }
+},
   })
 
   return {
