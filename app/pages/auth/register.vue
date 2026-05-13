@@ -1,4 +1,5 @@
 <template>
+  <UiToast />
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
 
@@ -308,6 +309,16 @@ const validatePassword = (password: string) => {
   return null
 }
 
+const getLocalizedRegisterErrorKey = (backendMessage: string): string => {
+  const map: Record<string, string> = {
+    'The email has already been taken.': 'auth.register.errors.email_taken',
+    'The email field is required.': 'auth.register.errors.email_required',
+    'The password must be at least 8 characters.': 'auth.register.errors.password_too_short',
+    'The password confirmation does not match.': 'auth.register.errors.password_mismatch',
+  }
+  return map[backendMessage] ?? 'auth.register.mistake'
+}
+
 const validateForm = (): boolean => {
   errors.email = errors.password = errors.password_confirmation = errors.terms = ''
   let valid = true
@@ -364,7 +375,8 @@ const submitRegistration = async () => {
 
   } catch (err: any) {
     resetTurnstile()
-    const message = err?.data?.message ?? err?.message ?? t('auth.register.mistake')
+    const raw = err?.data?.message ?? err?.message ?? ''
+    const message = t(getLocalizedRegisterErrorKey(raw))
     addToast({ message, type: 'error' })
   } finally {
     isSubmitting.value = false
@@ -385,7 +397,8 @@ const resendEmail = async (email: string) => {
 
     setTimeout(() => { resendSuccess.value = false }, 5000)
   } catch (err: any) {
-    const message = err?.data?.message ?? err?.message ?? t('auth.register.mistake')
+    const raw = err?.data?.message ?? err?.message ?? ''
+    const message = t(getLocalizedRegisterErrorKey(raw))
     addToast({ message, type: 'error' })
   } finally {
     isResending.value = false

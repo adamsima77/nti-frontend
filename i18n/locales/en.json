@@ -540,9 +540,16 @@
   },
 
   "register": {
+    "errors": {
+      "email_taken": "The email has already been taken.",
+      "email_required": "Email is required.",
+      "password_too_short": "Password must be at least 8 characters.",
+      "password_mismatch": "Passwords do not match."
+    },
     "title": "Register",
     "subtitle": "Create a new NTI account",
     "mistake": "Unexpected error",
+    "success_toast": "Account created! Check your email.",
     "check-email": "Check your email",
     "we-sent": "We sent a verification link to",
     "click": "Click the link in the email to complete registration.",
