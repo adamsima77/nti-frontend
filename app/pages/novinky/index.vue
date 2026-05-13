@@ -7,9 +7,7 @@
         :image="main_article?.image_url"
         :alt="main_article?.news_translations?.[0]?.title"
         :title="main_article?.news_translations?.[0]?.title"
-        :category="main_article?.category?.slug
-          ? main_article?.category?.slug.charAt(0).toUpperCase() + main_article?.category?.slug.slice(1)
-          : ''"
+        :category="main_article?.category.category_translations?.[0].name"
         :description="main_article?.news_translations?.[0]?.description"
         :link="localePath(`/novinky/${main_article?.slug}`)"
       />
@@ -67,9 +65,7 @@
             :key="article.id"
             :title="article?.news_translations?.[0]?.title"
             :description="article?.news_translations?.[0]?.description"
-            :category="article?.category?.slug
-              ? article.category.slug.charAt(0).toUpperCase() + article.category.slug.slice(1)
-              : ''"
+            :category="article?.category.category_translations[0].name"
             :image="article?.image_url"
             :alt="article?.news_translations?.[0]?.title"
             :link="localePath(`/novinky/${article.slug}`)"

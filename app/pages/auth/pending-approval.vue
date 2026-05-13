@@ -40,20 +40,29 @@
 definePageMeta({
   middleware: 'auth',
 })
+const { t } = useI18n()
+useHead({
+  title: computed(() => t('auth.pending')),
+})
 
 const auth = useAuthStore()
-
+const localePath = useLocalePath()
 const handleLogout = async () => {
   await auth.logout()
-  await navigateTo('/auth/login')
+  await navigateTo(localePath('/auth/login'))
 }
 
 const handleStorageChange = async (e: StorageEvent) => {
-  if (e.key === '_t' && e.newValue) {
-    await auth.getCurrentUser()
+  if (e.key === '_t') {
+    if (e.newValue) {
+      await auth.getCurrentUser()
 
-    if (auth.user && !auth.isPendingApproval) {
-      await navigateTo(auth.redirectUser())
+      if (auth.user && !auth.isPendingApproval) {
+        await navigateTo(auth.redirectUser())
+      }
+    } else {
+      auth.$reset()
+      await navigateTo(localePath('/auth/login'))
     }
   }
 }

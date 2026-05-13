@@ -55,7 +55,7 @@
         </h1>
 
         <p class="text-sm text-blue-600 font-semibold mb-3 inline-block">
-          {{ newsDetail?.category?.slug.charAt(0).toUpperCase() + newsDetail?.category?.slug.slice(1) }}
+        {{ newsDetail?.category?.category_translations?.[0]?.name }}
         </p>
 
         <p class="text-sm sm:text-base text-gray-400 mb-8">
@@ -91,7 +91,7 @@
           :key="article.id"
           :title="article?.news_translations?.[0]?.title"
           :description="article?.news_translations?.[0]?.description"
-          :category="article?.category?.slug.charAt(0).toUpperCase() + article?.category?.slug.slice(1)"
+          :category="article?.category?.category_translations?.[0]?.name"
           :image="article?.image_url"
           :alt="article?.news_translations?.[0]?.title"
           :link="localePath(`/novinky/${article.slug}`)"

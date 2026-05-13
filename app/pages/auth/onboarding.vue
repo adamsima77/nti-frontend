@@ -13,13 +13,12 @@
       />
 
       <div v-else class="text-center text-gray-500 text-sm">
-        Načítavam...
+        <UiLoader />
       </div>
 
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import OrganizationOnboarding from '~/components/OrganizationOnboarding.vue'
 import StudentOnboarding from '~/components/StudentOnboarding.vue'
@@ -28,30 +27,37 @@ definePageMeta({
   middleware: 'onboarding',
 })
 
+const { t } = useI18n()
+useHead({
+  title: computed(() => t('auth.onboarding')),
+})
+
 const auth = useAuthStore()
+const localePath = useLocalePath()
 
-const handleCompleted = async () => {
+const redirectUser = async () => {
   const user = await auth.getCurrentUser()
-  await nextTick()
   if (!user) return
-  await navigateTo(auth.redirectUser(user))
+
+  await navigateTo(localePath(auth.redirectUser(user)))
 }
 
-const syncAndRedirect = async () => {
-  const user = await auth.getCurrentUser()
-  await nextTick()
-  if (!user) return
-  await navigateTo(auth.redirectUser(user))
-}
+const handleCompleted = redirectUser
+const syncAndRedirect = redirectUser
 
 const handleStorageChange = async (e: StorageEvent) => {
-  if (e.key === '_t' && e.newValue) {
-    await syncAndRedirect()
+  if (e.key === '_t') {
+    if (e.newValue) {
+      await redirectUser()
+    } else {
+      auth.$reset()
+      await navigateTo(localePath('/auth/login'))
+    }
   }
 }
 
 const handleFocus = async () => {
-  await syncAndRedirect()
+  await redirectUser()
 }
 
 onMounted(() => {

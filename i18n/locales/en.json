@@ -245,6 +245,20 @@
   "open": "Open",
   "closed": "Closed",
   "calls": "Calls",
+  "org": "Organization",
+  "applies": "Applications",
+   "state": "State",
+   "log": "Apply",
+   "applications_closed": "Applications are closed",
+   "a_1": "This call does not accept more applications.",
+  "about_call": "About Call",
+  "info": "Information about call",
+    "ter": "Deadlines",
+    "start": "Start of applications",
+    "close": "Application deadline",
+      "project_start": "Project start",
+      "project_end": "End of project",
+      "criterions": "Evaluation criteria",
     "vyzvy_terminy": {
       "hero": {
         "title": "Challenges and deadlines",
@@ -330,7 +344,9 @@
     }
   },
  "auth": {
+  "pending": "Pending approval",
   "logout": "Log out",
+  "onboarding": "Onboarding",
   "verify-email": {
        "verifying": "Verifying email...",
        "wait": "Please wait, we are verifying the validity of the link.",
@@ -411,7 +427,7 @@
   "request_new_link": "Request new link"
 },
   "login": {
-
+     "success": "Login successful.",
      "errors": {
       "invalid_credentials": "Incorrect email or password.",
       "unverified_email": "Please verify your email before logging in.",

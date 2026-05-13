@@ -246,6 +246,20 @@
     "open": "Otvorené",
     "closed": "Uzamknuté",
     "calls": "Výzvy",
+    "about_call": "O výzve",
+    "info": "Informácie o výzve",
+    "org": "Organizácia",
+    "applies": "Prihlášok",
+    "state": "Stav",
+    "log": "Prihlásiť sa",
+    "applications_closed": "Prihlášky sú zatvorené",
+    "a_1": "Táto výzva už neprijíma nové prihlášky.",
+    "ter": "Termíny",
+    "start": "Začiatok prihlášok",
+    "close": "Uzávierka prihlášok",
+    "project_start": "Začiatok projektu",
+    "project_end": "Koniec projektu",
+    "criterions": "Kritériá hodnotenia",
     "vyzvy_terminy": {
       "hero": {
         "title": "Výzvy a termíny",
@@ -331,7 +345,9 @@
     }
   },
  "auth": {
+  "pending": "Čaká na schválenie",
   "logout": "Odhlásiť sa",
+  "onboarding": "Začíname",
   "verify-email":{
       "verifying": "Overujem e-mail...",
       "wait": "Prosím čakajte, overujeme platnosť odkazu.",
@@ -413,7 +429,7 @@
   "request_new_link": "Požiadať o nový odkaz"
 },
   "login": {
-
+    "success": "Boli ste úspešne odhlásený.",
      "errors": {
       "invalid_credentials": "Nesprávny email alebo heslo.",
       "unverified_email": "Prosím, overte svoj email pred prihlásením.",

@@ -40,7 +40,8 @@ export const useApi = () => {
     },
 
    async onResponseError({ response, request }) {
-  if (response.status === 401) {
+  const isAuthMeRequest = String(request).includes('/auth/me')
+  if (response.status === 401 || (response.status === 500 && isAuthMeRequest)) {
     // Don't redirect if this is the login request itself
     const isLoginRequest = String(request).includes('/auth/login')
     if (isLoginRequest) return

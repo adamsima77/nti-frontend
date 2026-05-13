@@ -235,7 +235,7 @@ const handleSubmit = async () => {
       type: 'success',
     })
 
-    await router.push(`/timy/${team.id}`)
+    await router.push(`/student/timy/${team.id}`)
   } finally {
     isSubmitting.value = false
   }

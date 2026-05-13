@@ -58,7 +58,7 @@
       </div>
 
       <!-- Registration form — Turnstile is here -->
-      <div v-else-if="step === 'register'">
+      <div v-else-if="step === 'register'" class ="mt-10">
         <div class="mb-8">
           <button
             type="button"

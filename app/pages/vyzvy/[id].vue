@@ -5,9 +5,9 @@
     <div class="bg-gradient-to-br from-navy via-blue-900 to-blue-800 text-white py-14 px-6">
       <div class="max-w-5xl mx-auto">
         <UiBreadcrumbs
-            class="mb-6 [&_*]:text-white"
+            class="mb-6 [&_*]:text-white  mt-10"
           :items="[
-            { label: 'Výzvy', to: localePath('/vyzvy') },
+            { label: $t('calls.calls'), to: localePath('/vyzvy') },
             { label: call?.title ?? '...' }
           ]"
         />
@@ -84,19 +84,19 @@
 
           <!-- DESCRIPTION -->
           <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <h2 class="text-xl font-bold text-navy mb-4">O výzve</h2>
+            <h2 class="text-xl font-bold text-navy mb-4">{{ $t('calls.about_call') }}</h2>
             <p class="text-gray-700 leading-relaxed">{{ call.description }}</p>
           </div>
 
           <!-- DATES -->
           <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <h2 class="text-xl font-bold text-navy mb-5">Termíny</h2>
+            <h2 class="text-xl font-bold text-navy mb-5">{{ $t('calls.ter') }}</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
               <div class="flex items-start gap-3 p-4 rounded-lg bg-blue-50">
                 <Calendar class="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
                 <div>
-                  <p class="text-xs text-blue-500 font-medium uppercase tracking-wide mb-1">Začiatok prihlášok</p>
+                  <p class="text-xs text-blue-500 font-medium uppercase tracking-wide mb-1">{{ $t('calls.start') }}</p>
                   <p class="font-semibold text-navy">{{ formatDate(call.applicationStart) }}</p>
                 </div>
               </div>
@@ -104,7 +104,7 @@
               <div class="flex items-start gap-3 p-4 rounded-lg bg-red-50">
                 <Clock class="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
                 <div>
-                  <p class="text-xs text-red-400 font-medium uppercase tracking-wide mb-1">Uzávierka prihlášok</p>
+                  <p class="text-xs text-red-400 font-medium uppercase tracking-wide mb-1">{{ $t('calls.close') }}</p>
                   <p class="font-semibold text-navy">{{ formatDate(call.applicationDeadline) }}</p>
                 </div>
               </div>
@@ -112,7 +112,7 @@
               <div class="flex items-start gap-3 p-4 rounded-lg bg-green-50">
                 <Calendar class="w-5 h-5 text-green-600 mt-0.5 shrink-0" />
                 <div>
-                  <p class="text-xs text-green-500 font-medium uppercase tracking-wide mb-1">Začiatok projektu</p>
+                  <p class="text-xs text-green-500 font-medium uppercase tracking-wide mb-1">{{ $t('calls.project_start') }}</p>
                   <p class="font-semibold text-navy">{{ formatDate(call.startDate) }}</p>
                 </div>
               </div>
@@ -120,7 +120,7 @@
               <div class="flex items-start gap-3 p-4 rounded-lg bg-gray-50">
                 <Clock class="w-5 h-5 text-gray-400 mt-0.5 shrink-0" />
                 <div>
-                  <p class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-1">Koniec projektu</p>
+                  <p class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-1">{{ $t('calls.project_end') }}</p>
                   <p class="font-semibold text-navy">{{ formatDate(call.endDate) }}</p>
                 </div>
               </div>
@@ -133,7 +133,7 @@
             v-if="call.criteria?.length"
             class="bg-white rounded-xl border border-gray-100 shadow-sm p-6"
           >
-            <h2 class="text-xl font-bold text-navy mb-5">Kritériá hodnotenia</h2>
+            <h2 class="text-xl font-bold text-navy mb-5">{{ $t('calls.criterions') }}</h2>
             <ul class="space-y-3">
               <li
                 v-for="criterion in call.criteria"
@@ -153,7 +153,7 @@
 
           <!-- INFO CARD -->
           <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sticky top-24">
-            <h2 class="text-base font-bold text-navy mb-5">Informácie o výzve</h2>
+            <h2 class="text-base font-bold text-navy mb-5">{{ $t('calls.info') }}</h2>
 
             <dl class="space-y-4 text-sm">
 
@@ -166,21 +166,21 @@
 
               <div class="flex justify-between items-center pb-3 border-b border-gray-100">
                 <dt class="text-gray-500 flex items-center gap-2">
-                  <Building class="w-4 h-4" /> Organizácia
+                  <Building class="w-4 h-4" /> {{ $t('calls.org') }}
                 </dt>
                 <dd class="font-medium text-navy text-right">{{ call.organization || '—' }}</dd>
               </div>
 
               <div class="flex justify-between items-center pb-3 border-b border-gray-100">
                 <dt class="text-gray-500 flex items-center gap-2">
-                  <Users class="w-4 h-4" /> Prihlášok
+                  <Users class="w-4 h-4" /> {{ $t('calls.applies') }}
                 </dt>
                 <dd class="font-medium text-navy">{{ call.applicantsCount ?? 0 }}</dd>
               </div>
 
               <div class="flex justify-between items-center">
                 <dt class="text-gray-500 flex items-center gap-2">
-                  <Activity class="w-4 h-4" /> Stav
+                  <Activity class="w-4 h-4" /> {{ $t('calls.state') }}
                 </dt>
                 <dd>
                   <span
@@ -191,7 +191,7 @@
                         : 'bg-gray-100 text-gray-600'
                     ]"
                   >
-                    {{ call.status === 'open' ? '🟢 Otvorené' : '🔒 Zatvorené' }}
+                    {{ call.status === 'open' ? `🟢 ${$t('calls.open')}` : `🔒 ${$t('calls.closed')}` }}
                   </span>
                 </dd>
               </div>
@@ -205,7 +205,7 @@
                 :to="localePath('/student/prihlasky/nova')"
               >
                 <button class="w-full px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                  Prihlásiť sa
+                  {{ $t('calls.log') }}
                   <ChevronRight class="w-4 h-4" />
                 </button>
               </NuxtLink>
@@ -214,8 +214,8 @@
                 v-else
                 class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800"
               >
-                <span class="font-semibold">Prihlášky sú zatvorené</span><br />
-                Táto výzva už neprijíma nové prihlášky.
+                <span class="font-semibold">{{ $t('calls.applications_closed') }}</span><br />
+               {{ $t('calls.a_1') }}
               </div>
             </div>
 
