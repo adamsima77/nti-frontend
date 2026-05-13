@@ -822,9 +822,16 @@
       "applications_count": "{count} prihlášok",
       "no_student_record": "Študentský záznam v databáze zatiaľ nemáte (napr. po onboardingu sa vytvorí cez API študenta).",
       "seo_title": "Môj profil | NTI",
+      "upload_photo": "Nahrať fotku",
+      "change_photo": "Zmeniť fotku",
+      "photo_uploading": "Nahrávam…",
       "toasts": {
         "role_detect_error": "Nepodarilo sa určiť roly používateľa.",
-        "saved": "Profil bol úspešne uložený"
+        "saved": "Profil bol úspešne uložený",
+        "invalid_photo_type": "Povolené sú len obrázky JPEG alebo PNG.",
+        "photo_too_large": "Súbor je príliš veľký (max. 4 MB).",
+        "photo_saved": "Profilová fotka bola uložená.",
+        "photo_error": "Nahrávanie fotky zlyhalo."
       }
     }
   },

@@ -822,9 +822,16 @@
       "applications_count": "{count} applications",
       "no_student_record": "You don't have a student record in the database yet (it is usually created via onboarding API).",
       "seo_title": "My Profile | NTI",
+      "upload_photo": "Upload photo",
+      "change_photo": "Change photo",
+      "photo_uploading": "Uploading…",
       "toasts": {
         "role_detect_error": "Unable to determine user roles.",
-        "saved": "Profile was saved successfully"
+        "saved": "Profile was saved successfully",
+        "invalid_photo_type": "Only JPEG or PNG images are allowed.",
+        "photo_too_large": "The file is too large (max. 4 MB).",
+        "photo_saved": "Profile photo was saved.",
+        "photo_error": "Photo upload failed."
       }
     }
   },

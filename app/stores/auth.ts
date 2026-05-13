@@ -19,7 +19,10 @@ interface User {
   email: string
   roles: Role[]
   status_id: number
+  /** Verejná URL alebo relatívna (/storage/...); môže chýbať v starších odpovediach API. */
   avatar_url: string | null
+  /** Relatívna cesta na disku (napr. avatars/...) z Laravel public disku. */
+  avatar?: string | null
   organization_name: string | null
 }
 
@@ -128,7 +131,18 @@ export const useAuthStore = defineStore('auth', () => {
 
   // ---- actions ----
 
-  const getCurrentUser = async (): Promise<User | null> => {
+  const getCurrentUser = async (opts?: { force?: boolean }): Promise<User | null> => {
+    // Po mutácii profilu treba nový request; inak sa môže vrátiť zdieľaný starý /auth/me
+    // spustený pred uložením (bez avatar_url).
+    if (opts?.force && initPromise.value) {
+      try {
+        await initPromise.value
+      } catch {
+        /* ignore */
+      }
+      initPromise.value = null
+    }
+
     if (initPromise.value) return initPromise.value
 
     initPromise.value = (async () => {
@@ -147,6 +161,11 @@ export const useAuthStore = defineStore('auth', () => {
     })()
 
     return initPromise.value
+  }
+
+  const patchUser = (data: Partial<User>) => {
+    if (!user.value) return
+    user.value = { ...user.value, ...data }
   }
 
   const syncUser = async () => {
@@ -243,6 +262,7 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
 
     getCurrentUser,
+    patchUser,
     syncUser,
     $reset,
 
