@@ -541,9 +541,16 @@
     },
 
   "register": {
+    "errors":{
+      "email_taken": "Tento email je už používaný",
+      "email_required": "Email je povinný",
+      "password_too_short": "Heslo musí mať aspoň 8 znakov",
+      "password_mismatch": "Heslá sa nezhodujú"
+    },
     "title": "Registrácia",
     "subtitle": "Vytvorte si nový účet v NTI",
     "mistake": "Chyba pri registrácii.",
+    "success_toast": "Účet bol vytvorený! Skontrolujte si email.",
     "check-email": "Skontrolujte si e-mail",
     "we-sent": "Poslali sme overovací odkaz na",
     "click": "Kliknite na odkaz v e-maile pre dokončenie registrácie.",
