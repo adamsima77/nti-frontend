@@ -87,6 +87,8 @@ import type { FormSchema, FormField as FormFieldType } from '~/stores/applicatio
 interface Props {
   formSchema: FormSchema
   initialData?: Record<string, any>
+  /** Ak false, automatické ukladanie draftu sa nespúšťa (napr. chýba vybraný tím). */
+  draftPersistEnabled?: boolean
 }
 
 interface Emits {
@@ -95,7 +97,9 @@ interface Emits {
   (e: 'submit', data: Record<string, any>): void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  draftPersistEnabled: true,
+})
 const emit = defineEmits<Emits>()
 
 const formData = reactive<Record<string, any>>({})
@@ -111,7 +115,9 @@ if (props.initialData) {
 const { markDirty, lastSaveTime } = useAutoSave({
   debounceMs: 30000,
   onSave: () => {
-    emit('save-draft', formData)
+    if (props.draftPersistEnabled) {
+      emit('save-draft', formData)
+    }
   },
 })
 
@@ -119,7 +125,9 @@ const { markDirty, lastSaveTime } = useAutoSave({
 watch(
   () => formData,
   () => {
-    markDirty()
+    if (props.draftPersistEnabled) {
+      markDirty()
+    }
   },
   { deep: true },
 )
@@ -136,13 +144,27 @@ const validateField = (fieldName: string) => {
 
   errors[fieldName] = ''
 
-  // Required validation
-  if (field.required && !formData[fieldName]) {
-    errors[fieldName] = `${field.label} je povinné`
-    return
-  }
-
   const value = formData[fieldName]
+
+  // Required validation (vrátane súborov / document_ids ako pole čísel)
+  if (field.required) {
+    if (field.type === 'file') {
+      const empty =
+        value === undefined ||
+        value === null ||
+        value === '' ||
+        (Array.isArray(value) && value.length === 0) ||
+        (Array.isArray(value) &&
+          value.every((x) => !(x instanceof File) && !(typeof x === 'number' && Number.isFinite(x) && x > 0)))
+      if (empty) {
+        errors[fieldName] = `${field.label} je povinné`
+        return
+      }
+    } else if (!value) {
+      errors[fieldName] = `${field.label} je povinné`
+      return
+    }
+  }
 
   // Length validation
   if (field.minLength && typeof value === 'string' && value.length < field.minLength) {

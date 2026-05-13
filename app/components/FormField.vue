@@ -190,6 +190,7 @@
       :allow-multiple="field.allowMultiple || false"
       :accept="field.accept || '*'"
       :error="error"
+      :document-upload="field.name === 'document_ids'"
       @update:model-value="$emit('update:modelValue', $event)"
       @change="$emit('blur')"
     />

@@ -800,6 +800,7 @@
       "toasts": {
         "loading_draft": "Loading draft application",
         "draft_saved": "Draft application saved",
+        "draft_needs_team": "Select a team in the dropdown above before saving a draft application.",
         "select_team": "Select a team",
         "created": "Application was created.",
         "submit_failed": "Submission failed"

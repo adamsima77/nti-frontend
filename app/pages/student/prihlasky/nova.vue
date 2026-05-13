@@ -144,6 +144,7 @@
         v-if="selectedCall.formSchema"
         :form-schema="selectedCall.formSchema"
         :initial-data="draftData"
+        :draft-persist-enabled="Boolean(selectedTeamId)"
         @cancel="handleCancel"
         @save-draft="handleSaveDraft"
         @submit="handleSubmit"
@@ -240,7 +241,15 @@ const selectCall = async (call: Call) => {
 }
 
 const handleSaveDraft = (data: Record<string, any>) => {
-  if (!selectedTeamId.value || !selectedCall.value) return
+  if (!selectedCall.value) return
+
+  if (!selectedTeamId.value) {
+    addToast({
+      message: t('student_dashboard.applications.toasts.draft_needs_team'),
+      type: 'warning',
+    })
+    return
+  }
 
   applicationsStore.saveDraft(selectedTeamId.value, selectedCall.value.id, data)
   addToast({
@@ -256,9 +265,12 @@ const handleSubmit = async (data: Record<string, any>) => {
   }
 
   const rawIds = (data as { document_ids?: unknown }).document_ids
-  const documentIds = Array.isArray(rawIds)
-    ? rawIds.map((x) => Number(x)).filter((n) => Number.isFinite(n) && n > 0)
-    : []
+  let documentIds: number[] = []
+  if (Array.isArray(rawIds)) {
+    documentIds = rawIds.map((x) => Number(x)).filter((n) => Number.isFinite(n) && n > 0)
+  } else if (typeof rawIds === 'number' && Number.isFinite(rawIds) && rawIds > 0) {
+    documentIds = [rawIds]
+  }
 
   const formData: Record<string, string> = {}
   for (const [key, value] of Object.entries(data)) {

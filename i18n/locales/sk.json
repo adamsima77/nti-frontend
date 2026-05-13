@@ -800,6 +800,7 @@
       "toasts": {
         "loading_draft": "Načítavam rozpracovanú prihlášku",
         "draft_saved": "Rozpracovaná prihláška uložená",
+        "draft_needs_team": "Pred uložením rozpracovanej prihlášky vyberte tím v zozname vyššie.",
         "select_team": "Vyberte tím",
         "created": "Prihláška bola vytvorená.",
         "submit_failed": "Odoslanie zlyhalo"
