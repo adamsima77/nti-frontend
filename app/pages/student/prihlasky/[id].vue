@@ -11,14 +11,14 @@
     >
       <UiEmptyState
         :icon="FileText"
-        title="Prihláška nenájdená"
+        :title="t('student_dashboard.applications.detail.not_found_title')"
       >
         <NuxtLink
           :to="localePath('/student/prihlasky')"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
         >
           <ArrowLeft class="w-4 h-4" />
-          Späť na prihlášky
+          {{ t('student_dashboard.applications.back_to_applications') }}
         </NuxtLink>
       </UiEmptyState>
     </div>
@@ -27,7 +27,7 @@
       <div class="mb-6">
         <UiBreadcrumbs
           :items="[
-            { label: 'Prihlášky', to: localePath('/student/prihlasky') },
+            { label: t('student_dashboard.applications.title'), to: localePath('/student/prihlasky') },
             { label: application.title },
           ]"
         />
@@ -52,17 +52,17 @@
             v-if="application.description"
             class="bg-white rounded-lg shadow-sm border border-gray-100 p-5"
           >
-            <h2 class="text-xl font-bold text-navy mb-3">Popis projektu</h2>
+            <h2 class="text-xl font-bold text-navy mb-3">{{ t('student_dashboard.applications.detail.project_description') }}</h2>
             <p class="text-sm text-gray-600 leading-relaxed">{{ application.description }}</p>
           </div>
 
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
-            <h2 class="text-xl font-bold text-navy mb-3">Dokumenty</h2>
+            <h2 class="text-xl font-bold text-navy mb-3">{{ t('student_dashboard.applications.detail.documents') }}</h2>
             <UiDataTable
               :columns="docColumns"
               :rows="documentRows"
               row-key="id"
-              empty-title="Žiadne dokumenty"
+              :empty-title="t('student_dashboard.applications.detail.no_documents')"
               :empty-icon="Paperclip"
             >
               <template #cell-name="{ row }">
@@ -75,10 +75,10 @@
           </div>
 
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
-            <h2 class="text-xl font-bold text-navy mb-3">Komentáre</h2>
+            <h2 class="text-xl font-bold text-navy mb-3">{{ t('student_dashboard.applications.detail.comments') }}</h2>
             <UiEmptyState
               v-if="!application.comments?.length"
-              title="Žiadne komentáre"
+              :title="t('student_dashboard.applications.detail.no_comments')"
             />
             <div
               v-else
@@ -102,7 +102,7 @@
             v-if="application.status === 'approved' && application.milestones.length"
             class="bg-white rounded-lg shadow-sm border border-gray-100 p-5"
           >
-            <h2 class="text-xl font-bold text-navy mb-3">Míľníkový prehľad</h2>
+            <h2 class="text-xl font-bold text-navy mb-3">{{ t('student_dashboard.applications.detail.milestones_overview') }}</h2>
             <div class="space-y-3">
               <div
                 v-for="milestone in application.milestones"
@@ -132,7 +132,7 @@
                     </div>
                     <div>
                       <p class="font-medium text-navy text-sm">{{ milestone.title }}</p>
-                      <p class="text-xs text-gray-500 mt-0.5">Termín: {{ milestone.dueDate }}</p>
+                      <p class="text-xs text-gray-500 mt-0.5">{{ t('student_dashboard.applications.detail.deadline') }}: {{ milestone.dueDate }}</p>
                     </div>
                   </div>
                   <span
@@ -156,7 +156,7 @@
                   v-if="milestone.status === 'completed' && milestone.completedAt"
                   class="text-xs text-gray-500 ml-8 mt-2"
                 >
-                  ✓ Dokončené: {{ milestone.completedAt }}
+                  ✓ {{ t('student_dashboard.applications.detail.completed') }}: {{ milestone.completedAt }}
                 </p>
               </div>
             </div>
@@ -165,33 +165,33 @@
 
         <div class="space-y-6">
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
-            <h2 class="text-lg font-bold text-navy mb-3">Informácie</h2>
+            <h2 class="text-lg font-bold text-navy mb-3">{{ t('student_dashboard.applications.detail.information') }}</h2>
             <dl class="space-y-3">
               <div class="flex justify-between">
-                <dt class="text-sm text-gray-500">Program</dt>
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.applications.filters.program') }}</dt>
                 <dd class="text-sm font-medium text-navy">{{ application.program }}</dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-sm text-gray-500">Tím</dt>
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.applications.team') }}</dt>
                 <dd class="text-sm font-medium text-navy">{{ application.team }}</dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-sm text-gray-500">Členov</dt>
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.applications.detail.members') }}</dt>
                 <dd class="text-sm font-medium text-navy">{{ application.members }}</dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-sm text-gray-500">Podané dňa</dt>
-                <dd class="text-sm font-medium text-navy">{{ application.submittedAt || '—' }}</dd>
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.applications.detail.submitted_at') }}</dt>
+                <dd class="text-sm font-medium text-navy">{{ application.submittedAt || t('student_dashboard.common.not_available') }}</dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-sm text-gray-500">Dokumenty</dt>
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.applications.detail.documents') }}</dt>
                 <dd class="text-sm font-medium text-navy">{{ documentRows.length }}</dd>
               </div>
             </dl>
           </div>
 
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
-            <h2 class="text-lg font-bold text-navy mb-3">História stavov</h2>
+            <h2 class="text-lg font-bold text-navy mb-3">{{ t('student_dashboard.applications.detail.status_history') }}</h2>
             <div
               v-if="historyRows.length"
               class="space-y-4"
@@ -225,7 +225,7 @@
             </div>
             <UiEmptyState
               v-else
-              title="Žiadna história"
+              :title="t('student_dashboard.applications.detail.no_history')"
             />
           </div>
         </div>
@@ -241,13 +241,14 @@ import type { ApplicationStatus } from '../../../composables/modules/student/typ
 
 const route = useRoute()
 const localePath = useLocalePath()
+const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
 })
 
-useHead({ title: 'Detail prihlášky | NTI' })
+useHead({ title: t('student_dashboard.applications.detail_seo_title') })
 
 const { application, pending } = useApplication(() => route.params.id as string)
 
@@ -259,9 +260,9 @@ const historyRows = computed(() => {
 })
 
 const docColumns = [
-  { key: 'name', label: 'Názov' },
-  { key: 'size', label: 'Veľkosť' },
-  { key: 'uploadedAt', label: 'Nahrané' },
+  { key: 'name', label: t('student_dashboard.applications.detail.table_name') },
+  { key: 'size', label: t('student_dashboard.applications.detail.table_size') },
+  { key: 'uploadedAt', label: t('student_dashboard.applications.detail.table_uploaded_at') },
 ]
 
 function historyDotColor(status: ApplicationStatus): string {
@@ -277,20 +278,20 @@ function historyDotColor(status: ApplicationStatus): string {
 
 function historyLabel(status: ApplicationStatus): string {
   const labels: Record<string, string> = {
-    approved: 'Schválené',
-    evaluating: 'V hodnotení',
-    submitted: 'Podané',
+    approved: t('student_dashboard.applications.status.approved'),
+    evaluating: t('student_dashboard.applications.status.evaluating'),
+    submitted: t('student_dashboard.applications.status.submitted'),
     draft: 'Draft',
-    rejected: 'Zamietnuté',
+    rejected: t('student_dashboard.applications.status.rejected'),
   }
   return labels[status] || status
 }
 
 function milestoneStatus(status: string): string {
   const labels: Record<string, string> = {
-    completed: 'Dokončené',
-    in_progress: 'V progrese',
-    pending: 'Čakajúce',
+    completed: t('student_dashboard.applications.detail.completed'),
+    in_progress: t('student_dashboard.applications.detail.in_progress'),
+    pending: t('student_dashboard.applications.detail.pending'),
   }
   return labels[status] || status
 }

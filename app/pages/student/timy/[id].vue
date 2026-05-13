@@ -15,14 +15,14 @@
     >
       <UiEmptyState
         :icon="Users"
-        title="Tím nenájdený"
+        :title="t('student_dashboard.teams.detail_not_found_title')"
       >
         <NuxtLink
           :to="localePath('/student/timy')"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
         >
           <ArrowLeft class="w-4 h-4" />
-          Späť na tímy
+          {{ t('student_dashboard.teams.back_to_teams') }}
         </NuxtLink>
       </UiEmptyState>
     </div>
@@ -30,7 +30,7 @@
     <template v-else>
       <!-- Breadcrumbs -->
       <div class="mb-8">
-        <UiBreadcrumbs :items="[{ label: 'Tímy', to: '/timy' }, { label: teamsStore.currentTeam.name }]" />
+        <UiBreadcrumbs :items="[{ label: t('student_dashboard.teams.title'), to: '/timy' }, { label: teamsStore.currentTeam.name }]" />
       </div>
 
       <!-- Header -->
@@ -38,8 +38,8 @@
         <div>
           <h1 class="text-2xl font-bold text-navy mb-1">{{ teamsStore.currentTeam.name }}</h1>
           <p class="text-sm text-gray-500">
-            Vytvorený {{ teamsStore.currentTeam.createdAt }} · {{ teamsStore.currentTeam.members.length }} členov ·
-            {{ teamsStore.currentTeam.applications.length }} prihlášok
+            {{ t('student_dashboard.teams.created_at') }} {{ teamsStore.currentTeam.createdAt }} · {{ t('student_dashboard.teams.members_count', { count: teamsStore.currentTeam.members.length }) }} ·
+            {{ t('student_dashboard.teams.applications_count', { count: teamsStore.currentTeam.applications.length }) }}
           </p>
         </div>
         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
@@ -54,19 +54,19 @@
           <!-- Members -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
             <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-bold text-navy">Členovia tímu</h2>
+              <h2 class="text-xl font-bold text-navy">{{ t('student_dashboard.teams.members_section') }}</h2>
               <button
                 @click="showInviteModal = true"
                 class="text-sm font-medium text-blue-600 hover:text-blue-800"
               >
-                + Pozvať
+                + {{ t('student_dashboard.teams.invite_member') }}
               </button>
             </div>
             <UiDataTable
               :columns="memberColumns"
               :rows="teamsStore.currentTeam.members"
               row-key="email"
-              empty-title="Žiadni členovia"
+              :empty-title="t('student_dashboard.teams.no_members')"
             >
               <template #cell-name="{ row }">
                 <div class="flex items-center gap-3">
@@ -97,7 +97,7 @@
                   @click="removeMemberAction(row.id)"
                   class="text-xs font-medium text-red-600 hover:text-red-800"
                 >
-                  Odstrániť
+                  {{ t('student_dashboard.teams.remove_member') }}
                 </button>
               </template>
             </UiDataTable>
@@ -105,18 +105,18 @@
 
           <!-- Applications -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-            <h2 class="text-xl font-bold text-navy mb-6">Prihlášky tímu</h2>
+            <h2 class="text-xl font-bold text-navy mb-6">{{ t('student_dashboard.teams.team_applications') }}</h2>
             <UiDataTable
               :columns="appColumns"
               :rows="teamsStore.currentTeam.applications"
-              empty-title="Tím zatiaľ nemá žiadne prihlášky"
+              :empty-title="t('student_dashboard.teams.no_team_applications')"
               @row-click="(row: any) => navigateTo(localePath(`/student/prihlasky/${row.id}`))"
             >
               <template #cell-title="{ row }">
                 <div>
                   <p class="text-sm font-medium text-navy">{{ row.title }}</p>
                   <p class="text-xs text-gray-400 mt-0.5">
-                    {{ row.program }} · {{ row.submittedAt || 'Rozpracovaná' }}
+                    {{ row.program }} · {{ row.submittedAt || t('student_dashboard.applications.draft') }}
                   </p>
                 </div>
               </template>
@@ -131,22 +131,22 @@
         <div class="space-y-6">
           <!-- Info card -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-bold text-navy mb-5">Informácie</h2>
+            <h2 class="text-lg font-bold text-navy mb-5">{{ t('student_dashboard.teams.information') }}</h2>
             <dl class="space-y-4">
               <div class="flex justify-between items-center">
-                <dt class="text-sm text-gray-500">Vytvorený</dt>
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.teams.created_at') }}</dt>
                 <dd class="text-sm font-medium text-navy">{{ teamsStore.currentTeam.createdAt }}</dd>
               </div>
               <div class="flex justify-between items-center">
-                <dt class="text-sm text-gray-500">Členov</dt>
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.teams.members_label') }}</dt>
                 <dd class="text-sm font-medium text-navy">{{ teamsStore.currentTeam.members.length }}</dd>
               </div>
               <div class="flex justify-between items-center">
-                <dt class="text-sm text-gray-500">Prihlášok</dt>
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.teams.applications_label') }}</dt>
                 <dd class="text-sm font-medium text-navy">{{ teamsStore.currentTeam.applications.length }}</dd>
               </div>
               <div class="flex justify-between items-center">
-                <dt class="text-sm text-gray-500">Vaša rola</dt>
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.teams.your_role') }}</dt>
                 <dd class="text-sm font-medium text-navy">{{ teamsStore.currentTeam.myRole }}</dd>
               </div>
             </dl>
@@ -154,14 +154,14 @@
 
           <!-- Quick actions -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-bold text-navy mb-5">Akcie</h2>
+            <h2 class="text-lg font-bold text-navy mb-5">{{ t('student_dashboard.teams.actions') }}</h2>
             <div class="space-y-3">
               <button
                 @click="showInviteModal = true"
                 class="w-full px-4 py-2.5 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition flex items-center justify-center gap-2"
               >
                 <UserPlus class="w-4 h-4" />
-                Pozvať člena
+                {{ t('student_dashboard.teams.invite_member') }}
               </button>
               <NuxtLink
                 to="/student/prihlasky/nova"
@@ -172,7 +172,7 @@
                   class="w-full"
                 >
                   <FileText class="w-4 h-4" />
-                  Nová prihláška
+                  {{ t('student_dashboard.applications.new_application') }}
                 </UiButton>
               </NuxtLink>
             </div>
@@ -195,6 +195,7 @@ import { ref, onMounted } from 'vue'
 import { ArrowLeft, Users, UserPlus, FileText } from 'lucide-vue-next'
 
 const localePath = useLocalePath()
+const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
@@ -203,15 +204,15 @@ definePageMeta({
 
 const route = useRoute()
 useSeoMeta({
-  title: 'Detail tímu | NTI',
-  description: 'Detail tímu v Nitrianskom technickom inkubátore. Členy, projektov a komunikácia.',
-  ogTitle: 'Detail tímu — NTI',
-  ogDescription: 'Detainý popis tímu s členmi, projektaného a históriou spolupráce.',
+  title: t('student_dashboard.teams.detail_seo_title'),
+  description: t('student_dashboard.teams.detail_seo_description'),
+  ogTitle: t('student_dashboard.teams.detail_og_title'),
+  ogDescription: t('student_dashboard.teams.detail_og_description'),
   ogType: 'website',
   ogUrl: 'https://nti.sk/timy',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'Detail tímu — NTI',
-  twitterDescription: 'Popis tímu a jeho projektov.',
+  twitterTitle: t('student_dashboard.teams.detail_og_title'),
+  twitterDescription: t('student_dashboard.teams.detail_twitter_description'),
 })
 
 const teamsStore = useTeamsStore()
@@ -221,14 +222,14 @@ const teamId = route.params.id as string
 const showInviteModal = ref(false)
 
 const memberColumns = [
-  { key: 'name', label: 'Člen' },
-  { key: 'role', label: 'Rola' },
+  { key: 'name', label: t('student_dashboard.teams.member') },
+  { key: 'role', label: t('student_dashboard.teams.role') },
   { key: 'actions', label: '' },
 ]
 
 const appColumns = [
-  { key: 'title', label: 'Prihláška' },
-  { key: 'status', label: 'Stav' },
+  { key: 'title', label: t('student_dashboard.applications.application') },
+  { key: 'status', label: t('student_dashboard.applications.filters.status') },
 ]
 
 // Load team data on mount
@@ -237,11 +238,11 @@ onMounted(async () => {
 })
 
 const removeMemberAction = async (memberId: number) => {
-  if (!confirm('Naozaj chcete odstrániť tohto člena z tímu?')) return
+  if (!confirm(t('student_dashboard.teams.remove_member_confirm'))) return
 
   await teamsStore.removeMember(teamId, memberId)
   addToast({
-    message: 'Člen bol odstránený z tímu',
+    message: t('student_dashboard.teams.toasts.member_removed'),
     type: 'success',
   })
 }
@@ -249,7 +250,7 @@ const removeMemberAction = async (memberId: number) => {
 const handleMemberInvited = () => {
   showInviteModal.value = false
   addToast({
-    message: 'Člen bol pozvnaný',
+    message: t('student_dashboard.teams.toasts.member_invited'),
     type: 'success',
   })
   // Reload team data

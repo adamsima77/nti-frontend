@@ -1,11 +1,11 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-navy">Moje prihlášky</h1>
+      <h1 class="text-2xl font-bold text-navy">{{ t('student_dashboard.applications.title') }}</h1>
       <NuxtLink :to="localePath('/student/prihlasky/nova')">
         <UiButton>
           <Plus class="w-4 h-4" />
-          Nová prihláška
+          {{ t('student_dashboard.applications.new_application') }}
         </UiButton>
       </NuxtLink>
     </div>
@@ -25,18 +25,18 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <UiInput
           v-model="searchQuery"
-          placeholder="Hľadať podľa názvu..."
+          :placeholder="t('student_dashboard.applications.filters.search_placeholder')"
           type="text"
         />
         <UiSelect
           v-model="statusFilter"
           :options="statusOptions"
-          placeholder="Stav"
+          :placeholder="t('student_dashboard.applications.filters.status')"
         />
         <UiSelect
           v-model="programFilter"
           :options="programOptions"
-          placeholder="Program"
+          :placeholder="t('student_dashboard.applications.filters.program')"
         />
       </div>
 
@@ -78,7 +78,7 @@
               :to="localePath(`/student/prihlasky/${app.id}`)"
               class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
             >
-              Zobraziť detail
+              {{ t('student_dashboard.common.view_detail') }}
               <ChevronRight class="w-4 h-4" />
             </NuxtLink>
           </div>
@@ -91,11 +91,11 @@
       >
         <UiEmptyState
           :icon="FileText"
-          title="Žiadne prihlášky"
-          description="Skúste zmeniť filtre alebo vytvorte novú prihlášku"
+          :title="t('student_dashboard.applications.empty_title')"
+          :description="t('student_dashboard.applications.empty_description')"
         >
           <NuxtLink :to="localePath('/student/prihlasky/nova')">
-            <UiButton size="sm">Nová prihláška</UiButton>
+            <UiButton size="sm">{{ t('student_dashboard.applications.new_application') }}</UiButton>
           </NuxtLink>
         </UiEmptyState>
       </div>
@@ -110,13 +110,14 @@ import type { Application } from '../../../composables/modules/student/types'
 import { useApplications } from '~/composables/modules/student/useApplications'
 
 const localePath = useLocalePath()
+const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
 })
 
-useHead({ title: 'Moje prihlášky | NTI' })
+useHead({ title: t('student_dashboard.applications.seo_title') })
 
 const { applications, pending } = useApplications()
 
@@ -125,12 +126,12 @@ const statusFilter = ref('')
 const programFilter = ref('')
 
 const statusOptions = [
-  { value: '', label: 'Všetky stavy' },
+  { value: '', label: t('student_dashboard.applications.filters.all_statuses') },
   { value: 'draft', label: 'Draft' },
-  { value: 'submitted', label: 'Podané' },
-  { value: 'evaluating', label: 'V hodnotení' },
-  { value: 'approved', label: 'Schválené' },
-  { value: 'rejected', label: 'Zamietnuté' },
+  { value: 'submitted', label: t('student_dashboard.applications.status.submitted') },
+  { value: 'evaluating', label: t('student_dashboard.applications.status.evaluating') },
+  { value: 'approved', label: t('student_dashboard.applications.status.approved') },
+  { value: 'rejected', label: t('student_dashboard.applications.status.rejected') },
 ]
 
 const programOptions = computed(() => {
@@ -138,7 +139,7 @@ const programOptions = computed(() => {
   for (const a of applications.value) {
     if (a.program) programs.add(a.program)
   }
-  return [{ value: '', label: 'Všetky programy' }, ...[...programs].sort().map((p) => ({ value: p, label: p }))]
+  return [{ value: '', label: t('student_dashboard.applications.filters.all_programs') }, ...[...programs].sort().map((p) => ({ value: p, label: p }))]
 })
 
 const filteredApplications = computed(() => {

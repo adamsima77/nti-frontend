@@ -1,7 +1,7 @@
 <template>
   <UiModal
     v-model="isOpen"
-    title="Pozvať člena do tímu"
+    :title="t('student_dashboard.teams.invite_modal_title')"
     @close="handleClose"
   >
     <div class="space-y-4">
@@ -9,7 +9,7 @@
       <UiInput
         v-model="formData.email"
         type="email"
-        label="Email"
+        :label="t('student_dashboard.common.email')"
         placeholder="clen@example.com"
         required
         :error="errors.email"
@@ -18,15 +18,15 @@
       <!-- Role select -->
       <UiSelect
         v-model="formData.role"
-        label="Úloha v tíme"
+        :label="t('student_dashboard.teams.role_in_team')"
         :options="roleOptions"
-        placeholder="Vyberte úlohu"
+        :placeholder="t('student_dashboard.teams.select_role')"
       />
 
       <!-- Message -->
       <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
         <p class="text-xs text-blue-700">
-          <strong>Poznámka:</strong> Osoba dostane pozvánku a môže ju akceptovať alebo odmietnuť.
+          <strong>{{ t('student_dashboard.common.note') }}:</strong> {{ t('student_dashboard.teams.invite_note') }}
         </p>
       </div>
 
@@ -36,15 +36,15 @@
           @click="handleClose"
           class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-200 transition"
         >
-          Zrušiť
+          {{ t('student_dashboard.common.cancel') }}
         </button>
         <button
           @click="handleSubmit"
           :disabled="isSubmitting"
           class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span v-if="!isSubmitting">Poslať pozvánku</span>
-          <span v-else>Posielam...</span>
+          <span v-if="!isSubmitting">{{ t('student_dashboard.teams.send_invite') }}</span>
+          <span v-else>{{ t('student_dashboard.common.sending') }}</span>
         </button>
       </div>
     </div>
@@ -66,6 +66,7 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const { t } = useI18n()
 
 const teamsStore = useTeamsStore()
 const { addToast } = useToast()
@@ -77,7 +78,7 @@ const isOpen = computed({
 
 const formData = reactive({
   email: '',
-  role: 'Developer',
+  role: 'Člen tímu',
 })
 
 const errors = reactive({
@@ -87,23 +88,19 @@ const errors = reactive({
 const isSubmitting = ref(false)
 
 const roleOptions = [
-  { label: 'Team Lead', value: 'Team Lead' },
-  { label: 'Developer', value: 'Developer' },
-  { label: 'Designer', value: 'Designer' },
-  { label: 'Analyst', value: 'Analyst' },
-  { label: 'Manager', value: 'Manager' },
+  { label: 'Člen tímu', value: 'Člen tímu' },
 ]
 
 const validateForm = () => {
   errors.email = ''
 
   if (!formData.email) {
-    errors.email = 'Email je povinný'
+    errors.email = t('student_dashboard.common.errors.email_required')
     return false
   }
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-    errors.email = 'Neplatný email'
+    errors.email = t('student_dashboard.common.errors.invalid_email')
     return false
   }
 
@@ -122,15 +119,15 @@ const handleSubmit = async () => {
     })
 
     addToast({
-      message: `Pozvánka poslana na ${formData.email}`,
+      message: t('student_dashboard.teams.toasts.invite_sent', { email: formData.email }),
       type: 'success',
     })
 
     emit('invited', result)
     handleClose()
-  } catch (err) {
+  } catch (err: any) {
     addToast({
-      message: 'Chyba pri poslaní pozvánky',
+      message: err?.data?.message ?? t('student_dashboard.teams.toasts.invite_error'),
       type: 'error',
     })
   } finally {
@@ -141,7 +138,7 @@ const handleSubmit = async () => {
 const handleClose = () => {
   isOpen.value = false
   formData.email = ''
-  formData.role = 'Developer'
+  formData.role = 'Člen tímu'
   errors.email = ''
 }
 </script>

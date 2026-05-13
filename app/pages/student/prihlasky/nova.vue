@@ -4,16 +4,16 @@
     <div class="mb-8">
       <UiBreadcrumbs
         :items="[
-          { label: 'Prihlášky', to: localePath('/student/prihlasky') },
-          { label: 'Nová prihláška' },
+          { label: t('student_dashboard.applications.title'), to: localePath('/student/prihlasky') },
+          { label: t('student_dashboard.applications.new_application') },
         ]"
       />
     </div>
 
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-navy mb-2">Nová prihláška</h1>
-      <p class="text-gray-600">Vyberte výzvu a vyplňte formulár pre prihlášku vášho tímu</p>
+      <h1 class="text-3xl font-bold text-navy mb-2">{{ t('student_dashboard.applications.new_application') }}</h1>
+      <p class="text-gray-600">{{ t('student_dashboard.applications.new_description') }}</p>
     </div>
 
     <!-- Step 1: Select Call -->
@@ -52,7 +52,7 @@
             <span
               class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700"
             >
-              Otvorené
+              {{ t('student_dashboard.applications.open_calls.open') }}
             </span>
           </div>
 
@@ -65,7 +65,7 @@
             </span>
             <span class="flex items-center gap-1">
               <Users class="w-4 h-4" />
-              {{ call.applicantsCount || 0 }} prihlášok
+              {{ t('student_dashboard.teams.applications_count', { count: call.applicantsCount || 0 }) }}
             </span>
           </div>
         </div>
@@ -78,11 +78,11 @@
       >
         <UiEmptyState
           :icon="FileText"
-          title="Žiadne otvorené výzvy"
-          description="V tomto momente nie sú dostupné žiadne otvorené výzvy. Skúste neskôr."
+          :title="t('student_dashboard.applications.open_calls.empty_title')"
+          :description="t('student_dashboard.applications.open_calls.empty_description')"
         >
           <NuxtLink :to="localePath('/student/prihlasky')">
-            <UiButton variant="outline">Späť na prihlášky</UiButton>
+            <UiButton variant="outline">{{ t('student_dashboard.applications.back_to_applications') }}</UiButton>
           </NuxtLink>
         </UiEmptyState>
       </div>
@@ -104,13 +104,13 @@
             @click="selectedCall = null"
             class="text-sm font-medium text-gray-600 hover:text-gray-800"
           >
-            ✕ Zmeniť výzvu
+            ✕ {{ t('student_dashboard.applications.change_call') }}
           </button>
         </div>
 
         <!-- Team selection -->
         <div class="space-y-2">
-          <label class="text-sm font-medium text-gray-700">Tím</label>
+          <label class="text-sm font-medium text-gray-700">{{ t('student_dashboard.applications.team') }}</label>
           <select
             v-model.number="selectedTeamId"
             class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -119,7 +119,7 @@
               value=""
               disabled
             >
-              Vyberte tím
+              {{ t('student_dashboard.applications.select_team') }}
             </option>
             <option
               v-for="team in teamsStore.teams"
@@ -145,8 +145,8 @@
         v-else
         class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
       >
-        Táto výzva zatiaľ neobsahuje schému dynamického formulára z API. Prihlášku je možné dokončiť po doplnení backendu
-        (napr. definícia polí a nahrávanie dokumentov s vrátením <code class="text-xs">document_ids</code>).
+        {{ t('student_dashboard.applications.no_form_schema') }}
+        {{ t('student_dashboard.applications.no_form_schema_continuation') }}
       </div>
     </div>
   </div>
@@ -162,10 +162,11 @@ definePageMeta({
   middleware: ['auth'],
 })
 
-useHead({ title: 'Nová prihláška | NTI' })
+useHead({ title: t('student_dashboard.applications.new_seo_title') })
 
 const router = useRouter()
 const localePath = useLocalePath()
+const { t } = useI18n()
 const callsStore = useCallsStore()
 const teamsStore = useTeamsStore()
 const applicationsStore = useApplicationsStore()
@@ -191,7 +192,7 @@ const selectCall = async (call: Call) => {
     if (draft) {
       draftData.value = draft.data
       addToast({
-        message: 'Načítavam rozpracovanú prihlášku',
+        message: t('student_dashboard.applications.toasts.loading_draft'),
         type: 'info',
       })
     }
@@ -203,14 +204,14 @@ const handleSaveDraft = (data: Record<string, any>) => {
 
   applicationsStore.saveDraft(selectedTeamId.value, selectedCall.value.id, data)
   addToast({
-    message: 'Rozpracovaná prihláška uložená',
+    message: t('student_dashboard.applications.toasts.draft_saved'),
     type: 'success',
   })
 }
 
 const handleSubmit = async (data: Record<string, any>) => {
   if (!selectedTeamId.value || !selectedCall.value) {
-    addToast({ message: 'Vyberte tím', type: 'error' })
+    addToast({ message: t('student_dashboard.applications.toasts.select_team'), type: 'error' })
     return
   }
 
@@ -229,7 +230,7 @@ const handleSubmit = async (data: Record<string, any>) => {
     })
 
     addToast({
-      message: 'Prihláška bola vytvorená.',
+      message: t('student_dashboard.applications.toasts.created'),
       type: 'success',
     })
 
@@ -237,7 +238,7 @@ const handleSubmit = async (data: Record<string, any>) => {
 
     await router.push(localePath(`/student/prihlasky/${application.id}`))
   } catch (err: any) {
-    const msg = err?.data?.message ?? err?.message ?? 'Odoslanie zlyhalo'
+    const msg = err?.data?.message ?? err?.message ?? t('student_dashboard.applications.toasts.submit_failed')
     addToast({ message: msg, type: 'error' })
   } finally {
     isSubmitting.value = false
@@ -245,7 +246,7 @@ const handleSubmit = async (data: Record<string, any>) => {
 }
 
 const handleCancel = () => {
-  if (confirm('Zrušiť rozpracovanú prihlášku bez uloženia?')) {
+  if (confirm(t('student_dashboard.applications.cancel_confirm'))) {
     selectedCall.value = null
     selectedTeamId.value = null
     draftData.value = {}

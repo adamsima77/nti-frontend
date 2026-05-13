@@ -2,13 +2,13 @@
   <div class="max-w-2xl mx-auto px-6 py-10">
     <!-- Breadcrumbs -->
     <div class="mb-8">
-      <UiBreadcrumbs :items="[{ label: 'Tímy', to: localePath('/student/timy') }, { label: 'Vytvoriť nový tím' }]" />
+        <UiBreadcrumbs :items="[{ label: t('student_dashboard.teams.title'), to: localePath('/student/timy') }, { label: t('student_dashboard.teams.create_new_title') }]" />
     </div>
 
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-navy mb-2">Vytvoriť nový tím</h1>
-      <p class="text-gray-600">Začnite tým, že pozvete členov vášho tímu. Môžete ich pozvať aj neskôr.</p>
+      <h1 class="text-3xl font-bold text-navy mb-2">{{ t('student_dashboard.teams.create_new_title') }}</h1>
+      <p class="text-gray-600">{{ t('student_dashboard.teams.create_description') }}</p>
     </div>
 
     <!-- Form -->
@@ -20,8 +20,8 @@
       <UiInput
         v-model="formData.name"
         type="text"
-        label="Názov tímu"
-        placeholder="napr. GreenTech Innovators"
+        :label="t('student_dashboard.teams.team_name')"
+        :placeholder="t('student_dashboard.teams.team_name_placeholder')"
         required
         :error="errors.name"
       />
@@ -29,17 +29,17 @@
       <!-- Description -->
       <UiTextarea
         v-model="formData.description"
-        label="Popis (voliteľné)"
-        placeholder="Krátky popis činnosti a zamerania vášho tímu..."
+        :label="t('student_dashboard.teams.description_optional')"
+        :placeholder="t('student_dashboard.teams.description_placeholder')"
       />
 
       <!-- Members section -->
       <div class="space-y-4 pt-6 border-t">
-        <h2 class="text-lg font-semibold text-navy">Členovia tímu</h2>
+        <h2 class="text-lg font-semibold text-navy">{{ t('student_dashboard.teams.members_section') }}</h2>
 
         <!-- Help text -->
         <p class="text-sm text-gray-600">
-          Môžete vyzvať členov. Každý dostane pozvánku cez email a bude sa môcť zapojiť do tímu.
+          {{ t('student_dashboard.teams.members_help') }}
         </p>
 
         <!-- Members list -->
@@ -68,20 +68,20 @@
 
         <!-- Add member form -->
         <div class="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <h3 class="text-sm font-medium text-navy">Pridať člena</h3>
+          <h3 class="text-sm font-medium text-navy">{{ t('student_dashboard.teams.add_member') }}</h3>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <UiInput
               v-model="newMember.email"
               type="email"
-              label="Email"
+              :label="t('student_dashboard.common.email')"
               placeholder="clen@example.com"
               :error="errors.memberEmail"
             />
 
             <UiSelect
               v-model="newMember.role"
-              label="Úloha"
+              :label="t('student_dashboard.teams.role')"
               :options="roleOptions"
             />
           </div>
@@ -91,7 +91,7 @@
             @click="addMember"
             class="w-full px-4 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition"
           >
-            + Pridať člena
+            + {{ t('student_dashboard.teams.add_member') }}
           </button>
         </div>
       </div>
@@ -102,15 +102,15 @@
           to="/timy"
           class="px-6 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
         >
-          Zrušiť
+          {{ t('student_dashboard.common.cancel') }}
         </NuxtLink>
         <button
           type="submit"
           :disabled="isSubmitting"
           class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
         >
-          <span v-if="!isSubmitting">Vytvoriť tím</span>
-          <span v-else>Vytváram...</span>
+          <span v-if="!isSubmitting">{{ t('student_dashboard.teams.create_team') }}</span>
+          <span v-else>{{ t('student_dashboard.teams.creating') }}</span>
         </button>
       </div>
     </form>
@@ -122,6 +122,7 @@ import { ref, reactive } from 'vue'
 import { X } from 'lucide-vue-next'
 
 const localePath = useLocalePath()
+const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
@@ -129,15 +130,15 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Vytvoriť nový tím | NTI',
-  description: 'Vytvoriť nový tím na Nitrianskom technickom inkubátore a spustiť spoluprácu.',
-  ogTitle: 'Vytvoriť nový tím — NTI',
-  ogDescription: 'Vytvorte nový tím a pridajte svojich členov do projektu.',
+  title: t('student_dashboard.teams.create_seo_title'),
+  description: t('student_dashboard.teams.create_seo_description'),
+  ogTitle: t('student_dashboard.teams.create_og_title'),
+  ogDescription: t('student_dashboard.teams.create_og_description'),
   ogType: 'website',
   ogUrl: 'https://nti.sk/timy/vytvorit',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'Vytvoriť nový tím — NTI',
-  twitterDescription: 'Vytvorte nový tím a spustite spoluprácu.',
+  twitterTitle: t('student_dashboard.teams.create_og_title'),
+  twitterDescription: t('student_dashboard.teams.create_twitter_description'),
 })
 
 const router = useRouter()
@@ -152,7 +153,7 @@ const formData = reactive({
 
 const newMember = reactive({
   email: '',
-  role: 'Developer',
+  role: 'Člen tímu',
 })
 
 const errors = reactive({
@@ -163,23 +164,19 @@ const errors = reactive({
 const isSubmitting = ref(false)
 
 const roleOptions = [
-  { label: 'Developer', value: 'Developer' },
-  { label: 'Team Lead', value: 'Team Lead' },
-  { label: 'Designer', value: 'Designer' },
-  { label: 'Analyst', value: 'Analyst' },
-  { label: 'Manager', value: 'Manager' },
+  { label: 'Člen tímu', value: 'Člen tímu' },
 ]
 
 const validateForm = () => {
   errors.name = ''
 
   if (!formData.name.trim()) {
-    errors.name = 'Názov tímu je povinný'
+    errors.name = t('student_dashboard.teams.errors.name_required')
     return false
   }
 
   if (formData.name.trim().length < 2) {
-    errors.name = 'Názov tímu musí mať aspoň 2 znaky'
+    errors.name = t('student_dashboard.teams.errors.name_min')
     return false
   }
 
@@ -190,18 +187,18 @@ const addMember = () => {
   errors.memberEmail = ''
 
   if (!newMember.email) {
-    errors.memberEmail = 'Email je povinný'
+    errors.memberEmail = t('student_dashboard.common.errors.email_required')
     return
   }
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newMember.email)) {
-    errors.memberEmail = 'Neplatný email'
+    errors.memberEmail = t('student_dashboard.common.errors.invalid_email')
     return
   }
 
   // Check if member already exists
   if (formData.members.some((m) => m.email.toLowerCase() === newMember.email.toLowerCase())) {
-    errors.memberEmail = 'Tento člen je už pridaný'
+    errors.memberEmail = t('student_dashboard.teams.errors.member_exists')
     return
   }
 
@@ -211,7 +208,7 @@ const addMember = () => {
   })
 
   newMember.email = ''
-  newMember.role = 'Developer'
+  newMember.role = 'Člen tímu'
 }
 
 const removeMember = (index: number) => {
@@ -231,11 +228,17 @@ const handleSubmit = async () => {
     })
 
     addToast({
-      message: `Tím "${team.name}" bol úspešne vytvorený`,
+      message: t('student_dashboard.teams.toasts.created', { name: team.name }),
       type: 'success',
     })
 
     await router.push(`/student/timy/${team.id}`)
+  } catch (err: any) {
+    const message = err?.data?.message ?? t('student_dashboard.teams.toasts.create_error')
+    addToast({
+      message,
+      type: 'error',
+    })
   } finally {
     isSubmitting.value = false
   }

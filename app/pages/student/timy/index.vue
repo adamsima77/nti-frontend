@@ -2,11 +2,11 @@
   <div class="max-w-7xl mx-auto px-6 py-10">
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-navy">Moje tímy</h1>
+      <h1 class="text-2xl font-bold text-navy">{{ t('student_dashboard.teams.title') }}</h1>
       <NuxtLink :to="localePath('/student/timy/vytvorit')">
         <UiButton>
           <Plus class="w-4 h-4" />
-          Vytvoriť tím
+          {{ t('student_dashboard.teams.create_team') }}
         </UiButton>
       </NuxtLink>
     </div>
@@ -30,13 +30,13 @@
     >
       <UiEmptyState
         :icon="Users"
-        title="Zatiaľ nemáte žiadne tímy"
-        description="Vytvorte si svoj prvý tím a pozvite členov!"
+        :title="t('student_dashboard.teams.empty_title')"
+        :description="t('student_dashboard.teams.empty_description')"
       >
         <NuxtLink :to="localePath('/student/timy/vytvorit')">
           <UiButton>
             <Plus class="w-4 h-4" />
-            Vytvoriť tím
+            {{ t('student_dashboard.teams.create_team') }}
           </UiButton>
         </NuxtLink>
       </UiEmptyState>
@@ -79,14 +79,14 @@
           >
             +{{ team.members.length - 4 }}
           </div>
-          <span class="text-sm text-gray-500 ml-2">{{ team.members.length }} členov</span>
+          <span class="text-sm text-gray-500 ml-2">{{ t('student_dashboard.teams.members_count', { count: team.members.length }) }}</span>
         </div>
 
         <!-- Stats -->
         <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
           <span class="flex items-center gap-1">
             <FileText class="w-4 h-4" />
-            {{ team.applications.length }} prihlášok
+            {{ t('student_dashboard.teams.applications_count', { count: team.applications.length }) }}
           </span>
           <span class="text-xs text-gray-400">{{ team.createdAt }}</span>
         </div>
@@ -96,7 +96,7 @@
           :to="localePath(`/student/timy/${team.id}`)"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
         >
-          Zobraziť detail
+          {{ t('student_dashboard.common.view_detail') }}
           <ChevronRight class="w-4 h-4" />
         </NuxtLink>
       </div>
@@ -109,6 +109,7 @@ import { Plus, FileText, ChevronRight, Users } from 'lucide-vue-next'
 import { onMounted } from 'vue'
 
 const localePath = useLocalePath()
+const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
@@ -116,15 +117,15 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Moje tímy | NTI',
-  description: 'Spravujte svoje tímy, sledujte projektov a komunikujte so svojimi členaní.',
-  ogTitle: 'Moje tímy — NTI',
-  ogDescription: 'Správa tímov, sledovanie projektov a spolupráca s členmi tímu.',
+  title: t('student_dashboard.teams.seo_title'),
+  description: t('student_dashboard.teams.seo_description'),
+  ogTitle: t('student_dashboard.teams.og_title'),
+  ogDescription: t('student_dashboard.teams.og_description'),
   ogType: 'website',
   ogUrl: 'https://nti.sk/timy',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'Moje tímy — NTI',
-  twitterDescription: 'Spravujte svoje tímy a projektov.',
+  twitterTitle: t('student_dashboard.teams.og_title'),
+  twitterDescription: t('student_dashboard.teams.twitter_description'),
 })
 
 const teamsStore = useTeamsStore()

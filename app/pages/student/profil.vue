@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
-    <h1 class="text-2xl font-bold text-navy mb-8">Môj profil</h1>
+    <h1 class="text-2xl font-bold text-navy mb-8">{{ t('student_dashboard.profile.title') }}</h1>
 
     <div
       v-if="pageLoading"
@@ -27,10 +27,10 @@
             <span
               class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600"
             >
-              Študent
+              {{ t('student_dashboard.profile.badge_student') }}
             </span>
             <div class="text-right text-sm text-gray-500">
-              {{ teamsCount }} tímov · {{ applicationsCount }} prihlášok
+              {{ t('student_dashboard.profile.teams_count', { count: teamsCount }) }} · {{ t('student_dashboard.profile.applications_count', { count: applicationsCount }) }}
             </div>
           </div>
         </div>
@@ -38,21 +38,21 @@
 
       <!-- Osobné údaje (uloženie cez API users) -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
-        <h2 class="text-lg font-bold text-navy mb-5">Osobné údaje</h2>
+        <h2 class="text-lg font-bold text-navy mb-5">{{ t('student_dashboard.profile.personal_data') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
           <UiInput
             v-model="form.firstName"
-            label="Meno"
+            :label="t('student_dashboard.profile.first_name')"
             required
           />
           <UiInput
             v-model="form.lastName"
-            label="Priezvisko"
+            :label="t('student_dashboard.profile.last_name')"
             required
           />
           <UiInput
             v-model="form.email"
-            label="Email"
+            :label="t('student_dashboard.common.email')"
             type="email"
             disabled
           />
@@ -62,7 +62,7 @@
             :disabled="saving"
             @click="saveProfile"
           >
-            {{ saving ? 'Ukladám…' : 'Uložiť zmeny' }}
+            {{ saving ? t('student_dashboard.common.saving') : t('student_dashboard.common.save_changes') }}
           </UiButton>
         </div>
       </div>
@@ -72,29 +72,29 @@
         v-if="studentRecord"
         class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6"
       >
-        <h2 class="text-lg font-bold text-navy mb-5">Študentský profil</h2>
+        <h2 class="text-lg font-bold text-navy mb-5">{{ t('student_dashboard.profile.student_profile') }}</h2>
         <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
-            <dt class="text-gray-500">Univerzita</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.university?.name ?? '—' }}</dd>
+            <dt class="text-gray-500">{{ t('student_dashboard.profile.university') }}</dt>
+            <dd class="font-medium text-navy">{{ studentRecord.university?.name ?? t('student_dashboard.common.not_available') }}</dd>
           </div>
           <div>
-            <dt class="text-gray-500">Študijný program</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.study_program?.name ?? '—' }}</dd>
+            <dt class="text-gray-500">{{ t('student_dashboard.profile.study_program') }}</dt>
+            <dd class="font-medium text-navy">{{ studentRecord.study_program?.name ?? t('student_dashboard.common.not_available') }}</dd>
           </div>
           <div>
-            <dt class="text-gray-500">Študijný odbor</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.study_field?.name ?? '—' }}</dd>
+            <dt class="text-gray-500">{{ t('student_dashboard.profile.study_field') }}</dt>
+            <dd class="font-medium text-navy">{{ studentRecord.study_field?.name ?? t('student_dashboard.common.not_available') }}</dd>
           </div>
           <div>
-            <dt class="text-gray-500">Ročník</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.study_year?.name ?? '—' }}</dd>
+            <dt class="text-gray-500">{{ t('student_dashboard.profile.study_year') }}</dt>
+            <dd class="font-medium text-navy">{{ studentRecord.study_year?.name ?? t('student_dashboard.common.not_available') }}</dd>
           </div>
           <div
             v-if="studentRecord.portfolio_url"
             class="md:col-span-2"
           >
-            <dt class="text-gray-500">Portfólio</dt>
+            <dt class="text-gray-500">{{ t('student_dashboard.profile.portfolio') }}</dt>
             <dd>
               <a
                 :href="studentRecord.portfolio_url"
@@ -111,7 +111,7 @@
         v-else-if="studentLoaded"
         class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-600"
       >
-        Študentský záznam v databáze zatiaľ nemáte (napr. po onboardingu sa vytvorí cez API študenta).
+        {{ t('student_dashboard.profile.no_student_record') }}
       </div>
     </template>
   </div>
@@ -126,13 +126,14 @@ const authStore = useAuthStore()
 const teamsStore = useTeamsStore()
 const { applications, refresh: refreshApplications } = useApplications()
 const { addToast } = useToast()
+const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
 })
 
-useHead({ title: 'Môj profil | NTI' })
+useHead({ title: t('student_dashboard.profile.seo_title') })
 
 const pageLoading = ref(true)
 const saving = ref(false)
@@ -196,7 +197,7 @@ async function saveProfile() {
 
   const roleIds = u.roles?.map((r) => r.id) ?? []
   if (!roleIds.length) {
-    addToast({ message: 'Nepodarilo sa určiť roly používateľa.', type: 'error' })
+    addToast({ message: t('student_dashboard.profile.toasts.role_detect_error'), type: 'error' })
     return
   }
 
@@ -210,7 +211,7 @@ async function saveProfile() {
     })
     await authStore.getCurrentUser()
     syncFormFromUser()
-    addToast({ message: 'Profil bol úspešne uložený', type: 'success' })
+    addToast({ message: t('student_dashboard.profile.toasts.saved'), type: 'success' })
   } catch (err: any) {
     const msg = err?.data?.message ?? err?.message ?? 'Uloženie zlyhalo'
     addToast({ message: msg, type: 'error' })
