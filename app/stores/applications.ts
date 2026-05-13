@@ -100,15 +100,21 @@ export const useApplicationsStore = defineStore('applications', () => {
     callId: number
     teamId: number
     documentIds: number[]
+    formData?: Record<string, string>
   }) => {
     isLoading.value = true
 
     try {
-      const response = await api.post('/applications', {
+      const body: Record<string, unknown> = {
         call_id: payload.callId,
         team_id: payload.teamId,
         document_ids: payload.documentIds,
-      }) as { data?: { id: number }; id?: number }
+      }
+      if (payload.formData && Object.keys(payload.formData).length > 0) {
+        body.form_data = payload.formData
+      }
+
+      const response = await api.post('/applications', body) as { data?: { id: number }; id?: number }
 
       const raw = response?.data ?? response
       const id = raw?.id

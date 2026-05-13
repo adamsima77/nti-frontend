@@ -1,6 +1,7 @@
 export const useApi = () => {
   const config = useRuntimeConfig()
   const auth = useAuthStore()
+  const localeCookie = useCookie<string>('i18n_redirected', { default: () => 'sk' })
 
   const baseURL = import.meta.server
     ? config.apiBase
@@ -13,6 +14,12 @@ export const useApi = () => {
     onRequest({ options }) {
       options.headers = {
         ...options.headers,
+      }
+
+      const loc = localeCookie.value === 'en' ? 'en' : 'sk'
+      options.headers = {
+        ...options.headers,
+        'X-Locale': loc,
       }
 
       // ✅ Attach token only on client

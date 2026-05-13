@@ -46,6 +46,7 @@ function mapApiCallToCall(raw: Record<string, unknown>): Call {
   const program = raw.program as Record<string, unknown> | undefined
   const status = raw.status as Record<string, unknown> | undefined
   const isOpen = Boolean(raw.is_open)
+  const formSchema = (raw.form_schema ?? raw.formSchema) as FormSchema | undefined
 
   return {
     id: Number(raw.id),
@@ -58,11 +59,13 @@ function mapApiCallToCall(raw: Record<string, unknown>): Call {
     status: isOpen ? 'open' : 'closed',
     applicantsCount: Number(raw.applicants_count ?? 0),
     maxTeams: raw.max_teams != null ? Number(raw.max_teams) : undefined,
+    formSchema,
   }
 }
 
 export const useCallsStore = defineStore('calls', () => {
   const api = useApi()
+  const localeCookie = useCookie<string>('i18n_redirected', { default: () => 'sk' })
 
   const calls = ref<Call[]>([])
   const currentCall = ref<Call | null>(null)
@@ -73,7 +76,8 @@ export const useCallsStore = defineStore('calls', () => {
   const fetchCalls = async () => {
     isLoading.value = true
     try {
-      const response = await api.get('/calls?per_page=100')
+      const lang = localeCookie.value === 'en' ? 'en' : 'sk'
+      const response = await api.get(`/calls/lang/${lang}?per_page=100`)
       const list = extractCallsList(response)
       calls.value = list.map(mapApiCallToCall)
       return calls.value
@@ -95,17 +99,19 @@ export const useCallsStore = defineStore('calls', () => {
     const callId = typeof id === 'string' ? parseInt(id, 10) : id
 
     try {
-      if (calls.value.length === 0) await fetchOpenCalls()
+      const lang = localeCookie.value === 'en' ? 'en' : 'sk'
+      const response = await api.get(`/calls/${callId}/lang/${lang}`)
+      const obj =
+        response && typeof response === 'object' && !Array.isArray(response)
+          ? (response as Record<string, unknown>)
+          : null
+      currentCall.value = obj && typeof obj.id === 'number' ? mapApiCallToCall(obj) : null
 
-      const found = calls.value.find((c) => c.id === callId)
-      if (found) {
-        currentCall.value = found
-        return currentCall.value
+      if (currentCall.value) {
+        const idx = calls.value.findIndex((c) => c.id === currentCall.value!.id)
+        if (idx !== -1) calls.value[idx] = currentCall.value
       }
 
-      const response = await api.get(`/calls/${callId}`)
-      const raw = extractSingleCall(response)
-      currentCall.value = raw ? mapApiCallToCall(raw) : null
       return currentCall.value
     } finally {
       isLoading.value = false

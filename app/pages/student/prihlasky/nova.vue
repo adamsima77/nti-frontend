@@ -111,6 +111,7 @@
         <!-- Team selection -->
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">{{ t('student_dashboard.applications.team') }}</label>
+          <p class="text-xs text-gray-500">{{ t('student_dashboard.applications.team_min_members_help') }}</p>
           <select
             v-model.number="selectedTeamId"
             class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -122,13 +123,19 @@
               {{ t('student_dashboard.applications.select_team') }}
             </option>
             <option
-              v-for="team in teamsStore.teams"
+              v-for="team in eligibleTeams"
               :key="team.id"
               :value="team.id"
             >
-              {{ team.name }}
+              {{ team.name }} — {{ t('student_dashboard.teams.members_count', { count: team.members.length }) }}
             </option>
           </select>
+          <p
+            v-if="teamsStore.teams.length && !eligibleTeams.length"
+            class="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-md px-3 py-2"
+          >
+            {{ t('student_dashboard.applications.team_no_eligible') }}
+          </p>
         </div>
       </div>
 
@@ -153,7 +160,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { Calendar, Users, FileText } from 'lucide-vue-next'
 import type { Call } from '~/stores/calls'
 
@@ -177,13 +184,18 @@ const selectedTeamId = ref<number | null>(null)
 const draftData = ref<Record<string, any>>({})
 const isSubmitting = ref(false)
 
+const eligibleTeams = computed(() =>
+  teamsStore.teams.filter((team) => Array.isArray(team.members) && team.members.length >= 3),
+)
+
 // Load calls and teams on mount
 onMounted(async () => {
   await Promise.all([callsStore.fetchOpenCalls(), teamsStore.fetchTeams()])
 })
 
 const selectCall = async (call: Call) => {
-  selectedCall.value = call
+  await callsStore.fetchCallById(call.id)
+  selectedCall.value = callsStore.currentCall ?? call
   selectedTeamId.value = null
 
   // Check if there's a draft for this call
@@ -220,6 +232,13 @@ const handleSubmit = async (data: Record<string, any>) => {
     ? rawIds.map((x) => Number(x)).filter((n) => Number.isFinite(n) && n > 0)
     : []
 
+  const formData: Record<string, string> = {}
+  for (const [key, value] of Object.entries(data)) {
+    if (key.startsWith('criterion_')) {
+      formData[key] = typeof value === 'string' ? value : String(value ?? '')
+    }
+  }
+
   isSubmitting.value = true
 
   try {
@@ -227,6 +246,7 @@ const handleSubmit = async (data: Record<string, any>) => {
       callId: selectedCall.value.id,
       teamId: Number(selectedTeamId.value),
       documentIds,
+      formData,
     })
 
     addToast({
