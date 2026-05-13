@@ -1,4 +1,5 @@
 <template>
+  <UiToast />
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
 
