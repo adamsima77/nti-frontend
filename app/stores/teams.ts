@@ -96,7 +96,7 @@ function normalizeTeamFromApi(
     if (me) myRole = mapApiMember(me).role
   }
 
-  myRole = mapTeamRoleName(myRole ?? 'Člen tímu')
+  myRole = mapTeamRoleName(myRole && String(myRole).trim() !== '' ? myRole : 'Člen tímu')
 
   const createdRaw = raw.createdAt ?? raw.created_at
   const createdAt =
@@ -160,6 +160,9 @@ export const useTeamsStore = defineStore('teams', () => {
       const uid = auth.user?.id ?? null
       currentTeam.value = raw ? normalizeTeamFromApi(raw, uid) : null
       return currentTeam.value
+    } catch {
+      currentTeam.value = null
+      return null
     } finally {
       isLoading.value = false
     }

@@ -58,6 +58,7 @@ export const useApplicationsStore = defineStore('applications', () => {
   const applications = ref<Application[]>([])
   const currentApplication = ref<Application | null>(null)
   const applicationDrafts = ref<Map<string, ApplicationDraft>>(new Map())
+  const draftRevision = ref(0)
   const isLoading = ref(false)
 
   // Computed
@@ -203,6 +204,8 @@ export const useApplicationsStore = defineStore('applications', () => {
       lastSavedAt: new Date().toISOString(),
     })
 
+    draftRevision.value += 1
+
     // Also persist to localStorage for offline support
     const drafts = JSON.parse(localStorage.getItem('app_drafts') || '{}')
     drafts[draftKey] = applicationDrafts.value.get(draftKey)
@@ -230,9 +233,27 @@ export const useApplicationsStore = defineStore('applications', () => {
     const draftKey = `${teamId}_${callId}`
     applicationDrafts.value.delete(draftKey)
 
+    draftRevision.value += 1
+
     const drafts = JSON.parse(localStorage.getItem('app_drafts') || '{}')
     delete drafts[draftKey]
     localStorage.setItem('app_drafts', JSON.stringify(drafts))
+  }
+
+  const listDraftsFromStorage = (): ApplicationDraft[] => {
+    if (import.meta.server) return []
+    try {
+      const drafts = JSON.parse(localStorage.getItem('app_drafts') || '{}')
+      const out: ApplicationDraft[] = []
+      for (const v of Object.values(drafts)) {
+        if (v && typeof v === 'object' && 'teamId' in v && 'callId' in v) {
+          out.push(v as ApplicationDraft)
+        }
+      }
+      return out
+    } catch {
+      return []
+    }
   }
 
   return {
@@ -243,6 +264,7 @@ export const useApplicationsStore = defineStore('applications', () => {
 
     // Computed
     userApplications,
+    draftRevision: computed(() => draftRevision.value),
 
     // Actions
     fetchApplications,
@@ -256,5 +278,6 @@ export const useApplicationsStore = defineStore('applications', () => {
     saveDraft,
     getDraft,
     clearDraft,
+    listDraftsFromStorage,
   }
 })

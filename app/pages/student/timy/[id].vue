@@ -30,7 +30,7 @@
     <template v-else>
       <!-- Breadcrumbs -->
       <div class="mb-8">
-        <UiBreadcrumbs :items="[{ label: t('student_dashboard.teams.title'), to: '/timy' }, { label: teamsStore.currentTeam.name }]" />
+        <UiBreadcrumbs :items="[{ label: t('student_dashboard.teams.title'), to: localePath('/student/timy') }, { label: teamsStore.currentTeam.name }]" />
       </div>
 
       <!-- Header -->
@@ -164,7 +164,7 @@
                 {{ t('student_dashboard.teams.invite_member') }}
               </button>
               <NuxtLink
-                to="/student/prihlasky/nova"
+                :to="localePath('/student/prihlasky/nova')"
                 class="block"
               >
                 <UiButton
@@ -199,7 +199,7 @@ const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
-  // middleware: 'auth', // TODO: re-enable when backend is available
+  middleware: ['auth'],
 })
 
 const route = useRoute()
@@ -240,11 +240,19 @@ onMounted(async () => {
 const removeMemberAction = async (memberId: number) => {
   if (!confirm(t('student_dashboard.teams.remove_member_confirm'))) return
 
-  await teamsStore.removeMember(teamId, memberId)
-  addToast({
-    message: t('student_dashboard.teams.toasts.member_removed'),
-    type: 'success',
-  })
+  try {
+    await teamsStore.removeMember(teamId, memberId)
+    addToast({
+      message: t('student_dashboard.teams.toasts.member_removed'),
+      type: 'success',
+    })
+  } catch (err: any) {
+    const msg = err?.data?.message ?? err?.message ?? t('student_dashboard.teams.toasts.member_remove_error')
+    addToast({
+      message: msg,
+      type: 'error',
+    })
+  }
 }
 
 const handleMemberInvited = () => {

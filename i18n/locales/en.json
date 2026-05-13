@@ -733,6 +733,7 @@
         "invite_sent": "Invitation sent to {email}",
         "invite_error": "Failed to send invitation",
         "member_removed": "Member was removed from the team",
+        "member_remove_error": "Could not remove the team member",
         "member_invited": "Member was invited"
       }
     },
@@ -746,6 +747,7 @@
       "detail_seo_title": "Application Detail | NTI",
       "back_to_applications": "Back to applications",
       "change_call": "Change call",
+      "continue_draft": "Continue draft",
       "select_team": "Select team",
       "team_min_members_help": "Only teams with at least three members can submit an application.",
       "team_no_eligible": "You have no team with at least three members. Invite more students from Teams.",
@@ -768,6 +770,7 @@
         "all_programs": "All programs"
       },
       "status": {
+        "draft": "Draft",
         "submitted": "Submitted",
         "evaluating": "Evaluating",
         "approved": "Approved",

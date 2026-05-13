@@ -172,6 +172,7 @@ const { t } = useI18n()
 useHead({ title: t('student_dashboard.applications.new_seo_title') })
 
 const router = useRouter()
+const route = useRoute()
 const localePath = useLocalePath()
 
 const callsStore = useCallsStore()
@@ -188,9 +189,32 @@ const eligibleTeams = computed(() =>
   teamsStore.teams.filter((team) => Array.isArray(team.members) && team.members.length >= 3),
 )
 
-// Load calls and teams on mount
+// Load calls and teams on mount; optional ?team=&call= z rozpracovanej prihlášky
 onMounted(async () => {
   await Promise.all([callsStore.fetchOpenCalls(), teamsStore.fetchTeams()])
+
+  const teamQ = route.query.team
+  const callQ = route.query.call
+  const teamId = typeof teamQ === 'string' ? Number(teamQ) : NaN
+  const callId = typeof callQ === 'string' ? Number(callQ) : NaN
+
+  if (Number.isFinite(callId) && callId > 0) {
+    await callsStore.fetchCallById(callId)
+    if (callsStore.currentCall) {
+      selectedCall.value = callsStore.currentCall
+    }
+    if (Number.isFinite(teamId) && teamId > 0) {
+      selectedTeamId.value = teamId
+      const draft = applicationsStore.getDraft(teamId, callId)
+      if (draft) {
+        draftData.value = draft.data
+        addToast({
+          message: t('student_dashboard.applications.toasts.loading_draft'),
+          type: 'info',
+        })
+      }
+    }
+  }
 })
 
 const selectCall = async (call: Call) => {
@@ -198,15 +222,19 @@ const selectCall = async (call: Call) => {
   selectedCall.value = callsStore.currentCall ?? call
   selectedTeamId.value = null
 
-  // Check if there's a draft for this call
-  if (teamsStore.teams.length > 0) {
-    const draft = applicationsStore.getDraft(teamsStore.teams[0]!.id, call.id)
+  // Načítaj rozpracovanú verziu pre túto výzvu (ľubovoľný tím, kde existuje draft)
+  for (const team of teamsStore.teams) {
+    const draft = applicationsStore.getDraft(team.id, selectedCall.value.id)
     if (draft) {
       draftData.value = draft.data
+      if (team.members.length >= 3) {
+        selectedTeamId.value = team.id
+      }
       addToast({
         message: t('student_dashboard.applications.toasts.loading_draft'),
         type: 'info',
       })
+      break
     }
   }
 }

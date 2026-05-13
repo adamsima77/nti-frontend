@@ -43,6 +43,13 @@ export interface Application {
   documentRows?: ApplicationDocumentRow[]
   history?: ApplicationHistoryEntry[]
   comments?: ApplicationComment[]
+  /** Lokálny koncept (localStorage), nie záznam v API */
+  isDraft?: boolean
+  draftTeamId?: number
+  draftCallId?: number
+  /** Z API (deduplikácia konceptov) */
+  callId?: number
+  teamId?: number
 }
 
 export interface ApplicationWithProgress extends Application {

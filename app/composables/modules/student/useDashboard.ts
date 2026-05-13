@@ -1,7 +1,6 @@
 import type { DashboardData, DashboardStats, Deadline, RequiredAction, Application, ApplicationWithProgress } from './types'
 import { useApplications } from './useApplications'
 import { useTeams } from './useTeams'
-import { useCalls } from '../programs/fetchCalls'
 
 /**
  * Calculate days remaining until deadline

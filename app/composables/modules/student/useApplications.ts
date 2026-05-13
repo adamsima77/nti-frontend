@@ -38,7 +38,10 @@ interface ApiDocumentItem {
 interface ApiApplication {
   id: number
   name?: string
+  team_id?: number
+  call_id?: number
   call?: {
+    id?: number
     name: string
     program?: {
       name: string
@@ -62,8 +65,22 @@ interface ApiApplication {
 function extractApplicationsList(res: unknown): ApiApplication[] {
   if (!res || typeof res !== 'object') return []
   if (Array.isArray(res)) return res as ApiApplication[]
+
   const r = res as Record<string, unknown>
-  if (Array.isArray(r.data)) return r.data as ApiApplication[]
+
+  if (Array.isArray(r.data)) {
+    return r.data as ApiApplication[]
+  }
+
+  // Laravel paginator / wrapped JSON: { data: { data: [...], meta } }
+  const inner = r.data
+  if (inner && typeof inner === 'object' && !Array.isArray(inner)) {
+    const nested = (inner as Record<string, unknown>).data
+    if (Array.isArray(nested)) {
+      return nested as ApiApplication[]
+    }
+  }
+
   return []
 }
 
@@ -146,6 +163,8 @@ export const mapApplication = (app: ApiApplication): Application => {
     title: app.name ?? app.call?.name ?? `Prihláška #${app.id}`,
     program: app.call?.program?.name ?? app.call?.name ?? 'Program',
     team: app.team?.name ?? (app.team_id != null ? `Tím #${app.team_id}` : 'Tím'),
+    teamId: app.team_id,
+    callId: app.call?.id ?? app.call_id,
     status: mapStatusFromApi(app.status),
     submittedAt: app.submitted_at,
     members: app.team_members_count ?? 0,
@@ -169,7 +188,7 @@ export const useApplications = () => {
     () => `applications-${locale.value}`,
     async () => {
       try {
-        const res = await api.get('/applications') as unknown
+        const res = (await api.get('/applications?per_page=100')) as unknown
         const apps = extractApplicationsList(res)
         return apps.map(mapApplication)
       } catch (err) {
