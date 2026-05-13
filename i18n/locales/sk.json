@@ -429,7 +429,7 @@
   "request_new_link": "Požiadať o nový odkaz"
 },
   "login": {
-    "success": "Boli ste úspešne odhlásený.",
+    "success": "Boli ste úspešne prihlásený.",
      "errors": {
       "invalid_credentials": "Nesprávny email alebo heslo.",
       "unverified_email": "Prosím, overte svoj email pred prihlásením.",
