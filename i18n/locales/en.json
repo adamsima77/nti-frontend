@@ -757,6 +757,7 @@
       "seo_title": "My Applications | NTI",
       "no_form_schema": "This call does not contain a dynamic form schema from API yet.",
       "no_form_schema_continuation": "The application can be completed after backend support is added",
+      "no_form_fields": "This call has no form fields (empty schema). Check the call configuration or contact an administrator.",
       "open_calls": {
         "open": "Open",
         "empty_title": "No open calls",

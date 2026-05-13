@@ -141,7 +141,7 @@
 
       <!-- Form -->
       <DynamicForm
-        v-if="selectedCall.formSchema"
+        v-if="selectedCall.formSchema?.fields?.length"
         :key="selectedCall.id"
         :form-schema="selectedCall.formSchema"
         :initial-data="draftData"
@@ -150,6 +150,12 @@
         @save-draft="handleSaveDraft"
         @submit="handleSubmit"
       />
+      <div
+        v-else-if="selectedCall.formSchema"
+        class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+      >
+        {{ t('student_dashboard.applications.no_form_fields') }}
+      </div>
       <div
         v-else
         class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"

@@ -757,6 +757,7 @@
       "seo_title": "Moje prihlášky | NTI",
       "no_form_schema": "Táto výzva zatiaľ neobsahuje schému dynamického formulára z API.",
       "no_form_schema_continuation": "Prihlášku je možné dokončiť po doplnení backendu",
+      "no_form_fields": "Táto výzva nemá žiadne polia formulára (prázdna schéma). Skontrolujte nastavenie výzvy alebo kontaktujte administrátora.",
       "open_calls": {
         "open": "Otvorené",
         "empty_title": "Žiadne otvorené výzvy",
