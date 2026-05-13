@@ -5,7 +5,7 @@
   >
     <!-- Label -->
     <label
-      v-if="field.label"
+      v-if="field.label && field.type !== 'repeater'"
       :for="`field-${field.name}`"
       class="text-sm font-medium text-gray-700"
     >
@@ -182,6 +182,15 @@
       </label>
     </div>
 
+    <!-- Repeater (dynamic rows) -->
+    <RepeaterField
+      v-if="field.type === 'repeater'"
+      :field="field"
+      :model-value="Array.isArray(modelValue) ? modelValue : []"
+      @update:model-value="$emit('update:modelValue', $event)"
+      @blur="$emit('blur')"
+    />
+
     <!-- File Input with Drag & Drop -->
     <FileUploadZone
       v-if="field.type === 'file'"
@@ -190,7 +199,7 @@
       :allow-multiple="field.allowMultiple || false"
       :accept="field.accept || '*'"
       :error="error"
-      :document-upload="field.name === 'document_ids'"
+      :document-upload="field.type === 'file' && (field.documentUpload === true || field.name === 'document_ids')"
       @update:model-value="$emit('update:modelValue', $event)"
       @change="$emit('blur')"
     />

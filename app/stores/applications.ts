@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 
 export interface FormField {
   name: string
-  type: 'text' | 'textarea' | 'email' | 'number' | 'select' | 'checkbox' | 'date' | 'file'
+  type: 'text' | 'textarea' | 'email' | 'number' | 'select' | 'checkbox' | 'date' | 'file' | 'repeater'
   label: string
   placeholder?: string
   description?: string
@@ -16,6 +16,10 @@ export interface FormField {
   maxFileSize?: number // bytes, default 10MB
   allowMultiple?: boolean
   accept?: string // MIME types: 'image/*', 'application/pdf', etc.
+  /** Ak true (alebo legacy name document_ids), súbor sa nahrá na /documents a do modelu sa uložia ID. */
+  documentUpload?: boolean
+  /** Pre type === 'repeater': definícia stĺpcov v jednom riadku */
+  fields?: FormField[]
 }
 
 export interface FormSchema {

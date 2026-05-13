@@ -142,6 +142,7 @@
       <!-- Form -->
       <DynamicForm
         v-if="selectedCall.formSchema"
+        :key="selectedCall.id"
         :form-schema="selectedCall.formSchema"
         :initial-data="draftData"
         :draft-persist-enabled="Boolean(selectedTeamId)"
@@ -164,6 +165,70 @@
 import { ref, onMounted, computed } from 'vue'
 import { Calendar, Users, FileText } from 'lucide-vue-next'
 import type { Call } from '~/stores/calls'
+import type { FormSchema } from '~/stores/applications'
+
+function parseUploadedDocumentIds(val: unknown): number[] {
+  if (val == null || val === '') {
+    return []
+  }
+  if (typeof val === 'number' && Number.isFinite(val) && val > 0) {
+    return [val]
+  }
+  if (Array.isArray(val)) {
+    return val
+      .map((x) => Number(x))
+      .filter((n) => Number.isFinite(n) && n > 0)
+  }
+  if (typeof val === 'string') {
+    try {
+      const parsed = JSON.parse(val) as unknown
+      if (Array.isArray(parsed)) {
+        return parsed.map((x) => Number(x)).filter((n) => Number.isFinite(n) && n > 0)
+      }
+      if (typeof parsed === 'number' && parsed > 0) {
+        return [parsed]
+      }
+    } catch {
+      if (/^\d+$/.test(val)) {
+        return [Number(val)]
+      }
+    }
+  }
+  return []
+}
+
+function collectDocumentIdsFromForm(schema: FormSchema, data: Record<string, unknown>): number[] {
+  const set = new Set<number>()
+  for (const f of schema.fields) {
+    if (f.type !== 'file') {
+      continue
+    }
+    for (const id of parseUploadedDocumentIds(data[f.name])) {
+      set.add(id)
+    }
+  }
+  return [...set].sort((a, b) => a - b)
+}
+
+function serializeFormDataForApi(schema: FormSchema, data: Record<string, unknown>): Record<string, string> {
+  const out: Record<string, string> = {}
+  for (const field of schema.fields) {
+    const v = data[field.name]
+    if (field.type === 'file') {
+      const ids = parseUploadedDocumentIds(v)
+      out[field.name] = ids.length ? JSON.stringify(ids) : ''
+    } else if (field.type === 'checkbox') {
+      out[field.name] = v === true || v === 1 || v === '1' ? '1' : '0'
+    } else if (field.type === 'repeater') {
+      out[field.name] = JSON.stringify(Array.isArray(v) ? v : [])
+    } else if (v == null) {
+      out[field.name] = ''
+    } else {
+      out[field.name] = typeof v === 'string' ? v : String(v)
+    }
+  }
+  return out
+}
 
 definePageMeta({
   layout: 'portal',
@@ -264,19 +329,21 @@ const handleSubmit = async (data: Record<string, any>) => {
     return
   }
 
-  const rawIds = (data as { document_ids?: unknown }).document_ids
-  let documentIds: number[] = []
-  if (Array.isArray(rawIds)) {
-    documentIds = rawIds.map((x) => Number(x)).filter((n) => Number.isFinite(n) && n > 0)
-  } else if (typeof rawIds === 'number' && Number.isFinite(rawIds) && rawIds > 0) {
-    documentIds = [rawIds]
+  const schema = selectedCall.value.formSchema
+  if (!schema?.fields?.length) {
+    addToast({ message: t('student_dashboard.applications.toasts.submit_failed'), type: 'error' })
+    return
   }
 
-  const formData: Record<string, string> = {}
-  for (const [key, value] of Object.entries(data)) {
-    if (key.startsWith('criterion_')) {
-      formData[key] = typeof value === 'string' ? value : String(value ?? '')
-    }
+  const formPayload = serializeFormDataForApi(schema, data as Record<string, unknown>)
+  const documentIds = collectDocumentIdsFromForm(schema, data as Record<string, unknown>)
+
+  if (documentIds.length === 0) {
+    addToast({
+      message: 'Nahrajte aspoň jednu prílohu (pole typu súbor v prihláške).',
+      type: 'error',
+    })
+    return
   }
 
   isSubmitting.value = true
@@ -286,7 +353,7 @@ const handleSubmit = async (data: Record<string, any>) => {
       callId: selectedCall.value.id,
       teamId: Number(selectedTeamId.value),
       documentIds,
-      formData,
+      formData: formPayload,
     })
 
     addToast({

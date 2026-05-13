@@ -106,10 +106,58 @@ const formData = reactive<Record<string, any>>({})
 const errors = reactive<Record<string, string>>({})
 const isSubmitting = ref(false)
 
-// Initialize form data
-if (props.initialData) {
-  Object.assign(formData, props.initialData)
+function coerceFieldValue(field: FormFieldType, raw: unknown): unknown {
+  if (field.type === 'repeater') {
+    if (typeof raw === 'string') {
+      try {
+        const parsed = JSON.parse(raw) as unknown
+        return Array.isArray(parsed) ? parsed : []
+      } catch {
+        return []
+      }
+    }
+    return Array.isArray(raw) ? raw : []
+  }
+  if (field.type === 'checkbox') {
+    if (typeof raw === 'string') {
+      const s = raw.toLowerCase()
+      return s === '1' || s === 'true' || s === 'yes' || s === 'on'
+    }
+    return Boolean(raw)
+  }
+  if (field.type === 'file') {
+    if (raw === undefined) {
+      return field.allowMultiple ? [] : undefined
+    }
+    return raw
+  }
+  if (raw == null) {
+    return ''
+  }
+  if (typeof raw === 'string' || typeof raw === 'number' || typeof raw === 'boolean') {
+    return String(raw)
+  }
+  return raw
 }
+
+function syncFormFromProps() {
+  const initial = props.initialData ?? {}
+  for (const key of Object.keys(formData)) {
+    delete formData[key]
+  }
+  for (const field of props.formSchema.fields) {
+    const raw = initial[field.name]
+    formData[field.name] = coerceFieldValue(field, raw)
+  }
+}
+
+watch(
+  [() => props.formSchema, () => props.initialData],
+  () => {
+    syncFormFromProps()
+  },
+  { deep: true, immediate: true },
+)
 
 // Setup debounced auto-save (30 seconds)
 const { markDirty, lastSaveTime } = useAutoSave({
@@ -158,6 +206,12 @@ const validateField = (fieldName: string) => {
           value.every((x) => !(x instanceof File) && !(typeof x === 'number' && Number.isFinite(x) && x > 0)))
       if (empty) {
         errors[fieldName] = `${field.label} je povinné`
+        return
+      }
+    } else if (field.type === 'repeater') {
+      const arr = Array.isArray(value) ? value : []
+      if (arr.length === 0) {
+        errors[fieldName] = `${field.label}: pridajte aspoň jeden riadok`
         return
       }
     } else if (!value) {
