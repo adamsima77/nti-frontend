@@ -18,10 +18,9 @@
   <div
     class="grid md:grid-cols-2 gap-8 mb-20 bg-gray-50 rounded-2xl overflow-hidden shadow-[0_-10px_30px_rgba(0,0,0,0.08),0_10px_30px_rgba(0,0,0,0.08)]"
   >
-
     
    <div class="w-full aspect-[16/9] rounded-2xl overflow-hidden">
- 
+ <UiSkeleton height="80rem" width="100%" />
 </div>
 
   

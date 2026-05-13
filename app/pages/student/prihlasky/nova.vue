@@ -161,12 +161,12 @@ definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
 })
-
+const { t } = useI18n()
 useHead({ title: t('student_dashboard.applications.new_seo_title') })
 
 const router = useRouter()
 const localePath = useLocalePath()
-const { t } = useI18n()
+
 const callsStore = useCallsStore()
 const teamsStore = useTeamsStore()
 const applicationsStore = useApplicationsStore()
