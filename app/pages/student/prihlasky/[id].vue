@@ -238,7 +238,7 @@
 import { computed } from 'vue'
 import { ArrowLeft, Paperclip, FileText, CheckCircle, Clock, Circle } from 'lucide-vue-next'
 import type { ApplicationStatus } from '../../../composables/modules/student/types'
-
+import { useApplication } from '../../../composables/modules/student/useApplications'
 const route = useRoute()
 const localePath = useLocalePath()
 const { t } = useI18n()
