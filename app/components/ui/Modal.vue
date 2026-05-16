@@ -13,7 +13,7 @@
 
         <!-- Modal dialog -->
         <div
-          class="relative bg-white rounded-lg shadow-2xl max-w-md w-11/12 md:max-w-xl max-h-[90vh] overflow-y-auto z-10"
+          class="relative bg-white rounded-lg shadow-2xl max-w-md w-11/12 md:max-w-3xl max-h-[90vh] overflow-y-auto z-10"
           @click.stop
         >
           <!-- Header -->

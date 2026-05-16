@@ -17,10 +17,10 @@ export const useNews = () => {
     () => `news-${locale.value}-${currentPage.value}`,
     async () => {
       return await get(
-        `/news/lang/${locale.value}?page=${currentPage.value}`
+        `/public/news/lang/${locale.value}?page=${currentPage.value}`
       ).catch((e: any) =>
         e?.response?.status === 404
-          ? get(`/news/lang/${fb()}?page=${currentPage.value}`)
+          ? get(`/public/news/lang/${fb()}?page=${currentPage.value}`)
           : Promise.reject(e)
       )
     },

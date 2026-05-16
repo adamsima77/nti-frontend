@@ -72,8 +72,8 @@
 
         <div class="w-full h-1 bg-gray-300 my-6" />
 
-        <div class="text-justify font-sans text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed">
-          {{ newsDetail?.news_translations?.[0]?.description }}
+        <div class="text-justify font-sans text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed" v-html = "newsDetail?.news_translations?.[0]?.description ">
+         
         </div>
 
         <div class="w-full h-1 bg-gray-300 my-6" />

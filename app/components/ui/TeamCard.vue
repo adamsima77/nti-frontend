@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md p-5 flex items-center gap-4 transition"
+    class="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md p-5 flex items-start h-full gap-4 transition"
   >
     <img
       :src="image"

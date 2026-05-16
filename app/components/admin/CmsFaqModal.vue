@@ -4,55 +4,41 @@
     :title="isEditing ? 'Upraviť FAQ' : 'Nová FAQ otázka'"
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <form
-      class="space-y-4"
-      @submit.prevent="handleSubmit"
-    >
-      <UiFormField
+    <form class="space-y-4" @submit.prevent="handleSubmit">
+      <FormField
+        v-model="form.question"
         label="Otázka"
-        required
+        field="question"
+        placeholder="Ako sa prihlásiť do programu?"
+        :touched="touched"
+        :is-valid="isValid"
         :error="errors.question"
-      >
-        <UiInput
-          v-model="form.question"
-          placeholder="Ako sa prihlásiť do programu?"
-        />
-      </UiFormField>
+      />
 
-      <UiFormField
+      <FormField
+        v-model="form.answer"
         label="Odpoveď"
-        required
+        field="answer"
+        placeholder="Odpoveď na otázku"
+        :touched="touched"
+        :is-valid="isValid"
         :error="errors.answer"
-      >
-        <UiTextarea
-          v-model="form.answer"
-          placeholder="Odpoveď na otázku (HTML)"
-          :rows="5"
-        />
-      </UiFormField>
+      />
 
-      <UiFormField
+      <FormField
+        v-model="form.category"
         label="Kategória"
+        field="category"
+        placeholder="Prihlasovanie"
+        :touched="touched"
+        :is-valid="isValid"
         :error="errors.category"
-      >
-        <UiInput
-          v-model="form.category"
-          placeholder="Prihlasovanie"
-        />
-      </UiFormField>
+      />
     </form>
 
     <template #actions>
-      <UiButton
-        variant="ghost"
-        @click="emit('update:modelValue', false)"
-      >
-        Zrušiť
-      </UiButton>
-      <UiButton
-        :disabled="isSaving"
-        @click="handleSubmit"
-      >
+      <UiButton variant="ghost" @click="emit('update:modelValue', false)">Zrušiť</UiButton>
+      <UiButton :disabled="isSaving" @click="handleSubmit">
         {{ isSaving ? 'Ukladanie...' : 'Uložiť' }}
       </UiButton>
     </template>
@@ -73,18 +59,17 @@ const emit = defineEmits<{
 const isEditing = computed(() => !!props.faqItem?.id)
 const isSaving = ref(false)
 const errors = ref<Record<string, string>>({})
+const touched = ref<Record<string, boolean>>({})
 
 const form = ref({ question: '', answer: '', category: '' })
 
 watch(
   () => props.faqItem,
   (faqItem) => {
+    touched.value = {}
+    errors.value = {}
     if (faqItem) {
-      form.value = {
-        question: faqItem.question,
-        answer: faqItem.answer || '',
-        category: faqItem.category || '',
-      }
+      form.value = { question: faqItem.question, answer: faqItem.answer || '', category: faqItem.category || '' }
     } else {
       form.value = { question: '', answer: '', category: '' }
     }
@@ -95,10 +80,15 @@ watch(
 const { addToast } = useToast()
 const api = useApi()
 
+function isValid(field: string): boolean {
+  return !errors.value[field]
+}
+
 function validate(): boolean {
   errors.value = {}
-  if (!form.value.question.trim()) errors.value.question = 'Otázka je povinná'
-  if (!form.value.answer.trim()) errors.value.answer = 'Odpoveď je povinná'
+  touched.value = {}
+  if (!form.value.question.trim()) { errors.value.question = 'Otázka je povinná';  touched.value.question = true }
+  if (!form.value.answer.trim())   { errors.value.answer   = 'Odpoveď je povinná'; touched.value.answer = true }
   return Object.keys(errors.value).length === 0
 }
 
@@ -107,9 +97,9 @@ async function handleSubmit() {
   isSaving.value = true
   try {
     if (isEditing.value) {
-      await api.put(`/v1/admin/cms/faq/${props.faqItem!.id}`, form.value)
+      await api.put(`/v1/cms/faq/${props.faqItem!.id}`, form.value)
     } else {
-      await api.post('/v1/admin/cms/faq', form.value)
+      await api.post('/v1/cms/faq', form.value)
     }
     addToast({ message: isEditing.value ? 'FAQ bola aktualizovaná' : 'FAQ bola vytvorená', type: 'success' })
     emit('saved')

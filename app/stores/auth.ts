@@ -120,7 +120,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   if (role === 'superadmin') return '/super-admin'
   if (role === 'admin')      return '/admin'
-  if (role === 'cms_editor') return '/content-manager'
+  if (role === 'cms_editor') return '/cms'
   if (role === 'evaluator')  return '/hodnotenie'
   if (role === 'company')    return '/firma'
   if (role === 'mentor')     return '/mentor'

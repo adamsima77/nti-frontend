@@ -90,8 +90,9 @@ import type { CmsBlock } from '~/types/cms'
 const localePath = useLocalePath()
 
 definePageMeta({
-  layout: 'admin',
-  // middleware: ['auth'],
+  layout: 'portal',
+  middleware: ['auth'],
+  roles: ['cms_editor', 'admin', 'super_admin'],
 })
 
 const route = useRoute()
@@ -117,8 +118,8 @@ const page = ref<{
 useHead({ title: computed(() => `${page.value.title || 'Stránka'} — CMS — Admin | NTI`) })
 
 const breadcrumbs = computed(() => [
-  { label: 'CMS', to: localePath('/admin/cms') },
-  { label: 'Stránky', to: localePath('/admin/cms') },
+  { label: 'CMS', to: localePath('/cms') },
+  { label: 'Stránky', to: localePath('/cms/managment') },
   { label: page.value.title || 'Nová stránka' },
 ])
 

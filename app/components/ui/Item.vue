@@ -19,9 +19,7 @@
         class="text-sm text-blue-600 font-semibold mb-2"
         >{{ category }}</NuxtLink
       >
-      <p class="text-sm sm:text-base md:text-base text-gray-500">
-        {{ description }}
-      </p>
+     
 
       <NuxtLink
         :to="link"

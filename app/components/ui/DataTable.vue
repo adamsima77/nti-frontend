@@ -127,7 +127,7 @@
       <UiPagination
         :current-page="currentPage"
         :total-pages="totalPages"
-        @update:current-page="emit('update:currentPage', $event)"
+        @update:current-page="emit('update:current-page', $event)"
       />
     </div>
   </div>
@@ -169,9 +169,9 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  'update:sortBy': [value: string]
-  'update:sortDir': [value: 'asc' | 'desc']
-  'update:currentPage': [value: number]
+  'update:sort-by': [value: string]
+  'update:sort-dir': [value: 'asc' | 'desc']
+  'update:current-page': [value: number]
   'row-click': [row: Record<string, any>]
 }>()
 
@@ -183,10 +183,12 @@ const hasRowClick = computed(() => {
 
 function toggleSort(key: string) {
   if (props.sortBy === key) {
-    emit('update:sortDir', props.sortDir === 'asc' ? 'desc' : 'asc')
+    emit('update:sort-dir', props.sortDir === 'asc' ? 'desc' : 'asc')
   } else {
-    emit('update:sortBy', key)
-    emit('update:sortDir', 'asc')
+    emit('update:sort-by', key)
+    emit('update:sort-dir', 'asc')
   }
+
+  emit('update:current-page', 1)
 }
 </script>

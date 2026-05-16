@@ -26,9 +26,7 @@
         {{ category }}
       </NuxtLink>
 
-      <p class="text-gray-500 text-base sm:text-lg md:text-xl lg:text-2xl mb-6">
-        {{ description }}
-      </p>
+      
 
       <NuxtLink
         :to="link"

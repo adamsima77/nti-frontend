@@ -31,6 +31,7 @@ import {
   FolderKanban,
   MessageSquare,
   ClipboardCheck,
+  FileCode, 
 } from 'lucide-vue-next'
 
 const mobileSidebarOpen = ref(false)
@@ -71,6 +72,14 @@ const navItems = computed(() => {
       { label: 'Moje tímy', to: '/student/timy', icon: Users },
       { label: 'Môj profil', to: '/student/profil', icon: UserCircle },
     ]
+  }
+
+  if(role === 'cms_editor'){
+        return [
+            { label: 'Dashboard', to: '/cms', icon: LayoutDashboard, section: 'Správa' },
+            { label: 'CMS', to: '/cms/management', icon: FileCode, section: 'Obsah' },
+            { label: 'Profil', to: '/cms/profil', icon: UserCircle, section: 'Účet' },
+        ]
   }
 
   if (role === 'company') {

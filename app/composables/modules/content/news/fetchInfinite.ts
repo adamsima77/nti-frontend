@@ -9,10 +9,10 @@ export const fetchInfinite = () => {
     typeof fallbackLocale.value === 'string' ? fallbackLocale.value : 'en'
 
   const fetchPage = async (page: number) => {
-    return get(`/news/lang/${locale.value}?page=${page}`)
+    return get(`/public/news/lang/${locale.value}?page=${page}`)
       .catch((e: any) =>
         e?.response?.status === 404
-          ? get(`/news/lang/${fb()}?page=${page}`)
+          ? get(`/public/news/lang/${fb()}?page=${page}`)
           : Promise.reject(e)
       )
   }

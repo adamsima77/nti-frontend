@@ -21,7 +21,7 @@ const props = defineProps({
     type: String,
     required: true,
     validator: (value) =>
-      ['approved', 'pending', 'rejected', 'evaluating', 'active', 'draft', 'submitted', 'paused'].includes(value),
+      ['approved', 'pending', 'rejected', 'evaluating', 'active', 'draft', 'submitted', 'paused', 'published', 'concept'].includes(value),
   },
 })
 
@@ -70,8 +70,14 @@ const statusConfig = {
   // firma/zadania
   published: {
     label: 'Publikované',
-    color: '#0D5FBF',
-    bgClass: 'bg-blue-50 text-blue-600',
+    color: '#16A34A',
+    bgClass: 'bg-green-50 text-green-700',
+  },
+
+  concept:{
+    label: 'Koncept',
+    color: '#F59E0B',
+    bgClass: 'bg-orange-50 text-orange-700'
   },
   matching: {
     label: 'V párovaní',
