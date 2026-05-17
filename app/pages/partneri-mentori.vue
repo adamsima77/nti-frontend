@@ -2,28 +2,28 @@
   <div class="max-w-7xl mx-auto px-4 py-20 md:px-6 md:py-16 space-y-20">
 
     <!-- HERO -->
-    <template v-if="!banner">
-      <div class="relative bg-blue-500 overflow-hidden rounded-lg shadow-2xl">
-        <div class="relative max-w-3xl mx-auto text-center text-white py-10 sm:py-12 md:py-16 px-4 md:px-8 space-y-4">
-          <UiSkeleton height="2.5rem" width="70%" class="mx-auto" />
-          <UiSkeleton height="1.2rem" width="90%" class="mx-auto" />
-          <UiSkeleton height="1.2rem" width="80%" class="mx-auto" />
-        </div>
-      </div>
-    </template>
-    <template v-else>
-      <div class="relative bg-blue-500 overflow-hidden rounded-lg shadow-2xl">
-        <div class="absolute inset-0 bg-gradient-to-b from-blue-500/70 to-blue-700/70 mix-blend-multiply pointer-events-none" />
-        <div class="relative max-w-3xl mx-auto text-center text-white py-10 sm:py-12 md:py-16 px-4 md:px-8">
-          <h2 class="text-3xl sm:text-4xl md:text-4xl font-extrabold mb-2">
-            {{ banner?.hero_banner_translations?.[0]?.title }}
-          </h2>
-          <p class="text-sm sm:text-base md:text-lg leading-relaxed">
-            {{ banner?.hero_banner_translations?.[0]?.description }}
-          </p>
-        </div>
-      </div>
-    </template>
+   <template v-if="banner_pending">
+  <div class="relative bg-blue-500 overflow-hidden rounded-lg shadow-2xl">
+    <div class="relative max-w-3xl mx-auto text-center text-white py-10 sm:py-12 md:py-16 px-4 md:px-8 space-y-4">
+      <UiSkeleton height="2.5rem" width="70%" class="mx-auto" />
+      <UiSkeleton height="1.2rem" width="90%" class="mx-auto" />
+      <UiSkeleton height="1.2rem" width="80%" class="mx-auto" />
+    </div>
+  </div>
+</template>
+<template v-else-if="banner">
+  <div class="relative bg-blue-500 overflow-hidden rounded-lg shadow-2xl">
+    <div class="absolute inset-0 bg-gradient-to-b from-blue-500/70 to-blue-700/70 mix-blend-multiply pointer-events-none" />
+    <div class="relative max-w-3xl mx-auto text-center text-white py-10 sm:py-12 md:py-16 px-4 md:px-8">
+      <h2 class="text-3xl sm:text-4xl md:text-4xl font-extrabold mb-2">
+        {{ banner?.hero_banner_translations?.[0]?.title }}
+      </h2>
+      <p class="text-sm sm:text-base md:text-lg leading-relaxed">
+        {{ banner?.hero_banner_translations?.[0]?.description }}
+      </p>
+    </div>
+  </div>
+</template>
 
     <!-- PARTNERS -->
     <section>
@@ -311,7 +311,7 @@ useSeoMeta({
 })
 
 // ── data ──────────────────────────────────────────────────
-const { banner } = useBanner(PageType.PARTNERS)
+const { banner, pending: banner_pending } = useBanner(PageType.PARTNERS)
 const { partnersList, isFetching, fetchNextPage, pending: partners_pending } = fetchPartnersi()
 const { referencesList, isFetching: referencesFetching, fetchNextPage: fetchNextReference, pending: references_pending } = fetchReferences()
 const { mentorsList, isFetching: isFetchingMentors, fetchNextPage: fetchNextMentor, pending: mentors_pending } = fetchMentors()

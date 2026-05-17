@@ -45,88 +45,45 @@
       </div>
     </div>
 
-    <!-- Recently edited + Drafts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-      <!-- Recently edited -->
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-navy">Naposledy upravené</h2>
-          <NuxtLink
-            to="/cms/novinky"
-            class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
-          >
-            Všetky články
-            <ChevronRight class="w-4 h-4" />
-          </NuxtLink>
-        </div>
-        <div class="space-y-3">
-          <div
-            v-for="item in mockRecentlyEdited"
-            :key="item.id"
-            class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center gap-4"
-          >
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" :class="contentTypeStyle(item.type).bg">
-              <component :is="contentTypeStyle(item.type).icon" class="w-4 h-4" :class="contentTypeStyle(item.type).color" />
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-medium text-navy text-sm truncate">{{ item.title }}</p>
-              <p class="text-xs text-gray-400 mt-0.5">{{ item.type }} · upravené {{ item.editedAt }}</p>
-            </div>
-            <NuxtLink
-              :to="item.link"
-              class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5 shrink-0"
-            >
-              Upraviť
-              <ChevronRight class="w-3.5 h-3.5" />
-            </NuxtLink>
-          </div>
-        </div>
+    <!-- Recently edited -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-navy">Naposledy upravené</h2>
+        <NuxtLink
+          to="/cms/management"
+          class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
+        >
+          Všetky položky
+          <ChevronRight class="w-4 h-4" />
+        </NuxtLink>
       </div>
-
-      <!-- Drafts -->
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-navy">Koncepty na dopracovanie</h2>
+      <div class="space-y-3">
+        <div
+          v-for="item in recentlyEditedItems"
+          :key="`${item.contentType}-${item.id}`"
+          class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center gap-4"
+        >
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" :class="contentTypeStyle(item.type).bg">
+            <component :is="contentTypeStyle(item.type).icon" class="w-4 h-4" :class="contentTypeStyle(item.type).color" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-navy text-sm truncate">{{ item.title }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ item.type }} · upravené {{ item.editedAt }}</p>
+          </div>
           <NuxtLink
-            to="/cms/novinky?status=draft"
-            class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
+            :to="item.editLink"
+            class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5 shrink-0"
           >
-            Zobraziť všetky
-            <ChevronRight class="w-4 h-4" />
+            Upraviť
+            <ChevronRight class="w-3.5 h-3.5" />
           </NuxtLink>
         </div>
-        <div class="space-y-3">
-          <div
-            v-for="draft in mockDrafts"
-            :key="draft.id"
-            class="bg-white rounded-lg shadow-sm border border-gray-100 p-4"
-          >
-            <div class="flex items-start justify-between mb-2">
-              <div class="flex-1 min-w-0 mr-2">
-                <p class="font-medium text-navy text-sm truncate">{{ draft.title }}</p>
-                <p class="text-xs text-gray-400 mt-0.5">{{ draft.type }} · vytvorené {{ draft.createdAt }}</p>
-              </div>
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 shrink-0">
-                Koncept
-              </span>
-            </div>
-            <div class="flex gap-2 mt-3">
-              <NuxtLink
-                :to="draft.link"
-                class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
-              >
-                Pokračovať v úprave
-                <ChevronRight class="w-3.5 h-3.5" />
-              </NuxtLink>
-            </div>
-          </div>
-          <p
-            v-if="!mockDrafts.length"
-            class="text-sm text-gray-400 text-center py-6"
-          >
-            Žiadne koncepty
-          </p>
-        </div>
+        <p
+          v-if="!recentlyEditedItems.length"
+          class="text-sm text-gray-400 text-center py-6"
+        >
+          Žiadne nedávno upravené položky
+        </p>
       </div>
     </div>
 
@@ -240,8 +197,102 @@ onMounted(async () => {
   faqCount.value = faqs.count
 })
 
+const { locale } = useI18n()
+const lang = computed(() => (locale.value === 'en' ? 'en' : 'sk'))
+const langId = computed(() => lang.value === 'en' ? 2 : 1)
 
-// ── Mock data ──────────────────────────────────────────────
+const lastUpdated = ref<any>({ article: [], partner: [], meta_tag: [], faq: [] })
+
+onMounted(async () => {
+  try {
+    const response = await api.get('/last-updated')
+    lastUpdated.value = response
+  } catch (error) {
+    console.error('Failed to fetch last updated:', error)
+  }
+})
+
+// ── Helper to get translation by current language ────────
+
+function getTranslation(translations: any[], defaultLangId = 1) {
+  if (!Array.isArray(translations)) return {}
+  const current = translations.find((t: any) => t.language_id === langId.value)
+  return current || translations[0] || {}
+}
+
+// ── Computed recently edited from API data ────────────────
+
+const recentlyEditedItems = computed(() => {
+  const items: any[] = []
+
+  // Add article
+  if (lastUpdated.value.article?.[0]) {
+    const article = lastUpdated.value.article[0]
+    const t = getTranslation(article.news_translations)
+    items.push({
+      id: article.id,
+      title: t.title ?? '—',
+      type: 'Článok',
+      editedAt: article.updated_at?.slice(0, 10) ?? '—',
+      editLink: { path: '/cms/management', query: { tab: 'clanky' } },
+      contentType: 'article',
+    })
+  }
+
+  // Add partner
+  if (lastUpdated.value.partner?.[0]) {
+    const partner = lastUpdated.value.partner[0]
+    items.push({
+      id: partner.id,
+      title: partner.name ?? '—',
+      type: 'Partner',
+      editedAt: partner.updated_at?.slice(0, 10) ?? '—',
+      editLink: { path: '/cms/management', query: { tab: 'partneri' } },
+      contentType: 'partner',
+    })
+  }
+
+  // Add FAQ
+  if (lastUpdated.value.faq?.[0]) {
+    const faq = lastUpdated.value.faq[0]
+    const t = getTranslation(faq.frequently_asked_question_translations)
+    items.push({
+      id: faq.id,
+      title: t.question ?? '—',
+      type: 'FAQ',
+      editedAt: faq.updated_at?.slice(0, 10) ?? '—',
+      editLink: { path: '/cms/management', query: { tab: 'faq' } },
+      contentType: 'faq',
+    })
+  }
+
+  // Add meta tag
+  if (lastUpdated.value.meta_tag?.[0]) {
+    const metaTag = lastUpdated.value.meta_tag[0]
+    const t = getTranslation(metaTag.meta_tag_translations)
+    items.push({
+      id: metaTag.id,
+      title: t.title ?? '—',
+      type: 'Meta tag',
+      editedAt: metaTag.updated_at?.slice(0, 10) ?? '—',
+      editLink: { path: '/cms/management', query: { tab: 'meta_tags' } },
+      contentType: 'meta_tag',
+    })
+  }
+
+  return items
+})
+
+const contentOverview = ref([])
+onMounted(async () => {
+  try {
+    const response = await api.get('/content-overview')
+    contentOverview.value = response
+  } catch (error) {
+   
+  }
+})
+
 
 const quickActions = [
   // Navigate to management and open the "new article" modal via query params
@@ -251,26 +302,12 @@ const quickActions = [
   { label: 'Verejný web', to: '/', icon: Globe, iconBg: 'bg-gray-100', iconColor: 'text-gray-600' },
 ]
 
-const mockRecentlyEdited = [
-  { id: 1, title: 'Program A — popis a podmienky', type: 'Stránka', editedAt: '14.05.2026', link: '/cms/stranky/1' },
-  { id: 2, title: 'NTI víťazi 2025 — výsledky', type: 'Článok', editedAt: '13.05.2026', link: '/cms/novinky/2' },
-  { id: 3, title: 'FAQ — Program B', type: 'FAQ', editedAt: '12.05.2026', link: '/cms/faq/3' },
-  { id: 4, title: 'Partner: TechCorp Slovakia', type: 'Partner', editedAt: '10.05.2026', link: '/cms/partneri/4' },
-]
-
-const mockDrafts = [
-  { id: 1, title: 'Výzva pre firmy — jún 2026', type: 'Článok', createdAt: '12.05.2026', link: '/cms/novinky/5' },
-  { id: 2, title: 'O NTI — aktualizovaná verzia', type: 'Stránka', createdAt: '08.05.2026', link: '/cms/stranky/2' },
-  { id: 3, title: 'Ako sa prihlásiť do Programu A', type: 'FAQ', createdAt: '05.05.2026', link: '/cms/faq/10' },
-]
-
 const mockContentSections = [
   { id: 1, name: 'Novinky', published: 14, drafts: 2, lastEdited: '14.05.2026', link: '/cms/novinky', icon: Newspaper, iconBg: 'bg-blue-50', iconColor: 'text-blue-600' },
   { id: 2, name: 'Stránky', published: 6, drafts: 1, lastEdited: '13.05.2026', link: '/cms/stranky', icon: Layout, iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
   { id: 3, name: 'Partneri', published: 8, drafts: 0, lastEdited: '10.05.2026', link: '/cms/partneri', icon: Users, iconBg: 'bg-green-50', iconColor: 'text-green-600' },
   { id: 4, name: 'FAQ', published: 22, drafts: 0, lastEdited: '12.05.2026', link: '/cms/faq', icon: HelpCircle, iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
   { id: 5, name: 'Bannery & Hero sekcie', published: 3, drafts: 0, lastEdited: '09.05.2026', link: '/cms/bannery', icon: Image, iconBg: 'bg-pink-50', iconColor: 'text-pink-600' },
-  { id: 6, name: 'Statické stránky', published: 4, drafts: 0, lastEdited: '01.05.2026', link: '/cms/staticke', icon: FileText, iconBg: 'bg-gray-100', iconColor: 'text-gray-500' },
 ]
 
 // ── Helpers ────────────────────────────────────────────────

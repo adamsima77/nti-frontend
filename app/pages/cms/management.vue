@@ -110,6 +110,11 @@
       :banner="editingItem"
       @saved="fetchData"
     />
+    <AdminCmsNtiMembersModal
+      v-model="showSiteMemberModal"
+      :member="editingItem"
+      @saved="fetchData"
+    />
     <AdminConfirmDeleteModal
       v-model="showDeleteModal"
       :item-name="deletingItemName"
@@ -211,7 +216,8 @@ const tabConfig: Record<TabKey, {
     columns: [
       { key: 'title',      label: 'Názov',           sortable: true },
       { key: 'page',       label: 'Stránka' },
-      { key: 'updated_at', label: 'Posledná úprava', sortable: true },
+      { key: 'status',     label: 'Stav' },
+      { key: 'published_at', label: 'Publikované', sortable: true },
     ],
     endpoint:       () => `/hero-banners/lang/${lang.value}`,
     deleteEndpoint: '/hero-banners',
@@ -220,8 +226,9 @@ const tabConfig: Record<TabKey, {
   site_members: {
     columns: [
       { key: 'name',         label: 'Názov',   sortable: true },
-      { key: 'image',        label: 'Obrázok' },
       { key: 'job_position', label: 'Pozícia', sortable: true },
+      { key: 'status',     label: 'Stav' },
+      { key: 'published_at', label: 'Publikované', sortable: true }
     ],
     endpoint:       () => `/site-members/lang/${lang.value}`,
     deleteEndpoint: '/site-members',
@@ -316,12 +323,11 @@ function mapMetaTags(raw: any[]): any[] {
 
 function mapSiteMembers(raw: any[]): any[] {
   return raw.map((item) => {
-    const t = item.site_member_translations?.[0] ?? {}
     return {
       id:           item.id,
-      name:         item.name         ?? '—',
-      image:        item.image_url    ?? '—',
-      job_position: t.job_position    ?? '—',
+      name:         item.name ?? '—',
+      job_position: item.job_position    ?? '—',
+      status:       item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
       published_at: item.created_at?.slice(0, 10) ?? '—',
       _raw:         item,
     }
@@ -364,8 +370,8 @@ function mapBanners(raw: any[]): any[] {
       id:         item.id,
       title:      t.title ?? '—',
       page:       item.page?.name ?? '—',
-      status:     item.status     ?? 'active',
-      updated_at: item.updated_at?.slice(0, 10) ?? '—',
+      status: item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
+      published_at: item.created_at?.slice(0, 10) ?? '—',
       _raw:       item,
     }
   })
@@ -512,6 +518,7 @@ const showDeleteModal           = ref(false)
 const isDeleting                = ref(false)
 const showMetaTagModal          = ref(false)
 const showPartnerReferenceModal = ref(false)
+const showSiteMemberModal       = ref(false)
 
 const deletingItemName = computed(() => {
   if (!deletingItem.value) return ''
@@ -558,7 +565,7 @@ function openModalForTab() {
     partneri:           showPartnerModal,
     faq:                showFaqModal,
     bannery:            showBannerModal,
-    site_members:       showPartnerModal,
+    site_members:       showSiteMemberModal,
     meta_tags:          showMetaTagModal,
     partner_references: showPartnerReferenceModal,
   }

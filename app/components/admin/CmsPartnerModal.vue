@@ -59,17 +59,17 @@
           :max-size="4"
         />
         <div class="mt-2">
-          <img
-            v-if="imagePreview"
-            :src="imagePreview"
-            alt="Logo preview"
-            class="max-h-40 rounded-md object-contain border border-gray-100"
-          />
-          <p v-else-if="form.image_url" class="text-xs text-gray-400 mt-1">
-            Aktuálne: <a :href="form.image_url" target="_blank" class="text-blue-600 hover:underline">zobraziť</a>
+           <p v-if="form.image_url" class="text-xs text-gray-400 mt-1">
+            Aktuálne:
+            <a
+              :href="form.image_url"
+              target="_blank"
+              class="text-blue-600 hover:underline"
+            >
+              zobraziť
+            </a>
           </p>
-        </div>
-        <p v-if="errors.image" class="text-xs text-red-500 mt-1">{{ errors.image }}</p>
+      </div>
       </div>
 
       <div>

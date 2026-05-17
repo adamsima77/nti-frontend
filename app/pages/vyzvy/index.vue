@@ -2,23 +2,26 @@
   <div class="min-h-screen flex flex-col">
 
     <!-- HERO -->
-    <div class="bg-gradient-to-br from-navy via-blue-900 to-blue-800 text-white py-20 px-6">
-      <div class="max-w-7xl mx-auto">
-        <template v-if="!banner">
-          <UiSkeleton height="3rem" width="50%" class="mb-4" />
-          <UiSkeleton height="1.5rem" width="70%" />
-        </template>
-
-        <template v-else>
-          <h1 class="text-5xl font-bold mb-4">
-            {{ banner?.hero_banner_translations?.[0]?.title }}
-          </h1>
-          <p class="text-xl text-blue-100">
-            {{ banner?.hero_banner_translations?.[0]?.description }}
-          </p>
-        </template>
-      </div>
+    <template v-if="banner_pending">
+  <div class="bg-gradient-to-br from-navy via-blue-900 to-blue-800 text-white py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+      <UiSkeleton height="3rem" width="50%" class="mb-4" />
+      <UiSkeleton height="1.5rem" width="70%" />
     </div>
+  </div>
+</template>
+<template v-else-if="banner">
+  <div class="bg-gradient-to-br from-navy via-blue-900 to-blue-800 text-white py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-5xl font-bold mb-4">
+        {{ banner?.hero_banner_translations?.[0]?.title }}
+      </h1>
+      <p class="text-xl text-blue-100">
+        {{ banner?.hero_banner_translations?.[0]?.description }}
+      </p>
+    </div>
+  </div>
+</template>
 
     <!-- CONTENT -->
     <div class="flex-1 bg-gray-50 py-20 px-6">
@@ -167,7 +170,7 @@ const page = ref(1)
 // --------------------
 const { calls, meta, pending } = useCalls(page)
 
-const { banner } = useBanner(PageType.CALLS_AND_DEADLINES)
+const { banner, pending: banner_pending } = useBanner(PageType.CALLS_AND_DEADLINES)
 const { metaTags } = fetchMeta(PageType.CALLS_AND_DEADLINES)
 
 // --------------------

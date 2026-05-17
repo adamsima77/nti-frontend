@@ -1,12 +1,8 @@
 <template>
   <!-- HERO -->
-  <template v-if="pending || !banner">
-  <div
-    class="relative mt-30 bg-blue-500 text-white py-24 sm:py-28 md:py-32 px-6 md:px-20 overflow-hidden rounded-lg shadow-2xl"
-  >
+ <template v-if="pending">
+  <div class="relative mt-30 bg-blue-500 text-white py-24 sm:py-28 md:py-32 px-6 md:px-20 overflow-hidden rounded-lg shadow-2xl">
     <div class="relative z-10 md:flex md:items-center md:justify-between gap-12">
-      
-      <!-- LEFT -->
       <div class="md:w-1/2 space-y-6">
         <UiSkeleton height="3.5rem" width="90%" />
         <div class="space-y-3">
@@ -19,20 +15,14 @@
           <UiSkeleton variant="rect" height="3.5rem" width="160px" />
         </div>
       </div>
-
-      <!-- RIGHT -->
       <div class="md:w-1/2 relative flex justify-center md:justify-end mt-10 md:mt-0">
-        <UiSkeleton
-          variant="rect"
-          class="w-64 sm:w-80 md:w-96 h-64 sm:h-80 md:h-96 rounded-full"
-        />
+        <UiSkeleton variant="rect" class="w-64 sm:w-80 md:w-96 h-64 sm:h-80 md:h-96 rounded-full" />
       </div>
-
     </div>
   </div>
 </template>
 
-<template v-else>
+<template v-else-if="banner">
   <UiHero
     :title="banner?.hero_banner_translations?.[0]?.title"
     :description="banner?.hero_banner_translations?.[0]?.description"

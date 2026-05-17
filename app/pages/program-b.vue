@@ -1,6 +1,6 @@
 <template>
   <div>
-   <template v-if="banner_pending || !banner">
+ <template v-if="banner_pending">
   <div class="relative mt-30 bg-blue-500 text-white py-24 sm:py-28 md:py-32 px-6 md:px-20 overflow-hidden rounded-lg shadow-2xl">
     <div class="relative z-10 md:flex md:items-center md:justify-between gap-12">
       <div class="md:w-1/2 space-y-6">
@@ -21,7 +21,8 @@
     </div>
   </div>
 </template>
-<template v-else>
+
+<template v-else-if="banner">
   <UiHero
     :title="banner?.hero_banner_translations?.[0]?.title"
     :description="banner?.hero_banner_translations?.[0]?.description"
