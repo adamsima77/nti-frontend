@@ -13,9 +13,9 @@ export const fetchPartnersi = () => {
 
   const { data: partners } = useAsyncData(
     `partners-${locale.value}`,
-    () => get(`/partners/lang/${locale.value}?page=1`)
+    () => get(`/public/partners/lang/${locale.value}?page=1`)
       .catch((e: any) => e?.response?.status === 404
-        ? get(`/partners/lang/${fb()}?page=1`)
+        ? get(`/public/partners/lang/${fb()}?page=1`)
         : Promise.reject(e)),
     {
       server: true,
@@ -40,9 +40,9 @@ export const fetchPartnersi = () => {
     meta.value = null
     initialized.value = false
     try {
-      const res = await get(`/partners/lang/${newLocale}?page=1`)
+      const res = await get(`/public/partners/lang/${newLocale}?page=1`)
         .catch((e: any) => e?.response?.status === 404
-          ? get(`/partners/lang/${fb()}?page=1`)
+          ? get(`/public/partners/lang/${fb()}?page=1`)
           : Promise.reject(e))
       if (res?.data) {
         partnersList.value = res.data
@@ -62,9 +62,9 @@ export const fetchPartnersi = () => {
     const nextPage = currentPage.value + 1
 
     try {
-      const res = await get(`/partners/lang/${locale.value}?page=${nextPage}`)
+      const res = await get(`/public/partners/lang/${locale.value}?page=${nextPage}`)
         .catch((e: any) => e?.response?.status === 404
-          ? get(`/partners/lang/${fb()}?page=${nextPage}`)
+          ? get(`/public/partners/lang/${fb()}?page=${nextPage}`)
           : Promise.reject(e))
       if (res?.data) {
         partnersList.value = [...partnersList.value, ...res.data]

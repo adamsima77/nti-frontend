@@ -9,10 +9,10 @@ export const useFaq = (pageId: number) => {
     () => `faq-${pageId}-${locale.value}`,
     async () => {
       try {
-        return await get(`/pages/${pageId}/faq/${locale.value}`)
+        return await get(`/public/pages/${pageId}/faq/${locale.value}`)
       } catch (e: any) {
         if (e?.response?.status === 404) {
-          return await get(`/pages/${pageId}/faq/${fb()}`)
+          return await get(`/public/pages/${pageId}/faq/${fb()}`)
         }
         throw e
       }

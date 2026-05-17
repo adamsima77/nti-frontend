@@ -116,7 +116,7 @@
       <img
         v-if="item?.image_url"
         :src="item.image_url"
-        :alt="item?.partner_translations?.[0]?.name ?? 'Partner'"
+        :alt="item?.name ?? 'Partner'"
         class="h-16 md:h-20 grayscale hover:grayscale-0 transition"
       />
 
@@ -124,7 +124,7 @@
         v-else
         class="h-16 md:h-20 w-32 flex items-center justify-center text-sm text-gray-400 font-medium"
       >
-        {{ item?.partner_translations?.[0]?.name ?? 'No name' }}
+        {{ item?.name ?? 'No name' }}
       </div>
     </div>
   </div>

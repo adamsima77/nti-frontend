@@ -14,10 +14,10 @@ export const fetchPartners = () => {
     key,
     async () => {
       try {
-        return await get(`/partners/lang/${locale.value}?page=${currentPage.value}`)
+        return await get(`/public/partners/lang/${locale.value}?page=${currentPage.value}`)
       } catch (e: any) {
         if (e?.response?.status === 404) {
-          return await get(`/partners/lang/${fb()}?page=${currentPage.value}`)
+          return await get(`/public/partners/lang/${fb()}?page=${currentPage.value}`)
         }
         throw e
       }

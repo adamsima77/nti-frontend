@@ -188,8 +188,9 @@ const tabConfig: Record<TabKey, {
   partneri: {
     columns: [
       { key: 'name',        label: 'Názov',  sortable: true },
-      { key: 'image',       label: 'Obrázok' },
       { key: 'description', label: 'Popis',  sortable: true },
+      { key: 'status',       label: 'Stav' },
+      { key: 'published_at', label: 'Publikované',  sortable: true }
     ],
     endpoint:       () => `/partners/lang/${lang.value}`,
     deleteEndpoint: '/partners',
@@ -198,12 +199,13 @@ const tabConfig: Record<TabKey, {
   faq: {
     columns: [
       { key: 'question',   label: 'Otázka',          sortable: true },
-      { key: 'category',   label: 'Kategória' },
-      { key: 'updated_at', label: 'Posledná úprava', sortable: true },
+      { key: 'page',   label: 'Stránka' },
+      { key: 'published_at', label: 'Publikované',  sortable: true },
+      { key: 'status',       label: 'Stav' }
     ],
     endpoint:       () => `/faq/lang/${lang.value}`,
     deleteEndpoint: '/faq',
-    paginated:      false,
+    paginated:      true,
   },
   bannery: {
     columns: [
@@ -271,7 +273,7 @@ function mapArticles(raw: any[]): any[] {
     return {
       id:           item.id,
       title:        t.title   ?? '—',
-      author:       item.user?.name ?? '—',
+      author: `${item.user?.name ?? ''} ${item.user?.surname ?? ''}`.trim() || '—',
       category:     cat.name  ?? item.category?.slug ?? '—',
       // cms_status is the relation name from your model
       status: item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
@@ -332,9 +334,10 @@ function mapPartners(raw: any[]): any[] {
     const desc = t.description ?? '—'
     return {
       id:          item.id,
-      name:        t.name        ?? '—',
-      image:       item.image_url ?? '—',
+      name:        item.name        ?? '—',
       description: desc.length > 50 ? desc.slice(0, 50) + '...' : desc,
+      status:      item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
+      published_at: item.created_at?.slice(0, 10) ?? '—',
       _raw:        item,
     }
   })
@@ -346,8 +349,9 @@ function mapFaq(raw: any[]): any[] {
     return {
       id:         item.id,
       question:   t.question  ?? '—',
-      category:   t.category  ?? '—',
-      updated_at: item.updated_at?.slice(0, 10) ?? '—',
+      page:   item.page?.name  ?? '—',
+      status: item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
+      published_at: item.created_at?.slice(0, 10) ?? '—',
       _raw:       item,
     }
   })

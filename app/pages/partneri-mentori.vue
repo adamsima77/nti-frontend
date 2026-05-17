@@ -73,8 +73,8 @@
                     class="min-w-[280px] max-w-[320px] snap-start"
                   >
                     <UiPartnerCard
-                      :name="p?.partner_translations?.[0]?.name"
-                      :alt="p?.partner_translations?.[0]?.name"
+                      :name="p?.name"
+                      :alt="p?.name"
                       :image="p?.image_url"
                       :description="p?.partner_translations?.[0]?.description"
                     />
