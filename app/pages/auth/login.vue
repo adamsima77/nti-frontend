@@ -92,8 +92,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, nextTick, onMounted, onUnmounted } from 'vue'
 
-const localePath   = useLocalePath()
-const { t }        = useI18n()
+const localePath = useLocalePath()
+const { t }      = useI18n()
 
 definePageMeta({
   layout: 'default',
@@ -104,8 +104,8 @@ useHead({
   title: computed(() => t('auth.login.title')),
 })
 
-const authStore    = useAuthStore()
-const route        = useRoute()
+const authStore = useAuthStore()
+const route     = useRoute()
 const { addToast, addToastAfterRedirect, flushPendingToast } = useToast()
 
 const turnstile      = ref(null)
@@ -113,12 +113,12 @@ const isLoading      = ref(false)
 const turnstileToken = ref('')
 
 const formData = reactive({
-  email: '',
+  email:    '',
   password: '',
 })
 
 const errors = reactive({
-  email: null as string | null,
+  email:    null as string | null,
   password: null as string | null,
 })
 
@@ -131,24 +131,18 @@ const resetTurnstile = () => {
 
 const getLocalizedLoginErrorKey = (backendMessage: string): string => {
   const map: Record<string, string> = {
-    'The provided credentials are incorrect.':
-      'auth.login.errors.invalid_credentials',
-    'Please verify your email before logging in.':
-      'auth.login.errors.unverified_email',
-    'Your account is pending email approval.':
-      'auth.login.errors.pending_email',
-    'Your account has been deactivated.':
-      'auth.login.errors.inactive',
-    'Your account has been blocked. Contact support.':
-      'auth.login.errors.banned',
-    'Human verification failed. Please try again.':
-      'auth.login.errors.turnstile',
+    'The provided credentials are incorrect.':         'auth.login.errors.invalid_credentials',
+    'Please verify your email before logging in.':     'auth.login.errors.unverified_email',
+    'Your account is pending email approval.':         'auth.login.errors.pending_email',
+    'Your account has been deactivated.':              'auth.login.errors.inactive',
+    'Your account has been blocked. Contact support.': 'auth.login.errors.banned',
+    'Human verification failed. Please try again.':    'auth.login.errors.turnstile',
   }
   return map[backendMessage] ?? 'auth.login.errors.generic'
 }
 
 const validateForm = () => {
-  errors.email = null
+  errors.email    = null
   errors.password = null
 
   let isValid = true
@@ -180,62 +174,48 @@ const handleLogin = async () => {
     )
 
     const redirectQuery = route.query.redirect
-    const redirectUrl = Array.isArray(redirectQuery)
-      ? redirectQuery[0]
-      : redirectQuery
+    const redirectRaw   = Array.isArray(redirectQuery) ? redirectQuery[0] : redirectQuery
+    // Decode the encoded redirect URL (e.g. %2Fcms%2Fmanagement%3Ftab%3Dbannery)
+    const redirectUrl   = redirectRaw ? decodeURIComponent(redirectRaw) : null
 
     resetTurnstile()
 
-    // Queue a success toast to appear after the redirect lands.
     addToastAfterRedirect({
       message: t('auth.login.success') ?? 'Welcome back!',
       type: 'success',
     })
 
     if (redirectUrl && redirectUrl.startsWith('/')) {
-      await navigateTo(localePath(redirectUrl))
+      // Split path and query so localePath only localizes the path
+      const url = new URL(redirectUrl, window.location.origin)
+      await navigateTo(localePath({
+        path:  url.pathname,
+        query: Object.fromEntries(url.searchParams),
+      }))
     } else {
       await navigateTo(localePath(authStore.redirectUser()))
     }
-
   } catch (error: unknown) {
     resetTurnstile()
-
     const raw = error instanceof Error ? error.message : ''
-
-    // Show the error toast immediately — we are NOT navigating away on failure,
-    // so the component stays mounted and the toast will render correctly.
     addToast({
       message: t(getLocalizedLoginErrorKey(raw)),
       type: 'error',
     })
-
   } finally {
     isLoading.value = false
   }
 }
 
-const checkTokenAndRedirect = async () => {
-  const token = localStorage.getItem('_t')
-  if (!token) return
-
-  if (!route.path.includes('/auth/login')) return
-
-  await authStore.getCurrentUser()
-  await navigateTo(localePath(authStore.redirectUser()))
-}
-
+// Cross-tab login sync — another tab logged in, reload so guest middleware re-runs
 const handleStorage = (e: StorageEvent) => {
   if (e.key === '_t' && e.newValue) {
-    checkTokenAndRedirect()
+    window.location.reload()
   }
 }
 
 onMounted(() => {
-  // Show any toast queued from a previous navigation (e.g. forced logout message).
   flushPendingToast()
-
-  checkTokenAndRedirect()
   window.addEventListener('storage', handleStorage)
 })
 

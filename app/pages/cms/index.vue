@@ -104,7 +104,7 @@
             </thead>
             <tbody class="divide-y divide-gray-50">
               <tr
-                v-for="section in mockContentSections"
+                v-for="section in contentSections"
                 :key="section.id"
                 class="hover:bg-gray-50 transition-colors"
               >
@@ -146,7 +146,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import {
   ChevronRight,
   FileText,
@@ -165,13 +164,14 @@ definePageMeta({
   roles: ['cms_editor'],
 })
 
+useHead({ title: 'CMS Dashboard | NTI' })
+
 const api = useApi()
-
-useHead({
-  title: 'CMS Dashboard | NTI',
-})
-
 const authStore = useAuthStore()
+const { locale } = useI18n()
+
+const lang    = computed(() => (locale.value === 'en' ? 'en' : 'sk'))
+const langId  = computed(() => lang.value === 'en' ? 2 : 1)
 
 const userDisplayName = computed(() => {
   const u = authStore.user
@@ -179,145 +179,176 @@ const userDisplayName = computed(() => {
   return u.name ? `${u.name} ${u.surname ?? ''}`.trim() : u.email ?? 'Editor'
 })
 
-const publicatedArticles = ref<number>(0)
-const draftCount = ref<number>(0)
-const partnerCount = ref<number>(0)
-const faqCount = ref<number>(0)
+// ── Stats ──────────────────────────────────────────────────
 
-onMounted(async () => {
-  const [published, concepts, partners, faqs] = await Promise.all([
-    api.get('/publicated-articles'),
-    api.get('/concept-count'),
-    api.get('/partner-count'),
-    api.get('/faq-count'),
-  ])
-  publicatedArticles.value = published.count
-  draftCount.value = concepts.count
-  partnerCount.value = partners.count
-  faqCount.value = faqs.count
-})
+const publicatedArticles = ref(0)
+const draftCount         = ref(0)
+const partnerCount       = ref(0)
+const faqCount           = ref(0)
 
-const { locale } = useI18n()
-const lang = computed(() => (locale.value === 'en' ? 'en' : 'sk'))
-const langId = computed(() => lang.value === 'en' ? 2 : 1)
+// ── Content overview ───────────────────────────────────────
 
-const lastUpdated = ref<any>({ article: [], partner: [], meta_tag: [], faq: [] })
+const contentOverview = ref<Record<string, any>>({})
 
-onMounted(async () => {
-  try {
-    const response = await api.get('/last-updated')
-    lastUpdated.value = response
-  } catch (error) {
-    console.error('Failed to fetch last updated:', error)
-  }
-})
-
-// ── Helper to get translation by current language ────────
-
-function getTranslation(translations: any[], defaultLangId = 1) {
-  if (!Array.isArray(translations)) return {}
-  const current = translations.find((t: any) => t.language_id === langId.value)
-  return current || translations[0] || {}
+const sectionMeta: Record<string, { name: string; link: string; icon: any; iconBg: string; iconColor: string }> = {
+  news:               { name: 'Novinky',      link: '/cms/management?tab=clanky',             icon: Newspaper,  iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
+  partners:           { name: 'Partneri',     link: '/cms/management?tab=partneri',           icon: Users,      iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
+  faq:                { name: 'FAQ',          link: '/cms/management?tab=faq',                icon: HelpCircle, iconBg: 'bg-amber-50',  iconColor: 'text-amber-600' },
+  hero_banners:       { name: 'Hero bannery', link: '/cms/management?tab=bannery',            icon: Image,      iconBg: 'bg-pink-50',   iconColor: 'text-pink-600' },
+  meta_tags:          { name: 'Meta tagy',    link: '/cms/management?tab=meta_tags',          icon: Layout,     iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
+  partner_references: { name: 'Referencie',   link: '/cms/management?tab=partner_references', icon: FileText,   iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
 }
 
-// ── Computed recently edited from API data ────────────────
+const contentSections = computed(() =>
+  Object.entries(sectionMeta).map(([key, meta], i) => {
+    const data = contentOverview.value[key] ?? {}
+    return {
+      id:         i + 1,
+      name:       meta.name,
+      published:  data.published ?? 0,
+      drafts:     data.concepts  ?? 0,
+      lastEdited: data.last_updated?.updated_at?.slice(0, 10) ?? '—',
+      link:       meta.link,
+      icon:       meta.icon,
+      iconBg:     meta.iconBg,
+      iconColor:  meta.iconColor,
+    }
+  }),
+)
+
+// ── Translation helper ─────────────────────────────────────
+
+function getTranslation(translations: any[]): any {
+  if (!Array.isArray(translations) || !translations.length) return {}
+  return translations.find((t) => t.language_id === langId.value) ?? translations[0]
+}
+
+// ── Recently edited ────────────────────────────────────────
 
 const recentlyEditedItems = computed(() => {
   const items: any[] = []
+  const o = contentOverview.value
 
-  // Add article
-  if (lastUpdated.value.article?.[0]) {
-    const article = lastUpdated.value.article[0]
-    const t = getTranslation(article.news_translations)
+  if (o.news?.last_updated) {
+    const item = o.news.last_updated
+    const t = getTranslation(item.news_translations ?? [])
     items.push({
-      id: article.id,
-      title: t.title ?? '—',
-      type: 'Článok',
-      editedAt: article.updated_at?.slice(0, 10) ?? '—',
-      editLink: { path: '/cms/management', query: { tab: 'clanky' } },
-      contentType: 'article',
+      id:          item.id,
+      title:       t.title ?? item.slug ?? '—',
+      type:        'Článok',
+      editedAt:    item.updated_at?.slice(0, 10) ?? '—',
+      editLink:    { path: '/cms/management', query: { tab: 'clanky' } },
+      contentType: 'news',
     })
   }
 
-  // Add partner
-  if (lastUpdated.value.partner?.[0]) {
-    const partner = lastUpdated.value.partner[0]
+  if (o.partners?.last_updated) {
+    const item = o.partners.last_updated
+    // name is on the root (not translated), description is translated
+    const t = getTranslation(item.partner_translations ?? [])
     items.push({
-      id: partner.id,
-      title: partner.name ?? '—',
-      type: 'Partner',
-      editedAt: partner.updated_at?.slice(0, 10) ?? '—',
-      editLink: { path: '/cms/management', query: { tab: 'partneri' } },
+      id:          item.id,
+      title:       item.name ?? t.description?.slice(0, 60) ?? '—',
+      type:        'Partner',
+      editedAt:    item.updated_at?.slice(0, 10) ?? '—',
+      editLink:    { path: '/cms/management', query: { tab: 'partneri' } },
       contentType: 'partner',
     })
   }
 
-  // Add FAQ
-  if (lastUpdated.value.faq?.[0]) {
-    const faq = lastUpdated.value.faq[0]
-    const t = getTranslation(faq.frequently_asked_question_translations)
+  if (o.faq?.last_updated) {
+    const item = o.faq.last_updated
+    const t = getTranslation(item.frequently_asked_question_translations ?? [])
     items.push({
-      id: faq.id,
-      title: t.question ?? '—',
-      type: 'FAQ',
-      editedAt: faq.updated_at?.slice(0, 10) ?? '—',
-      editLink: { path: '/cms/management', query: { tab: 'faq' } },
+      id:          item.id,
+      title:       t.question ?? '—',
+      type:        'FAQ',
+      editedAt:    item.updated_at?.slice(0, 10) ?? '—',
+      editLink:    { path: '/cms/management', query: { tab: 'faq' } },
       contentType: 'faq',
     })
   }
 
-  // Add meta tag
-  if (lastUpdated.value.meta_tag?.[0]) {
-    const metaTag = lastUpdated.value.meta_tag[0]
-    const t = getTranslation(metaTag.meta_tag_translations)
+  if (o.hero_banners?.last_updated) {
+    const item = o.hero_banners.last_updated
+    const t = getTranslation(item.hero_banner_translations ?? [])
     items.push({
-      id: metaTag.id,
-      title: t.title ?? '—',
-      type: 'Meta tag',
-      editedAt: metaTag.updated_at?.slice(0, 10) ?? '—',
-      editLink: { path: '/cms/management', query: { tab: 'meta_tags' } },
+      id:          item.id,
+      title:       t.title ?? `Banner #${item.id}`,
+      type:        'Banner',
+      editedAt:    item.updated_at?.slice(0, 10) ?? '—',
+      editLink:    { path: '/cms/management', query: { tab: 'bannery' } },
+      contentType: 'hero_banner',
+    })
+  }
+
+  if (o.meta_tags?.last_updated) {
+    const item = o.meta_tags.last_updated
+    const t = getTranslation(item.meta_tag_translations ?? [])
+    items.push({
+      id:          item.id,
+      title:       t.title ?? '—',
+      type:        'Meta tag',
+      editedAt:    item.updated_at?.slice(0, 10) ?? '—',
+      editLink:    { path: '/cms/management', query: { tab: 'meta_tags' } },
       contentType: 'meta_tag',
+    })
+  }
+
+  if (o.partner_references?.last_updated) {
+    const item = o.partner_references.last_updated
+    const t = getTranslation(item.partner_reference_translations ?? [])
+    items.push({
+      id:          item.id,
+      // name is translated per language in partner_reference_translations
+      title:       t.name ?? '—',
+      type:        'Referencia',
+      editedAt:    item.updated_at?.slice(0, 10) ?? '—',
+      editLink:    { path: '/cms/management', query: { tab: 'partner_references' } },
+      contentType: 'partner_reference',
     })
   }
 
   return items
 })
 
-const contentOverview = ref([])
+// ── Fetch ──────────────────────────────────────────────────
+
 onMounted(async () => {
   try {
-    const response = await api.get('/content-overview')
+    const response = await api.get('/content-overview') as Record<string, any>
     contentOverview.value = response
+
+    publicatedArticles.value = response.news?.published     ?? 0
+    partnerCount.value       = response.partners?.published ?? 0
+    faqCount.value           = response.faq?.published      ?? 0
+    draftCount.value         = Object.values(response).reduce(
+      (sum: number, s: any) => sum + (s?.concepts ?? 0), 0,
+    )
   } catch (error) {
-   
+    console.error('Failed to fetch content overview:', error)
   }
 })
 
+// ── Quick actions ──────────────────────────────────────────
 
 const quickActions = [
-  // Navigate to management and open the "new article" modal via query params
-  { label: 'Nový článok', to: { path: '/cms/management', query: { tab: 'clanky', create: '1' } }, icon: Plus, iconBg: 'bg-blue-50', iconColor: 'text-blue-600' },
+  { label: 'Nový článok',   to: { path: '/cms/management', query: { tab: 'clanky',    create: '1' } }, icon: Plus,   iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
   { label: 'Nové metadáta', to: { path: '/cms/management', query: { tab: 'meta_tags', create: '1' } }, icon: Layout, iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
-  { label: 'Partneri', to: { path: '/cms/management', query: { tab: 'partneri', create: '1' } }, icon: Users, iconBg: 'bg-green-50', iconColor: 'text-green-600' },
-  { label: 'Verejný web', to: '/', icon: Globe, iconBg: 'bg-gray-100', iconColor: 'text-gray-600' },
-]
-
-const mockContentSections = [
-  { id: 1, name: 'Novinky', published: 14, drafts: 2, lastEdited: '14.05.2026', link: '/cms/novinky', icon: Newspaper, iconBg: 'bg-blue-50', iconColor: 'text-blue-600' },
-  { id: 2, name: 'Stránky', published: 6, drafts: 1, lastEdited: '13.05.2026', link: '/cms/stranky', icon: Layout, iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
-  { id: 3, name: 'Partneri', published: 8, drafts: 0, lastEdited: '10.05.2026', link: '/cms/partneri', icon: Users, iconBg: 'bg-green-50', iconColor: 'text-green-600' },
-  { id: 4, name: 'FAQ', published: 22, drafts: 0, lastEdited: '12.05.2026', link: '/cms/faq', icon: HelpCircle, iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
-  { id: 5, name: 'Bannery & Hero sekcie', published: 3, drafts: 0, lastEdited: '09.05.2026', link: '/cms/bannery', icon: Image, iconBg: 'bg-pink-50', iconColor: 'text-pink-600' },
+  { label: 'Partneri',      to: { path: '/cms/management', query: { tab: 'partneri',  create: '1' } }, icon: Users,  iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
+  { label: 'Verejný web',   to: '/',                                                                    icon: Globe,  iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
 ]
 
 // ── Helpers ────────────────────────────────────────────────
 
 const contentTypeStyle = (type: string) => {
   const map: Record<string, { bg: string; color: string; icon: any }> = {
-    'Článok':  { bg: 'bg-blue-50',   color: 'text-blue-600',   icon: Newspaper },
-    'Stránka': { bg: 'bg-purple-50', color: 'text-purple-600', icon: Layout },
-    'FAQ':     { bg: 'bg-amber-50',  color: 'text-amber-600',  icon: HelpCircle },
-    'Partner': { bg: 'bg-green-50',  color: 'text-green-600',  icon: Users },
+    'Článok':    { bg: 'bg-blue-50',   color: 'text-blue-600',   icon: Newspaper },
+    'Partner':   { bg: 'bg-green-50',  color: 'text-green-600',  icon: Users },
+    'FAQ':       { bg: 'bg-amber-50',  color: 'text-amber-600',  icon: HelpCircle },
+    'Meta tag':  { bg: 'bg-purple-50', color: 'text-purple-600', icon: Layout },
+    'Banner':    { bg: 'bg-pink-50',   color: 'text-pink-600',   icon: Image },
+    'Referencia':{ bg: 'bg-gray-100',  color: 'text-gray-600',   icon: FileText },
   }
   return map[type] ?? { bg: 'bg-gray-100', color: 'text-gray-500', icon: FileText }
 }

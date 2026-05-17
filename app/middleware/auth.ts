@@ -1,14 +1,14 @@
 export default defineNuxtRouteMiddleware(async (to) => {
+  if (import.meta.server) return
   const auth  = useAuthStore()
   const token = import.meta.client ? localStorage.getItem('_t') : null
-
   const requiredRoles = to.meta.roles as string[] | undefined
 
   // Not logged in at all
   if (!auth.user && !token) {
     return navigateTo({
       path:  '/auth/login',
-      query: { redirect: to.fullPath },
+      query: { redirect: encodeURIComponent(to.fullPath) },
     })
   }
 
@@ -18,7 +18,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
       await auth.getCurrentUser()
     } catch {
       auth.$reset()
-      return navigateTo('/auth/login')
+      return navigateTo({
+        path:  '/auth/login',
+        query: { redirect: encodeURIComponent(to.fullPath) },
+      })
     }
   }
 
