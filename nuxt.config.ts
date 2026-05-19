@@ -58,7 +58,8 @@ export default defineNuxtConfig({
     '/mentor/**': { ssr: false },
     '/firma/**': { ssr: false },
     '/admin/**': { ssr: false },
-    '/notifikacie/**': { ssr: false }
+    '/notifikacie/**': { ssr: false },
+    '/cms/**': { ssr: false }
   },
 
   i18n: {

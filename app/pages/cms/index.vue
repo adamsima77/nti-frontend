@@ -301,7 +301,7 @@ const recentlyEditedItems = computed(() => {
     items.push({
       id:          item.id,
       // name is translated per language in partner_reference_translations
-      title:       t.name ?? '—',
+      title:       item.name ?? '—',
       type:        'Referencia',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
       editLink:    { path: '/cms/management', query: { tab: 'partner_references' } },

@@ -60,7 +60,7 @@
               :key="index"
               image=""
               :name="item?.name"
-              :role="item?.site_member_translations?.[0]?.job_position"
+              :role="item?.job_position"
             />
           </div>
 

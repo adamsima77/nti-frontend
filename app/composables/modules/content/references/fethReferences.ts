@@ -13,9 +13,9 @@ export const fetchReferences = () => {
 
   const { data: references } = useAsyncData(
     `references-${locale.value}`,
-    () => get(`/partner-references/lang/${locale.value}?page=1`)
+    () => get(`/public/partner-references/lang/${locale.value}?page=1`)
       .catch((e: any) => e?.response?.status === 404
-        ? get(`/partner-references/lang/${fb()}?page=1`)
+        ? get(`/public/partner-references/lang/${fb()}?page=1`)
         : Promise.reject(e)),
     {
       server: true,
@@ -40,9 +40,9 @@ export const fetchReferences = () => {
     meta.value = null
     initialized.value = false
     try {
-      const res = await get(`/partner-references/lang/${newLocale}?page=1`)
+      const res = await get(`/public/partner-references/lang/${newLocale}?page=1`)
         .catch((e: any) => e?.response?.status === 404
-          ? get(`/partner-references/lang/${fb()}?page=1`)
+          ? get(`/public/partner-references/lang/${fb()}?page=1`)
           : Promise.reject(e))
       if (res?.data) {
         referencesList.value = res.data
@@ -62,9 +62,9 @@ export const fetchReferences = () => {
     const nextPage = currentPage.value + 1
 
     try {
-      const res = await get(`/partner-references/lang/${locale.value}?page=${nextPage}`)
+      const res = await get(`/public/partner-references/lang/${locale.value}?page=${nextPage}`)
         .catch((e: any) => e?.response?.status === 404
-          ? get(`/partner-references/lang/${fb()}?page=${nextPage}`)
+          ? get(`/public/partner-references/lang/${fb()}?page=${nextPage}`)
           : Promise.reject(e))
       if (res?.data) {
         referencesList.value = [...referencesList.value, ...res.data]

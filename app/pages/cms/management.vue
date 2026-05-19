@@ -5,10 +5,10 @@
         <h1 class="text-2xl font-bold text-navy">CMS</h1>
         <p class="text-gray-500 mt-1">Správa obsahu, stránok a článkov</p>
       </div>
-      <UiButton @click="openCreateModal">
-        <Plus class="w-4 h-4" />
-        Pridať {{ activeTabLabel }}
-      </UiButton>
+      <UiButton v-if="activeTab !== 'email_templates'" @click="openCreateModal">
+  <Plus class="w-4 h-4" />
+  Pridať {{ activeTabLabel }}
+</UiButton>
     </div>
 
     <!-- Tabs -->
@@ -53,24 +53,25 @@
           </a>
         </template>
 
-        <template #row-actions="{ row }">
-          <div class="flex items-center gap-2">
-            <button
-              class="text-blue-600 hover:text-blue-800"
-              title="Upraviť"
-              @click="openEditModal(row)"
-            >
-              <Pencil class="w-4 h-4" />
-            </button>
-            <button
-              class="text-gray-400 hover:text-danger-500"
-              title="Vymazať"
-              @click="openDeleteModal(row)"
-            >
-              <Trash2 class="w-4 h-4" />
-            </button>
-          </div>
-        </template>
+       <template #row-actions="{ row }">
+  <div class="flex items-center gap-2">
+    <button
+      class="text-blue-600 hover:text-blue-800"
+      title="Upraviť"
+      @click="openEditModal(row)"
+    >
+      <Pencil class="w-4 h-4" />
+    </button>
+    <button
+      v-if="activeTab !== 'email_templates'"
+      class="text-gray-400 hover:text-danger-500"
+      title="Vymazať"
+      @click="openDeleteModal(row)"
+    >
+      <Trash2 class="w-4 h-4" />
+    </button>
+  </div>
+</template>
       </UiDataTable>
 
       <!-- Pagination -->
@@ -131,6 +132,12 @@
       :reference="editingItem"
       @saved="fetchData"
     />
+
+  <AdminCmsEmailTemplateModal
+  v-model="showEmailTemplateModal"
+  :template="editingItem"
+  @saved="fetchData"
+/>
   </div>
 </template>
 
@@ -161,6 +168,7 @@ const tabs = [
   { key: 'site_members',       label: 'Členovia NTI týmu' },
   { key: 'meta_tags',          label: 'Meta tagy' },
   { key: 'partner_references', label: 'Referencie partnerov' },
+  { key: 'email_templates',    label: 'E-mailové šablóny' },
 ]
 
 const activeTab = ref('clanky')
@@ -168,7 +176,7 @@ const activeTabLabel = computed(() => tabs.find((t) => t.key === activeTab.value
 const sortBy = ref<string | null>(null)
 const sortDir = ref<'asc' | 'desc'>('asc')
 
-type TabKey = 'clanky' | 'partneri' | 'faq' | 'bannery' | 'site_members' | 'meta_tags' | 'partner_references'
+type TabKey = 'clanky' | 'partneri' | 'faq' | 'bannery' | 'site_members' | 'meta_tags' | 'partner_references' | 'email_templates'
 
 // ── Tab config ─────────────────────────────────────────────
 
@@ -237,28 +245,38 @@ const tabConfig: Record<TabKey, {
   meta_tags: {
     columns: [
       { key: 'title',          label: 'Názov',       sortable: true },
-      { key: 'og_image',       label: 'OG Obrázok' },
-      { key: 'description',    label: 'Popis',       sortable: true },
-      { key: 'og_title',       label: 'OG Názov',    sortable: true },
-      { key: 'og_description', label: 'OG Popis',    sortable: true },
-      { key: 'og_type',        label: 'OG Typ',      sortable: true },
-      { key: 'og_url',         label: 'OG URL',      sortable: true },
+      { key: 'page',       label: 'Stránka' },
+      { key: 'status',     label: 'Stav' },
+      { key: 'published_at', label: 'Publikované', sortable: true }
+
     ],
     endpoint:       () => `/meta-tags/lang/${lang.value}`,
     deleteEndpoint: '/meta-tags',
-    paginated:      false,
+    paginated:      true,
   },
   partner_references: {
     columns: [
       { key: 'name',         label: 'Názov',   sortable: true },
       { key: 'job_position', label: 'Pozícia', sortable: true },
-      { key: 'image',        label: 'Obrázok' },
-      { key: 'description',  label: 'Popis',   sortable: true },
+      { key: 'status',     label: 'Stav' },
+      { key: 'published_at', label: 'Publikované', sortable: true }
     ],
     endpoint:       () => `/partner-references/lang/${lang.value}`,
     deleteEndpoint: '/partner-references',
     paginated:      true,
   },
+
+  //FIX
+  email_templates: {
+    columns: [
+      { key: 'slug',         label: 'Slug',   sortable: true },
+      { key: 'subject',      label: 'Predmet', sortable: true },
+      { key: 'published_at', label: 'Publikované',  sortable: true }
+    ],
+    endpoint:       () => `/email-templates/lang/${lang.value}`,
+    deleteEndpoint: '/email-templates',
+    paginated:      true,
+  }
 }
 
 // ── Translation mappers ────────────────────────────────────
@@ -290,15 +308,30 @@ function mapArticles(raw: any[]): any[] {
   })
 }
 
-function mapReferences(raw: any[]): any[] {
+function mapEmailTemplates(raw: any[]): any[] {
   return raw.map((item) => {
-    const t = item.partner_reference_translations?.[0] ?? {}
+    const t = item.email_template_translations?.find((x: any) =>
+      x.language?.name === lang.value,
+    ) ?? item.email_template_translations?.[0] ?? {}
+
     return {
       id:           item.id,
-      name:         t.name         ?? '—',
-      image:        item.image_url ?? '—',
-      description:  t.description  ?? '—',
-      job_position: t.job_position ?? '—',
+      slug:         item.slug ?? '—',
+      subject:      item.subject ?? '—',
+      published_at: item.created_at?.slice(0, 10) ?? '—',
+      _raw:         item,
+    }
+  })
+}
+
+function mapReferences(raw: any[]): any[] {
+  return raw.map((item) => {
+    return {
+      id:           item.id,
+      name:         item.name         ?? '—',
+      job_position: item.job_position ?? '—',
+      status: item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
+      published_at: item.created_at?.slice(0, 10) ?? '—',
       _raw:         item,
     }
   })
@@ -310,12 +343,9 @@ function mapMetaTags(raw: any[]): any[] {
     return {
       id:             item.id,
       title:          t.title          ?? '—',
-      og_image:       item.og_image_url ?? '—',
-      description:    t.description    ?? '—',
-      og_title:       t.og_title       ?? '—',
-      og_description: t.og_description ?? '—',
-      og_type:        t.og_type        ?? '—',
-      og_url:         t.og_url         ?? '—',
+      page:           item.page?.name  ?? '—',
+      status:         item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
+      published_at:   item.created_at?.slice(0, 10) ?? '—',
       _raw:           item,
     }
   })
@@ -386,6 +416,7 @@ function applyMapper(tab: TabKey, raw: any[]): any[] {
     site_members:       mapSiteMembers,
     meta_tags:          mapMetaTags,
     partner_references: mapReferences,
+    email_templates:    mapEmailTemplates,
   }
   return mappers[tab](raw)
 }
@@ -519,6 +550,7 @@ const isDeleting                = ref(false)
 const showMetaTagModal          = ref(false)
 const showPartnerReferenceModal = ref(false)
 const showSiteMemberModal       = ref(false)
+const showEmailTemplateModal     = ref(false)
 
 const deletingItemName = computed(() => {
   if (!deletingItem.value) return ''
@@ -542,6 +574,7 @@ async function openEditModal(row: any) {
       site_members:       `/site-members/cms/${row.id}`,
       meta_tags:          `/meta-tags/cms/${row.id}`,
       partner_references: `/partner-references/cms/${row.id}`,
+      email_templates:    `/email-templates/cms/${row.id}`,
     }
 
     const endpoint = endpointMap[activeTab.value as TabKey]
@@ -568,6 +601,7 @@ function openModalForTab() {
     site_members:       showSiteMemberModal,
     meta_tags:          showMetaTagModal,
     partner_references: showPartnerReferenceModal,
+    email_templates:  showEmailTemplateModal,
   }
   const modal = modalMap[activeTab.value as TabKey]
   if (modal) modal.value = true

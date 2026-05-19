@@ -245,8 +245,8 @@
                   >
                     <UiReferenceCard
                       class="h-full"
-                      :name="r?.partner_reference_translations?.[0]?.name"
-                      :job_position="r?.partner_reference_translations?.[0]?.job_position"
+                      :name="r?.name"
+                      :job_position="r?.job_position"
                       :quote="r?.partner_reference_translations?.[0]?.description"
                       :image="r?.image_url"
                     />

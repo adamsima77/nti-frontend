@@ -6,9 +6,9 @@ export const useMembers = () => {
 
   const { data: members, pending } = useAsyncData(
     `members`,  
-    () => get(`/site-members/lang/${locale.value}`)
+    () => get(`/public/site-members/lang/${locale.value}`)
       .catch((e: any) => e?.response?.status === 404
-        ? get(`/site-members/lang/${fb()}`)
+        ? get(`/public/site-members/lang/${fb()}`)
         : Promise.reject(e)),
     {
       server: true,
@@ -19,9 +19,9 @@ export const useMembers = () => {
   )
 
   watch(locale, async (newLocale) => {
-    members.value = await get(`/site-members/lang/${newLocale}`)
+    members.value = await get(`/public/site-members/lang/${newLocale}`)
       .catch((e: any) => e?.response?.status === 404
-        ? get(`/site-members/lang/${fb()}`)
+        ? get(`/public/site-members/lang/${fb()}`)
         : Promise.reject(e))
   }, { flush: 'post' })
 

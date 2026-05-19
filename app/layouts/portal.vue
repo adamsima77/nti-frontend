@@ -76,9 +76,9 @@ const navItems = computed(() => {
 
   if(role === 'cms_editor'){
         return [
-            { label: 'Dashboard', to: '/cms', icon: LayoutDashboard, section: 'Správa' },
-            { label: 'CMS', to: '/cms/management', icon: FileCode, section: 'Obsah' },
-            { label: 'Profil', to: '/cms/profil', icon: UserCircle, section: 'Účet' },
+            { label: 'Dashboard', to: '/cms', icon: LayoutDashboard },
+            { label: 'CMS', to: '/cms/management', icon: FileCode },
+            { label: 'Profil', to: '/cms/profil', icon: UserCircle },
         ]
   }
 
