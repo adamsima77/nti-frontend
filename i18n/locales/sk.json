@@ -845,5 +845,137 @@
     "step_review": "Tím NTI overí údaje vašej organizácie",
     "step_email": "Dostanete e-mail s potvrdením schválenia",
     "step_access": "Získate plný prístup do platformy"
+  },
+
+  "cms": {
+  "title": "CMS",
+  "subtitle": "Správa obsahu, stránok a článkov",
+  "addButton": "Pridať {label}",
+  "tabs": {
+    "articles": "Články",
+    "partners": "Partneri",
+    "faq": "FAQ",
+    "banners": "Bannery / CTA",
+    "siteMembers": "Členovia NTI týmu",
+    "metaTags": "Meta tagy",
+    "partnerReferences": "Referencie partnerov",
+    "emailTemplates": "E-mailové šablóny"
+  },
+  "columns": {
+    "title": "Názov",
+    "author": "Autor",
+    "category": "Kategória",
+    "status": "Stav",
+    "publishedAt": "Publikované",
+    "name": "Názov",
+    "description": "Popis",
+    "question": "Otázka",
+    "page": "Stránka",
+    "jobPosition": "Pozícia",
+    "slug": "Slug",
+    "subject": "Predmet"
+  },
+  "actions": {
+    "edit": "Upraviť",
+    "delete": "Vymazať"
+  },
+  "pagination": {
+    "total": "Celkom: {count} záznamov"
+  },
+  "toast": {
+    "deleteSuccess": "Položka bola vymazaná",
+    "deleteError": "Nepodarilo sa vymazať položku",
+    "loadError": "Nepodarilo sa načítať detail položky"
+  }
+},
+
+"profile": {
+  "title": "Môj profil",
+  "role": "Editor obsahu",
+  "avatar": {
+    "uploading": "Nahrávam...",
+    "change": "Zmeniť foto",
+    "upload": "Nahrať foto"
+  },
+  "personalData": {
+    "title": "Osobné údaje",
+    "firstName": "Meno",
+    "lastName": "Priezvisko",
+    "email": "Email",
+    "save": "Uložiť zmeny",
+    "saving": "Ukladám..."
+  },
+  "access": {
+    "title": "Prístup a oprávnenia",
+    "role": "Rola",
+    "email": "Email (neupraviteľný)"
+  },
+  "toast": {
+    "avatarTypeError": "Povolené sú iba JPEG a PNG súbory.",
+    "avatarSizeError": "Fotografia nesmie byť väčšia ako 4 MB.",
+    "avatarSuccess": "Fotografia bola uložená.",
+    "avatarError": "Nahratie fotografie zlyhalo.",
+    "saveSuccess": "Profil bol uložený.",
+    "saveError": "Uloženie zlyhalo."
+  }
+},
+
+"cmsDashboard": {
+    "welcome": "Vitaj späť, {name}",
+    "subtitle": "Spravujte a sledujte obsah vašej webovej stránky na jednom mieste.",
+
+    "defaultUser": "Editor",
+
+    "stats": {
+      "publishedArticles": "Publikované články",
+      "drafts": "Koncepty",
+      "partners": "Partneri",
+      "faqEntries": "FAQ položky"
+    },
+
+    "quickActions": {
+      "title": "Rýchle akcie",
+      "newArticle": "Nový článok",
+      "newMetadata": "Nové meta údaje",
+      "partners": "Pridať partnera",
+      "publicWeb": "Zobraziť web"
+    },
+
+    "recentlyEdited": {
+      "title": "Naposledy upravené",
+      "allItems": "Všetky položky",
+      "edited": "upravené",
+      "edit": "Upraviť",
+      "empty": "Žiadne nedávno upravené položky."
+    },
+
+    "overview": {
+      "title": "Prehľad obsahu",
+      "manage": "Spravovať",
+      "columns": {
+        "section": "Sekcia",
+        "published": "Publikované",
+        "drafts": "Koncepty",
+        "lastEdited": "Naposledy upravené"
+      }
+    },
+
+    "sections": {
+      "news": "Novinky",
+      "partners": "Partneri",
+      "faq": "FAQ",
+      "heroBanners": "Hero bannery",
+      "metaTags": "Meta tagy",
+      "partnerReferences": "Referencie partnerov"
+    },
+
+    "contentTypes": {
+      "news": "Novinka",
+      "partner": "Partner",
+      "faq": "FAQ",
+      "hero_banner": "Hero banner",
+      "meta_tag": "Meta tag",
+      "partner_reference": "Referencia partnera"
+    }
   }
 }

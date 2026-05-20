@@ -8,7 +8,9 @@
     <template v-else>
     <!-- Header -->
     <div class="mb-10">
+      <ClientOnly>
       <h1 class="text-3xl font-bold text-navy mb-1">{{ t('student_dashboard.home.welcome', { name: userDisplayName }) }}</h1>
+      </ClientOnly>
       <p class="text-gray-500">{{ t('student_dashboard.home.subtitle') }}</p>
     </div>
 

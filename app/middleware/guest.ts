@@ -1,4 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to) => {
+   if (import.meta.server) return
   const auth       = useAuthStore()
   const localePath = useLocalePath()
   const token      = import.meta.client ? localStorage.getItem('_t') : null

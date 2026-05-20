@@ -2,17 +2,17 @@
   <div class="max-w-7xl mx-auto px-6 py-10">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h1 class="text-2xl font-bold text-navy">CMS</h1>
-        <p class="text-gray-500 mt-1">Správa obsahu, stránok a článkov</p>
+        <h1 class="text-2xl font-bold text-navy">{{ $t('cms.title') }}</h1>
+        <p class="text-gray-500 mt-1">{{ $t('cms.subtitle') }}</p>
       </div>
       <UiButton v-if="activeTab !== 'email_templates'" @click="openCreateModal">
-  <Plus class="w-4 h-4" />
-  Pridať {{ activeTabLabel }}
-</UiButton>
+        <Plus class="w-4 h-4" />
+        {{ $t('cms.addButton', { label: activeTabLabel }) }}
+      </UiButton>
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
+    <div class="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit flex-wrap">
       <button
         v-for="tab in tabs"
         :key="tab.key"
@@ -22,7 +22,7 @@
         ]"
         @click="switchTab(tab.key)"
       >
-        {{ tab.label }}
+        {{ $t(tab.label) }}
       </button>
     </div>
 
@@ -53,25 +53,25 @@
           </a>
         </template>
 
-       <template #row-actions="{ row }">
-  <div class="flex items-center gap-2">
-    <button
-      class="text-blue-600 hover:text-blue-800"
-      title="Upraviť"
-      @click="openEditModal(row)"
-    >
-      <Pencil class="w-4 h-4" />
-    </button>
-    <button
-      v-if="activeTab !== 'email_templates'"
-      class="text-gray-400 hover:text-danger-500"
-      title="Vymazať"
-      @click="openDeleteModal(row)"
-    >
-      <Trash2 class="w-4 h-4" />
-    </button>
-  </div>
-</template>
+        <template #row-actions="{ row }">
+          <div class="flex items-center gap-2">
+            <button
+              class="text-blue-600 hover:text-blue-800"
+              :title="$t('cms.actions.edit')"
+              @click="openEditModal(row)"
+            >
+              <Pencil class="w-4 h-4" />
+            </button>
+            <button
+              v-if="activeTab !== 'email_templates'"
+              class="text-gray-400 hover:text-danger-500"
+              :title="$t('cms.actions.delete')"
+              @click="openDeleteModal(row)"
+            >
+              <Trash2 class="w-4 h-4" />
+            </button>
+          </div>
+        </template>
       </UiDataTable>
 
       <!-- Pagination -->
@@ -80,7 +80,7 @@
         class="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50"
       >
         <span class="text-sm text-gray-500">
-          Celkom: <span class="font-semibold text-navy">{{ pagination.total }}</span> záznamov
+          {{ $t('cms.pagination.total', { count: pagination.total }) }}
         </span>
         <UiPagination
           :current-page="pagination.currentPage"
@@ -132,12 +132,11 @@
       :reference="editingItem"
       @saved="fetchData"
     />
-
-  <AdminCmsEmailTemplateModal
-  v-model="showEmailTemplateModal"
-  :template="editingItem"
-  @saved="fetchData"
-/>
+    <AdminCmsEmailTemplateModal
+      v-model="showEmailTemplateModal"
+      :template="editingItem"
+      @saved="fetchData"
+    />
   </div>
 </template>
 
@@ -154,25 +153,28 @@ useHead({ title: 'CMS | NTI' })
 
 const api = useApi()
 const { addToast } = useToast()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const lang = computed(() => (locale.value === 'en' ? 'en' : 'sk'))
 
 // ── Tabs ───────────────────────────────────────────────────
 
 const tabs = [
-  { key: 'clanky',             label: 'Články' },
-  { key: 'partneri',           label: 'Partneri' },
-  { key: 'faq',                label: 'FAQ' },
-  { key: 'bannery',            label: 'Bannery / CTA' },
-  { key: 'site_members',       label: 'Členovia NTI týmu' },
-  { key: 'meta_tags',          label: 'Meta tagy' },
-  { key: 'partner_references', label: 'Referencie partnerov' },
-  { key: 'email_templates',    label: 'E-mailové šablóny' },
+  { key: 'clanky',             label: 'cms.tabs.articles' },
+  { key: 'partneri',           label: 'cms.tabs.partners' },
+  { key: 'faq',                label: 'cms.tabs.faq' },
+  { key: 'bannery',            label: 'cms.tabs.banners' },
+  { key: 'site_members',       label: 'cms.tabs.siteMembers' },
+  { key: 'meta_tags',          label: 'cms.tabs.metaTags' },
+  { key: 'partner_references', label: 'cms.tabs.partnerReferences' },
+  { key: 'email_templates',    label: 'cms.tabs.emailTemplates' },
 ]
 
 const activeTab = ref('clanky')
-const activeTabLabel = computed(() => tabs.find((t) => t.key === activeTab.value)?.label ?? '')
+const activeTabLabel = computed(() => {
+  const tab = tabs.find((tab) => tab.key === activeTab.value)
+  return tab ? t(tab.label) : ''
+})
 const sortBy = ref<string | null>(null)
 const sortDir = ref<'asc' | 'desc'>('asc')
 
@@ -188,11 +190,11 @@ const tabConfig: Record<TabKey, {
 }> = {
   clanky: {
     columns: [
-      { key: 'title',        label: 'Názov',       sortable: true },
-      { key: 'author',       label: 'Autor' },
-      { key: 'category',     label: 'Kategória' },
-      { key: 'status',       label: 'Stav' },
-      { key: 'published_at', label: 'Publikované',  sortable: true },
+      { key: 'title',        label: 'cms.columns.title',       sortable: true },
+      { key: 'author',       label: 'cms.columns.author' },
+      { key: 'category',     label: 'cms.columns.category' },
+      { key: 'status',       label: 'cms.columns.status' },
+      { key: 'published_at', label: 'cms.columns.publishedAt',  sortable: true },
     ],
     endpoint:       () => `/news/lang/${lang.value}`,
     deleteEndpoint: '/news',
@@ -200,10 +202,10 @@ const tabConfig: Record<TabKey, {
   },
   partneri: {
     columns: [
-      { key: 'name',        label: 'Názov',  sortable: true },
-      { key: 'description', label: 'Popis',  sortable: true },
-      { key: 'status',       label: 'Stav' },
-      { key: 'published_at', label: 'Publikované',  sortable: true }
+      { key: 'name',        label: 'cms.columns.name',        sortable: true },
+      { key: 'description', label: 'cms.columns.description',  sortable: true },
+      { key: 'status',      label: 'cms.columns.status' },
+      { key: 'published_at', label: 'cms.columns.publishedAt', sortable: true },
     ],
     endpoint:       () => `/partners/lang/${lang.value}`,
     deleteEndpoint: '/partners',
@@ -211,10 +213,10 @@ const tabConfig: Record<TabKey, {
   },
   faq: {
     columns: [
-      { key: 'question',   label: 'Otázka',          sortable: true },
-      { key: 'page',   label: 'Stránka' },
-      { key: 'published_at', label: 'Publikované',  sortable: true },
-      { key: 'status',       label: 'Stav' }
+      { key: 'question',    label: 'cms.columns.question',    sortable: true },
+      { key: 'page',        label: 'cms.columns.page' },
+      { key: 'published_at', label: 'cms.columns.publishedAt', sortable: true },
+      { key: 'status',      label: 'cms.columns.status' },
     ],
     endpoint:       () => `/faq/lang/${lang.value}`,
     deleteEndpoint: '/faq',
@@ -222,10 +224,10 @@ const tabConfig: Record<TabKey, {
   },
   bannery: {
     columns: [
-      { key: 'title',      label: 'Názov',           sortable: true },
-      { key: 'page',       label: 'Stránka' },
-      { key: 'status',     label: 'Stav' },
-      { key: 'published_at', label: 'Publikované', sortable: true },
+      { key: 'title',       label: 'cms.columns.title',       sortable: true },
+      { key: 'page',        label: 'cms.columns.page' },
+      { key: 'status',      label: 'cms.columns.status' },
+      { key: 'published_at', label: 'cms.columns.publishedAt', sortable: true },
     ],
     endpoint:       () => `/hero-banners/lang/${lang.value}`,
     deleteEndpoint: '/hero-banners',
@@ -233,10 +235,10 @@ const tabConfig: Record<TabKey, {
   },
   site_members: {
     columns: [
-      { key: 'name',         label: 'Názov',   sortable: true },
-      { key: 'job_position', label: 'Pozícia', sortable: true },
-      { key: 'status',     label: 'Stav' },
-      { key: 'published_at', label: 'Publikované', sortable: true }
+      { key: 'name',         label: 'cms.columns.name',        sortable: true },
+      { key: 'job_position', label: 'cms.columns.jobPosition',  sortable: true },
+      { key: 'status',       label: 'cms.columns.status' },
+      { key: 'published_at', label: 'cms.columns.publishedAt',  sortable: true },
     ],
     endpoint:       () => `/site-members/lang/${lang.value}`,
     deleteEndpoint: '/site-members',
@@ -244,11 +246,10 @@ const tabConfig: Record<TabKey, {
   },
   meta_tags: {
     columns: [
-      { key: 'title',          label: 'Názov',       sortable: true },
-      { key: 'page',       label: 'Stránka' },
-      { key: 'status',     label: 'Stav' },
-      { key: 'published_at', label: 'Publikované', sortable: true }
-
+      { key: 'title',        label: 'cms.columns.title',       sortable: true },
+      { key: 'page',         label: 'cms.columns.page' },
+      { key: 'status',       label: 'cms.columns.status' },
+      { key: 'published_at', label: 'cms.columns.publishedAt',  sortable: true },
     ],
     endpoint:       () => `/meta-tags/lang/${lang.value}`,
     deleteEndpoint: '/meta-tags',
@@ -256,40 +257,36 @@ const tabConfig: Record<TabKey, {
   },
   partner_references: {
     columns: [
-      { key: 'name',         label: 'Názov',   sortable: true },
-      { key: 'job_position', label: 'Pozícia', sortable: true },
-      { key: 'status',     label: 'Stav' },
-      { key: 'published_at', label: 'Publikované', sortable: true }
+      { key: 'name',         label: 'cms.columns.name',        sortable: true },
+      { key: 'job_position', label: 'cms.columns.jobPosition',  sortable: true },
+      { key: 'status',       label: 'cms.columns.status' },
+      { key: 'published_at', label: 'cms.columns.publishedAt',  sortable: true },
     ],
     endpoint:       () => `/partner-references/lang/${lang.value}`,
     deleteEndpoint: '/partner-references',
     paginated:      true,
   },
-
-  //FIX
   email_templates: {
     columns: [
-      { key: 'slug',         label: 'Slug',   sortable: true },
-      { key: 'subject',      label: 'Predmet', sortable: true },
-      { key: 'published_at', label: 'Publikované',  sortable: true }
+      { key: 'slug',         label: 'cms.columns.slug',        sortable: true },
+      { key: 'subject',      label: 'cms.columns.subject',     sortable: true },
+      { key: 'published_at', label: 'cms.columns.publishedAt', sortable: true },
     ],
     endpoint:       () => `/email-templates/lang/${lang.value}`,
     deleteEndpoint: '/email-templates',
     paginated:      true,
-  }
+  },
 }
 
 // ── Translation mappers ────────────────────────────────────
 
 function mapArticles(raw: any[]): any[] {
   return raw.map((item) => {
-    // fetchByLang loads ALL translations — find the one matching current UI lang
     const langTranslations = item.news_translations ?? []
     const t = langTranslations.find((x: any) =>
       x.language?.name === lang.value,
     ) ?? langTranslations[0] ?? {}
 
-    // category translation matching current lang
     const catTranslations = item.category?.category_translations ?? []
     const cat = catTranslations.find((x: any) =>
       x.language_id && x.name,
@@ -300,7 +297,6 @@ function mapArticles(raw: any[]): any[] {
       title:        t.title   ?? '—',
       author: `${item.user?.name ?? ''} ${item.user?.surname ?? ''}`.trim() || '—',
       category:     cat.name  ?? item.category?.slug ?? '—',
-      // cms_status is the relation name from your model
       status: item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
       published_at: item.created_at?.slice(0, 10) ?? '—',
       _raw:         item,
@@ -310,7 +306,7 @@ function mapArticles(raw: any[]): any[] {
 
 function mapEmailTemplates(raw: any[]): any[] {
   return raw.map((item) => {
-    const t = item.email_template_translations?.find((x: any) =>
+    const tr = item.email_template_translations?.find((x: any) =>
       x.language?.name === lang.value,
     ) ?? item.email_template_translations?.[0] ?? {}
 
@@ -339,14 +335,14 @@ function mapReferences(raw: any[]): any[] {
 
 function mapMetaTags(raw: any[]): any[] {
   return raw.map((item) => {
-    const t = item.meta_tag_translations?.[0] ?? {}
+    const tr = item.meta_tag_translations?.[0] ?? {}
     return {
-      id:             item.id,
-      title:          t.title          ?? '—',
-      page:           item.page?.name  ?? '—',
-      status:         item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
-      published_at:   item.created_at?.slice(0, 10) ?? '—',
-      _raw:           item,
+      id:           item.id,
+      title:        tr.title          ?? '—',
+      page:         item.page?.name   ?? '—',
+      status:       item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
+      published_at: item.created_at?.slice(0, 10) ?? '—',
+      _raw:         item,
     }
   })
 }
@@ -356,7 +352,7 @@ function mapSiteMembers(raw: any[]): any[] {
     return {
       id:           item.id,
       name:         item.name ?? '—',
-      job_position: item.job_position    ?? '—',
+      job_position: item.job_position ?? '—',
       status:       item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
       published_at: item.created_at?.slice(0, 10) ?? '—',
       _raw:         item,
@@ -366,8 +362,8 @@ function mapSiteMembers(raw: any[]): any[] {
 
 function mapPartners(raw: any[]): any[] {
   return raw.map((item) => {
-    const t = item.partner_translations?.[0] ?? {}
-    const desc = t.description ?? '—'
+    const tr = item.partner_translations?.[0] ?? {}
+    const desc = tr.description ?? '—'
     return {
       id:          item.id,
       name:        item.name        ?? '—',
@@ -381,28 +377,28 @@ function mapPartners(raw: any[]): any[] {
 
 function mapFaq(raw: any[]): any[] {
   return raw.map((item) => {
-    const t = item.frequently_asked_question_translations?.[0] ?? {}
+    const tr = item.frequently_asked_question_translations?.[0] ?? {}
     return {
-      id:         item.id,
-      question:   t.question  ?? '—',
-      page:   item.page?.name  ?? '—',
-      status: item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
+      id:           item.id,
+      question:     tr.question  ?? '—',
+      page:         item.page?.name  ?? '—',
+      status:       item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
       published_at: item.created_at?.slice(0, 10) ?? '—',
-      _raw:       item,
+      _raw:         item,
     }
   })
 }
 
 function mapBanners(raw: any[]): any[] {
   return raw.map((item) => {
-    const t = item.hero_banner_translations?.[0] ?? {}
+    const tr = item.hero_banner_translations?.[0] ?? {}
     return {
-      id:         item.id,
-      title:      t.title ?? '—',
-      page:       item.page?.name ?? '—',
-      status: item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
+      id:           item.id,
+      title:        tr.title ?? '—',
+      page:         item.page?.name ?? '—',
+      status:       item.status_id === null ? '—' : item.status_id === 1 ? 'published' : 'concept',
       published_at: item.created_at?.slice(0, 10) ?? '—',
-      _raw:       item,
+      _raw:         item,
     }
   })
 }
@@ -433,8 +429,14 @@ const pagination = ref({
   perPage:     15,
 })
 
-const currentColumns = computed(() => tabConfig[activeTab.value as TabKey]?.columns ?? [])
-const currentRows    = computed(() => {
+const currentColumns = computed(() => {
+  return (tabConfig[activeTab.value as TabKey]?.columns ?? []).map((col) => ({
+    ...col,
+    label: t(col.label),
+  }))
+})
+
+const currentRows = computed(() => {
   if (!sortBy.value) return rows.value
 
   return [...rows.value].sort((a, b) => {
@@ -506,22 +508,17 @@ const route = useRoute()
 const router = useRouter()
 
 function handleRouteQuery(q: Record<string, any>) {
-  // switch tab if provided
   const tab = q?.tab
   if (tab && tabs.some((t) => t.key === tab)) {
     activeTab.value = tab
   }
 
-  // open create modal if requested
   const create = q?.create
   if (create === '1' || create === 'true') {
-    // open modal for active tab
     openCreateModal()
 
-    // remove the create param so it doesn't reopen
     const newQuery = { ...route.query }
     delete newQuery.create
-    // keep tab in query but replace to avoid adding history entry
     router.replace({ path: route.path, query: newQuery }).catch(() => {})
   }
 }
@@ -531,7 +528,6 @@ onMounted(() => {
   fetchData()
 })
 
-// react to route query changes while on the page
 watch(
   () => route.query,
   (q) => handleRouteQuery(q as any),
@@ -550,7 +546,7 @@ const isDeleting                = ref(false)
 const showMetaTagModal          = ref(false)
 const showPartnerReferenceModal = ref(false)
 const showSiteMemberModal       = ref(false)
-const showEmailTemplateModal     = ref(false)
+const showEmailTemplateModal    = ref(false)
 
 const deletingItemName = computed(() => {
   if (!deletingItem.value) return ''
@@ -578,13 +574,11 @@ async function openEditModal(row: any) {
     }
 
     const endpoint = endpointMap[activeTab.value as TabKey]
-
     editingItem.value = await api.get(endpoint)
-
     openModalForTab()
   } catch {
     addToast({
-      message: 'Nepodarilo sa načítať detail položky',
+      message: t('cms.toast.loadError'),
       type: 'error',
     })
   } finally {
@@ -601,7 +595,7 @@ function openModalForTab() {
     site_members:       showSiteMemberModal,
     meta_tags:          showMetaTagModal,
     partner_references: showPartnerReferenceModal,
-    email_templates:  showEmailTemplateModal,
+    email_templates:    showEmailTemplateModal,
   }
   const modal = modalMap[activeTab.value as TabKey]
   if (modal) modal.value = true
@@ -620,12 +614,12 @@ async function handleDelete() {
   isDeleting.value = true
   try {
     await api.delete(`${config.deleteEndpoint}/${deletingItem.value.id}`)
-    addToast({ message: 'Položka bola vymazaná', type: 'success' })
-    showDeleteModal.value  = false
-    deletingItem.value     = null
+    addToast({ message: t('cms.toast.deleteSuccess'), type: 'success' })
+    showDeleteModal.value = false
+    deletingItem.value    = null
     await fetchData()
   } catch (e: any) {
-    addToast({ message: 'Nepodarilo sa vymazať položku', type: 'error' })
+    addToast({ message: t('cms.toast.deleteError'), type: 'error' })
   } finally {
     isDeleting.value = false
   }

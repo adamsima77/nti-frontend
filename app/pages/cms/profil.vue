@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
-    <h1 class="text-2xl font-bold text-navy mb-8">Môj profil</h1>
+    <h1 class="text-2xl font-bold text-navy mb-8">{{ $t('profile.title') }}</h1>
 
     <div v-if="pageLoading" class="space-y-4">
       <div class="h-32 bg-white rounded-lg border border-gray-100 animate-pulse" />
@@ -40,7 +40,7 @@
               :disabled="avatarUploading"
               @click="avatarInputRef?.click()"
             >
-              {{ avatarUploading ? 'Nahrávam...' : (avatarDisplayUrl ? 'Zmeniť foto' : 'Nahrať foto') }}
+              {{ avatarUploading ? $t('profile.avatar.uploading') : (avatarDisplayUrl ? $t('profile.avatar.change') : $t('profile.avatar.upload')) }}
             </UiButton>
           </div>
           <div class="flex-1 min-w-0">
@@ -48,50 +48,49 @@
             <p class="text-sm text-gray-500">{{ form.email }}</p>
           </div>
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-600 flex-shrink-0">
-            Editor obsahu
+            {{ $t('profile.role') }}
           </span>
         </div>
       </div>
 
       <!-- Osobné údaje -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
-        <h2 class="text-lg font-bold text-navy mb-5">Osobné údaje</h2>
+        <h2 class="text-lg font-bold text-navy mb-5">{{ $t('profile.personalData.title') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
           <UiInput
             v-model="form.firstName"
-            label="Meno"
+            :label="$t('profile.personalData.firstName')"
             required
           />
           <UiInput
             v-model="form.lastName"
-            label="Priezvisko"
+            :label="$t('profile.personalData.lastName')"
             required
           />
-          <!-- Email — read only, not editable -->
           <UiInput
             v-model="form.email"
-            label="Email"
+            :label="$t('profile.personalData.email')"
             type="email"
             disabled
           />
         </div>
         <div class="mt-6">
           <UiButton :disabled="saving" @click="saveProfile">
-            {{ saving ? 'Ukladám...' : 'Uložiť zmeny' }}
+            {{ saving ? $t('profile.personalData.saving') : $t('profile.personalData.save') }}
           </UiButton>
         </div>
       </div>
 
       <!-- Informácia o prístupe -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-        <h2 class="text-lg font-bold text-navy mb-4">Prístup a oprávnenia</h2>
+        <h2 class="text-lg font-bold text-navy mb-4">{{ $t('profile.access.title') }}</h2>
         <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
-            <dt class="text-gray-500">Rola</dt>
-            <dd class="font-medium text-navy">Editor obsahu</dd>
+            <dt class="text-gray-500">{{ $t('profile.access.role') }}</dt>
+            <dd class="font-medium text-navy">{{ $t('profile.role') }}</dd>
           </div>
           <div>
-            <dt class="text-gray-500">Email (neupraviteľný)</dt>
+            <dt class="text-gray-500">{{ $t('profile.access.email') }}</dt>
             <dd class="font-medium text-navy">{{ form.email }}</dd>
           </div>
         </dl>
@@ -115,9 +114,10 @@ const api = useApi()
 const config = useRuntimeConfig()
 const authStore = useAuthStore()
 const { addToast } = useToast()
+const { t } = useI18n()
 
-const pageLoading    = ref(true)
-const saving         = ref(false)
+const pageLoading     = ref(true)
+const saving          = ref(false)
 const avatarUploading = ref(false)
 const avatarInputRef  = ref<HTMLInputElement | null>(null)
 
@@ -179,11 +179,11 @@ async function onAvatarFile(ev: Event) {
 
   const mimeOk = ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)
   if (!mimeOk) {
-    addToast({ message: 'Povolené sú iba JPEG a PNG súbory.', type: 'error' })
+    addToast({ message: t('profile.toast.avatarTypeError'), type: 'error' })
     return
   }
   if (file.size > 4 * 1024 * 1024) {
-    addToast({ message: 'Fotografia nesmie byť väčšia ako 4 MB.', type: 'error' })
+    addToast({ message: t('profile.toast.avatarSizeError'), type: 'error' })
     return
   }
 
@@ -204,9 +204,9 @@ async function onAvatarFile(ev: Event) {
       ...(res.avatar     !== undefined ? { avatar:     res.avatar     } : {}),
     })
     syncFormFromUser()
-    addToast({ message: 'Fotografia bola uložená.', type: 'success' })
+    addToast({ message: t('profile.toast.avatarSuccess'), type: 'success' })
   } catch (err: any) {
-    addToast({ message: err?.data?.message ?? 'Nahratie fotografie zlyhalo.', type: 'error' })
+    addToast({ message: err?.data?.message ?? t('profile.toast.avatarError'), type: 'error' })
   } finally {
     avatarUploading.value = false
   }
@@ -228,9 +228,9 @@ async function saveProfile() {
     })
     await authStore.getCurrentUser({ force: true })
     syncFormFromUser()
-    addToast({ message: 'Profil bol uložený.', type: 'success' })
+    addToast({ message: t('profile.toast.saveSuccess'), type: 'success' })
   } catch (err: any) {
-    addToast({ message: err?.data?.message ?? 'Uloženie zlyhalo.', type: 'error' })
+    addToast({ message: err?.data?.message ?? t('profile.toast.saveError'), type: 'error' })
   } finally {
     saving.value = false
   }

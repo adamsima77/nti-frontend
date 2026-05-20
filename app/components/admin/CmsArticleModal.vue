@@ -75,7 +75,6 @@
           :max-size="4"
         />
         <div class="mt-2">
-          <img v-if="imagePreview" :src="imagePreview" alt="preview" class="max-h-40 rounded-md object-contain" />
           <p v-if="form.image_url" class="text-xs text-gray-400 mt-2">Aktuálne: <a :href="form.image_url" target="_blank" class="text-blue-600 hover:underline">zobraziť</a></p>
         </div>
       </div>

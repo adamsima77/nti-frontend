@@ -108,7 +108,7 @@
               <select v-model="form.study_program" @change="touch('study_program')"
                 class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
                 <option value="">{{ $t('auth.student-onboarding.select_program') }}</option>
-                <option v-for="p in studyPrograms" :key="p.id" :value="p.id">{{ p.name }}</option>
+                <option v-for="p in studyPrograms" :key="p.id" :value="p.id">{{ p.study_program_translations?.[0]?.name }}</option>
               </select>
             </div>
           </div>
@@ -120,7 +120,7 @@
               <select v-model="form.study_field" @change="touch('study_field')"
                 class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
                 <option value="">{{ $t('auth.student-onboarding.select_field') }}</option>
-                <option v-for="f in studyFields" :key="f.id" :value="f.id">{{ f.name }}</option>
+                <option v-for="f in studyFields" :key="f.id" :value="f.id">{{ f.study_field_translations?.[0]?.name }}</option>
               </select>
             </div>
           </div>
@@ -132,7 +132,7 @@
               <select v-model="form.year_of_study" @change="touch('year_of_study')"
                 class="flex-1 px-3.5 py-2.5 text-sm text-slate-900 bg-transparent border-none outline-none rounded-xl appearance-none cursor-pointer">
                 <option value="">{{ $t('auth.student-onboarding.select_year') }}</option>
-                <option v-for="y in studyYears" :key="y.id" :value="y.id">{{ y.name }}</option>
+                <option v-for="y in studyYears" :key="y.id" :value="y.id">{{ y.study_year_translations?.[0]?.name }}</option>
               </select>
             </div>
           </div>
@@ -242,9 +242,9 @@ onMounted(async () => {
   ;[universities.value, studyPrograms.value, studyFields.value, studyYears.value] =
     await Promise.all([
       api.get('/university'),
-      api.get('/study-program'),
-      api.get('/study-field'),
-      api.get('/study-years'),
+      api.get(`/study-programs-public/lang/${useI18n().locale.value}`),
+      api.get(`/study-fields-public/lang/${useI18n().locale.value}`),
+      api.get(`/study-years-public/lang/${useI18n().locale.value}`),
     ])
 })
 

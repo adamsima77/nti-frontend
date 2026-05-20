@@ -845,5 +845,137 @@
     "step_review": "NTI team reviews your organization details",
     "step_email": "You will receive a confirmation email once approved",
     "step_access": "You will get full access to the platform"
+  },
+
+  "cms": {
+  "title": "CMS",
+  "subtitle": "Content, pages and articles management",
+  "addButton": "Add {label}",
+  "tabs": {
+    "articles": "Articles",
+    "partners": "Partners",
+    "faq": "FAQ",
+    "banners": "Banners / CTA",
+    "siteMembers": "NTI Team Members",
+    "metaTags": "Meta Tags",
+    "partnerReferences": "Partner References",
+    "emailTemplates": "E-mail Templates"
+  },
+  "columns": {
+    "title": "Title",
+    "author": "Author",
+    "category": "Category",
+    "status": "Status",
+    "publishedAt": "Published",
+    "name": "Name",
+    "description": "Description",
+    "question": "Question",
+    "page": "Page",
+    "jobPosition": "Position",
+    "slug": "Slug",
+    "subject": "Subject"
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "pagination": {
+    "total": "Total: {count} records"
+  },
+  "toast": {
+    "deleteSuccess": "Item was deleted",
+    "deleteError": "Failed to delete item",
+    "loadError": "Failed to load item detail"
+  }
+},
+
+"profile": {
+  "title": "My Profile",
+  "role": "Content Editor",
+  "avatar": {
+    "uploading": "Uploading...",
+    "change": "Change photo",
+    "upload": "Upload photo"
+  },
+  "personalData": {
+    "title": "Personal Information",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "save": "Save changes",
+    "saving": "Saving..."
+  },
+  "access": {
+    "title": "Access & Permissions",
+    "role": "Role",
+    "email": "Email (non-editable)"
+  },
+  "toast": {
+    "avatarTypeError": "Only JPEG and PNG files are allowed.",
+    "avatarSizeError": "Photo must not exceed 4 MB.",
+    "avatarSuccess": "Photo was saved.",
+    "avatarError": "Photo upload failed.",
+    "saveSuccess": "Profile was saved.",
+    "saveError": "Save failed."
+  }
+},
+
+  "cmsDashboard": {
+    "welcome": "Welcome back, {name}",
+    "subtitle": "Manage and monitor your website content from one place.",
+
+    "defaultUser": "Editor",
+
+    "stats": {
+      "publishedArticles": "Published Articles",
+      "drafts": "Drafts",
+      "partners": "Partners",
+      "faqEntries": "FAQ Entries"
+    },
+
+    "quickActions": {
+      "title": "Quick Actions",
+      "newArticle": "New Article",
+      "newMetadata": "New Metadata",
+      "partners": "Add Partner",
+      "publicWeb": "View Website"
+    },
+
+    "recentlyEdited": {
+      "title": "Recently Edited",
+      "allItems": "All Items",
+      "edited": "edited",
+      "edit": "Edit",
+      "empty": "No recently edited items."
+    },
+
+    "overview": {
+      "title": "Content Overview",
+      "manage": "Manage",
+      "columns": {
+        "section": "Section",
+        "published": "Published",
+        "drafts": "Drafts",
+        "lastEdited": "Last Edited"
+      }
+    },
+
+    "sections": {
+      "news": "News",
+      "partners": "Partners",
+      "faq": "FAQ",
+      "heroBanners": "Hero Banners",
+      "metaTags": "Meta Tags",
+      "partnerReferences": "Partner References"
+    },
+
+    "contentTypes": {
+      "news": "News",
+      "partner": "Partner",
+      "faq": "FAQ",
+      "hero_banner": "Hero Banner",
+      "meta_tag": "Meta Tag",
+      "partner_reference": "Partner Reference"
+    }
   }
 }

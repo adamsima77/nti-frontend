@@ -1,10 +1,13 @@
 <template>
   <div class="min-h-screen bg-gray-50">
+    <ClientOnly>
     <LayoutPortalNavbar
       :sidebar-collapsed="sidebarCollapsed"
       @toggle-sidebar="mobileSidebarOpen = !mobileSidebarOpen"
     />
+    </ClientOnly>
 
+    <ClientOnly>
     <LayoutPortalSidebar
       :items="navItems"
       :is-open="mobileSidebarOpen"
@@ -12,6 +15,7 @@
       @close="mobileSidebarOpen = false"
       @toggle-collapse="sidebarCollapsed = !sidebarCollapsed"
     />
+    </ClientOnly>
 
     <main :class="['pt-16 min-h-screen transition-all duration-300', sidebarCollapsed ? 'md:ml-20' : 'md:ml-64']">
       <slot />

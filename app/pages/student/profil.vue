@@ -107,15 +107,15 @@
           </div>
           <div>
             <dt class="text-gray-500">{{ t('student_dashboard.profile.study_program') }}</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.study_program?.name ?? t('student_dashboard.common.not_available') }}</dd>
+            <dd class="font-medium text-navy">{{ studentRecord.study_program?.study_program_translations?.[0]?.name ?? t('student_dashboard.common.not_available') }}</dd>
           </div>
           <div>
             <dt class="text-gray-500">{{ t('student_dashboard.profile.study_field') }}</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.study_field?.name ?? t('student_dashboard.common.not_available') }}</dd>
+            <dd class="font-medium text-navy">{{ studentRecord.study_field?.study_field_translations?.[0]?.name ?? t('student_dashboard.common.not_available') }}</dd>
           </div>
           <div>
             <dt class="text-gray-500">{{ t('student_dashboard.profile.study_year') }}</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.study_year?.name ?? t('student_dashboard.common.not_available') }}</dd>
+            <dd class="font-medium text-navy">{{ studentRecord.study_year.study_year_translations?.[0]?.name ?? t('student_dashboard.common.not_available') }}</dd>
           </div>
           <div
             v-if="studentRecord.portfolio_url"

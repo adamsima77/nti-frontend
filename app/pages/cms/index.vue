@@ -3,44 +3,46 @@
   <div class="max-w-7xl mx-auto px-6 py-10">
     <!-- Header -->
     <div class="mb-10">
-      <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
-      <p class="text-gray-500">Správa obsahu verejnej časti webu</p>
+      <ClientOnly>
+      <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('cmsDashboard.welcome', { name: userDisplayName }) }}</h1>
+      </ClientOnly>
+      <p class="text-gray-500">{{ $t('cmsDashboard.subtitle') }}</p>
     </div>
 
     <!-- Stats row -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="bg-white rounded-lg shadow-sm border-l-4 border-blue-600 p-5">
         <div class="text-3xl font-bold text-blue-600">{{ publicatedArticles }}</div>
-        <p class="text-sm text-gray-500 mt-1">Publikované články</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.publishedArticles') }}</p>
       </div>
       <div class="bg-white rounded-lg shadow-sm border-l-4 border-amber-500 p-5">
         <div class="text-3xl font-bold text-amber-500">{{ draftCount }}</div>
-        <p class="text-sm text-gray-500 mt-1">Koncepty</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.drafts') }}</p>
       </div>
       <div class="bg-white rounded-lg shadow-sm border-l-4 border-purple-500 p-5">
         <div class="text-3xl font-bold text-purple-600">{{ partnerCount }}</div>
-        <p class="text-sm text-gray-500 mt-1">Partneri</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.partners') }}</p>
       </div>
       <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-600 p-5">
         <div class="text-3xl font-bold text-green-600">{{ faqCount }}</div>
-        <p class="text-sm text-gray-500 mt-1">FAQ záznamy</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.faqEntries') }}</p>
       </div>
     </div>
 
     <!-- Quick actions -->
     <div class="mb-8">
-      <h2 class="text-xl font-bold text-navy mb-4">Rýchle akcie</h2>
+      <h2 class="text-xl font-bold text-navy mb-4">{{ $t('cmsDashboard.quickActions.title') }}</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <NuxtLink
           v-for="action in quickActions"
-          :key="action.label"
+          :key="action.labelKey"
           :to="action.to"
           class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center gap-3 hover:shadow-md hover:border-blue-200 transition group"
         >
           <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" :class="action.iconBg">
             <component :is="action.icon" class="w-5 h-5" :class="action.iconColor" />
           </div>
-          <span class="text-sm font-medium text-navy group-hover:text-blue-600 transition">{{ action.label }}</span>
+          <span class="text-sm font-medium text-navy group-hover:text-blue-600 transition">{{ $t(action.labelKey) }}</span>
         </NuxtLink>
       </div>
     </div>
@@ -48,12 +50,12 @@
     <!-- Recently edited -->
     <div class="mb-8">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-navy">Naposledy upravené</h2>
+        <h2 class="text-xl font-bold text-navy">{{ $t('cmsDashboard.recentlyEdited.title') }}</h2>
         <NuxtLink
           to="/cms/management"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
         >
-          Všetky položky
+          {{ $t('cmsDashboard.recentlyEdited.allItems') }}
           <ChevronRight class="w-4 h-4" />
         </NuxtLink>
       </div>
@@ -68,13 +70,13 @@
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-medium text-navy text-sm truncate">{{ item.title }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">{{ item.type }} · upravené {{ item.editedAt }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ $t(`cmsDashboard.contentTypes.${item.contentType}`) }} · {{ $t('cmsDashboard.recentlyEdited.edited') }} {{ item.editedAt }}</p>
           </div>
           <NuxtLink
             :to="item.editLink"
             class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5 shrink-0"
           >
-            Upraviť
+            {{ $t('cmsDashboard.recentlyEdited.edit') }}
             <ChevronRight class="w-3.5 h-3.5" />
           </NuxtLink>
         </div>
@@ -82,23 +84,23 @@
           v-if="!recentlyEditedItems.length"
           class="text-sm text-gray-400 text-center py-6"
         >
-          Žiadne nedávno upravené položky
+          {{ $t('cmsDashboard.recentlyEdited.empty') }}
         </p>
       </div>
     </div>
 
     <!-- Content overview table -->
     <div class="mb-8">
-      <h2 class="text-xl font-bold text-navy mb-4">Prehľad obsahu</h2>
+      <h2 class="text-xl font-bold text-navy mb-4">{{ $t('cmsDashboard.overview.title') }}</h2>
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b border-gray-100 bg-gray-50">
-                <th class="text-left px-5 py-3 font-medium text-gray-500">Sekcia</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500">Publikované</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500">Koncepty</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500">Naposledy upravené</th>
+                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.section') }}</th>
+                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.published') }}</th>
+                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.drafts') }}</th>
+                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.lastEdited') }}</th>
                 <th class="text-left px-5 py-3 font-medium text-gray-500"></th>
               </tr>
             </thead>
@@ -113,7 +115,7 @@
                     <div class="w-7 h-7 rounded-md flex items-center justify-center" :class="section.iconBg">
                       <component :is="section.icon" class="w-4 h-4" :class="section.iconColor" />
                     </div>
-                    <span class="font-medium text-navy">{{ section.name }}</span>
+                    <span class="font-medium text-navy">{{ $t(section.nameKey) }}</span>
                   </div>
                 </td>
                 <td class="px-5 py-4 text-gray-600">{{ section.published }}</td>
@@ -132,7 +134,7 @@
                     :to="section.link"
                     class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
                   >
-                    Spravovať
+                    {{ $t('cmsDashboard.overview.manage') }}
                     <ChevronRight class="w-3.5 h-3.5" />
                   </NuxtLink>
                 </td>
@@ -168,15 +170,15 @@ useHead({ title: 'CMS Dashboard | NTI' })
 
 const api = useApi()
 const authStore = useAuthStore()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
-const lang    = computed(() => (locale.value === 'en' ? 'en' : 'sk'))
-const langId  = computed(() => lang.value === 'en' ? 2 : 1)
+const lang   = computed(() => (locale.value === 'en' ? 'en' : 'sk'))
+const langId = computed(() => lang.value === 'en' ? 2 : 1)
 
 const userDisplayName = computed(() => {
   const u = authStore.user
-  if (!u) return 'Editor'
-  return u.name ? `${u.name} ${u.surname ?? ''}`.trim() : u.email ?? 'Editor'
+  if (!u) return t('cmsDashboard.defaultUser')
+  return u.name ? `${u.name} ${u.surname ?? ''}`.trim() : u.email ?? t('cmsDashboard.defaultUser')
 })
 
 // ── Stats ──────────────────────────────────────────────────
@@ -190,13 +192,13 @@ const faqCount           = ref(0)
 
 const contentOverview = ref<Record<string, any>>({})
 
-const sectionMeta: Record<string, { name: string; link: string; icon: any; iconBg: string; iconColor: string }> = {
-  news:               { name: 'Novinky',      link: '/cms/management?tab=clanky',             icon: Newspaper,  iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
-  partners:           { name: 'Partneri',     link: '/cms/management?tab=partneri',           icon: Users,      iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
-  faq:                { name: 'FAQ',          link: '/cms/management?tab=faq',                icon: HelpCircle, iconBg: 'bg-amber-50',  iconColor: 'text-amber-600' },
-  hero_banners:       { name: 'Hero bannery', link: '/cms/management?tab=bannery',            icon: Image,      iconBg: 'bg-pink-50',   iconColor: 'text-pink-600' },
-  meta_tags:          { name: 'Meta tagy',    link: '/cms/management?tab=meta_tags',          icon: Layout,     iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
-  partner_references: { name: 'Referencie',   link: '/cms/management?tab=partner_references', icon: FileText,   iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
+const sectionMeta: Record<string, { nameKey: string; link: string; icon: any; iconBg: string; iconColor: string }> = {
+  news:               { nameKey: 'cmsDashboard.sections.news',               link: '/cms/management?tab=clanky',             icon: Newspaper,  iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
+  partners:           { nameKey: 'cmsDashboard.sections.partners',           link: '/cms/management?tab=partneri',           icon: Users,      iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
+  faq:                { nameKey: 'cmsDashboard.sections.faq',                link: '/cms/management?tab=faq',                icon: HelpCircle, iconBg: 'bg-amber-50',  iconColor: 'text-amber-600' },
+  hero_banners:       { nameKey: 'cmsDashboard.sections.heroBanners',        link: '/cms/management?tab=bannery',            icon: Image,      iconBg: 'bg-pink-50',   iconColor: 'text-pink-600' },
+  meta_tags:          { nameKey: 'cmsDashboard.sections.metaTags',           link: '/cms/management?tab=meta_tags',          icon: Layout,     iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
+  partner_references: { nameKey: 'cmsDashboard.sections.partnerReferences',  link: '/cms/management?tab=partner_references', icon: FileText,   iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
 }
 
 const contentSections = computed(() =>
@@ -204,7 +206,7 @@ const contentSections = computed(() =>
     const data = contentOverview.value[key] ?? {}
     return {
       id:         i + 1,
-      name:       meta.name,
+      nameKey:    meta.nameKey,
       published:  data.published ?? 0,
       drafts:     data.concepts  ?? 0,
       lastEdited: data.last_updated?.updated_at?.slice(0, 10) ?? '—',
@@ -220,7 +222,7 @@ const contentSections = computed(() =>
 
 function getTranslation(translations: any[]): any {
   if (!Array.isArray(translations) || !translations.length) return {}
-  return translations.find((t) => t.language_id === langId.value) ?? translations[0]
+  return translations.find((tr) => tr.language_id === langId.value) ?? translations[0]
 }
 
 // ── Recently edited ────────────────────────────────────────
@@ -231,81 +233,72 @@ const recentlyEditedItems = computed(() => {
 
   if (o.news?.last_updated) {
     const item = o.news.last_updated
-    const t = getTranslation(item.news_translations ?? [])
+    const tr = getTranslation(item.news_translations ?? [])
     items.push({
       id:          item.id,
-      title:       t.title ?? item.slug ?? '—',
-      type:        'Článok',
+      title:       tr.title ?? item.slug ?? '—',
+      contentType: 'news',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
       editLink:    { path: '/cms/management', query: { tab: 'clanky' } },
-      contentType: 'news',
     })
   }
 
   if (o.partners?.last_updated) {
     const item = o.partners.last_updated
-    // name is on the root (not translated), description is translated
-    const t = getTranslation(item.partner_translations ?? [])
+    const tr = getTranslation(item.partner_translations ?? [])
     items.push({
       id:          item.id,
-      title:       item.name ?? t.description?.slice(0, 60) ?? '—',
-      type:        'Partner',
+      title:       item.name ?? tr.description?.slice(0, 60) ?? '—',
+      contentType: 'partner',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
       editLink:    { path: '/cms/management', query: { tab: 'partneri' } },
-      contentType: 'partner',
     })
   }
 
   if (o.faq?.last_updated) {
     const item = o.faq.last_updated
-    const t = getTranslation(item.frequently_asked_question_translations ?? [])
+    const tr = getTranslation(item.frequently_asked_question_translations ?? [])
     items.push({
       id:          item.id,
-      title:       t.question ?? '—',
-      type:        'FAQ',
+      title:       tr.question ?? '—',
+      contentType: 'faq',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
       editLink:    { path: '/cms/management', query: { tab: 'faq' } },
-      contentType: 'faq',
     })
   }
 
   if (o.hero_banners?.last_updated) {
     const item = o.hero_banners.last_updated
-    const t = getTranslation(item.hero_banner_translations ?? [])
+    const tr = getTranslation(item.hero_banner_translations ?? [])
     items.push({
       id:          item.id,
-      title:       t.title ?? `Banner #${item.id}`,
-      type:        'Banner',
+      title:       tr.title ?? `Banner #${item.id}`,
+      contentType: 'hero_banner',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
       editLink:    { path: '/cms/management', query: { tab: 'bannery' } },
-      contentType: 'hero_banner',
     })
   }
 
   if (o.meta_tags?.last_updated) {
     const item = o.meta_tags.last_updated
-    const t = getTranslation(item.meta_tag_translations ?? [])
+    const tr = getTranslation(item.meta_tag_translations ?? [])
     items.push({
       id:          item.id,
-      title:       t.title ?? '—',
-      type:        'Meta tag',
+      title:       tr.title ?? '—',
+      contentType: 'meta_tag',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
       editLink:    { path: '/cms/management', query: { tab: 'meta_tags' } },
-      contentType: 'meta_tag',
     })
   }
 
   if (o.partner_references?.last_updated) {
     const item = o.partner_references.last_updated
-    const t = getTranslation(item.partner_reference_translations ?? [])
     items.push({
       id:          item.id,
-      // name is translated per language in partner_reference_translations
       title:       item.name ?? '—',
-      type:        'Referencia',
+      contentType: 'partner_reference',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
       editLink:    { path: '/cms/management', query: { tab: 'partner_references' } },
-      contentType: 'partner_reference',
     })
   }
 
@@ -333,23 +326,23 @@ onMounted(async () => {
 // ── Quick actions ──────────────────────────────────────────
 
 const quickActions = [
-  { label: 'Nový článok',   to: { path: '/cms/management', query: { tab: 'clanky',    create: '1' } }, icon: Plus,   iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
-  { label: 'Nové metadáta', to: { path: '/cms/management', query: { tab: 'meta_tags', create: '1' } }, icon: Layout, iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
-  { label: 'Partneri',      to: { path: '/cms/management', query: { tab: 'partneri',  create: '1' } }, icon: Users,  iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
-  { label: 'Verejný web',   to: '/',                                                                    icon: Globe,  iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
+  { labelKey: 'cmsDashboard.quickActions.newArticle',  to: { path: '/cms/management', query: { tab: 'clanky',    create: '1' } }, icon: Plus,   iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
+  { labelKey: 'cmsDashboard.quickActions.newMetadata', to: { path: '/cms/management', query: { tab: 'meta_tags', create: '1' } }, icon: Layout, iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
+  { labelKey: 'cmsDashboard.quickActions.partners',    to: { path: '/cms/management', query: { tab: 'partneri',  create: '1' } }, icon: Users,  iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
+  { labelKey: 'cmsDashboard.quickActions.publicWeb',   to: '/',                                                                   icon: Globe,  iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
 ]
 
 // ── Helpers ────────────────────────────────────────────────
 
-const contentTypeStyle = (type: string) => {
+const contentTypeStyle = (contentType: string) => {
   const map: Record<string, { bg: string; color: string; icon: any }> = {
-    'Článok':    { bg: 'bg-blue-50',   color: 'text-blue-600',   icon: Newspaper },
-    'Partner':   { bg: 'bg-green-50',  color: 'text-green-600',  icon: Users },
-    'FAQ':       { bg: 'bg-amber-50',  color: 'text-amber-600',  icon: HelpCircle },
-    'Meta tag':  { bg: 'bg-purple-50', color: 'text-purple-600', icon: Layout },
-    'Banner':    { bg: 'bg-pink-50',   color: 'text-pink-600',   icon: Image },
-    'Referencia':{ bg: 'bg-gray-100',  color: 'text-gray-600',   icon: FileText },
+    news:              { bg: 'bg-blue-50',   color: 'text-blue-600',   icon: Newspaper },
+    partner:           { bg: 'bg-green-50',  color: 'text-green-600',  icon: Users },
+    faq:               { bg: 'bg-amber-50',  color: 'text-amber-600',  icon: HelpCircle },
+    meta_tag:          { bg: 'bg-purple-50', color: 'text-purple-600', icon: Layout },
+    hero_banner:       { bg: 'bg-pink-50',   color: 'text-pink-600',   icon: Image },
+    partner_reference: { bg: 'bg-gray-100',  color: 'text-gray-600',   icon: FileText },
   }
-  return map[type] ?? { bg: 'bg-gray-100', color: 'text-gray-500', icon: FileText }
+  return map[contentType] ?? { bg: 'bg-gray-100', color: 'text-gray-500', icon: FileText }
 }
 </script>
