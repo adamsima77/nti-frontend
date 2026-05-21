@@ -1,20 +1,20 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <ClientOnly>
-    <LayoutPortalNavbar
-      :sidebar-collapsed="sidebarCollapsed"
-      @toggle-sidebar="mobileSidebarOpen = !mobileSidebarOpen"
-    />
+      <LayoutPortalNavbar
+        :sidebar-collapsed="sidebarCollapsed"
+        @toggle-sidebar="mobileSidebarOpen = !mobileSidebarOpen"
+      />
     </ClientOnly>
 
     <ClientOnly>
-    <LayoutPortalSidebar
-      :items="navItems"
-      :is-open="mobileSidebarOpen"
-      :is-collapsed="sidebarCollapsed"
-      @close="mobileSidebarOpen = false"
-      @toggle-collapse="sidebarCollapsed = !sidebarCollapsed"
-    />
+      <LayoutPortalSidebar
+        :items="navItems"
+        :is-open="mobileSidebarOpen"
+        :is-collapsed="sidebarCollapsed"
+        @close="mobileSidebarOpen = false"
+        @toggle-collapse="sidebarCollapsed = !sidebarCollapsed"
+      />
     </ClientOnly>
 
     <main :class="['pt-16 min-h-screen transition-all duration-300', sidebarCollapsed ? 'md:ml-20' : 'md:ml-64']">
@@ -23,7 +23,7 @@
   </div>
 </template>
 
-<script setup lang = "ts">
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import {
   LayoutDashboard,
@@ -35,23 +35,22 @@ import {
   FolderKanban,
   MessageSquare,
   ClipboardCheck,
-  FileCode, 
+  FileCode,
 } from 'lucide-vue-next'
 
 const mobileSidebarOpen = ref(false)
-const sidebarCollapsed = ref(false)
+const sidebarCollapsed  = ref(false)
 
-const authStore = useAuthStore()
-
+const authStore  = useAuthStore()
+const { t }      = useI18n()
+const localePath = useLocalePath()
 
 const handleStorageChange = async (e: StorageEvent) => {
-  
   if (e.key === '_t' && e.newValue) {
     await authStore.getCurrentUser()
     return
   }
 
-  
   if (e.key === '_t' && e.newValue === null) {
     authStore.$reset()
     await navigateTo('/auth/login')
@@ -71,45 +70,47 @@ const navItems = computed(() => {
 
   if (role === 'student') {
     return [
-      { label: 'Dashboard', to: '/student', icon: LayoutDashboard },
-      { label: 'Moje prihlášky', to: '/student/prihlasky', icon: FileText },
-      { label: 'Moje tímy', to: '/student/timy', icon: Users },
-      { label: 'Môj profil', to: '/student/profil', icon: UserCircle },
+      { label: t('portal_sidebar_links.dashboard'),    to: localePath('/student'),           icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.applications'), to: localePath('/student/prihlasky'), icon: FileText },
+      { label: t('portal_sidebar_links.teams'),        to: localePath('/student/timy'),      icon: Users },
+      { label: t('portal_sidebar_links.profile'),      to: localePath('/student/profil'),    icon: UserCircle },
     ]
   }
 
-  if(role === 'cms_editor'){
-        return [
-            { label: 'Dashboard', to: '/cms', icon: LayoutDashboard },
-            { label: 'CMS', to: '/cms/management', icon: FileCode },
-            { label: 'Profil', to: '/cms/profil', icon: UserCircle },
-        ]
+  if (role === 'cms_editor') {
+    return [
+      { label: t('portal_sidebar_links.dashboard'),  to: localePath('/cms'),            icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.cms'),        to: localePath('/cms/management'), icon: FileCode },
+      { label: t('portal_sidebar_links.cmsProfile'), to: localePath('/cms/profil'),     icon: UserCircle },
+    ]
   }
 
   if (role === 'company') {
     return [
-      { label: 'Dashboard', to: '/firma', icon: LayoutDashboard },
-      { label: 'Profil organizácie', to: '/firma/profil', icon: Building2 },
-      { label: 'Zadania', to: '/firma/zadania', icon: ClipboardList },
-      { label: 'Správa členov', to: '/firma/clenovia', icon: Users },
+      { label: t('portal_sidebar_links.dashboard'),      to: localePath('/firma'),          icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.companyProfile'), to: localePath('/firma/profil'),   icon: Building2 },
+      { label: t('portal_sidebar_links.tasks'),          to: localePath('/firma/zadania'),  icon: ClipboardList },
+      { label: t('portal_sidebar_links.members'),        to: localePath('/firma/clenovia'), icon: Users },
     ]
   }
 
   if (role === 'mentor') {
     return [
-      { label: 'Dashboard', to: '/mentor', icon: LayoutDashboard },
-      { label: 'Projekty', to: '/mentor/projekty', icon: FolderKanban },
-      { label: 'Konzultácie', to: '/mentor/konzultacie', icon: MessageSquare },
+      { label: t('portal_sidebar_links.dashboard'),     to: localePath('/mentor'),             icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.projects'),      to: localePath('/mentor/projekty'),    icon: FolderKanban },
+      { label: t('portal_sidebar_links.consultations'), to: localePath('/mentor/konzultacie'), icon: MessageSquare },
     ]
   }
 
   if (role === 'evaluator') {
     return [
-      { label: 'Dashboard', to: '/hodnotenie', icon: LayoutDashboard },
-      { label: 'Hodnotenia', to: '/hodnotenie/zoznam', icon: ClipboardCheck },
+      { label: t('portal_sidebar_links.dashboard'),  to: localePath('/hodnotenie'),        icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.evaluations'),to: localePath('/hodnotenie/zoznam'), icon: ClipboardCheck },
     ]
   }
 
-  return [{ label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard }]
+  return [
+    { label: t('portal_sidebar_links.dashboard'), to: localePath('/dashboard'), icon: LayoutDashboard },
+  ]
 })
 </script>

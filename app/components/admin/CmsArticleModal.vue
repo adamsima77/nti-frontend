@@ -1,7 +1,7 @@
 <template>
   <UiModal
     :model-value="modelValue"
-    :title="isEditing ? 'Upraviť článok' : 'Nový článok'"
+    :title="isEditing ? $t('cms_modals.news.titleEdit') : $t('cms_modals.news.titleCreate')"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <!-- Language tabs (edit only) -->
@@ -35,15 +35,15 @@
       <div class="grid grid-cols-2 gap-4">
         <UiFormField
           v-model="form.slug"
-          label="Slug"
+          :label="$t('cms_modals.news.fieldSlug')"
           field="slug"
-          placeholder="moj-clanok"
+          :placeholder="$t('cms_modals.news.slugPlaceholder')"
           :touched="touched"
           :is-valid="isValid"
           :error="errors.slug"
         />
         <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1.5">Kategória</label>
+          <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.news.fieldCategory') }}</label>
           <UiSelect v-model="form.category_id" :options="categoryOptions" />
           <p v-if="errors.category_id" class="text-xs text-red-500 mt-1">{{ errors.category_id }}</p>
         </div>
@@ -51,36 +51,39 @@
 
       <!-- Language selector (create only) -->
       <div v-if="!isEditing">
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Jazyk</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.news.fieldLanguage') }}</label>
         <UiSelect v-model="form.language_id" :options="languageOptions" />
         <p v-if="errors.language_id" class="text-xs text-red-500 mt-1">{{ errors.language_id }}</p>
       </div>
 
       <UiFormField
         v-model="form.title"
-        label="Nadpis"
+        :label="$t('cms_modals.news.fieldTitle')"
         field="title"
-        placeholder="Nadpis článku"
+        :placeholder="$t('cms_modals.news.titlePlaceholder')"
         :touched="touched"
         :is-valid="isValid"
         :error="errors.title"
       />
 
       <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Náhľad obrázku</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.news.fieldImage') }}</label>
         <UiFileUpload
           v-model="form.image"
-          label="Obrázok (jpeg, jpg, png)"
+          :label="$t('cms_modals.news.imageLabel')"
           accept=".jpg,.jpeg,.png"
           :max-size="4"
         />
         <div class="mt-2">
-          <p v-if="form.image_url" class="text-xs text-gray-400 mt-2">Aktuálne: <a :href="form.image_url" target="_blank" class="text-blue-600 hover:underline">zobraziť</a></p>
+          <p v-if="form.image_url" class="text-xs text-gray-400 mt-2">
+            {{ $t('cms_modals.news.imageCurrentLabel') }}
+            <a :href="form.image_url" target="_blank" class="text-blue-600 hover:underline">{{ $t('cms_modals.news.imageCurrentLink') }}</a>
+          </p>
         </div>
       </div>
 
       <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Obsah</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.news.fieldContent') }}</label>
         <ClientOnly>
           <Editor v-model="form.description" />
         </ClientOnly>
@@ -88,16 +91,16 @@
       </div>
 
       <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Stav</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.news.fieldStatus') }}</label>
         <UiSelect v-model="form.status_id" :options="statusOptions" />
         <p v-if="errors.status_id" class="text-xs text-red-500 mt-1">{{ errors.status_id }}</p>
       </div>
     </div>
 
     <template #actions>
-      <UiButton variant="ghost" @click="emit('update:modelValue', false)">Zrušiť</UiButton>
+      <UiButton variant="ghost" @click="emit('update:modelValue', false)">{{ $t('cms_modals.news.cancel') }}</UiButton>
       <UiButton :disabled="isSaving || metaLoading" @click="handleSubmit">
-        {{ isSaving ? 'Ukladanie...' : 'Uložiť' }}
+        {{ isSaving ? $t('cms_modals.news.saving') : $t('cms_modals.news.save') }}
       </UiButton>
     </template>
   </UiModal>
@@ -137,7 +140,7 @@ const emit = defineEmits<{
 
 const api = useApi()
 const { addToast } = useToast()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const lang = computed(() => (locale.value === 'en' ? 'en' : 'sk'))
 
 // ── Meta ───────────────────────────────────────────────────
@@ -160,16 +163,12 @@ async function fetchMeta() {
       api.get(`/categories/lang/${lang.value}`) as Promise<any>,
     ])
 
-    // languages — apiResource, may be paginated
     const langList: any[] = Array.isArray(langs) ? langs : (langs?.data ?? [])
     availableLanguages.value = langList.map((l: any) => ({ id: l.id, name: l.name }))
 
-    // statuses — plain array from our simple controller
     const statusList: any[] = Array.isArray(statuses) ? statuses : (statuses?.data ?? [])
     statusOptions.value = statusList.map((s: any) => ({ value: s.id, label: s.name }))
 
-    // categories/lang returns paginated { data: [] }
-    // each item has category_translations: [{ name, language_id }]
     const catList: any[] = cats?.data ?? []
     categoryOptions.value = catList
       .map((c: any) => ({
@@ -177,7 +176,7 @@ async function fetchMeta() {
         label: c.category_translations?.[0]?.name ?? c.slug ?? `#${c.id}`,
       }))
   } catch {
-    addToast({ message: 'Nepodarilo sa načítať dáta formulára', type: 'error' })
+    addToast({ message: t('cms_modals.news.toastLoadError'), type: 'error' })
   } finally {
     metaLoading.value = false
   }
@@ -195,8 +194,8 @@ const emptyForm = () => ({
   slug:        '',
   category_id: null as number | null,
   language_id: null as number | null,
-    image: null as File | null,
-    image_url: '',
+  image:       null as File | null,
+  image_url:   '',
   title:       '',
   description: '',
   status_id:   null as number | null,
@@ -257,7 +256,6 @@ watch(
   },
 )
 
-// handles parent swapping article prop while modal stays open
 watch(
   () => props.article,
   (article) => {
@@ -275,37 +273,33 @@ watch(
 )
 
 function fillFormForLang(article: ArticleRaw, langId: number) {
-  const t = article.news_translations?.find((x) => x.language_id === langId) ?? null
+  const tr = article.news_translations?.find((x) => x.language_id === langId) ?? null
   form.value = {
     slug:        article.slug        ?? '',
     category_id: article.category_id ?? null,
     language_id: langId,
-    image: null,
-    image_url: article.image_url ?? '',
-    title:       t?.title            ?? '',
-    description: t?.description      ?? '',
+    image:       null,
+    image_url:   article.image_url   ?? '',
+    title:       tr?.title           ?? '',
+    description: tr?.description     ?? '',
     status_id:   article.status_id   ?? article.cms_status?.id ?? null,
   }
 }
 
-// react to file selection changes to show preview
 watch(() => form.value.image, (file) => {
   setPreviewFromFile(file as File | null)
 })
 
-// when modal is opened for editing, ensure preview shows existing URL
 watch(
   () => props.modelValue,
   (open) => {
     if (!open) {
-      // clear selected file preview when closing
       if (currentObjectUrl) {
         try { URL.revokeObjectURL(currentObjectUrl) } catch {}
         currentObjectUrl = null
       }
       imagePreview.value = null
     } else {
-      // on open, show existing image_url if any
       imagePreview.value = form.value.image_url || null
     }
   }
@@ -318,7 +312,7 @@ function switchLang(langId: number) {
 
 function hasTranslation(langId: number): boolean {
   return !!props.article?.news_translations?.some(
-    (t) => t.language_id === langId && t.title?.trim(),
+    (tr) => tr.language_id === langId && tr.title?.trim(),
   )
 }
 
@@ -337,19 +331,19 @@ function validate(): boolean {
   touched.value = {}
 
   if (!form.value.slug.trim())
-    { errors.value.slug = 'Slug je povinný'; touched.value.slug = true }
+    { errors.value.slug = t('cms_modals.news.validSlug'); touched.value.slug = true }
 
   if (!form.value.category_id)
-    { errors.value.category_id = 'Kategória je povinná' }
+    { errors.value.category_id = t('cms_modals.news.validCategory') }
 
   if (!isEditing.value && !form.value.language_id)
-    { errors.value.language_id = 'Jazyk je povinný' }
+    { errors.value.language_id = t('cms_modals.news.validLanguage') }
 
   if (!form.value.title.trim())
-    { errors.value.title = 'Nadpis je povinný'; touched.value.title = true }
+    { errors.value.title = t('cms_modals.news.validTitle'); touched.value.title = true }
 
   if (isContentEmpty(form.value.description))
-    { errors.value.description = 'Obsah je povinný' }
+    { errors.value.description = t('cms_modals.news.validContent') }
 
   return Object.keys(errors.value).length === 0
 }
@@ -361,7 +355,6 @@ async function handleSubmit() {
   isSaving.value = true
 
   try {
-    // Use FormData so we can include an optional cover image file
     const payload = new FormData()
     payload.append('slug', form.value.slug)
     if (form.value.category_id !== null) payload.append('category_id', String(form.value.category_id))
@@ -375,14 +368,13 @@ async function handleSubmit() {
     }
 
     if (isEditing.value) {
-      // Some backends expect `_method=PUT` when sending multipart via POST
       await api.post(`/news/${props.article!.id}?_method=PUT`, payload)
     } else {
       await api.post('/news', payload)
     }
 
     addToast({
-      message: isEditing.value ? 'Článok bol aktualizovaný' : 'Článok bol vytvorený',
+      message: isEditing.value ? t('cms_modals.news.toastUpdated') : t('cms_modals.news.toastCreated'),
       type: 'success',
     })
     emit('saved')
@@ -395,7 +387,7 @@ async function handleSubmit() {
         touched.value[field] = true
       })
     } else {
-      addToast({ message: 'Nepodarilo sa uložiť článok', type: 'error' })
+      addToast({ message: t('cms_modals.news.toastSaveError'), type: 'error' })
     }
   } finally {
     isSaving.value = false

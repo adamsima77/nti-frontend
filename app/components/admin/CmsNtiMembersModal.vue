@@ -1,7 +1,7 @@
 <template>
   <UiModal
     :model-value="modelValue"
-    :title="isEditing ? 'Upraviť člena NTI' : 'Nový člen NTI'"
+    :title="isEditing ? $t('cms_modals.site_member.titleEdit') : $t('cms_modals.site_member.titleCreate')"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <!-- Loading -->
@@ -14,9 +14,9 @@
       <!-- Name -->
       <UiFormField
         v-model="form.name"
-        label="Meno a priezvisko"
+        :label="$t('cms_modals.site_member.fieldName')"
         field="name"
-        placeholder="Ján Novák"
+        :placeholder="$t('cms_modals.site_member.namePlaceholder')"
         :touched="touched"
         :is-valid="isValid"
         :error="errors.name"
@@ -25,53 +25,40 @@
       <!-- Image -->
       <div>
         <label class="block text-xs font-semibold text-slate-500 mb-1.5">
-          Fotografia
+          {{ $t('cms_modals.site_member.fieldImage') }}
         </label>
-
         <UiFileUpload
           v-model="form.imageFile"
-          label="Fotografia (jpeg, jpg, png)"
+          :label="$t('cms_modals.site_member.imageLabel')"
           accept=".jpg,.jpeg,.png"
           :max-size="4"
         />
-
         <div class="mt-2">
           <p v-if="form.image_url" class="text-xs text-gray-400 mt-1">
-            Aktuálne:
-            <a
-              :href="form.image_url"
-              target="_blank"
-              class="text-blue-600 hover:underline"
-            >
-              zobraziť
+            {{ $t('cms_modals.site_member.imageCurrentLabel') }}
+            <a :href="form.image_url" target="_blank" class="text-blue-600 hover:underline">
+              {{ $t('cms_modals.site_member.imageCurrentLink') }}
             </a>
           </p>
         </div>
-
-        <p v-if="errors.image" class="text-xs text-red-500 mt-1">
-          {{ errors.image }}
-        </p>
+        <p v-if="errors.image" class="text-xs text-red-500 mt-1">{{ errors.image }}</p>
       </div>
 
       <!-- Status -->
       <div>
         <label class="block text-xs font-semibold text-slate-500 mb-1.5">
-          Stav
+          {{ $t('cms_modals.site_member.fieldStatus') }}
         </label>
-
         <UiSelect v-model="form.status_id" :options="statusOptions" />
-
-        <p v-if="errors.status_id" class="text-xs text-red-500 mt-1">
-          {{ errors.status_id }}
-        </p>
+        <p v-if="errors.status_id" class="text-xs text-red-500 mt-1">{{ errors.status_id }}</p>
       </div>
 
       <!-- Job position -->
       <UiFormField
         v-model="form.job_position"
-        label="Pozícia"
+        :label="$t('cms_modals.site_member.fieldPosition')"
         field="job_position"
-        placeholder="Frontend Developer"
+        :placeholder="$t('cms_modals.site_member.positionPlaceholder')"
         :touched="touched"
         :is-valid="isValid"
         :error="errors.job_position"
@@ -81,11 +68,10 @@
     <!-- Actions -->
     <template #actions>
       <UiButton variant="ghost" @click="closeModal">
-        Zrušiť
+        {{ $t('cms_modals.site_member.cancel') }}
       </UiButton>
-
       <UiButton :disabled="isSaving || metaLoading" @click="handleSubmit">
-        {{ isSaving ? 'Ukladanie...' : 'Uložiť' }}
+        {{ isSaving ? $t('cms_modals.site_member.saving') : $t('cms_modals.site_member.save') }}
       </UiButton>
     </template>
   </UiModal>
@@ -114,13 +100,14 @@ const emit = defineEmits<{
 
 const api = useApi()
 const { addToast } = useToast()
+const { t } = useI18n()
 
 // ── State ─────────────────────────────
 
 const metaLoading = ref(false)
-const isSaving = ref(false)
+const isSaving    = ref(false)
 
-const errors = ref<Record<string, string>>({})
+const errors  = ref<Record<string, string>>({})
 const touched = ref<Record<string, boolean>>({})
 
 const statusOptions = ref<{ value: number; label: string }[]>([])
@@ -128,11 +115,11 @@ const statusOptions = ref<{ value: number; label: string }[]>([])
 // ── Form ─────────────────────────────
 
 const emptyForm = () => ({
-  name: '',
+  name:         '',
   job_position: '',
-  imageFile: null as File | null,
-  image_url: '',
-  status_id: null as number | null,
+  imageFile:    null as File | null,
+  image_url:    '',
+  status_id:    null as number | null,
 })
 
 const form = ref(emptyForm())
@@ -152,7 +139,7 @@ watch(
     if (objectUrl) URL.revokeObjectURL(objectUrl)
 
     if (file instanceof File) {
-      objectUrl = URL.createObjectURL(file)
+      objectUrl          = URL.createObjectURL(file)
       imagePreview.value = objectUrl
     } else {
       imagePreview.value = form.value.image_url || null
@@ -168,18 +155,10 @@ onUnmounted(() => {
 
 async function fetchMeta() {
   metaLoading.value = true
-
   try {
     const statuses = await api.get('/cms-statuses') as any
-
-    const list: any[] = Array.isArray(statuses)
-      ? statuses
-      : (statuses?.data ?? [])
-
-    statusOptions.value = list.map((s) => ({
-      value: s.id,
-      label: s.name,
-    }))
+    const list: any[] = Array.isArray(statuses) ? statuses : (statuses?.data ?? [])
+    statusOptions.value = list.map((s) => ({ value: s.id, label: s.name }))
   } finally {
     metaLoading.value = false
   }
@@ -195,23 +174,22 @@ watch(
       return
     }
 
-    errors.value = {}
+    errors.value  = {}
     touched.value = {}
 
     await fetchMeta()
 
     if (props.member?.id) {
       form.value = {
-        name: props.member.name ?? '',
+        name:         props.member.name         ?? '',
         job_position: props.member.job_position ?? '',
-        imageFile: null,
-        image_url: props.member.image_url ?? '',
-        status_id: props.member.status_id ?? null,
+        imageFile:    null,
+        image_url:    props.member.image_url    ?? '',
+        status_id:    props.member.status_id    ?? null,
       }
-
       imagePreview.value = props.member.image_url ?? null
     } else {
-      form.value = emptyForm()
+      form.value         = emptyForm()
       imagePreview.value = null
     }
   }
@@ -220,10 +198,10 @@ watch(
 // ── Helpers ───────────────────────────
 
 function resetForm() {
-  form.value = emptyForm()
+  form.value         = emptyForm()
   imagePreview.value = null
-  errors.value = {}
-  touched.value = {}
+  errors.value       = {}
+  touched.value      = {}
 
   if (objectUrl) {
     URL.revokeObjectURL(objectUrl)
@@ -242,16 +220,14 @@ function isValid(field: string) {
 }
 
 function validate() {
-  errors.value = {}
+  errors.value  = {}
   touched.value = {}
 
-  if (!form.value.name.trim()) {
-    errors.value.name = 'Meno je povinné'
-  }
+  if (!form.value.name.trim())
+    { errors.value.name = t('cms_modals.site_member.validName') }
 
-  if (!form.value.job_position.trim()) {
-    errors.value.job_position = 'Pozícia je povinná'
-  }
+  if (!form.value.job_position.trim())
+    { errors.value.job_position = t('cms_modals.site_member.validPosition') }
 
   return Object.keys(errors.value).length === 0
 }
@@ -260,55 +236,40 @@ function validate() {
 
 async function handleSubmit() {
   if (!validate()) return
-
   isSaving.value = true
 
   try {
     const payload = new FormData()
-
     payload.append('name', form.value.name)
     payload.append('job_position', form.value.job_position)
 
-    if (form.value.status_id !== null) {
+    if (form.value.status_id !== null)
       payload.append('status_id', String(form.value.status_id))
-    }
 
-    if (form.value.imageFile instanceof File) {
+    if (form.value.imageFile instanceof File)
       payload.append('image', form.value.imageFile)
-    }
 
     if (isEditing.value) {
-      await api.post(
-        `/site-members/${props.member!.id}?_method=PUT`,
-        payload
-      )
+      await api.post(`/site-members/${props.member!.id}?_method=PUT`, payload)
     } else {
       await api.post('/site-members', payload)
     }
 
     addToast({
-      message: isEditing.value
-        ? 'Člen NTI bol aktualizovaný'
-        : 'Člen NTI bol vytvorený',
+      message: isEditing.value ? t('cms_modals.site_member.toastUpdated') : t('cms_modals.site_member.toastCreated'),
       type: 'success',
     })
-
     emit('saved')
     closeModal()
-
   } catch (e: any) {
     const laravelErrors = e?.response?.data?.errors
-
     if (laravelErrors) {
       Object.entries(laravelErrors).forEach(([field, msgs]: any) => {
-        errors.value[field] = Array.isArray(msgs) ? msgs[0] : msgs
+        errors.value[field]  = Array.isArray(msgs) ? msgs[0] : msgs
         touched.value[field] = true
       })
     } else {
-      addToast({
-        message: 'Nepodarilo sa uložiť člena NTI',
-        type: 'error',
-      })
+      addToast({ message: t('cms_modals.site_member.toastSaveError'), type: 'error' })
     }
   } finally {
     isSaving.value = false

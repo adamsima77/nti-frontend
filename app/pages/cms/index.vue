@@ -52,7 +52,7 @@
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-navy">{{ $t('cmsDashboard.recentlyEdited.title') }}</h2>
         <NuxtLink
-          to="/cms/management"
+          :to="localePath('/cms/management')"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
         >
           {{ $t('cmsDashboard.recentlyEdited.allItems') }}
@@ -171,7 +171,7 @@ useHead({ title: 'CMS Dashboard | NTI' })
 const api = useApi()
 const authStore = useAuthStore()
 const { locale, t } = useI18n()
-
+const localePath = useLocalePath()
 const lang   = computed(() => (locale.value === 'en' ? 'en' : 'sk'))
 const langId = computed(() => lang.value === 'en' ? 2 : 1)
 
@@ -193,12 +193,12 @@ const faqCount           = ref(0)
 const contentOverview = ref<Record<string, any>>({})
 
 const sectionMeta: Record<string, { nameKey: string; link: string; icon: any; iconBg: string; iconColor: string }> = {
-  news:               { nameKey: 'cmsDashboard.sections.news',               link: '/cms/management?tab=clanky',             icon: Newspaper,  iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
-  partners:           { nameKey: 'cmsDashboard.sections.partners',           link: '/cms/management?tab=partneri',           icon: Users,      iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
-  faq:                { nameKey: 'cmsDashboard.sections.faq',                link: '/cms/management?tab=faq',                icon: HelpCircle, iconBg: 'bg-amber-50',  iconColor: 'text-amber-600' },
-  hero_banners:       { nameKey: 'cmsDashboard.sections.heroBanners',        link: '/cms/management?tab=bannery',            icon: Image,      iconBg: 'bg-pink-50',   iconColor: 'text-pink-600' },
-  meta_tags:          { nameKey: 'cmsDashboard.sections.metaTags',           link: '/cms/management?tab=meta_tags',          icon: Layout,     iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
-  partner_references: { nameKey: 'cmsDashboard.sections.partnerReferences',  link: '/cms/management?tab=partner_references', icon: FileText,   iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
+  news:               { nameKey: 'cmsDashboard.sections.news',               link: localePath('/cms/management?tab=clanky'),             icon: Newspaper,  iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
+  partners:           { nameKey: 'cmsDashboard.sections.partners',           link: localePath('/cms/management?tab=partneri'),           icon: Users,      iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
+  faq:                { nameKey: 'cmsDashboard.sections.faq',                link: localePath('/cms/management?tab=faq'),                icon: HelpCircle, iconBg: 'bg-amber-50',  iconColor: 'text-amber-600' },
+  hero_banners:       { nameKey: 'cmsDashboard.sections.heroBanners',        link: localePath('/cms/management?tab=bannery'),            icon: Image,      iconBg: 'bg-pink-50',   iconColor: 'text-pink-600' },
+  meta_tags:          { nameKey: 'cmsDashboard.sections.metaTags',           link: localePath('/cms/management?tab=meta_tags'),          icon: Layout,     iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
+  partner_references: { nameKey: 'cmsDashboard.sections.partnerReferences',  link: localePath('/cms/management?tab=partner_references'), icon: FileText,   iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
 }
 
 const contentSections = computed(() =>
@@ -239,7 +239,7 @@ const recentlyEditedItems = computed(() => {
       title:       tr.title ?? item.slug ?? '—',
       contentType: 'news',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
-      editLink:    { path: '/cms/management', query: { tab: 'clanky' } },
+      editLink:    { path: localePath('/cms/management'), query: { tab: 'clanky' } },
     })
   }
 
@@ -251,7 +251,7 @@ const recentlyEditedItems = computed(() => {
       title:       item.name ?? tr.description?.slice(0, 60) ?? '—',
       contentType: 'partner',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
-      editLink:    { path: '/cms/management', query: { tab: 'partneri' } },
+      editLink:    { path: localePath('/cms/management'), query: { tab: 'partneri' } },
     })
   }
 
@@ -263,7 +263,7 @@ const recentlyEditedItems = computed(() => {
       title:       tr.question ?? '—',
       contentType: 'faq',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
-      editLink:    { path: '/cms/management', query: { tab: 'faq' } },
+      editLink:    { path: localePath('/cms/management'), query: { tab: 'faq' } },
     })
   }
 
@@ -275,7 +275,7 @@ const recentlyEditedItems = computed(() => {
       title:       tr.title ?? `Banner #${item.id}`,
       contentType: 'hero_banner',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
-      editLink:    { path: '/cms/management', query: { tab: 'bannery' } },
+      editLink:    { path: localePath('/cms/management'), query: { tab: 'bannery' } },
     })
   }
 
@@ -287,7 +287,7 @@ const recentlyEditedItems = computed(() => {
       title:       tr.title ?? '—',
       contentType: 'meta_tag',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
-      editLink:    { path: '/cms/management', query: { tab: 'meta_tags' } },
+      editLink:    { path: localePath('/cms/management'), query: { tab: 'meta_tags' } },
     })
   }
 
@@ -298,7 +298,7 @@ const recentlyEditedItems = computed(() => {
       title:       item.name ?? '—',
       contentType: 'partner_reference',
       editedAt:    item.updated_at?.slice(0, 10) ?? '—',
-      editLink:    { path: '/cms/management', query: { tab: 'partner_references' } },
+      editLink:    { path: localePath('/cms/management'), query: { tab: 'partner_references' } },
     })
   }
 
@@ -326,10 +326,10 @@ onMounted(async () => {
 // ── Quick actions ──────────────────────────────────────────
 
 const quickActions = [
-  { labelKey: 'cmsDashboard.quickActions.newArticle',  to: { path: '/cms/management', query: { tab: 'clanky',    create: '1' } }, icon: Plus,   iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
-  { labelKey: 'cmsDashboard.quickActions.newMetadata', to: { path: '/cms/management', query: { tab: 'meta_tags', create: '1' } }, icon: Layout, iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
-  { labelKey: 'cmsDashboard.quickActions.partners',    to: { path: '/cms/management', query: { tab: 'partneri',  create: '1' } }, icon: Users,  iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
-  { labelKey: 'cmsDashboard.quickActions.publicWeb',   to: '/',                                                                   icon: Globe,  iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
+  { labelKey: 'cmsDashboard.quickActions.newArticle',  to: { path: localePath('/cms/management'), query: { tab: 'clanky',    create: '1' } }, icon: Plus,   iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
+  { labelKey: 'cmsDashboard.quickActions.newMetadata', to: { path: localePath('/cms/management'), query: { tab: 'meta_tags', create: '1' } }, icon: Layout, iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
+  { labelKey: 'cmsDashboard.quickActions.partners',    to: { path: localePath('/cms/management'), query: { tab: 'partneri',  create: '1' } }, icon: Users,  iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
+  { labelKey: 'cmsDashboard.quickActions.publicWeb',   to: localePath('/'),                                                                   icon: Globe,  iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
 ]
 
 // ── Helpers ────────────────────────────────────────────────

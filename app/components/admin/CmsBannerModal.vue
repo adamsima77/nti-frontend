@@ -1,7 +1,7 @@
 <template>
   <UiModal
     :model-value="modelValue"
-    :title="isEditing ? 'Upraviť hero banner' : 'Nový hero banner'"
+    :title="isEditing ? $t('cms_modals.hero_banner.titleEdit') : $t('cms_modals.hero_banner.titleCreate')"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <!-- Language tabs (edit only) -->
@@ -32,23 +32,23 @@
     </div>
 
     <div v-else class="space-y-4">
-      <!-- Shared: page selector — always at the top -->
+      <!-- Shared: page selector -->
       <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Stránka</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.hero_banner.fieldPage') }}</label>
         <UiSelect v-model="form.page_id" :options="pageOptions" />
         <p v-if="errors.page_id" class="text-xs text-red-500 mt-1">{{ errors.page_id }}</p>
       </div>
 
       <!-- Shared: status -->
       <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Stav</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.hero_banner.fieldStatus') }}</label>
         <UiSelect v-model="form.status_id" :options="statusOptions" />
         <p v-if="errors.status_id" class="text-xs text-red-500 mt-1">{{ errors.status_id }}</p>
       </div>
 
       <!-- Language selector (create only) -->
       <div v-if="!isEditing">
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Jazyk</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.hero_banner.fieldLanguage') }}</label>
         <UiSelect v-model="form.language_id" :options="languageOptions" />
         <p v-if="errors.language_id" class="text-xs text-red-500 mt-1">{{ errors.language_id }}</p>
       </div>
@@ -56,9 +56,11 @@
       <!-- Translated fields -->
       <UiFormField
         v-model="form.title"
-        :label="isEditing && activeLangLabel ? `Nadpis (${activeLangLabel})` : 'Nadpis'"
+        :label="isEditing && activeLangLabel
+          ? `${$t('cms_modals.hero_banner.fieldTitle')} (${activeLangLabel})`
+          : $t('cms_modals.hero_banner.fieldTitle')"
         field="title"
-        placeholder="Nadpis hero banneru"
+        :placeholder="$t('cms_modals.hero_banner.titlePlaceholder')"
         :touched="touched"
         :is-valid="isValid"
         :error="errors.title"
@@ -66,13 +68,13 @@
 
       <div>
         <label class="block text-xs font-semibold text-slate-500 mb-1.5">
-          Popis
+          {{ $t('cms_modals.hero_banner.fieldDescription') }}
           <span v-if="isEditing && activeLangLabel" class="ml-1 font-normal text-gray-400">({{ activeLangLabel }})</span>
         </label>
         <textarea
           v-model="form.description"
           rows="4"
-          placeholder="Krátky popis banneru"
+          :placeholder="$t('cms_modals.hero_banner.descriptionPlaceholder')"
           class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
         />
         <p v-if="errors.description" class="text-xs text-red-500 mt-1">{{ errors.description }}</p>
@@ -80,9 +82,9 @@
     </div>
 
     <template #actions>
-      <UiButton variant="ghost" @click="emit('update:modelValue', false)">Zrušiť</UiButton>
+      <UiButton variant="ghost" @click="emit('update:modelValue', false)">{{ $t('cms_modals.hero_banner.cancel') }}</UiButton>
       <UiButton :disabled="isSaving || metaLoading" @click="handleSubmit">
-        {{ isSaving ? 'Ukladanie...' : 'Uložiť' }}
+        {{ isSaving ? $t('cms_modals.hero_banner.saving') : $t('cms_modals.hero_banner.save') }}
       </UiButton>
     </template>
   </UiModal>
@@ -122,6 +124,7 @@ const emit = defineEmits<{
 
 const api = useApi()
 const { addToast } = useToast()
+const { t } = useI18n()
 
 // ── Meta ───────────────────────────────────────────────────
 
@@ -155,7 +158,7 @@ async function fetchMeta() {
     const statusList: any[] = Array.isArray(statuses) ? statuses : (statuses?.data ?? [])
     statusOptions.value = statusList.map((s: any) => ({ value: s.id, label: s.name }))
   } catch {
-    addToast({ message: 'Nepodarilo sa načítať dáta formulára', type: 'error' })
+    addToast({ message: t('cms_modals.hero_banner.toastLoadError'), type: 'error' })
   } finally {
     metaLoading.value = false
   }
@@ -175,10 +178,8 @@ const activeLangLabel = computed(
 
 const emptyForm = () => ({
   language_id:  null as number | null,
-  // shared
   page_id:      null as number | null,
   status_id:    null as number | null,
-  // translated
   title:        '',
   description:  '',
 })
@@ -212,7 +213,6 @@ watch(
   },
 )
 
-// handles parent swapping banner prop while modal stays open
 watch(
   () => props.banner,
   (banner) => {
@@ -230,15 +230,13 @@ watch(
 )
 
 function fillFormForLang(banner: HeroBannerRaw, langId: number) {
-  const t = banner.hero_banner_translations?.find((x) => x.language_id === langId) ?? null
+  const tr = banner.hero_banner_translations?.find((x) => x.language_id === langId) ?? null
   form.value = {
     language_id:  langId,
-    // shared
-    page_id:      banner.page_id  ?? null,
+    page_id:      banner.page_id   ?? null,
     status_id:    banner.status_id ?? banner.cms_status?.id ?? null,
-    // translated
-    title:        t?.title       ?? '',
-    description:  t?.description ?? '',
+    title:        tr?.title        ?? '',
+    description:  tr?.description  ?? '',
   }
 }
 
@@ -249,7 +247,7 @@ function switchLang(langId: number) {
 
 function hasTranslation(langId: number): boolean {
   return !!props.banner?.hero_banner_translations?.some(
-    (t) => t.language_id === langId && t.title?.trim(),
+    (tr) => tr.language_id === langId && tr.title?.trim(),
   )
 }
 
@@ -264,16 +262,16 @@ function validate(): boolean {
   touched.value = {}
 
   if (!form.value.page_id)
-    { errors.value.page_id = 'Stránka je povinná' }
+    { errors.value.page_id = t('cms_modals.hero_banner.validPage') }
 
   if (!isEditing.value && !form.value.language_id)
-    { errors.value.language_id = 'Jazyk je povinný' }
+    { errors.value.language_id = t('cms_modals.hero_banner.validLanguage') }
 
   if (!form.value.title.trim())
-    { errors.value.title = 'Nadpis je povinný'; touched.value.title = true }
+    { errors.value.title = t('cms_modals.hero_banner.validTitle'); touched.value.title = true }
 
   if (!form.value.description.trim())
-    { errors.value.description = 'Popis je povinný'; touched.value.description = true }
+    { errors.value.description = t('cms_modals.hero_banner.validDescription'); touched.value.description = true }
 
   return Object.keys(errors.value).length === 0
 }
@@ -300,7 +298,7 @@ async function handleSubmit() {
     }
 
     addToast({
-      message: isEditing.value ? 'Banner bol aktualizovaný' : 'Banner bol vytvorený',
+      message: isEditing.value ? t('cms_modals.hero_banner.toastUpdated') : t('cms_modals.hero_banner.toastCreated'),
       type: 'success',
     })
     emit('saved')
@@ -313,7 +311,7 @@ async function handleSubmit() {
         touched.value[field] = true
       })
     } else {
-      addToast({ message: 'Nepodarilo sa uložiť banner', type: 'error' })
+      addToast({ message: t('cms_modals.hero_banner.toastSaveError'), type: 'error' })
     }
   } finally {
     isSaving.value = false

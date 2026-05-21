@@ -1,7 +1,7 @@
 <template>
   <UiModal
     :model-value="modelValue"
-    :title="isEditing ? 'Upraviť referenciu' : 'Nová referencia'"
+    :title="isEditing ? $t('cms_modals.reference.titleEdit') : $t('cms_modals.reference.titleCreate')"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <!-- LANGUAGE TABS (EDIT ONLY) -->
@@ -38,28 +38,24 @@
 
       <!-- LANGUAGE SELECT (CREATE ONLY) -->
       <div v-if="!isEditing">
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Jazyk</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.reference.fieldLanguage') }}</label>
         <UiSelect v-model="form.language_id" :options="languageOptions" />
-        <p v-if="errors.language_id" class="text-xs text-red-500 mt-1">
-          {{ errors.language_id }}
-        </p>
+        <p v-if="errors.language_id" class="text-xs text-red-500 mt-1">{{ errors.language_id }}</p>
       </div>
 
       <!-- STATUS -->
       <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Stav</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.reference.fieldStatus') }}</label>
         <UiSelect v-model="form.status_id" :options="statusOptions" />
-        <p v-if="errors.status_id" class="text-xs text-red-500 mt-1">
-          {{ errors.status_id }}
-        </p>
+        <p v-if="errors.status_id" class="text-xs text-red-500 mt-1">{{ errors.status_id }}</p>
       </div>
 
       <!-- NAME -->
       <UiFormField
         v-model="form.name"
-        label="Meno"
+        :label="$t('cms_modals.reference.fieldName')"
         field="name"
-        placeholder="Meno osoby"
+        :placeholder="$t('cms_modals.reference.namePlaceholder')"
         :touched="touched"
         :is-valid="isValid"
         :error="errors.name"
@@ -68,9 +64,9 @@
       <!-- JOB POSITION -->
       <UiFormField
         v-model="form.job_position"
-        label="Pracovná pozícia"
+        :label="$t('cms_modals.reference.fieldJobPosition')"
         field="job_position"
-        placeholder="Napr. CEO, Developer..."
+        :placeholder="$t('cms_modals.reference.jobPositionPlaceholder')"
         :touched="touched"
         :is-valid="isValid"
         :error="errors.job_position"
@@ -79,9 +75,9 @@
       <!-- DESCRIPTION -->
       <UiFormField
         v-model="form.description"
-        label="Popis"
+        :label="$t('cms_modals.reference.fieldDescription')"
         field="description"
-        placeholder="Popis referencie"
+        :placeholder="$t('cms_modals.reference.descriptionPlaceholder')"
         :touched="touched"
         :is-valid="isValid"
         :error="errors.description"
@@ -90,8 +86,8 @@
       <!-- IMAGE -->
       <UiFileUpload
         v-model="form.image"
-        label="Fotografia"
-        description="Nahraj fotografiu osoby"
+        :label="$t('cms_modals.reference.fieldImage')"
+        :description="$t('cms_modals.reference.imageDescription')"
         accept=".jpg,.jpeg,.png"
         :max-size="4"
         @update:model-value="handleImageChange"
@@ -106,19 +102,18 @@
           class="max-h-40 rounded-md object-contain"
         />
         <p v-if="form.image_url && !imagePreview" class="text-xs text-gray-400 mt-2">
-          Aktuálne: <a :href="form.image_url" target="_blank" class="text-blue-600 hover:underline">zobraziť</a>
+          {{ $t('cms_modals.reference.imageCurrentLabel') }}
+          <a :href="form.image_url" target="_blank" class="text-blue-600 hover:underline">{{ $t('cms_modals.reference.imageCurrentLink') }}</a>
         </p>
       </div>
-
     </div>
 
     <template #actions>
       <UiButton variant="ghost" @click="emit('update:modelValue', false)">
-        Zrušiť
+        {{ $t('cms_modals.reference.cancel') }}
       </UiButton>
-
       <UiButton :disabled="isSaving || metaLoading" @click="handleSubmit">
-        {{ isSaving ? 'Ukladanie...' : 'Uložiť' }}
+        {{ isSaving ? $t('cms_modals.reference.saving') : $t('cms_modals.reference.save') }}
       </UiButton>
     </template>
   </UiModal>
@@ -161,17 +156,15 @@ const emit = defineEmits<{
 
 const api = useApi()
 const { addToast } = useToast()
+const { t } = useI18n()
 
 // ── META ─────────────────────────────────────────────
 const availableLanguages = ref<Language[]>([])
-const statusOptions = ref<Status[]>([])
-const metaLoading = ref(false)
+const statusOptions      = ref<Status[]>([])
+const metaLoading        = ref(false)
 
 const languageOptions = computed(() =>
-  availableLanguages.value.map(l => ({
-    value: l.id,
-    label: l.name.toUpperCase(),
-  }))
+  availableLanguages.value.map(l => ({ value: l.id, label: l.name.toUpperCase() })),
 )
 
 async function fetchMeta() {
@@ -192,22 +185,22 @@ async function fetchMeta() {
 }
 
 // ── STATE ────────────────────────────────────────────
-const isEditing = computed(() => !!props.reference?.id)
-const isSaving = ref(false)
+const isEditing    = computed(() => !!props.reference?.id)
+const isSaving     = ref(false)
 const imagePreview = ref<string | null>(null)
 
-const errors = ref<Record<string, string>>({})
-const touched = ref<Record<string, boolean>>({})
+const errors       = ref<Record<string, string>>({})
+const touched      = ref<Record<string, boolean>>({})
 const activeLangId = ref<number | null>(null)
 
 const emptyForm = () => ({
-  language_id: null as number | null,
-  status_id: null as number | null,
-  name: '',
+  language_id:  null as number | null,
+  status_id:    null as number | null,
+  name:         '',
   job_position: '',
-  description: '',
-  image: null as File | null,
-  image_url: null as string | null,
+  description:  '',
+  image:        null as File | null,
+  image_url:    null as string | null,
 })
 
 const form = ref(emptyForm())
@@ -217,9 +210,7 @@ function handleImageChange(file: File | null) {
   form.value.image = file
   if (file) {
     const reader = new FileReader()
-    reader.onload = (e) => {
-      imagePreview.value = e.target?.result as string
-    }
+    reader.onload = (e) => { imagePreview.value = e.target?.result as string }
     reader.readAsDataURL(file)
   } else {
     imagePreview.value = null
@@ -234,21 +225,20 @@ function switchLang(langId: number) {
 
 function hasTranslation(langId: number) {
   return !!props.reference?.partner_reference_translations?.some(
-    t => t.language_id === langId && t.description?.trim()
+    tr => tr.language_id === langId && tr.description?.trim()
   )
 }
 
 function fillFormForLang(reference: PartnerReferenceRaw, langId: number) {
-  const t = reference.partner_reference_translations?.find(x => x.language_id === langId)
-
+  const tr = reference.partner_reference_translations?.find(x => x.language_id === langId)
   form.value = {
-    language_id: langId,
-    status_id: reference.status_id ?? null,
-    name: reference.name ?? '',
+    language_id:  langId,
+    status_id:    reference.status_id    ?? null,
+    name:         reference.name         ?? '',
     job_position: reference.job_position ?? '',
-    description: t?.description ?? '',
-    image: null,
-    image_url: reference.image_url ?? null,
+    description:  tr?.description        ?? '',
+    image:        null,
+    image_url:    reference.image_url    ?? null,
   }
 }
 
@@ -258,8 +248,8 @@ watch(
   async (open) => {
     if (!open) return
 
-    errors.value = {}
-    touched.value = {}
+    errors.value       = {}
+    touched.value      = {}
     activeLangId.value = null
     imagePreview.value = null
 
@@ -274,7 +264,7 @@ watch(
       form.value = {
         ...emptyForm(),
         language_id: firstLangId,
-        status_id: statusOptions.value[0]?.value ?? null,
+        status_id:   statusOptions.value[0]?.value ?? null,
       }
     }
   }
@@ -286,32 +276,23 @@ function isValid(field: string) {
 }
 
 function validate() {
-  errors.value = {}
-  touched.value = {
-    name: true,
-    job_position: true,
-    description: true,
-  }
+  errors.value  = {}
+  touched.value = { name: true, job_position: true, description: true }
 
-  if (!form.value.name?.trim()) {
-    errors.value.name = 'Meno je povinné'
-  }
+  if (!form.value.name?.trim())
+    { errors.value.name = t('cms_modals.reference.validName') }
 
-  if (!form.value.job_position?.trim()) {
-    errors.value.job_position = 'Pracovná pozícia je povinná'
-  }
+  if (!form.value.job_position?.trim())
+    { errors.value.job_position = t('cms_modals.reference.validJobPosition') }
 
-  if (!form.value.description?.trim()) {
-    errors.value.description = 'Popis je povinný'
-  }
+  if (!form.value.description?.trim())
+    { errors.value.description = t('cms_modals.reference.validDescription') }
 
-  if (!form.value.language_id && !isEditing.value) {
-    errors.value.language_id = 'Jazyk je povinný'
-  }
+  if (!form.value.language_id && !isEditing.value)
+    { errors.value.language_id = t('cms_modals.reference.validLanguage') }
 
-  if (!form.value.status_id) {
-    errors.value.status_id = 'Stav je povinný'
-  }
+  if (!form.value.status_id)
+    { errors.value.status_id = t('cms_modals.reference.validStatus') }
 
   return Object.keys(errors.value).length === 0
 }
@@ -319,23 +300,18 @@ function validate() {
 // ── SUBMIT ──────────────────────────────────────────
 async function handleSubmit() {
   if (!validate()) return
-
   isSaving.value = true
 
   try {
     const payload = new FormData()
-
-    payload.append('status_id', String(form.value.status_id ?? ''))
-    payload.append('name', form.value.name)
+    payload.append('status_id',    String(form.value.status_id ?? ''))
+    payload.append('name',         form.value.name)
     payload.append('job_position', form.value.job_position)
-    payload.append('description', form.value.description)
+    payload.append('description',  form.value.description)
+    payload.append('language_id',  String(isEditing.value ? activeLangId.value : form.value.language_id ?? ''))
 
-    const langId = isEditing.value ? activeLangId.value : form.value.language_id
-    payload.append('language_id', String(langId ?? ''))
-
-    if (form.value.image) {
+    if (form.value.image)
       payload.append('image', form.value.image)
-    }
 
     if (isEditing.value) {
       payload.append('_method', 'PUT')
@@ -345,18 +321,14 @@ async function handleSubmit() {
     }
 
     addToast({
-      message: isEditing.value
-        ? 'Referencia bola aktualizovaná'
-        : 'Referencia bola vytvorená',
+      message: isEditing.value ? t('cms_modals.reference.toastUpdated') : t('cms_modals.reference.toastCreated'),
       type: 'success',
     })
-
     emit('saved')
     emit('update:modelValue', false)
-
   } catch (err: any) {
     addToast({
-      message: err?.response?.data?.message || 'Nepodarilo sa uložiť referenciu',
+      message: err?.response?.data?.message || t('cms_modals.reference.toastSaveError'),
       type: 'error',
     })
   } finally {

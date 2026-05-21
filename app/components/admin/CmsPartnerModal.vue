@@ -1,7 +1,7 @@
 <template>
   <UiModal
     :model-value="modelValue"
-    :title="isEditing ? 'Upraviť partnera' : 'Nový partner'"
+    :title="isEditing ? $t('cms_modals.partners.titleEdit') : $t('cms_modals.partners.titleCreate')"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <!-- Language tabs (edit only) -->
@@ -34,7 +34,7 @@
     <div v-else class="space-y-4">
       <!-- Language selector (create only) -->
       <div v-if="!isEditing">
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Jazyk</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.partners.fieldLanguage') }}</label>
         <UiSelect v-model="form.language_id" :options="languageOptions" />
         <p v-if="errors.language_id" class="text-xs text-red-500 mt-1">{{ errors.language_id }}</p>
       </div>
@@ -42,38 +42,32 @@
       <!-- Shared fields — same across all languages -->
       <UiFormField
         v-model="form.name"
-        label="Názov"
+        :label="$t('cms_modals.partners.fieldName')"
         field="name"
-        placeholder="Názov partnera"
+        :placeholder="$t('cms_modals.partners.namePlaceholder')"
         :touched="touched"
         :is-valid="isValid"
         :error="errors.name"
       />
 
       <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Logo</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.partners.fieldLogo') }}</label>
         <UiFileUpload
           v-model="form.imageFile"
-          label="Logo (jpeg, jpg, png)"
+          :label="$t('cms_modals.partners.logoLabel')"
           accept=".jpg,.jpeg,.png"
           :max-size="4"
         />
         <div class="mt-2">
-           <p v-if="form.image_url" class="text-xs text-gray-400 mt-1">
-            Aktuálne:
-            <a
-              :href="form.image_url"
-              target="_blank"
-              class="text-blue-600 hover:underline"
-            >
-              zobraziť
-            </a>
+          <p v-if="form.image_url" class="text-xs text-gray-400 mt-1">
+            {{ $t('cms_modals.partners.imageCurrentLabel') }}
+            <a :href="form.image_url" target="_blank" class="text-blue-600 hover:underline">{{ $t('cms_modals.partners.imageCurrentLink') }}</a>
           </p>
-      </div>
+        </div>
       </div>
 
       <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Stav</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.partners.fieldStatus') }}</label>
         <UiSelect v-model="form.status_id" :options="statusOptions" />
         <p v-if="errors.status_id" class="text-xs text-red-500 mt-1">{{ errors.status_id }}</p>
       </div>
@@ -81,23 +75,23 @@
       <!-- Translated field — changes per language tab -->
       <div>
         <label class="block text-xs font-semibold text-slate-500 mb-1.5">
-          Popis
+          {{ $t('cms_modals.partners.fieldDescription') }}
           <span v-if="isEditing && activeLangLabel" class="ml-1 font-normal text-gray-400">({{ activeLangLabel }})</span>
         </label>
-       <textarea
-       v-model="form.description"
-       rows="4"
-       placeholder="Popis partnera"
-       class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
-      />
+        <textarea
+          v-model="form.description"
+          rows="4"
+          :placeholder="$t('cms_modals.partners.descriptionPlaceholder')"
+          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
+        />
         <p v-if="errors.description" class="text-xs text-red-500 mt-1">{{ errors.description }}</p>
       </div>
     </div>
 
     <template #actions>
-      <UiButton variant="ghost" @click="emit('update:modelValue', false)">Zrušiť</UiButton>
+      <UiButton variant="ghost" @click="emit('update:modelValue', false)">{{ $t('cms_modals.partners.cancel') }}</UiButton>
       <UiButton :disabled="isSaving || metaLoading" @click="handleSubmit">
-        {{ isSaving ? 'Ukladanie...' : 'Uložiť' }}
+        {{ isSaving ? $t('cms_modals.partners.saving') : $t('cms_modals.partners.save') }}
       </UiButton>
     </template>
   </UiModal>
@@ -135,6 +129,7 @@ const emit = defineEmits<{
 
 const api = useApi()
 const { addToast } = useToast()
+const { t } = useI18n()
 
 // ── Meta ───────────────────────────────────────────────────
 
@@ -160,7 +155,7 @@ async function fetchMeta() {
     const statusList: any[] = Array.isArray(statuses) ? statuses : (statuses?.data ?? [])
     statusOptions.value = statusList.map((s: any) => ({ value: s.id, label: s.name }))
   } catch {
-    addToast({ message: 'Nepodarilo sa načítať dáta formulára', type: 'error' })
+    addToast({ message: t('cms_modals.partners.toastLoadError'), type: 'error' })
   } finally {
     metaLoading.value = false
   }
@@ -181,8 +176,8 @@ const activeLangLabel = computed(
 const emptyForm = () => ({
   language_id: null as number | null,
   name:        '',
-  imageFile:   null as File | null,   // the actual File for FormData
-  image_url:   '',                    // existing URL from server (display only)
+  imageFile:   null as File | null,
+  image_url:   '',
   status_id:   null as number | null,
   description: '',
 })
@@ -194,7 +189,6 @@ const form = ref(emptyForm())
 const imagePreview    = ref<string | null>(null)
 let currentObjectUrl: string | null = null
 
-// UiFileUpload only emits update:modelValue — watch the bound ref directly
 watch(() => form.value.imageFile, (file) => {
   if (currentObjectUrl) {
     try { URL.revokeObjectURL(currentObjectUrl) } catch {}
@@ -208,7 +202,6 @@ watch(() => form.value.imageFile, (file) => {
   }
 })
 
-
 onUnmounted(() => {
   if (currentObjectUrl) {
     try { URL.revokeObjectURL(currentObjectUrl) } catch {}
@@ -221,7 +214,6 @@ watch(
   () => props.modelValue,
   async (open) => {
     if (!open) {
-      // clean up on close
       if (currentObjectUrl) {
         try { URL.revokeObjectURL(currentObjectUrl) } catch {}
         currentObjectUrl = null
@@ -251,7 +243,6 @@ watch(
   },
 )
 
-// handles parent swapping partner prop while modal stays open
 watch(
   () => props.partner,
   (partner) => {
@@ -270,9 +261,8 @@ watch(
 )
 
 function fillFormForLang(partner: PartnerRaw, langId: number) {
-  const t = partner.partner_translations?.find((x) => x.language_id === langId) ?? null
+  const tr = partner.partner_translations?.find((x) => x.language_id === langId) ?? null
 
-  // revoke any blob URL from a previously selected file
   if (currentObjectUrl) {
     try { URL.revokeObjectURL(currentObjectUrl) } catch {}
     currentObjectUrl = null
@@ -284,10 +274,9 @@ function fillFormForLang(partner: PartnerRaw, langId: number) {
     imageFile:   null,
     image_url:   partner.image_url ?? '',
     status_id:   partner.status_id ?? partner.cms_status?.id ?? null,
-    description: t?.description    ?? '',
+    description: tr?.description   ?? '',
   }
 
-  // show the server image on load; a new file selection will override this
   imagePreview.value = partner.image_url || null
 }
 
@@ -298,7 +287,7 @@ function switchLang(langId: number) {
 
 function hasTranslation(langId: number): boolean {
   return !!props.partner?.partner_translations?.some(
-    (t) => t.language_id === langId && t.description?.trim(),
+    (tr) => tr.language_id === langId && tr.description?.trim(),
   )
 }
 
@@ -317,13 +306,13 @@ function validate(): boolean {
   touched.value = {}
 
   if (!form.value.name.trim())
-    { errors.value.name = 'Názov je povinný'; touched.value.name = true }
+    { errors.value.name = t('cms_modals.partners.validName'); touched.value.name = true }
 
   if (!isEditing.value && !form.value.language_id)
-    { errors.value.language_id = 'Jazyk je povinný' }
+    { errors.value.language_id = t('cms_modals.partners.validLanguage') }
 
   if (isContentEmpty(form.value.description))
-    { errors.value.description = 'Popis je povinný' }
+    { errors.value.description = t('cms_modals.partners.validDescription') }
 
   return Object.keys(errors.value).length === 0
 }
@@ -341,7 +330,6 @@ async function handleSubmit() {
     payload.append('language_id', String(isEditing.value ? (activeLangId.value ?? '') : (form.value.language_id ?? '')))
     if (form.value.status_id !== null) payload.append('status_id', String(form.value.status_id))
 
-    // only append image when the user actually picked a new file
     if (form.value.imageFile instanceof File) {
       payload.append('image', form.value.imageFile)
     }
@@ -353,7 +341,7 @@ async function handleSubmit() {
     }
 
     addToast({
-      message: isEditing.value ? 'Partner bol aktualizovaný' : 'Partner bol vytvorený',
+      message: isEditing.value ? t('cms_modals.partners.toastUpdated') : t('cms_modals.partners.toastCreated'),
       type: 'success',
     })
     emit('saved')
@@ -366,7 +354,7 @@ async function handleSubmit() {
         touched.value[field] = true
       })
     } else {
-      addToast({ message: 'Nepodarilo sa uložiť partnera', type: 'error' })
+      addToast({ message: t('cms_modals.partners.toastSaveError'), type: 'error' })
     }
   } finally {
     isSaving.value = false
