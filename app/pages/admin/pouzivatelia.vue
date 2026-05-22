@@ -91,8 +91,9 @@ import { Eye, Pencil, Download, UserX } from 'lucide-vue-next'
 import type { AdminUser } from '~/types/admin'
 
 definePageMeta({
-  layout: 'admin',
-  // middleware: ['auth'],
+  layout: 'portal',
+  middleware: ['auth'],
+  roles: ['nti_admin', 'nti_superadmin']
 })
 
 useHead({ title: 'Používatelia — Admin | NTI' })

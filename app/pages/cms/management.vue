@@ -146,7 +146,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-vue-next'
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
-  roles: ['cms_editor', 'admin', 'super_admin'],
+  roles: ['cms_editor', 'nti_admin', 'nti_superadmin'],
 })
 
 useHead({ title: 'CMS | NTI' })

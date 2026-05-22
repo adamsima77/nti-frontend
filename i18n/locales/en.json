@@ -1188,7 +1188,7 @@
   "confirming": "Deleting..."
 }
   },
-  "portal_sidebar_links": {
+ "portal_sidebar_links": {
   "dashboard": "Dashboard",
   "applications": "My applications",
   "teams": "My teams",
@@ -1200,6 +1200,15 @@
   "members": "Member management",
   "projects": "Projects",
   "consultations": "Consultations",
-  "evaluations": "Evaluations"
+  "evaluations": "Evaluations",
+  "users": "Users",
+  "challenges": "Challenges",
+  "adminApplications": "Applications",
+  "emailTemplates": "Email templates",
+  "exports": "Exports",
+  "auditLog": "Audit log",
+  "sectionManagement": "Management",
+  "sectionContent": "Content",
+  "sectionSystem": "System"
 }
 }

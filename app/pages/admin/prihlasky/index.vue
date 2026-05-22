@@ -83,8 +83,9 @@ import { Eye, UserPlus } from 'lucide-vue-next'
 import type { AdminApplication } from '~/types/admin'
 
 definePageMeta({
-  layout: 'admin',
-  // middleware: ['auth'],
+  layout: 'portal',
+  middleware: ['auth'],
+  roles: ['nti_admin', 'nti_superadmin'] 
 })
 
 useHead({ title: 'Prihlášky — Admin | NTI' })

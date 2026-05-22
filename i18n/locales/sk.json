@@ -1186,7 +1186,7 @@
   "confirming": "Mazanie..."
 }
   },
-  "portal_sidebar_links": {
+ "portal_sidebar_links": {
   "dashboard": "Dashboard",
   "applications": "Moje prihlášky",
   "teams": "Moje tímy",
@@ -1198,7 +1198,16 @@
   "members": "Správa členov",
   "projects": "Projekty",
   "consultations": "Konzultácie",
-  "evaluations": "Hodnotenia"
+  "evaluations": "Hodnotenia",
+  "users": "Používatelia",
+  "challenges": "Výzvy",
+  "adminApplications": "Prihlášky",
+  "emailTemplates": "Šablóny emailov",
+  "exports": "Exporty",
+  "auditLog": "Audit log",
+  "sectionManagement": "Správa",
+  "sectionContent": "Obsah",
+  "sectionSystem": "Systém"
 }
   
 }

@@ -36,6 +36,11 @@ import {
   MessageSquare,
   ClipboardCheck,
   FileCode,
+  Megaphone,
+  Mail,
+  Download,
+  Shield,
+  ShieldCheck
 } from 'lucide-vue-next'
 
 const mobileSidebarOpen = ref(false)
@@ -68,6 +73,32 @@ onUnmounted(() => {
 const navItems = computed(() => {
   const role = authStore.userRole
 
+  if (role === 'admin') {
+    return [
+      { label: t('portal_sidebar_links.dashboard'),        to: localePath('/admin'),                   icon: LayoutDashboard, section: t('portal_sidebar_links.sectionManagement') },
+      { label: t('portal_sidebar_links.users'),            to: localePath('/admin/pouzivatelia'),      icon: Users,           section: t('portal_sidebar_links.sectionManagement') },
+      { label: t('portal_sidebar_links.challenges'),       to: localePath('/admin/vyzvy'),             icon: Megaphone,       section: t('portal_sidebar_links.sectionManagement') },
+      { label: t('portal_sidebar_links.adminApplications'),to: localePath('/admin/prihlasky'),         icon: FileText,        section: t('portal_sidebar_links.sectionManagement') },
+      { label: t('portal_sidebar_links.cms'),              to: localePath('/cms/management'),          icon: FileCode,        section: t('portal_sidebar_links.sectionContent') },
+      { label: t('portal_sidebar_links.exports'),          to: localePath('/admin/exporty'),           icon: Download,        section: t('portal_sidebar_links.sectionSystem') },
+     
+    ]
+  }
+
+  if(role === 'superadmin') {
+    return [
+      { label: t('portal_sidebar_links.dashboard'),        to: localePath('/superadmin'),              icon: LayoutDashboard, section: t('portal_sidebar_links.sectionManagement') },
+      { label: t('portal_sidebar_links.users'),            to: localePath('/admin/pouzivatelia'),      icon: Users,           section: t('portal_sidebar_links.sectionManagement') },
+      { label: t('portal_sidebar_links.challenges'),       to: localePath('/admin/vyzvy'),             icon: Megaphone,       section: t('portal_sidebar_links.sectionManagement') },
+      { label: t('portal_sidebar_links.adminApplications'),to: localePath('/admin/prihlasky'),         icon: FileText,        section: t('portal_sidebar_links.sectionManagement') },
+      { label: t('portal_sidebar_links.cms'),              to: localePath('/cms/management'),          icon: FileCode,        section: t('portal_sidebar_links.sectionContent') },
+      { label: t('portal_sidebar_links.roles'),            to: localePath('/superadmin/role'),         icon: ShieldCheck,     section: t('portal_sidebar_links.sectionSystem') },
+      { label: t('portal_sidebar_links.exports'),          to: localePath('/admin/exporty'),           icon: Download,        section: t('portal_sidebar_links.sectionSystem') },
+      { label: t('portal_sidebar_links.auditLog'),         to: localePath('/admin/audit-log'),         icon: Shield,          section: t('portal_sidebar_links.sectionSystem') },
+      
+    ]
+  }
+
   if (role === 'student') {
     return [
       { label: t('portal_sidebar_links.dashboard'),    to: localePath('/student'),           icon: LayoutDashboard },
@@ -87,10 +118,10 @@ const navItems = computed(() => {
 
   if (role === 'company') {
     return [
-      { label: t('portal_sidebar_links.dashboard'),      to: localePath('/firma'),          icon: LayoutDashboard },
-      { label: t('portal_sidebar_links.companyProfile'), to: localePath('/firma/profil'),   icon: Building2 },
-      { label: t('portal_sidebar_links.tasks'),          to: localePath('/firma/zadania'),  icon: ClipboardList },
-      { label: t('portal_sidebar_links.members'),        to: localePath('/firma/clenovia'), icon: Users },
+      { label: t('portal_sidebar_links.dashboard'),       to: localePath('/firma'),          icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.companyProfile'),  to: localePath('/firma/profil'),   icon: Building2 },
+      { label: t('portal_sidebar_links.tasks'),           to: localePath('/firma/zadania'),  icon: ClipboardList },
+      { label: t('portal_sidebar_links.members'),         to: localePath('/firma/clenovia'), icon: Users },
     ]
   }
 
@@ -104,8 +135,8 @@ const navItems = computed(() => {
 
   if (role === 'evaluator') {
     return [
-      { label: t('portal_sidebar_links.dashboard'),  to: localePath('/hodnotenie'),        icon: LayoutDashboard },
-      { label: t('portal_sidebar_links.evaluations'),to: localePath('/hodnotenie/zoznam'), icon: ClipboardCheck },
+      { label: t('portal_sidebar_links.dashboard'),   to: localePath('/hodnotenie'),        icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.evaluations'), to: localePath('/hodnotenie/zoznam'), icon: ClipboardCheck },
     ]
   }
 

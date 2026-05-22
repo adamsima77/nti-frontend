@@ -46,8 +46,9 @@
 import { FileText, Users, Megaphone, ClipboardCheck, Download } from 'lucide-vue-next'
 
 definePageMeta({
-  layout: 'admin',
-  // middleware: ['auth'], // TODO: re-enable when backend is available
+  layout: 'portal',
+  middleware: ['auth'],
+  roles: ['nti_admin', 'nti_superadmin'] 
 })
 
 useHead({ title: 'Exporty — Admin | NTI' })

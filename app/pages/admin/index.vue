@@ -74,9 +74,9 @@
 import { FileText, Users, UserPlus, CheckCircle, AlertCircle } from 'lucide-vue-next'
 
 definePageMeta({
-  layout: 'admin',
+  layout: 'portal',
   middleware: ['auth'],
-  roles: ['nti_admin']
+ roles: ['nti_admin', 'nti_superadmin'] 
 })
 
 useHead({ title: 'Dashboard — Admin | NTI' })

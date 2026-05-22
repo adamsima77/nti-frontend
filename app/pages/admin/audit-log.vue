@@ -36,8 +36,9 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'admin',
-  // middleware: ['auth'], // TODO: re-enable when backend is available
+  layout: 'portal',
+  middleware: ['auth'],
+  roles: ['nti_admin', 'nti_superadmin'] 
 })
 
 useHead({ title: 'Audit log — Admin | NTI' })
