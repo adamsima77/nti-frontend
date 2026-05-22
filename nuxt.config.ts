@@ -59,7 +59,8 @@ export default defineNuxtConfig({
     '/firma/**': { ssr: false },
     '/admin/**': { ssr: false },
     '/notifikacie/**': { ssr: false },
-    '/cms/**': { ssr: false }
+    '/cms/**': { ssr: false },
+    '/superadmin/**': { ssr: false }
   },
 
   i18n: {
