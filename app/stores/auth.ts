@@ -33,6 +33,7 @@ const enum UserStatus {
   INACTIVE           = 4,
   BANNED             = 5,
   PENDING_APPROVAL   = 6,
+  ANONYMIZED         = 7,
 }
 
 const ROLE_MAP: Record<string, string> = {

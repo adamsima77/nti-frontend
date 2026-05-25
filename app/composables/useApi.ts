@@ -22,7 +22,7 @@ export const useApi = () => {
         'X-Locale': loc,
       }
 
-      // ✅ Attach token only on client
+      // Attach token only on client
       const token = import.meta.client
         ? localStorage.getItem('_t')
         : null
@@ -34,34 +34,35 @@ export const useApi = () => {
         }
       }
 
-      // ✅ IMPORTANT: DO NOT override multipart requests
+      // DO NOT set Content-Type for FormData — let the browser set it with boundary
       const isFormData = options.body instanceof FormData
-
       if (!isFormData) {
         options.headers = {
           ...options.headers,
           'Content-Type': 'application/json',
         }
       }
-      // If FormData → let browser set Content-Type automatically
     },
 
-   async onResponseError({ response, request }) {
-  const isAuthMeRequest = String(request).includes('/auth/me')
-  if (response.status === 401 || (response.status === 500 && isAuthMeRequest)) {
-    // Don't redirect if this is the login request itself
-    const isLoginRequest = String(request).includes('/auth/login')
-    if (isLoginRequest) return
+    async onResponseError({ response, request }) {
+      if (response.status === 401) {
+        const isLoginRequest = String(request).includes('/auth/login')
+        if (isLoginRequest) return
 
-    if (import.meta.client) {
-      localStorage.removeItem('_t')
-    }
-    auth.user = null
+        if (import.meta.client) {
+          localStorage.removeItem('_t')
+        }
+        auth.user = null
 
-    const localePath = useLocalePath()
-    await navigateTo(localePath('/auth/login'))
-  }
-},
+        const localePath = useLocalePath()
+        await navigateTo(localePath('/auth/login'))
+        return
+      }
+
+      // For all other errors (422 validation, 500 server errors, etc.)
+      // do NOT swallow — let the error propagate so callers can catch it.
+      // The response data is available on the error object as e.data.
+    },
   })
 
   return {

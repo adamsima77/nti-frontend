@@ -11,7 +11,8 @@
           <p class="text-sm font-medium text-gray-800">Táto akcia je nevratná!</p>
           <p class="text-sm text-gray-600 mt-1">
             Naozaj chcete anonymizovať dáta používateľa
-            <strong>{{ user?.name }}</strong> ({{ user?.email }})? Všetky osobné údaje budú trvalo odstránené.
+            <strong>{{ user?.name }} {{ user?.surname }}</strong> ({{ user?.email }})?
+            Všetky osobné údaje budú trvalo odstránené.
           </p>
         </div>
       </div>
@@ -55,11 +56,10 @@
 
 <script setup lang="ts">
 import { AlertTriangle, X } from 'lucide-vue-next'
-import type { AdminUser } from '~/types/admin'
 
 const props = defineProps<{
   modelValue: boolean
-  user: AdminUser | null
+  user: any | null
 }>()
 
 const emit = defineEmits<{
@@ -75,8 +75,12 @@ async function handleAnonymize() {
   if (!props.user) return
   isProcessing.value = true
   try {
-    await api.delete(`/v1/admin/users/${props.user.id}/gdpr-delete`)
-    addToast({ message: `Používateľ ${props.user.name} bol anonymizovaný`, type: 'success' })
+    // Route: POST /users/anonymize-user/{id}
+    await api.post(`/users/anonymize-user/${props.user.id}`)
+    addToast({
+      message: `Používateľ ${props.user.name} ${props.user.surname} bol anonymizovaný`,
+      type: 'success',
+    })
     emit('anonymized')
     emit('update:modelValue', false)
   } catch {

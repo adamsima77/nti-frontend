@@ -1,74 +1,99 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold text-navy">Používatelia</h1>
-      <p class="text-gray-500 mt-1">Správa registrovaných používateľov a ich rolí</p>
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-navy">Používatelia</h1>
+        <p class="text-gray-500 mt-1">Správa registrovaných používateľov a ich rolí</p>
+      </div>
+      <UiButton @click="openCreateModal">
+        <Plus class="w-4 h-4 mr-1" />
+        Pridať používateľa
+      </UiButton>
     </div>
 
     <div class="bg-white rounded-lg border border-gray-200">
       <UiDataTable
         :columns="columns"
-        :rows="filteredUsers"
+        :rows="currentRows"
+        :sort-by="sortBy"
+        :sort-dir="sortDir"
         :loading="isLoading"
+        @update:sort-by="sortBy = $event"
+        @update:sort-dir="sortDir = $event"
+        @update:current-page="onPageChange"
       >
         <template #header>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 border-b border-gray-100">
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 border-b border-gray-100">
             <UiInput
               v-model="search"
               placeholder="Hľadať podľa mena alebo emailu..."
+              @input="onSearchInput"
             />
             <UiSelect
               v-model="roleFilter"
               :options="roleOptions"
               placeholder="Všetky role"
+              @change="onFilterChange"
             />
+            <UiSelect
+              v-model="statusFilter"
+              :options="statusOptions"
+              placeholder="Všetky stavy"
+              @change="onFilterChange"
+            />
+            <div class="flex items-center gap-3">
+              <button
+                v-if="hasActiveFilters"
+                class="flex items-center gap-1 text-sm text-gray-400 hover:text-danger-500 transition-colors"
+                title="Zrušiť filtre"
+                @click="resetFilters"
+              >
+                <X class="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </template>
 
-        <template #cell-role="{ value }">
-          <span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
-            {{ value }}
-          </span>
+        <template #cell-name="{ row }">
+          <span>{{ row.name }} {{ row.surname }}</span>
         </template>
 
-        <template #cell-name="{ row, value }">
-          <span :class="{ 'line-through text-gray-400': row.is_anonymized }">
-            {{ value }}
-          </span>
-          <span
-            v-if="row.is_anonymized"
-            class="ml-2 inline-block px-1.5 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-500"
-          >
-            anonymizovaný
-          </span>
+        <template #cell-roles="{ row }">
+          <div class="flex flex-wrap gap-1">
+            <span
+              v-for="role in row.roles"
+              :key="role.id"
+              class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700"
+            >
+              {{ roleLabel(role.name) }}
+            </span>
+          </div>
+        </template>
+
+        <template #cell-status="{ row }">
+          <UiStatusBadge v-if="row.status" :status="row.status.name" />
+        </template>
+
+        <template #cell-created_at="{ row }">
+          {{ formatDate(row.created_at) }}
         </template>
 
         <template #row-actions="{ row }">
           <div class="flex items-center gap-2">
             <button
               class="text-blue-600 hover:text-blue-800 text-sm"
-              title="Zobraziť"
-            >
-              <Eye class="w-4 h-4" />
-            </button>
-            <button
-              class="text-gray-400 hover:text-gray-600 text-sm"
               title="Upraviť"
+              :disabled="isSuperAdmin(row)"
+              :class="{ 'opacity-30 cursor-not-allowed': isSuperAdmin(row) }"
+              @click="!isSuperAdmin(row) && openEditModal(row)"
             >
               <Pencil class="w-4 h-4" />
             </button>
+
             <button
-              class="text-blue-600 hover:text-blue-800 text-sm"
-              title="GDPR export"
-              :disabled="row.is_anonymized"
-              @click="handleGdprExport(row)"
-            >
-              <Download class="w-4 h-4" />
-            </button>
-            <button
+              v-if="!isSuperAdmin(row)"
               class="text-gray-400 hover:text-danger-500 text-sm"
               title="GDPR anonymizácia"
-              :disabled="row.is_anonymized"
               @click="openAnonymizeModal(row)"
             >
               <UserX class="w-4 h-4" />
@@ -76,7 +101,30 @@
           </div>
         </template>
       </UiDataTable>
+
+      <div
+        v-if="pagination.totalPages > 1"
+        class="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50"
+      >
+        <span class="text-sm text-gray-500">
+          Celkovo: {{ pagination.total }} používateľov
+        </span>
+
+        <UiPagination
+          :current-page="pagination.currentPage"
+          :total-pages="pagination.totalPages"
+          @update:current-page="onPageChange"
+        />
+      </div>
     </div>
+
+    <AdminUserEditModal
+      v-model="showEditModal"
+      :user="selectedUser"
+      :roles="allRoles"
+      :statuses="allStatuses"
+      @saved="fetchUsers"
+    />
 
     <AdminGdprAnonymizeModal
       v-model="showAnonymizeModal"
@@ -87,13 +135,12 @@
 </template>
 
 <script setup lang="ts">
-import { Eye, Pencil, Download, UserX } from 'lucide-vue-next'
-import type { AdminUser } from '~/types/admin'
+import { Pencil, UserX, Plus, X } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
-  roles: ['nti_admin', 'nti_superadmin']
+  roles: ['nti_admin', 'nti_superadmin'],
 })
 
 useHead({ title: 'Používatelia — Admin | NTI' })
@@ -101,113 +148,185 @@ useHead({ title: 'Používatelia — Admin | NTI' })
 const api = useApi()
 const { addToast } = useToast()
 
+const allRoles = ref<any[]>([])
+const allStatuses = ref<any[]>([])
+
+const roleOptions = computed(() => [
+  { value: '', label: 'Všetky role' },
+  ...allRoles.value.map(r => ({
+    value: r.name,
+    label: r.display_name ?? r.name,
+  })),
+])
+
+const statusOptions = computed(() => [
+  { value: '', label: 'Všetky stavy' },
+  ...allStatuses.value.map(s => ({
+    value: String(s.id),
+    label: s.name,
+  })),
+])
+
+async function fetchMeta() {
+  const [rolesRes, statusesRes] = await Promise.all([
+    api.get('/roles') as Promise<any>,
+    api.get('/statuses') as Promise<any>,
+  ])
+
+  allRoles.value = rolesRes?.roles ?? []
+  allStatuses.value = statusesRes?.statuses ?? []
+}
+
+function roleLabel(name: string): string {
+  return allRoles.value.find(r => r.name === name)?.display_name ?? name
+}
+
+function formatDate(date: string) {
+  return new Date(date).toLocaleString('sk-SK', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 const search = ref('')
 const roleFilter = ref('')
-const isLoading = ref(false)
+const statusFilter = ref('')
+const sortBy = ref<string | null>(null)
+const sortDir = ref<'asc' | 'desc'>('asc')
+
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+
+const hasActiveFilters = computed(() =>
+  !!search.value ||
+  !!roleFilter.value ||
+  !!statusFilter.value
+)
+
+function resetFilters() {
+  search.value = ''
+  roleFilter.value = ''
+  statusFilter.value = ''
+
+  pagination.value.currentPage = 1
+
+  fetchUsers()
+}
+
+function isSuperAdmin(row: any): boolean {
+  return row.roles?.some((r: any) => r.name === 'nti_superadmin')
+}
 
 const columns = [
   { key: 'name', label: 'Meno', sortable: true },
   { key: 'email', label: 'Email', sortable: true },
-  { key: 'role', label: 'Rola', sortable: true },
-  { key: 'registered', label: 'Registrácia', sortable: true },
+  { key: 'roles', label: 'Role' },
+  { key: 'status', label: 'Stav' },
+  { key: 'created_at', label: 'Registrácia', sortable: true },
 ]
 
-const roleOptions = [
-  { value: '', label: 'Všetky role' },
-  { value: 'student', label: 'Študent' },
-  { value: 'team_lead', label: 'Team lead' },
-  { value: 'company', label: 'Firma' },
-  { value: 'mentor', label: 'Mentor' },
-  { value: 'evaluator', label: 'Hodnotiteľ' },
-  { value: 'content_editor', label: 'Editor obsahu' },
-  { value: 'nti_admin', label: 'NTI Admin' },
-  { value: 'super_admin', label: 'Super Admin' },
-]
+const isLoading = ref(false)
+const rows = ref<any[]>([])
 
-const mockUsers: AdminUser[] = [
-  { id: 1, name: 'Ján Novák', email: 'jan.novak@ukf.sk', role: 'student', registered: '12.01.2026' },
-  { id: 2, name: 'Mária Horváthová', email: 'maria.h@ukf.sk', role: 'student', registered: '15.01.2026' },
-  { id: 3, name: 'Peter Kráľ', email: 'peter.kral@ukf.sk', role: 'team_lead', registered: '20.01.2026' },
-  { id: 4, name: 'Eva Svobodová', email: 'eva.s@firma.sk', role: 'company', registered: '01.02.2026' },
-  { id: 5, name: 'Tomáš Beneš', email: 'tomas.b@ukf.sk', role: 'mentor', registered: '05.02.2026' },
-  { id: 6, name: 'Lucia Nemcová', email: 'lucia.n@ukf.sk', role: 'evaluator', registered: '10.02.2026' },
-  { id: 7, name: 'Marek Dvořák', email: 'marek.d@nti.sk', role: 'nti_admin', registered: '01.01.2026' },
-  { id: 8, name: 'Admin Systém', email: 'admin@nti.sk', role: 'super_admin', registered: '01.01.2026' },
-  {
-    id: 9,
-    name: 'Anonymizovaný používateľ',
-    email: 'anon-9@removed.local',
-    role: 'student',
-    registered: '05.11.2025',
-    is_anonymized: true,
-  },
-]
+const pagination = ref({
+  currentPage: 1,
+  totalPages: 1,
+  total: 0,
+  perPage: 15,
+})
 
-const users = ref<AdminUser[]>([...mockUsers])
+const currentRows = computed(() => {
+  if (!sortBy.value) return rows.value
 
-const filteredUsers = computed(() => {
-  return users.value.filter((u) => {
-    const matchSearch =
-      !search.value ||
-      u.name.toLowerCase().includes(search.value.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.value.toLowerCase())
-    const matchRole = !roleFilter.value || u.role === roleFilter.value
-    return matchSearch && matchRole
+  return [...rows.value].sort((a, b) => {
+    const av = a[sortBy.value!] ?? ''
+    const bv = b[sortBy.value!] ?? ''
+
+    const cmp = String(av).localeCompare(String(bv), 'sk', {
+      numeric: true,
+      sensitivity: 'base',
+    })
+
+    return sortDir.value === 'asc' ? cmp : -cmp
   })
 })
 
 async function fetchUsers() {
   isLoading.value = true
+
   try {
-    const response = await api.get('/v1/admin/users')
-    users.value = response.data || response || []
-  } catch {
-    // Keep existing data
+    const params: Record<string, any> = {
+      page: pagination.value.currentPage,
+      per_page: pagination.value.perPage,
+    }
+
+    if (search.value) params.search = search.value
+    if (roleFilter.value) params.role = roleFilter.value
+    if (statusFilter.value) params.status = statusFilter.value
+
+    const response = await api.get('/users', { params }) as any
+
+    rows.value = response?.data ?? []
+    pagination.value.total = response?.total ?? 0
+    pagination.value.currentPage = response?.current_page ?? 1
+    pagination.value.totalPages = response?.last_page ?? 1
   } finally {
     isLoading.value = false
   }
 }
 
-onMounted(() => fetchUsers())
-
-// GDPR
-const showAnonymizeModal = ref(false)
-const selectedUser = ref<AdminUser | null>(null)
-
-function openAnonymizeModal(user: AdminUser) {
-  selectedUser.value = user
-  showAnonymizeModal.value = true
+function onPageChange(page: number) {
+  pagination.value.currentPage = page
+  fetchUsers()
 }
 
-async function handleGdprExport(user: AdminUser) {
-  addToast({ message: `Generujem GDPR export pre ${user.name}...`, type: 'info' })
+function onFilterChange() {
+  pagination.value.currentPage = 1
+  fetchUsers()
+}
+
+function onSearchInput() {
+  if (searchTimeout) clearTimeout(searchTimeout)
+
+  searchTimeout = setTimeout(() => {
+    pagination.value.currentPage = 1
+    fetchUsers()
+  }, 400)
+}
+
+onMounted(async () => {
+  await fetchMeta()
+  fetchUsers()
+})
+
+const showEditModal = ref(false)
+const showAnonymizeModal = ref(false)
+const selectedUser = ref<any>(null)
+
+function openCreateModal() {
+  selectedUser.value = null
+  showEditModal.value = true
+}
+
+async function openEditModal(row: any) {
   try {
-    const config = useRuntimeConfig()
-    const apiBase = config.public.apiBase || 'http://localhost:8000/api'
-    const authStore = useAuthStore()
-    const response = await fetch(`${apiBase}/v1/admin/users/${user.id}/gdpr-export`, {
-      method: 'POST',
-      headers: {
-        ...(authStore.token ? { Authorization: `Bearer ${authStore.token}` } : {}),
-      },
-      credentials: 'include',
-    })
-
-    if (!response.ok) throw new Error('Export failed')
-
-    const blob = await response.blob()
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `gdpr-export-${user.id}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-
-    addToast({ message: 'GDPR export bol stiahnutý', type: 'success' })
+    isLoading.value = true
+    selectedUser.value = await api.get(`/users/${row.id}`)
+    showEditModal.value = true
   } catch {
-    addToast({ message: 'Nepodarilo sa vygenerovať GDPR export', type: 'error' })
+    addToast({
+      message: 'Nepodarilo sa načítať používateľa',
+      type: 'error',
+    })
+  } finally {
+    isLoading.value = false
   }
+}
+
+function openAnonymizeModal(row: any) {
+  selectedUser.value = row
+  showAnonymizeModal.value = true
 }
 </script>
