@@ -1,12 +1,26 @@
 <!-- pages/mentor/projekty/[id].vue -->
 <template>
   <div class="max-w-5xl mx-auto px-6 py-10">
+    <div
+      v-if="loading"
+      class="mb-6 rounded-lg border border-gray-100 bg-white p-4 text-sm text-gray-500"
+    >
+      {{ t('mentor.detail.loading') }}
+    </div>
+
+    <div
+      v-else-if="pageError"
+      class="mb-6 rounded-lg border border-danger-200 bg-danger-50 p-4 text-sm text-danger-700"
+    >
+      {{ pageError }}
+    </div>
+
     <!-- Back -->
     <NuxtLink
       :to="localePath('/mentor/projekty')"
       class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-navy transition-colors mb-6"
     >
-      <ChevronLeft class="w-4 h-4" /> Späť na projekty
+      <ChevronLeft class="w-4 h-4" /> {{ t('mentor.detail.back') }}
     </NuxtLink>
 
     <!-- Project header -->
@@ -22,13 +36,15 @@
             {{ project.program }}
           </span>
         </div>
-        <p class="text-gray-500 text-sm">{{ project.teamName }} · Priradený {{ project.assignedAt }}</p>
+        <p class="text-gray-500 text-sm">
+          {{ project.teamName }} · {{ t('mentor.dashboard.assignedAt', { date: project.assignedAt }) }}
+        </p>
       </div>
       <button
         @click="showConsultationModal = true"
         class="shrink-0 inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
       >
-        <Plus class="w-4 h-4" /> Nová konzultácia
+        <Plus class="w-4 h-4" /> {{ t('mentor.detail.newConsultation') }}
       </button>
     </div>
 
@@ -39,19 +55,22 @@
         <div class="bg-white rounded-lg border border-gray-100 p-6">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-semibold text-navy flex items-center gap-2">
-              <Flag class="w-4 h-4 text-purple-500" /> Míľniky projektu
+              <Flag class="w-4 h-4 text-purple-500" /> {{ t('mentor.detail.milestones') }}
             </h2>
             <span class="text-xs text-gray-400"
-              >{{ completedMilestones }}/{{ project.milestones.length }} dokončených</span
+              >{{ completedMilestones }}/{{ project.milestones.length }} {{ t('mentor.detail.completed') }}</span
             >
           </div>
 
           <div class="space-y-3">
             <div
-              v-for="milestone in project.milestones"
+              v-for="(milestone, milestoneIndex) in project.milestones"
               :key="milestone.id"
               class="border rounded-lg p-4 transition-all"
-              :class="milestoneCardClass(milestone.status)"
+              :class="[
+                milestoneCardClass(milestone.status),
+                isMilestoneLocked(milestone, milestoneIndex) ? 'opacity-60' : '',
+              ]"
             >
               <div class="flex items-start justify-between gap-3 mb-2">
                 <div class="flex items-start gap-3">
@@ -72,30 +91,38 @@
                   </div>
                   <div>
                     <p class="font-medium text-navy text-sm">{{ milestone.title }}</p>
-                    <p class="text-xs text-gray-500 mt-0.5">Termín: {{ milestone.dueDate }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">
+                      {{ t('mentor.detail.dueDateLabel', { date: milestone.dueDate }) }}
+                    </p>
                   </div>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
                   <UiStatusBadge :status="milestoneStatusValue(milestone.status)" />
-                  <!-- Approve/reject actions for pending -->
-                  <template v-if="milestone.status === 'pending_approval'">
+                  <template v-if="canReviewMilestone(milestone, milestoneIndex)">
                     <button
                       @click="handleMilestoneAction(milestone.id, 'approve')"
                       :disabled="milestoneLoading === milestone.id"
                       class="inline-flex items-center gap-1 px-2.5 py-1 bg-success-50 text-success-600 hover:bg-success-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
                     >
-                      <CheckCircle class="w-3.5 h-3.5" /> Schváliť
+                      <CheckCircle class="w-3.5 h-3.5" /> {{ t('mentor.detail.approve') }}
                     </button>
                     <button
                       @click="handleMilestoneAction(milestone.id, 'reject')"
                       :disabled="milestoneLoading === milestone.id"
                       class="inline-flex items-center gap-1 px-2.5 py-1 bg-danger-50 text-danger-600 hover:bg-danger-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
                     >
-                      <X class="w-3.5 h-3.5" /> Vrátiť
+                      <X class="w-3.5 h-3.5" /> {{ t('mentor.detail.reject') }}
                     </button>
                   </template>
                 </div>
               </div>
+
+              <p
+                v-if="isMilestoneLocked(milestone, milestoneIndex)"
+                class="ml-8 mt-2 text-xs text-gray-500"
+              >
+                {{ milestoneLockedMessage(milestone, milestoneIndex) }}
+              </p>
 
               <!-- Description -->
               <p
@@ -130,12 +157,15 @@
                 </div>
               </div>
 
-              <!-- Add comment inline -->
-              <div class="ml-8 mt-2 flex gap-2">
+              <!-- Add comment inline (review / reject only) -->
+              <div
+                v-if="canReviewMilestone(milestone, milestoneIndex)"
+                class="ml-8 mt-2 flex gap-2"
+              >
                 <input
                   v-model="newComment[milestone.id]"
                   type="text"
-                  placeholder="Pridať komentár k míľniku..."
+                  :placeholder="t('mentor.detail.commentPlaceholder')"
                   @keydown.enter.prevent="addComment(milestone.id)"
                   class="flex-1 px-3 py-1.5 rounded border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
                 />
@@ -154,7 +184,7 @@
         <!-- Consultation log -->
         <div class="bg-white rounded-lg border border-gray-100 p-6">
           <h2 class="text-base font-semibold text-navy flex items-center gap-2 mb-4">
-            <MessageSquare class="w-4 h-4 text-purple-500" /> Záznamy z konzultácií
+            <MessageSquare class="w-4 h-4 text-purple-500" /> {{ t('mentor.detail.consultations') }}
           </h2>
 
           <div class="space-y-4">
@@ -180,7 +210,7 @@
                 v-if="c.actionItems.length"
                 class="space-y-1"
               >
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Úlohy</p>
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ t('mentor.detail.tasks') }}</p>
                 <ul class="space-y-1">
                   <li
                     v-for="item in c.actionItems"
@@ -193,11 +223,11 @@
               </div>
             </div>
 
-            <div
-              v-if="!project.consultations.length"
+              <div
+                v-if="!project.consultations.length"
               class="text-center py-8 text-sm text-gray-400"
             >
-              Zatiaľ žiadne konzultácie — pridajte prvý záznam.
+                {{ t('mentor.detail.noConsultations') }}
             </div>
           </div>
         </div>
@@ -207,7 +237,7 @@
       <div class="space-y-4">
         <!-- Team info -->
         <div class="bg-white rounded-lg border border-gray-100 p-5">
-          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Tím</h3>
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('mentor.detail.team') }}</h3>
           <div class="space-y-2">
             <div
               v-for="member in project.teamMembers"
@@ -234,7 +264,7 @@
 
         <!-- Progress card -->
         <div class="bg-white rounded-lg border border-gray-100 p-5">
-          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Postup</h3>
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('mentor.detail.progress') }}</h3>
           <div class="text-3xl font-bold text-navy mb-1">
             {{ Math.round((completedMilestones / project.milestones.length) * 100) }}%
           </div>
@@ -244,26 +274,33 @@
               :style="{ width: `${(completedMilestones / project.milestones.length) * 100}%` }"
             />
           </div>
-          <p class="text-xs text-gray-400">{{ completedMilestones }} z {{ project.milestones.length }} míľnikov</p>
+          <p class="text-xs text-gray-400">
+            {{
+              t('mentor.detail.milestonesOf', {
+                completed: completedMilestones,
+                total: project.milestones.length,
+              })
+            }}
+          </p>
         </div>
 
         <!-- Quick stats -->
         <div class="bg-white rounded-lg border border-gray-100 p-5 space-y-3">
-          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Štatistiky</h3>
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">{{ t('mentor.detail.statsTitle') }}</h3>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Konzultácie</span>
+            <span class="text-gray-500">{{ t('mentor.detail.consultations') }}</span>
             <span class="font-medium text-navy">{{ project.consultations.length }}</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Celkový čas</span>
+            <span class="text-gray-500">{{ t('mentor.detail.totalTime') }}</span>
             <span class="font-medium text-navy">{{ totalConsultationTime }} min</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Posledná konzultácia</span>
+            <span class="text-gray-500">{{ t('mentor.detail.lastConsultation') }}</span>
             <span class="font-medium text-navy">{{ project.consultations[0]?.date ?? '—' }}</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Program</span>
+            <span class="text-gray-500">{{ t('mentor.detail.program') }}</span>
             <span class="font-medium text-navy">{{ project.program }}</span>
           </div>
         </div>
@@ -273,7 +310,7 @@
           v-if="project.productOwner"
           class="bg-purple-50 border border-purple-100 rounded-lg p-5"
         >
-          <h3 class="text-sm font-semibold text-purple-800 mb-2">Product Owner</h3>
+          <h3 class="text-sm font-semibold text-purple-800 mb-2">{{ t('mentor.detail.productOwner') }}</h3>
           <p class="font-medium text-purple-900 text-sm">{{ project.productOwner.name }}</p>
           <p class="text-xs text-purple-600 mt-0.5">{{ project.productOwner.email }}</p>
         </div>
@@ -292,7 +329,7 @@
       <div class="relative bg-white rounded-xl shadow-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-5">
           <h3 class="font-semibold text-navy text-lg">
-            {{ editingConsultation ? 'Upraviť konzultáciu' : 'Nová konzultácia' }}
+            {{ editingConsultation ? t('mentor.detail.editConsultation') : t('mentor.detail.newConsultationTitle') }}
           </h3>
           <button
             @click="closeConsultationModal"
@@ -307,8 +344,8 @@
             :field="{
               name: 'title',
               type: 'text',
-              label: 'Názov / téma',
-              placeholder: 'Napr. Review sprint 2, Architektúra databázy',
+              label: t('mentor.detail.topic'),
+              placeholder: t('mentor.detail.topicPlaceholder'),
               required: true,
             }"
             v-model="consultationForm.title"
@@ -316,12 +353,12 @@
           />
           <div class="grid grid-cols-2 gap-4">
             <FormField
-              :field="{ name: 'date', type: 'date', label: 'Dátum', required: true }"
+              :field="{ name: 'date', type: 'date', label: t('mentor.detail.date'), required: true }"
               v-model="consultationForm.date"
               :error="consultationErrors.date ?? undefined"
             />
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Trvanie (min)</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor.detail.duration') }}</label>
               <input
                 v-model.number="consultationForm.duration"
                 type="number"
@@ -335,11 +372,11 @@
             :field="{
               name: 'type',
               type: 'select',
-              label: 'Typ konzultácie',
+              label: t('mentor.detail.type'),
               options: [
-                { value: 'online', label: 'Online (videohovor)' },
-                { value: 'personal', label: 'Osobne' },
-                { value: 'written', label: 'Písomná / e-mail' },
+                { value: 'online', label: t('mentor.detail.typeOnline') },
+                { value: 'personal', label: t('mentor.detail.typePersonal') },
+                { value: 'written', label: t('mentor.detail.typeWritten') },
               ],
               required: true,
             }"
@@ -349,8 +386,8 @@
             :field="{
               name: 'summary',
               type: 'textarea',
-              label: 'Záznam / zhrnutie',
-              placeholder: 'Čo sa riešilo, aké závery padli, na čom tím pracuje...',
+              label: t('mentor.detail.record'),
+              placeholder: t('mentor.detail.recordPlaceholder'),
               required: true,
             }"
             v-model="consultationForm.summary"
@@ -359,7 +396,7 @@
 
           <!-- Action items -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Úlohy pre tím</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor.detail.tasks') }}</label>
             <div class="space-y-2">
               <div
                 v-for="(_, i) in consultationForm.actionItems"
@@ -369,7 +406,7 @@
                 <input
                   v-model="consultationForm.actionItems[i]"
                   type="text"
-                  placeholder="Napr. Dopracovať databázovú schému do piatku"
+                  :placeholder="t('mentor.detail.taskPlaceholder')"
                   class="flex-1 px-3 py-2 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
                 />
                 <button
@@ -385,7 +422,7 @@
                 @click="consultationForm.actionItems.push('')"
                 class="inline-flex items-center gap-1.5 text-sm text-purple-600 hover:text-purple-800"
               >
-                <Plus class="w-4 h-4" /> Pridať úlohu
+                <Plus class="w-4 h-4" /> {{ t('mentor.detail.addTask') }}
               </button>
             </div>
           </div>
@@ -403,7 +440,7 @@
             @click="closeConsultationModal"
             class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50"
           >
-            Zrušiť
+            {{ t('mentor.detail.cancel') }}
           </button>
           <button
             @click="saveConsultation"
@@ -430,7 +467,7 @@
                 d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
               />
             </svg>
-            {{ isSavingConsultation ? 'Ukladám...' : 'Uložiť záznam' }}
+            {{ isSavingConsultation ? t('mentor.detail.saving') : t('mentor.detail.save') }}
           </button>
         </div>
       </div>
@@ -439,7 +476,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import {
   ChevronLeft,
   Flag,
@@ -455,124 +492,94 @@ import {
   AlertCircle,
   Users,
 } from 'lucide-vue-next'
+import type { Consultation, MentorProject, Milestone, MilestoneComment } from '../../../types/mentor'
+import { useMentorDashboard } from '../../../composables/useMentorDashboard'
 
+definePageMeta({
+  layout: 'portal',
+})
+
+const { t } = useI18n()
 const localePath = useLocalePath()
 const route = useRoute()
+const api = useApi()
+const { addToast } = useToast()
 
-useHead({ title: 'Detail projektu | NTI Mentor' })
-
-const authStore = useAuthStore()
-
-// TODO: remove when backend is available
-if (!authStore.user) {
-  authStore.user = {
-    id: 10,
-    email: 'mentor@nti.sk',
-    first_name: 'Matej',
-    last_name: 'Novotný',
-    role: 'mentor',
-  }
-  authStore.token = 'mock-token'
+type MentorProjectDetail = MentorProject & {
+  productOwner?: { name: string; email?: string | null } | null
+  teamMembers?: Array<{ id: number; name: string; role: string }>
+  consultations: Consultation[]
+  milestones: Array<Milestone & { comments: MilestoneComment[] }>
 }
 
-// ── Mock project data ────────────────────────────────────────
-const project = reactive({
-  id: Number(route.params.projectId),
-  name: 'AI chatbot pre zákaznícku podporu',
-  teamName: 'AI Innovators',
-  program: 'Program B',
-  status: 'active',
-  assignedAt: '01.03.2026',
-  productOwner: { name: 'Peter Kováč', email: 'peter.kovac@techfirma.sk' },
-  teamMembers: [
-    { id: 1, name: 'Tomáš Horváth', role: 'Vedúci tímu' },
-    { id: 2, name: 'Lucia Free', role: 'Backend developer' },
-    { id: 3, name: 'Marek Blaho', role: 'Frontend developer' },
-  ],
-  milestones: [
-    {
-      id: 1,
-      title: 'Analýza a návrh architektúry',
-      dueDate: '20.03.2026',
-      status: 'completed',
-      description: 'Dokumentácia technickej architektúry, ERD diagram, API kontrakt.',
-      comments: [
-        {
-          id: 1,
-          author: 'Martin Kováč',
-          date: '21.03.2026',
-          text: 'Skvelá práca, architektúra je čistá. Odporúčam pridať rate limiting do API kontraktu.',
-        },
-        { id: 2, author: 'Tomáš Horváth', date: '21.03.2026', text: 'Zapracované, ďakujeme za feedback.' },
-      ],
-    },
-    {
-      id: 2,
-      title: 'MVP — funkčný chatbot',
-      dueDate: '30.04.2026',
-      status: 'pending_approval',
-      description: 'Základná funkcionalita chatbota s integráciou OpenAI API a jednoduchou webovou konzolou.',
-      comments: [
-        { id: 3, author: 'Tomáš Horváth', date: '01.04.2026', text: 'MVP je hotový, čakáme na schválenie mentora.' },
-      ],
-    },
-    {
-      id: 3,
-      title: 'Integrácia so Salesforce CRM',
-      dueDate: '31.05.2026',
-      status: 'in_progress',
-      description: 'Napojenie chatbota na zákaznícke dáta v Salesforce cez REST API.',
-      comments: [],
-    },
-    {
-      id: 4,
-      title: 'Finálne odovzdanie',
-      dueDate: '30.06.2026',
-      status: 'pending',
-      description: 'Produkčný deployment, dokumentácia, záverečná prezentácia.',
-      comments: [],
-    },
-  ],
-  consultations: [
-    {
-      id: 1,
-      title: 'Kick-off konzultácia',
-      date: '05.03.2026',
-      duration: 90,
-      type: 'Osobne',
-      summary:
-        'Úvodné stretnutie s tímom. Predstavenie projektu, definícia cieľov, rozdelenie rolí. Dohodnutý spôsob komunikácie (Slack + týždenné sync).',
-      actionItems: ['Vytvoriť repo a nastaviť CI/CD pipeline', 'Pripraviť technickú špecifikáciu do 10.03.'],
-    },
-    {
-      id: 2,
-      title: 'Review architektúry',
-      date: '22.03.2026',
-      duration: 60,
-      type: 'Online (videohovor)',
-      summary:
-        'Tím prezentoval návrh architektúry. Diskusia o voľbe LLM providera (OpenAI vs. self-hosted). Rozhodnutie: OpenAI API pre MVP, self-hosted pre produkciu.',
-      actionItems: ['Pridať rate limiting do API dizajnu', 'Zdokumentovať fallback scenáre pre API výpadok'],
-    },
-    {
-      id: 3,
-      title: 'Sprint review #2',
-      date: '01.04.2026',
-      duration: 45,
-      type: 'Online (videohovor)',
-      summary:
-        'Tím predviedol funkčnú demo verziu chatbota. Kvalita odpovedí je dobrá. Chýba handling edge-case otázok mimo scope. Odoslaný na schválenie míľnika.',
-      actionItems: [
-        'Otestovať edge cases a pridať fallback odpovede',
-        'Pripraviť dokumentáciu pre Salesforce integráciu',
-      ],
-    },
-  ],
+useHead({ title: t('mentor.detail.pageTitle') })
+
+const project = reactive<MentorProjectDetail>({
+  id: Number(route.params.id),
+  name: '',
+  teamName: '',
+  program: '',
+  status: 'draft',
+  assignedAt: '',
+  productOwner: null,
+  teamMembers: [],
+  milestones: [],
+  consultations: [],
 })
+
+const loading = ref(false)
+const pageError = ref<string | null>(null)
+const {
+  projects: mentorProjects,
+  fetchProjects,
+  fetchDashboard,
+  fetchMilestones,
+  fetchConsultations,
+  updateMilestoneStatus,
+} = useMentorDashboard()
+
+const loadProject = async () => {
+  loading.value = true
+  pageError.value = null
+
+  try {
+    if (!mentorProjects.value.length) {
+      await fetchProjects()
+    }
+
+    const found = mentorProjects.value.find((item: MentorProject) => item.id === project.id)
+    if (!found) {
+      pageError.value = t('mentor.detail.errors.notFound')
+      return
+    }
+
+    Object.assign(project, {
+      ...found,
+      productOwner: found.productOwner ?? null,
+      teamMembers: found.teamMembers ?? [],
+      milestones: found.milestones ?? [],
+      consultations: [],
+    })
+
+    const [milestones, consultations] = await Promise.all([
+      fetchMilestones(project.id),
+      fetchConsultations(project.id),
+    ])
+
+    if (milestones) project.milestones = milestones as MentorProjectDetail['milestones']
+    if (consultations) project.consultations = consultations
+  } catch {
+    pageError.value = t('mentor.detail.errors.loadFailed')
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(loadProject)
 
 // ── Computed ─────────────────────────────────────────────────
 const completedMilestones = computed(() => project.milestones.filter((m) => m.status === 'completed').length)
-const totalConsultationTime = computed(() => project.consultations.reduce((s, c) => s + c.duration, 0))
+const totalConsultationTime = computed(() => project.consultations.reduce((sum, consultation) => sum + consultation.duration, 0))
 
 // ── Milestone helpers ─────────────────────────────────────────
 const milestoneLoading = ref<number | null>(null)
@@ -581,26 +588,61 @@ const newComment = reactive<Record<number, string>>({})
 const milestoneStatusValue = (status: string) =>
   ({
     completed: 'approved',
-    pending_approval: 'pending',
+    pending_approval: 'pending_approval',
     in_progress: 'active',
+    rejected: 'rejected',
     pending: 'draft',
   })[status] ?? 'draft'
+
+const priorMilestonesIncomplete = (index: number) =>
+  project.milestones.slice(0, index).some((m) => m.status !== 'completed')
+
+const canReviewMilestone = (milestone: { status: string }, index: number) =>
+  milestone.status === 'pending_approval' && !priorMilestonesIncomplete(index)
+
+const isMilestoneLocked = (milestone: { status: string }, index: number) => {
+  if (milestone.status === 'completed') return false
+  if (canReviewMilestone(milestone, index)) return false
+  return true
+}
+
+const milestoneLockedMessage = (milestone: { status: string }, index: number) => {
+  if (priorMilestonesIncomplete(index)) return t('mentor.detail.lockedPrevious')
+  if (milestone.status === 'in_progress') return t('mentor.detail.lockedInProgress')
+  if (milestone.status === 'pending') return t('mentor.detail.lockedDraft')
+  return t('mentor.detail.lockedDefault')
+}
 
 const milestoneCardClass = (status: string) =>
   ({
     completed: 'border-success-200 bg-success-50/30',
     pending_approval: 'border-warning-200 bg-warning-50/30',
     in_progress: 'border-blue-200 bg-blue-50/30',
+    rejected: 'border-danger-200 bg-danger-50/30',
     pending: 'border-gray-100 bg-white',
   })[status] ?? 'border-gray-100'
 
 const handleMilestoneAction = async (milestoneId: number, action: 'approve' | 'reject') => {
+  if (action === 'reject') {
+    const comment = newComment[milestoneId]?.trim() ?? ''
+    if (comment.length < 20) {
+      addToast({ message: t('mentor.detail.errors.rejectCommentRequired'), type: 'error' })
+      return
+    }
+  }
+
   milestoneLoading.value = milestoneId
   try {
-    // TODO: await api.patch(`/mentor/milestones/${milestoneId}`, { action })
-    await new Promise((r) => setTimeout(r, 600))
-    const m = project.milestones.find((m) => m.id === milestoneId)
-    if (m) m.status = action === 'approve' ? 'completed' : 'in_progress'
+    await updateMilestoneStatus(
+      project.id,
+      milestoneId,
+      action === 'approve' ? 'completed' : 'rejected',
+      action === 'reject' ? newComment[milestoneId]?.trim() : undefined,
+    )
+    if (action === 'reject') newComment[milestoneId] = ''
+    // Keep dashboard + project list in sync (pending actions, pendingMilestone flag, stats).
+    await Promise.all([fetchProjects(), fetchDashboard()])
+    await loadProject()
   } finally {
     milestoneLoading.value = null
   }
@@ -609,12 +651,11 @@ const handleMilestoneAction = async (milestoneId: number, action: 'approve' | 'r
 const addComment = async (milestoneId: number) => {
   const text = newComment[milestoneId]?.trim()
   if (!text) return
-  // TODO: await api.post(`/mentor/milestones/${milestoneId}/comments`, { text })
   const m = project.milestones.find((m) => m.id === milestoneId)
   if (m) {
     m.comments.push({
       id: Date.now(),
-      author: 'Martin Kováč',
+      author: 'Mentor',
       date: new Date().toLocaleDateString('sk-SK'),
       text,
     })
@@ -647,7 +688,7 @@ const editConsultation = (c: any) => {
     title: c.title,
     date: c.date,
     duration: c.duration,
-    type: c.type === 'Osobne' ? 'personal' : c.type === 'Online (videohovor)' ? 'online' : 'written',
+    type: normalizeConsultationType(c.type),
     summary: c.summary,
     actionItems: [...c.actionItems, ''],
   })
@@ -678,41 +719,38 @@ const validateConsultation = () => {
 const typeLabel = (type: string) =>
   ({ online: 'Online (videohovor)', personal: 'Osobne', written: 'Písomná / e-mail' })[type] ?? type
 
+const normalizeConsultationType = (type: string) =>
+  ({
+    online: 'online',
+    personal: 'personal',
+    written: 'written',
+    'Online (videohovor)': 'online',
+    Osobne: 'personal',
+    'Písomná / e-mail': 'written',
+  })[type] ?? 'written'
+
 const saveConsultation = async () => {
   if (!validateConsultation()) return
   isSavingConsultation.value = true
   consultationError.value = null
   try {
-    // TODO: await api.post/put(`/mentor/projects/${project.id}/consultations`, consultationForm)
-    await new Promise((r) => setTimeout(r, 700))
     const items = consultationForm.actionItems.filter((i) => i.trim())
-    if (editingConsultation.value) {
-      const idx = project.consultations.findIndex((c) => c.id === editingConsultation.value.id)
-      if (idx !== -1) {
-        project.consultations[idx] = {
-          id: project.consultations[idx]!.id,
-          title: consultationForm.title,
-          date: consultationForm.date,
-          duration: consultationForm.duration,
-          type: typeLabel(consultationForm.type),
-          summary: consultationForm.summary,
-          actionItems: items,
-        }
-      }
-    } else {
-      project.consultations.unshift({
-        id: Date.now(),
-        title: consultationForm.title,
-        date: consultationForm.date,
-        duration: consultationForm.duration,
-        type: typeLabel(consultationForm.type),
-        summary: consultationForm.summary,
-        actionItems: items,
-      })
-    }
+    await api.post(`/mentor/projects/${project.id}/consultations`, {
+      note: [
+        consultationForm.title.trim(),
+        `Dátum: ${consultationForm.date}`,
+        `Typ: ${typeLabel(consultationForm.type)}`,
+        `Trvanie: ${consultationForm.duration} min`,
+        consultationForm.summary.trim(),
+        items.length ? `Úlohy: ${items.join('; ')}` : '',
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    })
+    await loadProject()
     closeConsultationModal()
   } catch {
-    consultationError.value = 'Nastala chyba pri ukladaní.'
+    consultationError.value = t('mentor.detail.errors.saveFailed')
   } finally {
     isSavingConsultation.value = false
   }

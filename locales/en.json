@@ -1413,7 +1413,12 @@
       "tasks": "Tasks assigned"
     },
     "noEntries": "No entries",
-    "tryFilters": "Try changing filters or add a new consultation"
+    "tryFilters": "Try changing filters or add a new consultation",
+    "types": {
+      "online": "Online",
+      "personal": "In person",
+      "written": "Written"
+    }
   },
   "consultationForm": {
     "pageTitle": "New consultation | NTI Mentor",
@@ -1578,7 +1583,12 @@
       "tasks": "Tasks assigned"
     },
     "noEntries": "No entries",
-    "tryFilters": "Try changing filters or add a new consultation"
+    "tryFilters": "Try changing filters or add a new consultation",
+    "types": {
+      "online": "Online",
+      "personal": "In person",
+      "written": "Written"
+    }
   },
   "consultationForm": {
     "pageTitle": "New consultation | NTI Mentor",
@@ -1661,7 +1671,8 @@
     "errors": {
       "notFound": "The project was not found or you do not have access to it.",
       "loadFailed": "Failed to load project detail.",
-      "saveFailed": "An error occurred while saving."
+      "saveFailed": "An error occurred while saving.",
+      "rejectCommentRequired": "A comment is required when rejecting a milestone (min. 20 characters)."
     }
   }
  },

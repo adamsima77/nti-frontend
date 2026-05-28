@@ -64,20 +64,12 @@
       </div>
     </div>
 
-    <div class="mt-4 text-right">
-      <button
-        @click="clearAll"
-        class="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-800 transition"
-      >
-        Vymazať všetky
-      </button>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Users, MessageSquare, Flag, Clock, ChevronRight, AlertTriangle } from 'lucide-vue-next'
+import { ref, computed, onMounted } from 'vue'
+import { Users, MessageSquare, Flag, AlertTriangle, Clock } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
@@ -86,9 +78,6 @@ definePageMeta({
 
 useHead({ title: 'Notifikácie | NTI' })
 
-const authStore = useAuthStore()
-const userRole = authStore.user?.role || 'student'
-
 const availableTypes = [
   { value: 'project', label: 'Projekty' },
   { value: 'milestone', label: 'Míľniky' },
@@ -96,51 +85,25 @@ const availableTypes = [
   { value: 'system_alert', label: 'Systém' },
 ]
 
-const notifications = ref([
-  {
-    id: 1,
-    type: 'project',
-    title: 'Nový projekt',
-    message: 'EcoTrack priradený',
-    date: '02.04.2026',
-    read: false,
-    roles: ['mentor', 'student'],
-  },
-  {
-    id: 2,
-    type: 'milestone',
-    title: 'Míľnik čaká na schválenie',
-    message: 'AI chatbot – MVP',
-    date: '01.04.2026',
-    read: false,
-    roles: ['mentor', 'evaluator'],
-  },
-  {
-    id: 3,
-    type: 'consultation',
-    title: 'Nová konzultácia',
-    message: 'EcoTrack review',
-    date: '28.03.2026',
-    read: true,
-    roles: ['mentor'],
-  },
-  {
-    id: 4,
-    type: 'system_alert',
-    title: 'Údržba systému',
-    message: 'Downtime 04.04.2026 02:00–04:00',
-    date: '03.04.2026',
-    read: false,
-    roles: ['admin', 'superadmin', 'mentor', 'student'],
-  },
-])
+const { notifications: apiNotifications, fetchNotifications, markAsRead } = useNotifications()
+
+onMounted(fetchNotifications)
+
+const notifications = computed(() =>
+  apiNotifications.value.map((n) => ({
+    id: n.id,
+    type: n.category ?? 'system_alert',
+    title: n.title,
+    message: n.body,
+    date: n.createdAt ? new Date(n.createdAt).toLocaleDateString('sk-SK') : '',
+    read: n.read,
+  })),
+)
 
 const filterType = ref<'all' | string>('all')
 
 const filteredNotifications = computed(() =>
-  notifications.value.filter(
-    (n) => n.roles.includes(userRole) && (filterType.value === 'all' || n.type === filterType.value),
-  ),
+  notifications.value.filter((n) => filterType.value === 'all' || n.type === filterType.value),
 )
 
 const notificationIcon = (type: string) => {
@@ -173,12 +136,9 @@ const notificationColor = (type: string) => {
   }
 }
 
-const toggleRead = (id: number) => {
-  const n = notifications.value.find((n) => n.id === id)
-  if (n) n.read = !n.read
-}
-
-const clearAll = () => {
-  notifications.value = []
+const toggleRead = async (id: number) => {
+  const n = notifications.value.find((item) => item.id === id)
+  if (!n || n.read) return
+  await markAsRead(id)
 }
 </script>

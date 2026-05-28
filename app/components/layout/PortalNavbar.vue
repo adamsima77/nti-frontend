@@ -17,22 +17,22 @@
       <!-- Locale Switcher - shown on md+ screens -->
       <div class="hidden md:flex items-center gap-1 ml-4">
         <button
-          @click="setLocale('en')"
           :class="[
             'px-2 py-1 text-xs font-medium rounded transition-colors duration-200',
             locale === 'en' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
           ]"
           :title="$t('locale.en_title')"
+          @click="setLocale('en')"
         >
           EN
         </button>
         <button
-          @click="setLocale('sk')"
           :class="[
             'px-2 py-1 text-xs font-medium rounded transition-colors duration-200',
             locale === 'sk' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
           ]"
           :title="$t('locale.sk_title')"
+          @click="setLocale('sk')"
         >
           SK
         </button>
@@ -40,8 +40,8 @@
     </div>
 
     <div
-      class="flex items-center gap-2 sm:gap-3 md:gap-4"
       ref="dropdownRef"
+      class="flex items-center gap-2 sm:gap-3 md:gap-4"
     >
       <button
         class="text-gray-500 hover:text-navy transition-colors relative"
@@ -86,36 +86,28 @@
           </div>
           <div v-else>
             <div
-              v-for="(n, index) in notifications"
-              :key="index"
+              v-for="n in notifications"
+              :key="n.id"
               class="flex items-center justify-between px-4 py-3 text-xs sm:text-sm hover:bg-gray-50 border-b border-gray-100 active:scale-[0.99]"
             >
               <NuxtLink
-                :to="n.link || ''"
-                class="flex items-center justify-between w-full gap-2"
+                to="/notifikacie"
+                class="flex flex-col flex-1 min-w-0 gap-0.5"
                 @click="showNotifications = false"
               >
                 <div :class="n.read ? 'text-gray-500 text-xs sm:text-sm' : 'text-navy font-medium text-xs sm:text-sm'">
                   {{ n.title }}
                 </div>
-                <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-navy transition-colors" />
+                <p class="text-xs text-gray-400 truncate">{{ n.body }}</p>
               </NuxtLink>
 
               <button
                 v-if="!n.read"
-                @click.stop="markAsRead(index)"
-                class="text-green-500 hover:text-green-600 ml-2"
+                class="text-green-500 hover:text-green-600 ml-2 shrink-0"
                 :title="$t('portal.mark_as_read')"
+                @click.stop="handleMarkAsRead(n.id)"
               >
                 <Check class="w-4 h-4" />
-              </button>
-              <button
-                v-else
-                @click.stop="toggleRead(index)"
-                class="ml-2"
-                :title="$t('portal.mark_as_unread')"
-              >
-                <Check class="w-4 h-4 text-blue-400" />
               </button>
             </div>
           </div>
@@ -137,9 +129,10 @@
   </nav>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
-import { Menu, Bell, LogOut, ChevronRight, Check } from 'lucide-vue-next'
+import { Menu, Bell, LogOut, Check } from 'lucide-vue-next'
+import { useNotifications } from '~/composables/useNotifications'
 
 const { setLocale, locale } = useI18n()
 const localePath = useLocalePath()
@@ -154,7 +147,7 @@ const authStore = useAuthStore()
 const userName = computed(() => {
   const user = authStore.user
   if (!user) return ''
-  if (user.first_name && user.last_name) return `${user.first_name} ${user.last_name}`
+  if (user.name && user.surname) return `${user.name} ${user.surname}`
   if (user.organization_name) return user.organization_name
   return user.email || ''
 })
@@ -165,40 +158,49 @@ const handleLogout = async () => {
 }
 
 const showNotifications = ref(false)
-const notifications = ref([
-  { title: 'New user registered', time: '2 min ago', read: false, link: '/users' },
-  { title: 'Server restart scheduled', time: '10 min ago', read: false, link: '/status' },
-  { title: 'Invoice paid', time: '1 hour ago', read: true, link: '/invoices' },
-])
+const {
+  notifications,
+  unreadCount,
+  fetchNotifications,
+  markAsRead: markNotificationAsRead,
+  markAllAsRead: markAllNotificationsAsRead,
+} = useNotifications()
 
-const unreadCount = computed(() => notifications.value.filter((n) => !n.read).length)
-
-const toggleNotifications = () => {
+const toggleNotifications = async () => {
   showNotifications.value = !showNotifications.value
+  if (showNotifications.value && !notifications.value.length) {
+    await fetchNotifications()
+  }
 }
 
-const markAsRead = (index) => {
-  notifications.value[index].read = true
+const handleMarkAsRead = async (id: number) => {
+  try {
+    await markNotificationAsRead(id)
+  } catch {
+    // useApi already surfaces errors
+  }
 }
 
-const markAllAsRead = () => {
-  notifications.value = notifications.value.map((n) => ({ ...n, read: true }))
+const markAllAsRead = async () => {
+  try {
+    await markAllNotificationsAsRead()
+  } catch {
+    // useApi already surfaces errors
+  }
 }
 
-const dropdownRef = ref(null)
+const dropdownRef = ref<HTMLElement | null>(null)
 
-const handleClickOutside = (event) => {
-  if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as Node | null
+  if (dropdownRef.value && target && !dropdownRef.value.contains(target)) {
     showNotifications.value = false
   }
 }
 
-const toggleRead = (index) => {
-  notifications.value[index].read = !notifications.value[index].read
-}
-
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  fetchNotifications()
 })
 
 onBeforeUnmount(() => {

@@ -4,14 +4,14 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-navy mb-1">Konzultácie</h1>
-        <p class="text-gray-500 text-sm">História všetkých zápisov z mentoringových konzultácií</p>
+        <h1 class="text-3xl font-bold text-navy mb-1">{{ t('mentor.consultations.title') }}</h1>
+        <p class="text-gray-500 text-sm">{{ t('mentor.consultations.subtitle') }}</p>
       </div>
       <NuxtLink
         to="/mentor/konzultacie/nova"
         class="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-purple-700 transition-colors text-sm"
       >
-        <Plus class="w-4 h-4" /> Nová konzultácia
+        <Plus class="w-4 h-4" /> {{ t('mentor.consultations.new') }}
       </NuxtLink>
     </div>
 
@@ -22,7 +22,7 @@
         v-model="filterProject"
         class="px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-400"
       >
-        <option value="">Všetky projekty</option>
+        <option value="">{{ t('mentor.consultations.filters.allProjects') }}</option>
         <option
           v-for="p in projectOptions"
           :key="p.value"
@@ -36,36 +36,50 @@
         v-model="filterType"
         class="px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-400"
       >
-        <option value="">Všetky typy</option>
-        <option value="online">Online</option>
-        <option value="personal">Osobne</option>
-        <option value="written">Písomná</option>
+        <option value="">{{ t('mentor.consultations.filters.allTypes') }}</option>
+        <option value="online">{{ t('mentor.consultations.filters.online') }}</option>
+        <option value="personal">{{ t('mentor.consultations.filters.personal') }}</option>
+        <option value="written">{{ t('mentor.consultations.filters.written') }}</option>
       </select>
       <!-- Month filter -->
       <select
         v-model="filterMonth"
         class="px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-400"
       >
-        <option value="">Všetky mesiace</option>
-        <option value="2026-04">Apríl 2026</option>
-        <option value="2026-03">Marec 2026</option>
-        <option value="2026-02">Február 2026</option>
+        <option value="">{{ t('mentor.consultations.filters.allMonths') }}</option>
+        <option value="2026-04">{{ t('mentor.consultations.months.april2026') }}</option>
+        <option value="2026-03">{{ t('mentor.consultations.months.march2026') }}</option>
+        <option value="2026-02">{{ t('mentor.consultations.months.february2026') }}</option>
       </select>
+    </div>
+
+    <div
+      v-if="loading"
+      class="mb-6 rounded-lg border border-gray-100 bg-white p-4 text-sm text-gray-500"
+    >
+      {{ t('mentor.consultations.loading') }}
+    </div>
+
+    <div
+      v-else-if="error"
+      class="mb-6 rounded-lg border border-danger-200 bg-danger-50 p-4 text-sm text-danger-700"
+    >
+      {{ error }}
     </div>
 
     <!-- Summary bar -->
     <div class="grid grid-cols-3 gap-4 mb-6">
       <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
         <p class="text-2xl font-bold text-purple-600">{{ filteredConsultations.length }}</p>
-        <p class="text-xs text-gray-500 mt-0.5">Konzultácií</p>
+        <p class="text-xs text-gray-500 mt-0.5">{{ t('mentor.consultations.stats.consultations') }}</p>
       </div>
       <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
         <p class="text-2xl font-bold text-navy">{{ totalTime }}</p>
-        <p class="text-xs text-gray-500 mt-0.5">Minút celkom</p>
+        <p class="text-xs text-gray-500 mt-0.5">{{ t('mentor.consultations.stats.minutesTotal') }}</p>
       </div>
       <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
         <p class="text-2xl font-bold text-navy">{{ totalActionItems }}</p>
-        <p class="text-xs text-gray-500 mt-0.5">Úloh zadaných</p>
+        <p class="text-xs text-gray-500 mt-0.5">{{ t('mentor.consultations.stats.tasks') }}</p>
       </div>
     </div>
 
@@ -83,12 +97,12 @@
               <span
                 class="text-xs px-2 py-0.5 rounded-full font-medium"
                 :class="typeClass(c.type)"
-                >{{ c.type }}</span
+                >{{ typeLabel(c.type) }}</span
               >
             </div>
             <p class="text-xs text-gray-400">
               <NuxtLink
-                :to="`/mentor/${c.projectId}`"
+                :to="`/mentor/projekty/${c.projectId}`"
                 class="text-purple-600 hover:underline"
                 >{{ c.projectName }}</NuxtLink
               >
@@ -122,16 +136,24 @@
         class="text-center py-16 bg-white rounded-lg border border-gray-100"
       >
         <MessageSquare class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-        <p class="text-gray-500 font-medium">Žiadne záznamy</p>
-        <p class="text-sm text-gray-400 mt-1">Skúste zmeniť filtre alebo pridajte novú konzultáciu</p>
+        <p class="text-gray-500 font-medium">{{ t('mentor.consultations.noEntries') }}</p>
+        <p class="text-sm text-gray-400 mt-1">{{ t('mentor.consultations.tryFilters') }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Plus, ExternalLink, ArrowRight, MessageSquare } from 'lucide-vue-next'
+import type { Consultation as BaseConsultation } from '../../../types/mentor'
+
+const { t } = useI18n()
+
+type Consultation = BaseConsultation & {
+  projectId: number
+  projectName: string
+}
 
 definePageMeta({
   layout: 'portal',
@@ -139,109 +161,84 @@ definePageMeta({
   roles: ['mentor'],
 })
 
-useHead({ title: 'Konzultácie | NTI Mentor' })
-
-const authStore = useAuthStore()
-
-// TODO: remove when backend is available
-if (!authStore.user) {
-  authStore.user = {
-    id: 10,
-    email: 'mentor@nti.sk',
-    first_name: 'Matej',
-    last_name: 'Novotný',
-    role: 'mentor',
-  }
-  authStore.token = 'mock-token'
-}
+useHead({ title: t('mentor.consultations.pageTitle') })
+const api = useApi()
 
 const filterProject = ref('')
 const filterType = ref('')
 const filterMonth = ref('')
+const consultations = ref<Consultation[]>([])
+const loading = ref(false)
+const error = ref<string | null>(null)
 
-const projectOptions = [
-  { value: '1', label: 'EcoTrack' },
-  { value: '2', label: 'AI chatbot' },
-  { value: '3', label: 'StudyBuddy' },
-]
+const projectOptions = computed(() => {
+  const options = new Map<string, { value: string; label: string }>()
 
-// TODO: fetch from API
-const allConsultations = [
-  {
-    id: 1,
-    projectId: 2,
-    projectName: 'AI chatbot',
-    title: 'Sprint review #2',
-    type: 'online',
-    date: '01.04.2026',
-    duration: 45,
-    summary: 'Tím predviedol MVP chatbota. Kvalita odpovedí je dobrá, chýba handling edge-case otázok.',
-    actionItems: ['Otestovať edge cases', 'Pripraviť dokumentáciu pre Salesforce integráciu'],
-  },
-  {
-    id: 2,
-    projectId: 1,
-    projectName: 'EcoTrack',
-    title: 'Review databázovej schémy',
-    type: 'online',
-    date: '28.03.2026',
-    duration: 60,
-    summary: 'Diskusia o optimalizácii dotazov pre veľké datasety. Rozhodnutie použiť TimescaleDB.',
-    actionItems: ['Prepísať migrácie na TimescaleDB', 'Benchmarky dotazov'],
-  },
-  {
-    id: 3,
-    projectId: 2,
-    projectName: 'AI chatbot',
-    title: 'Review architektúry',
-    type: 'online',
-    date: '22.03.2026',
-    duration: 60,
-    summary: 'Diskusia o voľbe LLM providera. Rozhodnutie: OpenAI pre MVP, self-hosted pre produkciu.',
-    actionItems: ['Pridať rate limiting', 'Dokumentovať fallback scenáre'],
-  },
-  {
-    id: 4,
-    projectId: 1,
-    projectName: 'EcoTrack',
-    title: 'Kick-off',
-    type: 'personal',
-    date: '16.02.2026',
-    duration: 90,
-    summary: 'Úvodné stretnutie. Definícia cieľov, roadmapa, rozdelenie rolí v tíme.',
-    actionItems: ['Nastaviť repo a CI/CD', 'Vypracovať tech spec'],
-  },
-  {
-    id: 5,
-    projectId: 2,
-    projectName: 'AI chatbot',
-    title: 'Kick-off konzultácia',
-    type: 'personal',
-    date: '05.03.2026',
-    duration: 90,
-    summary: 'Predstavenie projektu a zadania firmy. Dohodnutý spôsob komunikácie.',
-    actionItems: ['Vytvoriť repo', 'Pripraviť tech spec do 10.03.'],
-  },
-]
+  for (const consultation of consultations.value) {
+    options.set(String(consultation.projectId), {
+      value: String(consultation.projectId),
+      label: consultation.projectName,
+    })
+  }
+
+  return Array.from(options.values())
+})
+
+const fetchConsultations = async () => {
+  loading.value = true
+  error.value = null
+
+  try {
+    const res = await api.get('/mentor/consultations')
+    consultations.value = Array.isArray(res) ? (res as Consultation[]) : []
+  } catch (err) {
+    error.value = (err as { data?: { message?: string }; message?: string } | null)?.data?.message
+      ?? (err as { message?: string } | null)?.message
+      ?? t('mentor.consultations.loading')
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchConsultations)
+
+const toMonthKey = (date: string) => {
+  const match = date.match(/^(\d{2})\.(\d{2})\.(\d{4})$/)
+  if (!match) return ''
+  return `${match[3]}-${match[2]}`
+}
+
+const normalizeConsultationType = (type: string) => {
+  if (type === 'online' || type === 'Online (videohovor)') return 'online'
+  if (type === 'personal' || type === 'Osobne') return 'personal'
+  return 'written'
+}
 
 const filteredConsultations = computed(() =>
-  allConsultations.filter((c) => {
+  consultations.value.filter((c: Consultation) => {
     if (filterProject.value && String(c.projectId) !== filterProject.value) return false
+    if (filterMonth.value && toMonthKey(String(c.date)) !== filterMonth.value) return false
     if (filterType.value) {
-      const map: Record<string, string> = { online: 'online', personal: 'personal', written: 'written' }
-      const typeKey = c.type === 'Online (videohovor)' ? 'online' : c.type === 'Osobne' ? 'personal' : 'written'
-      if (typeKey !== map[filterType.value]) return false
+      if (normalizeConsultationType(c.type) !== filterType.value) return false
     }
     return true
   }),
 )
 
-const totalTime = computed(() => filteredConsultations.value.reduce((s, c) => s + c.duration, 0))
-const totalActionItems = computed(() => filteredConsultations.value.reduce((s, c) => s + c.actionItems.length, 0))
+const totalTime = computed(() => filteredConsultations.value.reduce((sum: number, c: Consultation) => sum + c.duration, 0))
+const totalActionItems = computed(() => filteredConsultations.value.reduce((sum: number, c: Consultation) => sum + c.actionItems.length, 0))
 
 const typeClass = (type: string) => {
-  if (type === 'online' || type === 'Online (videohovor)') return 'bg-blue-50 text-blue-600'
-  if (type === 'personal' || type === 'Osobne') return 'bg-purple-50 text-purple-600'
+  const normalizedType = normalizeConsultationType(type)
+  if (normalizedType === 'online') return 'bg-blue-50 text-blue-600'
+  if (normalizedType === 'personal') return 'bg-purple-50 text-purple-600'
   return 'bg-gray-100 text-gray-500'
+}
+
+const typeLabel = (type: string) => {
+  const normalizedType = normalizeConsultationType(type)
+  if (normalizedType === 'online') return t('mentor.consultations.types.online')
+  if (normalizedType === 'personal') return t('mentor.consultations.types.personal')
+  return t('mentor.consultations.types.written')
 }
 </script>
