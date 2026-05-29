@@ -2,12 +2,12 @@
   <div class="max-w-7xl mx-auto px-6 py-10">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h1 class="text-2xl font-bold text-navy">Používatelia</h1>
-        <p class="text-gray-500 mt-1">Správa registrovaných používateľov a ich rolí</p>
+        <h1 class="text-2xl font-bold text-navy">{{ $t('user_management.title') }}</h1>
+        <p class="text-gray-500 mt-1">{{ $t('user_management.subtitle') }}</p>
       </div>
       <UiButton @click="openCreateModal">
         <Plus class="w-4 h-4 mr-1" />
-        Pridať používateľa
+        {{ $t('user_management.add_user') }}
       </UiButton>
     </div>
 
@@ -26,26 +26,26 @@
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 border-b border-gray-100">
             <UiInput
               v-model="search"
-              placeholder="Hľadať podľa mena alebo emailu..."
+              :placeholder="$t('user_management.search_placeholder')"
               @input="onSearchInput"
             />
             <UiSelect
               v-model="roleFilter"
               :options="roleOptions"
-              placeholder="Všetky role"
+              :placeholder="$t('user_management.all_roles')"
               @change="onFilterChange"
             />
             <UiSelect
               v-model="statusFilter"
               :options="statusOptions"
-              placeholder="Všetky stavy"
+              :placeholder="$t('user_management.all_statuses')"
               @change="onFilterChange"
             />
             <div class="flex items-center gap-3">
               <button
                 v-if="hasActiveFilters"
                 class="flex items-center gap-1 text-sm text-gray-400 hover:text-danger-500 transition-colors"
-                title="Zrušiť filtre"
+                :title="$t('user_management.clear_filters')"
                 @click="resetFilters"
               >
                 <X class="w-4 h-4" />
@@ -80,9 +80,10 @@
 
         <template #row-actions="{ row }">
           <div class="flex items-center gap-2">
+            <!-- Edit -->
             <button
-              class="text-blue-600 hover:text-blue-800 text-sm"
-              title="Upraviť"
+              class="text-blue-600 hover:text-blue-800 transition-colors"
+              :title="$t('user_management.edit')"
               :disabled="isSuperAdmin(row)"
               :class="{ 'opacity-30 cursor-not-allowed': isSuperAdmin(row) }"
               @click="!isSuperAdmin(row) && openEditModal(row)"
@@ -90,10 +91,21 @@
               <Pencil class="w-4 h-4" />
             </button>
 
+            <!-- GDPR Report download -->
             <button
               v-if="!isSuperAdmin(row)"
-              class="text-gray-400 hover:text-danger-500 text-sm"
-              title="GDPR anonymizácia"
+              class="text-gray-400 hover:text-blue-600 transition-colors"
+              :title="$t('user_management.gdpr_download')"
+              @click="openGdprReportModal(row)"
+            >
+              <Download class="w-4 h-4" />
+            </button>
+
+            <!-- GDPR Anonymize -->
+            <button
+              v-if="!isSuperAdmin(row)"
+              class="text-gray-400 hover:text-danger-500 transition-colors"
+              :title="$t('user_management.gdpr_anonymize')"
               @click="openAnonymizeModal(row)"
             >
               <UserX class="w-4 h-4" />
@@ -107,7 +119,7 @@
         class="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50"
       >
         <span class="text-sm text-gray-500">
-          Celkovo: {{ pagination.total }} používateľov
+          {{ $t('user_management.total_users', { count: pagination.total }) }}
         </span>
 
         <UiPagination
@@ -118,6 +130,7 @@
       </div>
     </div>
 
+    <!-- Edit / Create user -->
     <AdminUserEditModal
       v-model="showEditModal"
       :user="selectedUser"
@@ -126,6 +139,14 @@
       @saved="fetchUsers"
     />
 
+    <!-- GDPR Report generation + download -->
+    <AdminGdprReportModal
+      v-model="showGdprReportModal"
+      :user="selectedUser"
+      @generated="fetchUsers"
+    />
+
+    <!-- GDPR Anonymize -->
     <AdminGdprAnonymizeModal
       v-model="showAnonymizeModal"
       :user="selectedUser"
@@ -135,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { Pencil, UserX, Plus, X } from 'lucide-vue-next'
+import { Pencil, UserX, Download, Plus, X } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
@@ -143,16 +164,20 @@ definePageMeta({
   roles: ['nti_admin', 'nti_superadmin'],
 })
 
-useHead({ title: 'Používatelia — Admin | NTI' })
+const { t } = useI18n()
 
-const api = useApi()
+useHead({ title: t('user_management.page_title') })
+
+const api          = useApi()
 const { addToast } = useToast()
 
-const allRoles = ref<any[]>([])
+// ── Meta: roles & statuses ───────────────────────────────────────────────────
+
+const allRoles    = ref<any[]>([])
 const allStatuses = ref<any[]>([])
 
 const roleOptions = computed(() => [
-  { value: '', label: 'Všetky role' },
+  { value: '', label: t('user_management.all_roles') },
   ...allRoles.value.map(r => ({
     value: r.name,
     label: r.display_name ?? r.name,
@@ -160,7 +185,7 @@ const roleOptions = computed(() => [
 ])
 
 const statusOptions = computed(() => [
-  { value: '', label: 'Všetky stavy' },
+  { value: '', label: t('user_management.all_statuses') },
   ...allStatuses.value.map(s => ({
     value: String(s.id),
     label: s.name,
@@ -169,11 +194,11 @@ const statusOptions = computed(() => [
 
 async function fetchMeta() {
   const [rolesRes, statusesRes] = await Promise.all([
-    api.get('/roles') as Promise<any>,
+    api.get('/roles')    as Promise<any>,
     api.get('/statuses') as Promise<any>,
   ])
 
-  allRoles.value = rolesRes?.roles ?? []
+  allRoles.value    = rolesRes?.roles    ?? []
   allStatuses.value = statusesRes?.statuses ?? []
 }
 
@@ -183,58 +208,56 @@ function roleLabel(name: string): string {
 
 function formatDate(date: string) {
   return new Date(date).toLocaleString('sk-SK', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
+    day:    '2-digit',
+    month:  '2-digit',
+    year:   'numeric',
+    hour:   '2-digit',
     minute: '2-digit',
   })
 }
 
-const search = ref('')
-const roleFilter = ref('')
+// ── Filters ──────────────────────────────────────────────────────────────────
+
+const search       = ref('')
+const roleFilter   = ref('')
 const statusFilter = ref('')
-const sortBy = ref<string | null>(null)
-const sortDir = ref<'asc' | 'desc'>('asc')
+const sortBy       = ref<string | null>(null)
+const sortDir      = ref<'asc' | 'desc'>('asc')
 
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
 const hasActiveFilters = computed(() =>
-  !!search.value ||
-  !!roleFilter.value ||
-  !!statusFilter.value
+  !!search.value || !!roleFilter.value || !!statusFilter.value
 )
 
 function resetFilters() {
-  search.value = ''
-  roleFilter.value = ''
+  search.value       = ''
+  roleFilter.value   = ''
   statusFilter.value = ''
-
   pagination.value.currentPage = 1
-
   fetchUsers()
 }
 
-function isSuperAdmin(row: any): boolean {
-  return row.roles?.some((r: any) => r.name === 'nti_superadmin')
-}
+// ── Columns ──────────────────────────────────────────────────────────────────
 
 const columns = [
-  { key: 'name', label: 'Meno', sortable: true },
-  { key: 'email', label: 'Email', sortable: true },
-  { key: 'roles', label: 'Role' },
-  { key: 'status', label: 'Stav' },
-  { key: 'created_at', label: 'Registrácia', sortable: true },
+  { key: 'name',       label: t('user_management.col_name'),       sortable: true },
+  { key: 'email',      label: t('user_management.col_email'),      sortable: true },
+  { key: 'roles',      label: t('user_management.col_roles') },
+  { key: 'status',     label: t('user_management.col_status') },
+  { key: 'created_at', label: t('user_management.col_registered'), sortable: true },
 ]
 
+// ── Table data ───────────────────────────────────────────────────────────────
+
 const isLoading = ref(false)
-const rows = ref<any[]>([])
+const rows      = ref<any[]>([])
 
 const pagination = ref({
   currentPage: 1,
-  totalPages: 1,
-  total: 0,
-  perPage: 15,
+  totalPages:  1,
+  total:       0,
+  perPage:     15,
 })
 
 const currentRows = computed(() => {
@@ -245,7 +268,7 @@ const currentRows = computed(() => {
     const bv = b[sortBy.value!] ?? ''
 
     const cmp = String(av).localeCompare(String(bv), 'sk', {
-      numeric: true,
+      numeric:     true,
       sensitivity: 'base',
     })
 
@@ -258,20 +281,20 @@ async function fetchUsers() {
 
   try {
     const params: Record<string, any> = {
-      page: pagination.value.currentPage,
+      page:     pagination.value.currentPage,
       per_page: pagination.value.perPage,
     }
 
-    if (search.value) params.search = search.value
-    if (roleFilter.value) params.role = roleFilter.value
+    if (search.value)       params.search = search.value
+    if (roleFilter.value)   params.role   = roleFilter.value
     if (statusFilter.value) params.status = statusFilter.value
 
     const response = await api.get('/users', { params }) as any
 
-    rows.value = response?.data ?? []
-    pagination.value.total = response?.total ?? 0
-    pagination.value.currentPage = response?.current_page ?? 1
-    pagination.value.totalPages = response?.last_page ?? 1
+    rows.value                    = response?.data          ?? []
+    pagination.value.total        = response?.total         ?? 0
+    pagination.value.currentPage  = response?.current_page  ?? 1
+    pagination.value.totalPages   = response?.last_page     ?? 1
   } finally {
     isLoading.value = false
   }
@@ -301,32 +324,43 @@ onMounted(async () => {
   fetchUsers()
 })
 
-const showEditModal = ref(false)
-const showAnonymizeModal = ref(false)
-const selectedUser = ref<any>(null)
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function isSuperAdmin(row: any): boolean {
+  return row.roles?.some((r: any) => r.name === 'nti_superadmin')
+}
+
+// ── Modal state ───────────────────────────────────────────────────────────────
+
+const selectedUser          = ref<any>(null)
+const showEditModal         = ref(false)
+const showGdprReportModal   = ref(false)
+const showAnonymizeModal    = ref(false)
 
 function openCreateModal() {
-  selectedUser.value = null
+  selectedUser.value  = null
   showEditModal.value = true
 }
 
 async function openEditModal(row: any) {
   try {
-    isLoading.value = true
+    isLoading.value    = true
     selectedUser.value = await api.get(`/users/${row.id}`)
     showEditModal.value = true
   } catch {
-    addToast({
-      message: 'Nepodarilo sa načítať používateľa',
-      type: 'error',
-    })
+    addToast({ message: t('user_management.load_error'), type: 'error' })
   } finally {
     isLoading.value = false
   }
 }
 
+function openGdprReportModal(row: any) {
+  selectedUser.value        = row
+  showGdprReportModal.value = true
+}
+
 function openAnonymizeModal(row: any) {
-  selectedUser.value = row
+  selectedUser.value      = row
   showAnonymizeModal.value = true
 }
 </script>

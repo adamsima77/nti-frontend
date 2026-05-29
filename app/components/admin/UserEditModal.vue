@@ -2,7 +2,7 @@
   <UiModal v-model="open" :title="modalTitle">
     <div v-if="isLoading" class="py-12 flex flex-col items-center gap-3 text-gray-400">
       <div class="w-7 h-7 rounded-full border-2 border-gray-200 border-t-blue-500 animate-spin" />
-      <span class="text-sm">Načítavam...</span>
+      <span class="text-sm">{{ $t('user_management.loading') }}</span>
     </div>
 
     <template v-else>
@@ -10,15 +10,15 @@
       <div class="flex gap-1 mb-6 bg-gray-100 rounded-xl p-1 w-fit">
         <button :class="tabClass('basic')" @click="activeTab = 'basic'">
           <UserIcon class="w-3.5 h-3.5" />
-          Základné údaje
+          {{ $t('user_management.tab_basic') }}
         </button>
         <button v-if="isStudent" :class="tabClass('student')" @click="activeTab = 'student'">
           <GraduationCap class="w-3.5 h-3.5" />
-          Profil študenta
+          {{ $t('user_management.tab_student') }}
         </button>
         <button v-if="isPartner" :class="tabClass('organization')" @click="activeTab = 'organization'">
           <Building2 class="w-3.5 h-3.5" />
-          Organizácia
+          {{ $t('user_management.tab_organization') }}
         </button>
       </div>
 
@@ -33,7 +33,7 @@
             <img
               v-if="avatarPreview || props.user?.avatar_url"
               :src="avatarPreview ?? props.user.avatar_url"
-              alt="Profilová fotka"
+              :alt="$t('user_management.profile_photo')"
               class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
             />
             <div
@@ -44,7 +44,7 @@
             </div>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-gray-700 mb-1">Profilová fotka</p>
+            <p class="text-sm font-medium text-gray-700 mb-1">{{ $t('user_management.profile_photo') }}</p>
             <UiFileUpload
               v-model="avatarFile"
               accept=".jpg,.jpeg,.png"
@@ -57,32 +57,32 @@
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Meno</label>
-            <UiInput v-model="form.name" placeholder="Meno" />
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.field_name') }}</label>
+            <UiInput v-model="form.name" :placeholder="$t('user_management.field_name')" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Priezvisko</label>
-            <UiInput v-model="form.surname" placeholder="Priezvisko" />
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.field_surname') }}</label>
+            <UiInput v-model="form.surname" :placeholder="$t('user_management.field_surname')" />
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.field_email') }}</label>
           <UiInput v-model="form.email" type="email" placeholder="email@example.com" />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Pracovná pozícia</label>
-          <UiInput v-model="form.job_position" placeholder="Pracovná pozícia" />
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.field_job_position') }}</label>
+          <UiInput v-model="form.job_position" :placeholder="$t('user_management.field_job_position')" />
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Stav</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.col_status') }}</label>
             <UiSelect v-model="form.status_id" :options="statusSelectOptions" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Rola</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.col_roles') }}</label>
             <div class="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-lg bg-gray-50 min-h-[42px] items-center">
               <label
                 v-for="role in assignableRoles"
@@ -100,7 +100,7 @@
               </label>
             </div>
             <p v-if="isCreateMode" class="mt-1.5 text-xs text-gray-400">
-              Študent a Partner sprístupnia ďalšie záložky.
+              {{ $t('user_management.role_hint') }}
             </p>
           </div>
         </div>
@@ -108,13 +108,13 @@
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1.5">
-              {{ isCreateMode ? 'Heslo' : 'Nové heslo' }}
-              <span v-if="!isCreateMode" class="text-gray-400 font-normal text-xs">(nechajte prázdne)</span>
+              {{ isCreateMode ? $t('user_management.field_password') : $t('user_management.field_new_password') }}
+              <span v-if="!isCreateMode" class="text-gray-400 font-normal text-xs">({{ $t('user_management.password_leave_empty') }})</span>
             </label>
             <UiInput v-model="form.password" type="password" placeholder="••••••••" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Potvrdenie hesla</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.field_password_confirm') }}</label>
             <UiInput v-model="form.password_confirmation" type="password" placeholder="••••••••" />
           </div>
         </div>
@@ -126,36 +126,36 @@
       <div v-show="activeTab === 'student'" class="space-y-5">
         <div v-if="loadingLookups" class="py-8 flex flex-col items-center gap-3 text-gray-400">
           <div class="w-6 h-6 rounded-full border-2 border-gray-200 border-t-blue-500 animate-spin" />
-          <span class="text-sm">Načítavam číselníky...</span>
+          <span class="text-sm">{{ $t('user_management.loading_lookups') }}</span>
         </div>
 
         <template v-else>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Študijný program</label>
-              <UiSelect v-model="studentForm.study_program_id" :options="studyProgramOptions" placeholder="Vyberte program" />
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.field_study_program') }}</label>
+              <UiSelect v-model="studentForm.study_program_id" :options="studyProgramOptions" :placeholder="$t('user_management.select_program')" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Študijný odbor</label>
-              <UiSelect v-model="studentForm.study_field_id" :options="studyFieldOptions" placeholder="Vyberte odbor" />
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.field_study_field') }}</label>
+              <UiSelect v-model="studentForm.study_field_id" :options="studyFieldOptions" :placeholder="$t('user_management.select_field')" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Ročník</label>
-              <UiSelect v-model="studentForm.study_year_id" :options="studyYearOptions" placeholder="Vyberte ročník" />
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.field_study_year') }}</label>
+              <UiSelect v-model="studentForm.study_year_id" :options="studyYearOptions" :placeholder="$t('user_management.select_year')" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Univerzita</label>
-              <UiSelect v-model="studentForm.university_id" :options="universityOptions" placeholder="Vyberte univerzitu" />
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.field_university') }}</label>
+              <UiSelect v-model="studentForm.university_id" :options="universityOptions" :placeholder="$t('user_management.select_university')" />
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Portfolio URL</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('user_management.field_portfolio_url') }}</label>
             <UiInput v-model="studentForm.portfolio_url" placeholder="https://..." />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Akademické príznaky</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('user_management.field_academic_flags') }}</label>
             <div
               v-if="academicFlagOptions.length"
               class="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-lg bg-gray-50"
@@ -174,7 +174,7 @@
                 {{ flag.name }}
               </label>
             </div>
-            <p v-else class="text-sm text-gray-400 italic">Žiadne príznaky k dispozícii.</p>
+            <p v-else class="text-sm text-gray-400 italic">{{ $t('user_management.no_flags') }}</p>
           </div>
 
           <!-- CV -->
@@ -184,9 +184,9 @@
                 <FileText class="w-4 h-4 text-gray-400" />
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-700">CV dokument</p>
-                <p v-if="studentForm.cv_document_id" class="text-xs text-green-600 mt-0.5">Nahrané</p>
-                <p v-else class="text-xs text-gray-400 mt-0.5">Žiadne CV</p>
+                <p class="text-sm font-medium text-gray-700">{{ $t('user_management.cv_document') }}</p>
+                <p v-if="studentForm.cv_document_id" class="text-xs text-green-600 mt-0.5">{{ $t('user_management.cv_uploaded') }}</p>
+                <p v-else class="text-xs text-gray-400 mt-0.5">{{ $t('user_management.cv_none') }}</p>
               </div>
             </div>
             <button
@@ -195,7 +195,7 @@
               class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors"
               @click="studentForm.cv_document_id = null"
             >
-              Odstrániť
+              {{ $t('user_management.remove') }}
             </button>
           </div>
         </template>
@@ -220,7 +220,7 @@
               <div class="flex-1 min-w-0">
                 <h3 class="font-medium text-gray-800 text-sm truncate">{{ orgForm.name || '—' }}</h3>
                 <span class="text-xs text-gray-400">
-                  {{ props.user?.organizations?.[idx]?.pivot?.organization_role ?? 'člen' }}
+                  {{ props.user?.organizations?.[idx]?.pivot?.organization_role ?? $t('user_management.org_member') }}
                 </span>
               </div>
             </div>
@@ -228,52 +228,52 @@
             <div class="p-4 space-y-4">
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Názov</label>
-                  <UiInput v-model="orgForm.name" placeholder="Názov organizácie" />
+                  <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">{{ $t('user_management.org_name') }}</label>
+                  <UiInput v-model="orgForm.name" :placeholder="$t('user_management.org_name_placeholder')" />
                 </div>
                 <div>
-                  <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">IČO</label>
+                  <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">{{ $t('user_management.org_ico') }}</label>
                   <UiInput v-model="orgForm.ico" placeholder="12345678" />
                 </div>
                 <div>
-                  <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Telefón</label>
+                  <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">{{ $t('user_management.org_phone') }}</label>
                   <UiInput v-model="orgForm.phone" placeholder="+421..." />
                 </div>
                 <div>
-                  <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Web</label>
+                  <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">{{ $t('user_management.org_web') }}</label>
                   <UiInput v-model="orgForm.web_url" placeholder="https://..." />
                 </div>
               </div>
 
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Popis</label>
-                <UiInput v-model="orgForm.description" placeholder="Krátky popis" />
+                <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">{{ $t('user_management.org_description') }}</label>
+                <UiInput v-model="orgForm.description" :placeholder="$t('user_management.org_description_placeholder')" />
               </div>
 
               <div>
-                <p class="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">Adresa</p>
+                <p class="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">{{ $t('user_management.org_address') }}</p>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
-                    <label class="block text-xs text-gray-500 mb-1">Ulica</label>
-                    <UiInput v-model="orgForm.address.street" placeholder="Ulica 1" />
+                    <label class="block text-xs text-gray-500 mb-1">{{ $t('user_management.addr_street') }}</label>
+                    <UiInput v-model="orgForm.address.street" :placeholder="$t('user_management.addr_street_placeholder')" />
                   </div>
                   <div>
-                    <label class="block text-xs text-gray-500 mb-1">Mesto</label>
-                    <UiInput v-model="orgForm.address.city" placeholder="Bratislava" />
+                    <label class="block text-xs text-gray-500 mb-1">{{ $t('user_management.addr_city') }}</label>
+                    <UiInput v-model="orgForm.address.city" :placeholder="$t('user_management.addr_city_placeholder')" />
                   </div>
                   <div>
-                    <label class="block text-xs text-gray-500 mb-1">PSČ</label>
-                    <UiInput v-model="orgForm.address.postal_code" placeholder="811 01" />
+                    <label class="block text-xs text-gray-500 mb-1">{{ $t('user_management.addr_postal') }}</label>
+                    <UiInput v-model="orgForm.address.postal_code" :placeholder="$t('user_management.addr_postal_placeholder')" />
                   </div>
                   <div>
-                    <label class="block text-xs text-gray-500 mb-1">Krajina</label>
-                    <UiInput v-model="orgForm.address.country" placeholder="Slovensko" />
+                    <label class="block text-xs text-gray-500 mb-1">{{ $t('user_management.addr_country') }}</label>
+                    <UiInput v-model="orgForm.address.country" :placeholder="$t('user_management.addr_country_placeholder')" />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">Sektory</label>
+                <label class="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">{{ $t('user_management.org_sectors') }}</label>
                 <div
                   v-if="sectorOptions.length"
                   class="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-lg bg-gray-50"
@@ -292,7 +292,7 @@
                     {{ sector.label }}
                   </label>
                 </div>
-                <p v-else class="text-sm text-gray-400 italic">Načítavam sektory...</p>
+                <p v-else class="text-sm text-gray-400 italic">{{ $t('user_management.loading_sectors') }}</p>
               </div>
             </div>
           </div>
@@ -302,58 +302,58 @@
         <template v-else>
           <div class="flex items-center gap-2 mb-1">
             <div class="h-px flex-1 bg-gray-100" />
-            <span class="text-xs text-gray-400 uppercase font-medium tracking-wider">Nová organizácia</span>
+            <span class="text-xs text-gray-400 uppercase font-medium tracking-wider">{{ $t('user_management.new_organization') }}</span>
             <div class="h-px flex-1 bg-gray-100" />
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Názov</label>
-              <UiInput v-model="newOrgForm.name" placeholder="Názov organizácie" />
+              <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">{{ $t('user_management.org_name') }}</label>
+              <UiInput v-model="newOrgForm.name" :placeholder="$t('user_management.org_name_placeholder')" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">IČO</label>
+              <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">{{ $t('user_management.org_ico') }}</label>
               <UiInput v-model="newOrgForm.ico" placeholder="12345678" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Telefón</label>
+              <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">{{ $t('user_management.org_phone') }}</label>
               <UiInput v-model="newOrgForm.phone" placeholder="+421..." />
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Web</label>
+              <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">{{ $t('user_management.org_web') }}</label>
               <UiInput v-model="newOrgForm.web_url" placeholder="https://..." />
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Popis</label>
-            <UiInput v-model="newOrgForm.description" placeholder="Krátky popis" />
+            <label class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">{{ $t('user_management.org_description') }}</label>
+            <UiInput v-model="newOrgForm.description" :placeholder="$t('user_management.org_description_placeholder')" />
           </div>
 
           <div>
-            <p class="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">Adresa</p>
+            <p class="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">{{ $t('user_management.org_address') }}</p>
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs text-gray-500 mb-1">Ulica</label>
-                <UiInput v-model="newOrgForm.address.street" placeholder="Ulica 1" />
+                <label class="block text-xs text-gray-500 mb-1">{{ $t('user_management.addr_street') }}</label>
+                <UiInput v-model="newOrgForm.address.street" :placeholder="$t('user_management.addr_street_placeholder')" />
               </div>
               <div>
-                <label class="block text-xs text-gray-500 mb-1">Mesto</label>
-                <UiInput v-model="newOrgForm.address.city" placeholder="Bratislava" />
+                <label class="block text-xs text-gray-500 mb-1">{{ $t('user_management.addr_city') }}</label>
+                <UiInput v-model="newOrgForm.address.city" :placeholder="$t('user_management.addr_city_placeholder')" />
               </div>
               <div>
-                <label class="block text-xs text-gray-500 mb-1">PSČ</label>
-                <UiInput v-model="newOrgForm.address.postal_code" placeholder="811 01" />
+                <label class="block text-xs text-gray-500 mb-1">{{ $t('user_management.addr_postal') }}</label>
+                <UiInput v-model="newOrgForm.address.postal_code" :placeholder="$t('user_management.addr_postal_placeholder')" />
               </div>
               <div>
-                <label class="block text-xs text-gray-500 mb-1">Krajina</label>
-                <UiInput v-model="newOrgForm.address.country" placeholder="Slovensko" />
+                <label class="block text-xs text-gray-500 mb-1">{{ $t('user_management.addr_country') }}</label>
+                <UiInput v-model="newOrgForm.address.country" :placeholder="$t('user_management.addr_country_placeholder')" />
               </div>
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">Sektory</label>
+            <label class="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">{{ $t('user_management.org_sectors') }}</label>
             <div
               v-if="sectorOptions.length"
               class="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-lg bg-gray-50"
@@ -372,16 +372,16 @@
                 {{ sector.label }}
               </label>
             </div>
-            <p v-else class="text-sm text-gray-400 italic">Načítavam sektory...</p>
+            <p v-else class="text-sm text-gray-400 italic">{{ $t('user_management.loading_sectors') }}</p>
           </div>
         </template>
       </div>
     </template>
 
     <template #actions>
-      <UiButton variant="ghost" @click="open = false">Zatvoriť</UiButton>
+      <UiButton variant="ghost" @click="open = false">{{ $t('user_management.close') }}</UiButton>
       <UiButton :loading="isSaving" @click="handleSave">
-        {{ isCreateMode ? 'Vytvoriť používateľa' : 'Uložiť zmeny' }}
+        {{ isCreateMode ? $t('user_management.create_user') : $t('user_management.save_changes') }}
       </UiButton>
     </template>
   </UiModal>
@@ -404,6 +404,7 @@ const emit = defineEmits<{
 
 const api = useApi()
 const { addToast } = useToast()
+const { t } = useI18n()
 
 const open = computed({
   get: () => props.modelValue,
@@ -420,8 +421,8 @@ const isCreateMode = computed(() => !props.user)
 
 const modalTitle = computed(() =>
   isCreateMode.value
-    ? 'Vytvoriť používateľa'
-    : `Upraviť: ${props.user?.name ?? ''} ${props.user?.surname ?? ''}`.trim()
+    ? t('user_management.create_user')
+    : `${t('user_management.edit_user_prefix')} ${props.user?.name ?? ''} ${props.user?.surname ?? ''}`.trim()
 )
 
 // ── Avatar preview ─────────────────────────────────────────
@@ -531,7 +532,7 @@ async function fetchStudentLookups() {
     universities.value        = Array.isArray(unis)     ? unis     : (unis?.universities      ?? unis?.university ?? unis?.data ?? [])
     academicFlagOptions.value = Array.isArray(flags)    ? flags    : (flags?.academic_flags   ?? flags?.data    ?? [])
   } catch {
-    addToast({ message: 'Nepodarilo sa načítať číselníky pre študenta', type: 'error' })
+    addToast({ message: t('user_management.error_loading_lookups'), type: 'error' })
   } finally {
     loadingLookups.value = false
   }
@@ -543,7 +544,6 @@ watch(isStudent, (val) => { if (val) fetchStudentLookups() }, { immediate: true 
 
 const sectors = ref<any[]>([])
 
-// Values are numbers so checkbox v-model comparison works correctly
 const sectorOptions = computed(() =>
   sectors.value.map(s => ({
     value: Number(s.id),
@@ -623,7 +623,6 @@ function buildOrgForm(org: any): OrgForm {
       postal_code: org.address?.postal_code ?? '',
       country:     org.address?.country     ?? '',
     },
-    // Sector IDs as numbers so checkbox v-model matches sectorOptions values
     sectors: org.sectors?.map((s: any) => Number(s.id)) ?? [],
   }
 }
@@ -701,25 +700,23 @@ async function handleSave() {
     }
     addToast({
       message: isCreateMode.value
-        ? 'Používateľ bol úspešne vytvorený'
-        : 'Používateľ bol úspešne aktualizovaný',
+        ? t('user_management.toast_created')
+        : t('user_management.toast_updated'),
       type: 'success',
     })
     emit('saved')
     open.value = false
   } catch (e: any) {
-    // Laravel returns validation errors under e.data.errors as { field: [msg, ...] }
-    // and a human message under e.data.message for other errors
     const laravelErrors = e?.data?.errors ?? e?.response?.data?.errors
     if (laravelErrors) {
       const first = Object.values(laravelErrors).flat()[0] as string
-      addToast({ message: first ?? 'Neplatné údaje', type: 'error' })
+      addToast({ message: first ?? t('user_management.error_invalid_data'), type: 'error' })
     } else {
       const msg = e?.data?.message ?? e?.response?.data?.message
       addToast({
         message: msg ?? (isCreateMode.value
-          ? 'Nepodarilo sa vytvoriť používateľa'
-          : 'Nepodarilo sa uložiť zmeny'),
+          ? t('user_management.error_create')
+          : t('user_management.error_save')),
         type: 'error',
       })
     }
@@ -729,9 +726,6 @@ async function handleSave() {
 }
 
 // ── Create ─────────────────────────────────────────────────
-// All data — user, student profile, organization — is sent in one request.
-// UserController creates everything via Eloquent relations on the new user.
-// No user_id is ever passed from the frontend.
 
 async function runCreate() {
   const fd = new FormData()
@@ -745,7 +739,6 @@ async function runCreate() {
   if (form.value.role)         fd.append('roles[]',      String(form.value.role))
   if (avatarFile.value)        fd.append('avatar',       avatarFile.value)
 
-  // Student profile nested under student[...]
   if (isStudent.value && studentForm.value.study_program_id) {
     fd.append('student[study_program_id]', String(studentForm.value.study_program_id))
     if (studentForm.value.study_field_id) fd.append('student[study_field_id]', String(studentForm.value.study_field_id))
@@ -755,7 +748,6 @@ async function runCreate() {
     studentForm.value.academic_flags.forEach(id => fd.append('student[academic_flags][]', String(id)))
   }
 
-  // Organization nested under organization[...]
   if (isPartner.value && newOrgForm.value.name) {
     const org = newOrgForm.value
     fd.append('organization[name]', org.name)
@@ -778,7 +770,6 @@ async function runCreate() {
 async function runUpdate() {
   const user = props.user!
 
-  // 1. Update basic user fields
   const payload: Record<string, any> = {
     ...form.value,
     roles: form.value.role ? [form.value.role] : [],
@@ -790,22 +781,12 @@ async function runUpdate() {
   }
   await api.put(`/users/${user.id}`, payload)
 
-  // 2. Upload new avatar if a file was picked
   if (avatarFile.value) {
     const fd = new FormData()
     fd.append('avatar', avatarFile.value)
     await api.post(`/users/${user.id}/avatar`, fd)
   }
 
-  // 3. Student profile — update existing or create new via POST /students
-  //    POST /students uses $request->user() which is the admin, so for edit mode
-  //    we always use PUT on the existing student record.
-  //    If the role was just switched to student and no profile exists yet,
-  //    create it via the dedicated endpoint — StudentsController@store will
-  //    create for the authenticated user (admin), which is wrong, so instead
-  //    we call the update endpoint after a create via UserController.
-  //    For simplicity: if student profile doesn't exist yet on an existing user,
-  //    use a dedicated admin endpoint or handle it here as a PUT to avoid issues.
   if (isStudent.value) {
     const studentPayload = {
       study_program_id: studentForm.value.study_program_id || undefined,
@@ -818,16 +799,12 @@ async function runUpdate() {
     }
 
     if (user.student) {
-      // Profile exists — update it directly
       await api.put(`/students/${user.student.id}`, studentPayload)
     } else {
-      // No profile yet — send via /users/:id/student so the backend can use
-      // $user->student()->create(...) without touching $request->user()
       await api.post(`/users/${user.id}/student`, studentPayload)
     }
   }
 
-  // 4. Organizations — update each existing one
   if (isPartner.value) {
     for (const orgForm of orgForms.value) {
       const { id, address, sectors, ...fields } = orgForm
@@ -839,7 +816,6 @@ async function runUpdate() {
       })
     }
 
-    // Partner has no org yet and the form is filled — create via user sub-route
     if (!user.organizations?.length && newOrgForm.value.name) {
       await api.post(`/users/${user.id}/organization`, {
         ...newOrgForm.value,
