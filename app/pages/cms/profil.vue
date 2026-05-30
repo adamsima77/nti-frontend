@@ -95,6 +95,18 @@
           </div>
         </dl>
       </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-red-100 p-6 mt-6">
+        <h2 class="text-lg font-bold text-red-700 mb-2">Delete account</h2>
+        <p class="text-sm text-gray-600 mb-4">This action anonymizes your account and cannot be undone.</p>
+        <UiButton
+          variant="danger"
+          :disabled="deletingAccount"
+          @click="deleteAccount"
+        >
+          {{ deletingAccount ? 'Deleting account...' : 'Delete account' }}
+        </UiButton>
+      </div>
     </template>
   </div>
 </template>
@@ -119,6 +131,7 @@ const { t } = useI18n()
 const pageLoading     = ref(true)
 const saving          = ref(false)
 const avatarUploading = ref(false)
+const deletingAccount = ref(false)
 const avatarInputRef  = ref<HTMLInputElement | null>(null)
 
 const form = reactive({
@@ -233,6 +246,26 @@ async function saveProfile() {
     addToast({ message: err?.data?.message ?? t('profile.toast.saveError'), type: 'error' })
   } finally {
     saving.value = false
+  }
+}
+
+async function deleteAccount() {
+  const u = authStore.user
+  if (!u) return
+
+  const confirmed = window.confirm('Delete and anonymize your account? This cannot be undone.')
+  if (!confirmed) return
+
+  deletingAccount.value = true
+  try {
+    await api.post(`/users/anonymize-user/${u.id}`)
+    authStore.$reset()
+    addToast({ message: 'Your account was anonymized.', type: 'success' })
+    await navigateTo('/auth/login')
+  } catch (err: any) {
+    addToast({ message: err?.data?.message ?? 'Account anonymization failed.', type: 'error' })
+  } finally {
+    deletingAccount.value = false
   }
 }
 </script>

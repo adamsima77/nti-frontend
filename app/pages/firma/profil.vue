@@ -131,7 +131,14 @@
       </div>
 
       <!-- Actions -->
-      <div class="flex justify-end gap-3">
+      <div class="flex justify-between gap-3">
+        <UiButton
+          variant="danger"
+          :disabled="isDeletingAccount"
+          @click="deleteAccount"
+        >
+          {{ isDeletingAccount ? 'Mažem účet...' : 'Vymazať účet' }}
+        </UiButton>
         <button
           type="button"
           @click="resetForm"
@@ -186,6 +193,8 @@ useHead({
 })
 
 const authStore = useAuthStore()
+const api = useApi()
+const { addToast } = useToast()
 
 // TODO: remove when backend is available
 if (!authStore.user) {
@@ -199,6 +208,7 @@ if (!authStore.user) {
 }
 
 const isSaving = ref(false)
+const isDeletingAccount = ref(false)
 const saveSuccess = ref(false)
 const saveError = ref<string | null>(null)
 
@@ -265,6 +275,26 @@ const handleSave = async () => {
     saveError.value = 'Nastala chyba pri ukladaní. Skúste znova.'
   } finally {
     isSaving.value = false
+  }
+}
+
+const deleteAccount = async () => {
+  const userId = authStore.user?.id
+  if (!userId) return
+
+  const confirmed = window.confirm('Naozaj chcete anonymizovať a vymazať účet? Túto akciu nie je možné vrátiť.')
+  if (!confirmed) return
+
+  isDeletingAccount.value = true
+  try {
+    await api.post(`/users/anonymize-user/${userId}`)
+    authStore.$reset()
+    addToast({ message: 'Účet bol anonymizovaný.', type: 'success' })
+    await navigateTo('/auth/login')
+  } catch (err: any) {
+    addToast({ message: err?.data?.message ?? 'Anonymizácia účtu zlyhala.', type: 'error' })
+  } finally {
+    isDeletingAccount.value = false
   }
 }
 </script>

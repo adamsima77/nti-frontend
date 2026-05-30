@@ -140,6 +140,18 @@
       >
         {{ t('student_dashboard.profile.no_student_record') }}
       </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-red-100 p-6">
+        <h2 class="text-lg font-bold text-red-700 mb-2">Vymazať účet</h2>
+        <p class="text-sm text-gray-600 mb-4">Táto akcia anonymizuje váš účet a nie je možné ju vrátiť späť.</p>
+        <UiButton
+          variant="danger"
+          :disabled="deletingAccount"
+          @click="deleteAccount"
+        >
+          {{ deletingAccount ? 'Mažem účet...' : 'Vymazať účet' }}
+        </UiButton>
+      </div>
     </template>
   </div>
 </template>
@@ -166,6 +178,7 @@ useHead({ title: t('student_dashboard.profile.seo_title') })
 const pageLoading = ref(true)
 const saving = ref(false)
 const avatarUploading = ref(false)
+const deletingAccount = ref(false)
 const avatarInputRef = ref<HTMLInputElement | null>(null)
 const studentLoaded = ref(false)
 const studentRecord = ref<any | null>(null)
@@ -308,6 +321,27 @@ async function saveProfile() {
     addToast({ message: msg, type: 'error' })
   } finally {
     saving.value = false
+  }
+}
+
+async function deleteAccount() {
+  const u = authStore.user
+  if (!u) return
+
+  const confirmed = window.confirm('Naozaj chcete anonymizovať a vymazať účet? Túto akciu nie je možné vrátiť.')
+  if (!confirmed) return
+
+  deletingAccount.value = true
+  try {
+    await api.post(`/users/anonymize-user/${u.id}`)
+    authStore.$reset()
+    addToast({ message: 'Účet bol anonymizovaný.', type: 'success' })
+    await navigateTo('/auth/login')
+  } catch (err: any) {
+    const msg = err?.data?.message ?? err?.message ?? 'Anonymizácia účtu zlyhala.'
+    addToast({ message: msg, type: 'error' })
+  } finally {
+    deletingAccount.value = false
   }
 }
 </script>
