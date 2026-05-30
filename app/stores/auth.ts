@@ -40,12 +40,21 @@ const ROLE_MAP: Record<string, string> = {
   'nti_superadmin': 'superadmin',
   'nti_admin':      'admin',
   'cms_editor':     'cms_editor',
+  'content-manager':'cms_editor',
   'student':        'student',
   'team_leader':    'student',
   'partner':        'company',
+  'organization':   'company',
   'mentor':         'mentor',
   'evaluator':      'evaluator',
   'guest':          'guest',
+}
+
+const ROLE_ALIASES: Record<string, string[]> = {
+  partner: ['organization'],
+  organization: ['partner'],
+  cms_editor: ['content-manager'],
+  'content-manager': ['cms_editor'],
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -92,9 +101,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   const hasRole = (roles: string | string[]): boolean => {
     if (!userRoles.value.length) return false
-    return Array.isArray(roles)
-      ? roles.some(r => userRoles.value.includes(r))
-      : userRoles.value.includes(roles)
+    const ownRoles = new Set(userRoles.value)
+    const requestedRoles = Array.isArray(roles) ? roles : [roles]
+
+    return requestedRoles.some((requestedRole) => {
+      if (ownRoles.has(requestedRole)) return true
+
+      const aliases = ROLE_ALIASES[requestedRole] ?? []
+      return aliases.some(alias => ownRoles.has(alias))
+    })
   }
 
   const hasPermission = (permission: string): boolean => {

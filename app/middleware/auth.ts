@@ -3,6 +3,17 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const auth  = useAuthStore()
   const token = import.meta.client ? localStorage.getItem('_t') : null
   const requiredRoles = to.meta.roles as string[] | undefined
+  const requiredPermissions = to.meta.permissions as string[] | undefined
+
+  const inferredPermissionByPrefix: Array<{ prefix: string; permissions: string[] }> = [
+    { prefix: '/student', permissions: ['students.profile.view_own'] },
+    { prefix: '/firma', permissions: ['organizations.view'] },
+    { prefix: '/hodnotenie', permissions: ['evaluation.view_any'] },
+    { prefix: '/cms', permissions: ['content.view'] },
+  ]
+
+  const requiredPermissionSet = requiredPermissions
+    ?? inferredPermissionByPrefix.find((entry) => to.path.startsWith(entry.prefix))?.permissions
 
   // Not logged in at all
   if (!auth.user && !token) {
@@ -43,6 +54,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // Role-based access check
   if (requiredRoles?.length && !auth.hasRole(requiredRoles)) {
+    throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+  }
+
+  // Permission-based access check
+  if (requiredPermissionSet?.length && !requiredPermissionSet.some(permission => auth.hasPermission(permission))) {
     throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
   }
 })
