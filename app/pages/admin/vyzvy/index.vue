@@ -5,23 +5,25 @@
         <h1 class="text-2xl font-bold text-navy">Výzvy</h1>
         <p class="text-gray-500 mt-1">Správa výziev a prihlasovacích období</p>
       </div>
-      <UiButton @click="openCreateModal">
-        <Plus class="w-4 h-4 mr-1" />
-        Nová výzva
-      </UiButton>
+      <div class="flex items-center gap-2">
+        <UiButton v-if="canCreateCalls" @click="openCreateModal">
+          <Plus class="w-4 h-4 mr-1" />
+          Nová výzva
+        </UiButton>
+      </div>
     </div>
 
     <div class="bg-white rounded-lg border border-gray-200">
-    <UiDataTable
-  :columns="columns"
-  :rows="currentRows"
-  :sort-by="sortBy"
-  :sort-dir="sortDir"
-  :loading="loading"
-  :paginated="true"
-  @update:sort-by="sortBy = $event"
-  @update:sort-dir="sortDir = $event"
->
+      <UiDataTable
+        :columns="columns"
+        :rows="currentRows"
+        :sort-by="sortBy"
+        :sort-dir="sortDir"
+        :loading="loading"
+        :paginated="true"
+        @update:sort-by="sortBy = $event"
+        @update:sort-dir="sortDir = $event"
+      >
         <template #header>
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 border-b border-gray-100">
             <UiSelect
@@ -72,9 +74,9 @@
 
         <template #cell-status="{ row }">
           <UiStatusBadge
-  v-if="resolveStatusKey(row)"
-  :status="resolveStatusKey(row)"
-/>
+            v-if="resolveStatusKey(row)"
+            :status="resolveStatusKey(row)"
+          />
           <span v-else class="text-gray-400">—</span>
         </template>
 
@@ -93,18 +95,17 @@
           </div>
         </template>
 
-       <template #cell-applications="{ row }">
-  <span class="inline-flex items-center gap-1 text-sm font-medium text-gray-700">
-    <FileText class="w-3.5 h-3.5 text-gray-400" />
-    {{ row.applicants_count ?? row.applications_count ?? 0 }}
-  </span>
-</template>
+        <template #cell-applications="{ row }">
+          <span class="inline-flex items-center gap-1 text-sm font-medium text-gray-700">
+            <FileText class="w-3.5 h-3.5 text-gray-400" />
+            {{ row.applicants_count ?? row.applications_count ?? 0 }}
+          </span>
+        </template>
 
         <template #row-actions="{ row }">
           <div class="flex items-center gap-2">
-            
-          
             <button
+              v-if="canEditCalls"
               class="text-gray-400 hover:text-navy transition-colors"
               title="Upraviť"
               @click="openEditModal(row)"
@@ -137,8 +138,9 @@
     />
   </div>
 </template>
+
 <script setup lang="ts">
-import { Plus, Pencil, FileText, X } from 'lucide-vue-next'
+import { Plus, Pencil, Eye, FileText, X } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
@@ -203,6 +205,12 @@ interface CallRow {
 const api = useApi()
 const { addToast } = useToast()
 
+// ── Auth & Permissions ────────────────────────────────────────────────────────
+
+const authStore = useAuthStore()
+const canCreateCalls = computed(() => authStore.hasPermission('programs.create'))
+const canEditCalls = computed(() => authStore.hasPermission('programs.edit'))
+
 // ── Filters ───────────────────────────────────────────────────────────────────
 
 const statusFilter = ref('')
@@ -239,7 +247,7 @@ function resetFilters() {
 const columns = [
   { key: 'name', label: 'Názov', sortable: true },
   { key: 'program', label: 'Program', sortable: true },
-  { key: 'status', label: 'Stav' },
+  { key: 'status', label: 'Stav', sortable: true },
   { key: 'deadline', label: 'Deadline', sortable: true },
   { key: 'applications', label: 'Prihlášky', sortable: true },
 ]
@@ -326,11 +334,9 @@ async function fetchCalls() {
 
     const res: any = await api.get('/v1/admin/calls', { params })
 
-    // FIX: Defensive unwrap that mirrors the logic you used inside openEditModal
     const data = res?.data ?? res
     calls.value = Array.isArray(data) ? data : []
 
-    // Pagination fallbacks if response is a naked array or carries meta signatures
     pagination.value.total =
       res?.meta?.total ??
       res?.total ??

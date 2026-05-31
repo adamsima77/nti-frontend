@@ -354,7 +354,7 @@
     <!-- Actions -->
     <div class="flex flex-col sm:flex-row justify-between gap-3">
       <button
-        v-if="!isNew"
+        v-if="!isNew && canDelete"
         type="button"
         @click="$emit('delete')"
         class="inline-flex items-center gap-2 px-4 py-2.5 border border-danger-200 text-danger-600 rounded-lg text-sm font-medium hover:bg-danger-50 transition-colors"
@@ -418,10 +418,13 @@ import {
   Trash2,
 } from 'lucide-vue-next'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   isNew: boolean
   initialData?: Record<string, any>
-}>()
+  canDelete?: boolean
+}>(), {
+  canDelete: true,
+})
 
 const emit = defineEmits<{
   (e: 'saved', id: number | null): void

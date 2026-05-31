@@ -8,6 +8,7 @@
         <p class="text-gray-500 text-sm">Členovia organizácie s prístupom do portálu NTI</p>
       </div>
       <button
+        v-if="canManageContacts"
         @click="showInviteModal = true"
         class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
       >
@@ -66,7 +67,7 @@
               </td>
               <td class="px-5 py-4">
                 <select
-                  v-if="member.id !== currentUserId && canEdit"
+                  v-if="member.id !== currentUserId && canManageContacts"
                   v-model="member.role"
                   @change="handleRoleChange(member)"
                   class="px-2 py-1 rounded border border-gray-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -101,7 +102,7 @@
               <td class="px-5 py-4">
                 <div class="flex items-center justify-end gap-1">
                   <button
-                    v-if="member.status === 'pending'"
+                    v-if="canManageContacts && member.status === 'pending'"
                     @click="resendInvite(member)"
                     class="p-1.5 text-gray-400 hover:text-blue-600 transition-colors rounded"
                     title="Znova odoslať pozvánku"
@@ -109,7 +110,7 @@
                     <RefreshCw class="w-4 h-4" />
                   </button>
                   <button
-                    v-if="member.id !== currentUserId && canEdit"
+                    v-if="member.id !== currentUserId && canManageContacts"
                     @click="confirmRemove(member)"
                     class="p-1.5 text-gray-400 hover:text-danger-500 transition-colors rounded"
                     title="Odstrániť člena"
@@ -144,12 +145,14 @@
           >
           <div class="flex gap-2">
             <button
+              v-if="canManageContacts"
               @click="resendInvite(invite)"
               class="text-xs text-warning-700 hover:underline"
             >
               Znova odoslať
             </button>
             <button
+              v-if="canManageContacts"
               @click="cancelInvite(invite)"
               class="text-xs text-danger-600 hover:underline"
             >
@@ -316,19 +319,8 @@ useHead({ title: 'Správa členov | NTI Firma' })
 
 const authStore = useAuthStore()
 
-// TODO: remove when backend is available
-if (!authStore.user) {
-  authStore.user = {
-    id: 2,
-    email: 'info@techfirma.sk',
-    organization_name: 'TechFirma s.r.o.',
-    role: 'company',
-  }
-  authStore.token = 'mock-token'
-}
-
 const currentUserId = 2
-const canEdit = true // TODO: check if current user is admin
+const canManageContacts = computed(() => authStore.hasPermission('organizations.manage_contacts'))
 
 interface Member {
   id: number

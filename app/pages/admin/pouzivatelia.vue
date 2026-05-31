@@ -82,6 +82,7 @@
           <div class="flex items-center gap-2">
             <!-- Edit -->
             <button
+              v-if="canEditUsers"
               class="text-blue-600 hover:text-blue-800 transition-colors"
               :title="$t('user_management.edit')"
               :disabled="isSuperAdmin(row)"
@@ -93,7 +94,7 @@
 
             <!-- GDPR Report download -->
             <button
-              v-if="!isSuperAdmin(row)"
+              v-if="canGenerateGdprReport && !isSuperAdmin(row)"
               class="text-gray-400 hover:text-blue-600 transition-colors"
               :title="$t('user_management.gdpr_download')"
               @click="openGdprReportModal(row)"
@@ -103,7 +104,7 @@
 
             <!-- GDPR Anonymize -->
             <button
-              v-if="!isSuperAdmin(row)"
+              v-if="canAnonymizeUsers && !isSuperAdmin(row)"
               class="text-gray-400 hover:text-danger-500 transition-colors"
               :title="$t('user_management.gdpr_anonymize')"
               @click="openAnonymizeModal(row)"
@@ -170,6 +171,7 @@ useHead({ title: t('user_management.page_title') })
 
 const api          = useApi()
 const { addToast } = useToast()
+const authStore = useAuthStore()
 
 // ── Meta: roles & statuses ───────────────────────────────────────────────────
 
@@ -221,7 +223,7 @@ function formatDate(date: string) {
 const search       = ref('')
 const roleFilter   = ref('')
 const statusFilter = ref('')
-const sortBy       = ref<string | null>(null)
+const sortBy       = ref<string | undefined>(undefined)
 const sortDir      = ref<'asc' | 'desc'>('asc')
 
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
@@ -248,6 +250,10 @@ const columns = [
   { key: 'created_at', label: t('user_management.col_registered'), sortable: true },
 ]
 
+const canEditUsers = computed(() => authStore.hasPermission('identityaccess.users.edit'))
+const canGenerateGdprReport = computed(() => authStore.hasPermission('audit.manage_gdpr'))
+const canAnonymizeUsers = computed(() => authStore.hasPermission('audit.anonymize_users'))
+
 // ── Table data ───────────────────────────────────────────────────────────────
 
 const isLoading = ref(false)
@@ -261,11 +267,12 @@ const pagination = ref({
 })
 
 const currentRows = computed(() => {
-  if (!sortBy.value) return rows.value
+  const sortKey = sortBy.value
+  if (!sortKey) return rows.value
 
   return [...rows.value].sort((a, b) => {
-    const av = a[sortBy.value!] ?? ''
-    const bv = b[sortBy.value!] ?? ''
+    const av = a[sortKey] ?? ''
+    const bv = b[sortKey] ?? ''
 
     const cmp = String(av).localeCompare(String(bv), 'sk', {
       numeric:     true,
