@@ -1516,5 +1516,31 @@
     "cancel": "Zrušiť",
     "close": "Zatvoriť",
     "retry": "Skúsiť znova"
+  },
+  "admin_dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Prehľad aktivít a štatistík platformy",
+    "stats": {
+      "applications": "Prihlášky",
+      "activeCalls": "Aktívne výzvy",
+      "users": "Používatelia",
+      "teams": "Tímy"
+    },
+    "activeCalls": {
+      "title": "Aktívne výzvy",
+      "applicationsCount": "{count} prihlášok",
+      "deadline": "Deadline",
+      "empty": "Žiadne aktívne výzvy nie sú momentálne k dispozícii."
+    },
+    "pendingApprovals": {
+      "title": "Čakajúce organizácie na schválenie",
+      "noOrganization": "Bez organizácie",
+      "noPosition": "Pozícia neuvedená",
+      "registration": "Registrácia",
+      "empty": "Žiadne organizácie nečakajú na schválenie."
+    },
+    "cmsOverview": {
+      "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."
+    }
   }
 }
