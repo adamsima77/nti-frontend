@@ -48,6 +48,7 @@
           <ArrowDown class="w-4 h-4 text-gray-500" />
         </button>
         <button
+          v-if="canEditBlocks"
           class="p-1.5 rounded hover:bg-gray-100"
           title="Upraviť"
           @click="editBlock(index)"
@@ -55,6 +56,7 @@
           <Pencil class="w-4 h-4 text-blue-600" />
         </button>
         <button
+          v-if="canDeleteBlocks"
           class="p-1.5 rounded hover:bg-gray-100"
           title="Vymazať"
           @click="removeBlock(index)"
@@ -129,6 +131,10 @@ const emit = defineEmits<{
   'update:modelValue': [value: CmsBlock[]]
 }>()
 
+const authStore = useAuthStore()
+const canEditBlocks = computed(() => authStore.hasPermission('content.edit_any'))
+const canDeleteBlocks = computed(() => authStore.hasPermission('content.delete_any'))
+
 const showPicker = ref(false)
 const showEditorModal = ref(false)
 const editingBlockIndex = ref<number | null>(null)
@@ -188,6 +194,7 @@ function addBlock(type: BlockType) {
 
 function editBlock(index: number) {
   const block = props.modelValue[index]
+  if (!block) return
   editingBlockIndex.value = index
   editingBlockType.value = block.type
   editingBlockData.value = { ...block.content }
@@ -203,7 +210,13 @@ function moveBlock(index: number, direction: number) {
   const blocks = [...props.modelValue]
   const target = index + direction
   if (target < 0 || target >= blocks.length) return
-  ;[blocks[index], blocks[target]] = [blocks[target], blocks[index]]
+
+  const currentBlock = blocks[index]
+  const targetBlock = blocks[target]
+  if (!currentBlock || !targetBlock) return
+
+  blocks[index] = targetBlock
+  blocks[target] = currentBlock
   emit(
     'update:modelValue',
     blocks.map((b, i) => ({ ...b, order: i })),
@@ -213,7 +226,9 @@ function moveBlock(index: number, direction: number) {
 function handleBlockSaved(data: any) {
   const blocks = [...props.modelValue]
   if (editingBlockIndex.value !== null) {
-    blocks[editingBlockIndex.value] = { ...blocks[editingBlockIndex.value], content: data }
+    const currentBlock = blocks[editingBlockIndex.value]
+    if (!currentBlock) return
+    blocks[editingBlockIndex.value] = { ...currentBlock, content: data }
   } else {
     blocks.push({
       id: `new-${Date.now()}`,

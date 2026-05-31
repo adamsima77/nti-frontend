@@ -56,6 +56,7 @@
         <template #row-actions="{ row }">
           <div class="flex items-center gap-2">
             <button
+              v-if="canEditContent"
               class="text-blue-600 hover:text-blue-800"
               :title="$t('cms.actions.edit')"
               @click="openEditModal(row)"
@@ -63,7 +64,7 @@
               <Pencil class="w-4 h-4" />
             </button>
             <button
-              v-if="activeTab !== 'email_templates'"
+              v-if="canDeleteContent && activeTab !== 'email_templates'"
               class="text-gray-400 hover:text-danger-500"
               :title="$t('cms.actions.delete')"
               @click="openDeleteModal(row)"
@@ -154,6 +155,7 @@ useHead({ title: 'CMS | NTI' })
 const api = useApi()
 const { addToast } = useToast()
 const { locale, t } = useI18n()
+const authStore = useAuthStore()
 
 const lang = computed(() => (locale.value === 'en' ? 'en' : 'sk'))
 
@@ -175,8 +177,10 @@ const activeTabLabel = computed(() => {
   const tab = tabs.find((tab) => tab.key === activeTab.value)
   return tab ? t(tab.label) : ''
 })
-const sortBy = ref<string | null>(null)
+const sortBy = ref<string | undefined>(undefined)
 const sortDir = ref<'asc' | 'desc'>('asc')
+const canEditContent = computed(() => authStore.hasPermission('content.edit_any'))
+const canDeleteContent = computed(() => authStore.hasPermission('content.delete_any'))
 
 type TabKey = 'clanky' | 'partneri' | 'faq' | 'bannery' | 'site_members' | 'meta_tags' | 'partner_references' | 'email_templates'
 
@@ -437,11 +441,12 @@ const currentColumns = computed(() => {
 })
 
 const currentRows = computed(() => {
-  if (!sortBy.value) return rows.value
+  const sortKey = sortBy.value
+  if (!sortKey) return rows.value
 
   return [...rows.value].sort((a, b) => {
-    const aValue = a[sortBy.value] ?? ''
-    const bValue = b[sortBy.value] ?? ''
+    const aValue = a[sortKey] ?? ''
+    const bValue = b[sortKey] ?? ''
 
     if (typeof aValue === 'number' && typeof bValue === 'number') {
       return sortDir.value === 'asc' ? aValue - bValue : bValue - aValue

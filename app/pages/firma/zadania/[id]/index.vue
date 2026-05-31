@@ -21,6 +21,7 @@
       </div>
       <div class="flex gap-2 shrink-0">
         <NuxtLink
+          v-if="canEditTask"
           :to="`/firma/zadania/${task.id}/edit`"
           class="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
         >
@@ -28,7 +29,7 @@
           Upraviť
         </NuxtLink>
         <button
-          v-if="task.status === 'draft'"
+          v-if="canEditTask && task.status === 'draft'"
           class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
         >
           <Send class="w-4 h-4" />
@@ -249,6 +250,8 @@ const task = {
     },
   ],
 }
+
+const canEditTask = computed(() => authStore.hasPermission('organizations.edit_own'))
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('sk-SK', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val)

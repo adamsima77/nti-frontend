@@ -5,7 +5,7 @@
         <h1 class="text-2xl font-bold text-navy">Vyzvy</h1>
         <p class="text-gray-500 mt-1">Sprava vyziev a prihlasovacich obdobi</p>
       </div>
-      <UiButton>
+      <UiButton v-if="canCreateCalls">
         <Plus class="w-4 h-4" />
         Nova vyzva
       </UiButton>
@@ -25,7 +25,10 @@
             <button class="text-blue-600 hover:text-blue-800">
               <Eye class="w-4 h-4" />
             </button>
-            <button class="text-gray-400 hover:text-gray-600">
+            <button
+              v-if="canEditCalls"
+              class="text-gray-400 hover:text-gray-600"
+            >
               <Pencil class="w-4 h-4" />
             </button>
           </div>
@@ -45,6 +48,10 @@ definePageMeta({
 })
 
 useHead({ title: 'Vyzvy — Admin | NTI' })
+
+const authStore = useAuthStore()
+const canCreateCalls = computed(() => authStore.hasPermission('programs.create'))
+const canEditCalls = computed(() => authStore.hasPermission('programs.edit'))
 
 const columns = [
   { key: 'name', label: 'Nazov', sortable: true },

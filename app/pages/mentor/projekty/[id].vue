@@ -41,6 +41,7 @@
         </p>
       </div>
       <button
+        v-if="canManageConsultations"
         @click="showConsultationModal = true"
         class="shrink-0 inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
       >
@@ -199,6 +200,7 @@
                   <p class="text-xs text-gray-400 mt-0.5">{{ c.date }} · {{ c.duration }} min · {{ c.type }}</p>
                 </div>
                 <button
+                  v-if="canManageConsultations"
                   @click="editConsultation(c)"
                   class="text-gray-400 hover:text-blue-600 transition-colors"
                 >
@@ -504,6 +506,7 @@ const localePath = useLocalePath()
 const route = useRoute()
 const api = useApi()
 const { addToast } = useToast()
+const authStore = useAuthStore()
 
 type MentorProjectDetail = MentorProject & {
   productOwner?: { name: string; email?: string | null } | null
@@ -580,6 +583,7 @@ onMounted(loadProject)
 // ── Computed ─────────────────────────────────────────────────
 const completedMilestones = computed(() => project.milestones.filter((m) => m.status === 'completed').length)
 const totalConsultationTime = computed(() => project.consultations.reduce((sum, consultation) => sum + consultation.duration, 0))
+const canManageConsultations = computed(() => authStore.hasPermission('mentorship.edit_any') || authStore.hasPermission('mentorship.edit_own'))
 
 // ── Milestone helpers ─────────────────────────────────────────
 const milestoneLoading = ref<number | null>(null)

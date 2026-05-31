@@ -42,6 +42,7 @@
       v-else-if="taskData"
       :is-new="false"
       :initial-data="taskData"
+      :can-delete="canDeleteTask"
       @saved="handleSaved"
       @delete="handleDelete"
     />
@@ -80,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { ChevronLeft } from 'lucide-vue-next'
 import ZadanieForm from '~/components/ui/ZadanieForm.vue'
 
@@ -94,19 +95,10 @@ useHead({ title: 'Upraviť zadanie | NTI Firma' })
 
 const authStore = useAuthStore()
 
-// TODO: remove when backend is available
-if (!authStore.user) {
-  authStore.user = {
-    id: 2,
-    email: 'info@techfirma.sk',
-    organization_name: 'TechFirma s.r.o.',
-    role: 'company',
-  }
-  authStore.token = 'mock-token'
-}
 
 const route = useRoute()
 const router = useRouter()
+const canDeleteTask = computed(() => authStore.hasPermission('organizations.edit_own'))
 
 const isLoading = ref(true)
 const showDeleteModal = ref(false)
