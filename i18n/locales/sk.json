@@ -1542,36 +1542,30 @@
     "commission_avg_label": "Priemer komisie",
     "application_label": "Prihláška",
     "program_label": "Program"
-<<<<<<< HEAD
+  },
+  "cmsOverview": {
+    "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."
+  },
+  "admin_calls": {
+    "title": "Výzvy",
+    "subtitle": "Správa výziev a prihlasovacích období",
+    "page_title": "Výzvy — Admin | NTI",
+    "add_call": "Nová výzva",
+    "all_statuses": "Všetky stavy",
+    "deadline_from": "Deadline od",
+    "deadline_to": "Deadline do",
+    "clear_filters": "Zrušiť filtre",
+    "total_calls": "Celkovo výziev: {count}",
+    "col_name": "Názov",
+    "col_program": "Program",
+    "col_organization": "Organizácia",
+    "col_status": "Stav",
+    "col_deadline": "Deadline",
+    "col_applications": "Prihlášky",
+    "edit": "Upraviť",
+    "open": "Otvorená",
+    "closed": "Uzavretá",
+    "load_error": "Nepodarilo sa načítať výzvu.",
+    "fetch_error": "Nepodarilo sa načítať výzvy."
   }
 }
-=======
-  },
-    "cmsOverview": {
-      "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."
-    },
-
-   "admin_calls": {
-  "title": "Výzvy",
-  "subtitle": "Správa výziev a prihlasovacích období",
-  "page_title": "Výzvy — Admin | NTI",
-  "add_call": "Nová výzva",
-  "all_statuses": "Všetky stavy",
-  "deadline_from": "Deadline od",
-  "deadline_to": "Deadline do",
-  "clear_filters": "Zrušiť filtre",
-  "total_calls": "Celkovo výziev: {count}",
-  "col_name": "Názov",
-  "col_program": "Program",
-  "col_organization": "Organizácia",
-  "col_status": "Stav",
-  "col_deadline": "Deadline",
-  "col_applications": "Prihlášky",
-  "edit": "Upraviť",
-  "open": "Otvorená",
-  "closed": "Uzavretá",
-  "load_error": "Nepodarilo sa načítať výzvu.",
-  "fetch_error": "Nepodarilo sa načítať výzvy."
-}
-}
->>>>>>> c751b73f037d3bfa430e3676857ba452ca9bc897
