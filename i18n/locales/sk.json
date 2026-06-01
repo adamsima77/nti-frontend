@@ -1413,6 +1413,7 @@
       "sufficient": "Dostatočný",
       "insufficient": "Nedostatočný"
     },
+<<<<<<< HEAD
     "overall_comment": "Celkový komentár a odporúčanie",
     "internal_note_label": "Interná poznámka pre komisiu",
     "internal_note_placeholder": "Poznámky viditeľné iba pre členov komisie...",
@@ -1462,4 +1463,32 @@
     "application_label": "Prihláška",
     "program_label": "Program"
   }
+=======
+    "cmsOverview": {
+      "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."
+    }
+  },
+   "admin_calls": {
+  "title": "Výzvy",
+  "subtitle": "Správa výziev a prihlasovacích období",
+  "page_title": "Výzvy — Admin | NTI",
+  "add_call": "Nová výzva",
+  "all_statuses": "Všetky stavy",
+  "deadline_from": "Deadline od",
+  "deadline_to": "Deadline do",
+  "clear_filters": "Zrušiť filtre",
+  "total_calls": "Celkovo výziev: {count}",
+  "col_name": "Názov",
+  "col_program": "Program",
+  "col_organization": "Organizácia",
+  "col_status": "Stav",
+  "col_deadline": "Deadline",
+  "col_applications": "Prihlášky",
+  "edit": "Upraviť",
+  "open": "Otvorená",
+  "closed": "Uzavretá",
+  "load_error": "Nepodarilo sa načítať výzvu.",
+  "fetch_error": "Nepodarilo sa načítať výzvy."
+}
+>>>>>>> e263f9342dbe30a3ae99094a5bce7d6af209552b
 }

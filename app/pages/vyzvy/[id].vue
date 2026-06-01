@@ -22,12 +22,12 @@
             <span
               :class="[
                 'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold',
-                call.status === 'open'
+                isCallOpen(call) === true
                   ? 'bg-green-400/20 text-green-200'
                   : 'bg-gray-400/20 text-gray-300'
               ]"
             >
-              {{ call.status === 'open' ? `🟢 ${$t('calls.open')}` : `🔒 ${$t('calls.closed')}` }}
+              {{ isCallOpen(call) === true ? `🟢 ${$t('calls.open')}` : `🔒 ${$t('calls.closed')}` }}
             </span>
             <span class="text-blue-300 text-sm">{{ call.programName }}</span>
           </div>
@@ -186,12 +186,12 @@
                   <span
                     :class="[
                       'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold',
-                      call.status === 'open'
+                      isCallOpen(call) === true
                         ? 'bg-green-50 text-green-700'
                         : 'bg-gray-100 text-gray-600'
                     ]"
                   >
-                    {{ call.status === 'open' ? `🟢 ${$t('calls.open')}` : `🔒 ${$t('calls.closed')}` }}
+                    {{ isCallOpen(call) === true ? `🟢 ${$t('calls.open')}` : `🔒 ${$t('calls.closed')}` }}
                   </span>
                 </dd>
               </div>
@@ -201,7 +201,7 @@
             <!-- CTA -->
             <div class="mt-6">
               <NuxtLink
-                v-if="call.status === 'open'"
+                v-if="isCallOpen(call) === true"
                 :to="localePath('/student/prihlasky/nova')"
               >
                 <button class="w-full px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
@@ -250,5 +250,18 @@ useSeoMeta({
 const formatDate = (dateString?: string) => {
   if (!dateString) return '—'
   return new Date(dateString).toLocaleDateString('sk-SK')
+}
+
+const isCallOpen = (call: any) => {
+  const forceClosed = call.force_closed ?? call.forceClosed
+  const deadline = call.application_deadline ?? call.applicationDeadline
+
+  if (forceClosed) return false
+  if (deadline) {
+    const d = new Date(deadline)
+    if (new Date() > d) return false
+  }
+
+  return true
 }
 </script>
