@@ -2,13 +2,13 @@
   <div class="max-w-7xl mx-auto px-6 py-10">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h1 class="text-2xl font-bold text-navy">Výzvy</h1>
-        <p class="text-gray-500 mt-1">Správa výziev a prihlasovacích období</p>
+        <h1 class="text-2xl font-bold text-navy">{{ $t('admin_calls.title') }}</h1>
+        <p class="text-gray-500 mt-1">{{ $t('admin_calls.subtitle') }}</p>
       </div>
       <div class="flex items-center gap-2">
         <UiButton v-if="canCreateCalls" @click="openCreateModal">
           <Plus class="w-4 h-4 mr-1" />
-          Nová výzva
+          {{ $t('admin_calls.add_call') }}
         </UiButton>
       </div>
     </div>
@@ -29,26 +29,26 @@
             <UiSelect
               v-model="statusFilter"
               :options="statusOptions"
-              placeholder="Všetky stavy"
+              :placeholder="$t('admin_calls.all_statuses')"
               @change="onFilterChange"
             />
             <UiInput
               v-model="deadlineFrom"
               type="date"
-              placeholder="Deadline od"
+              :placeholder="$t('admin_calls.deadline_from')"
               @change="onFilterChange"
             />
             <UiInput
               v-model="deadlineTo"
               type="date"
-              placeholder="Deadline do"
+              :placeholder="$t('admin_calls.deadline_to')"
               @change="onFilterChange"
             />
             <div class="flex items-center gap-3">
               <button
                 v-if="hasActiveFilters"
                 class="flex items-center gap-1 text-sm text-gray-400 hover:text-danger-500 transition-colors"
-                title="Zrušiť filtre"
+                :title="$t('admin_calls.clear_filters')"
                 @click="resetFilters"
               >
                 <X class="w-4 h-4" />
@@ -89,9 +89,11 @@
               v-if="row.is_open"
               class="text-xs text-emerald-600 font-medium mt-0.5"
             >
-              Otvorená
+              {{ $t('admin_calls.open') }}
             </p>
-            <p v-else class="text-xs text-gray-400 mt-0.5">Uzavretá</p>
+            <p v-else class="text-xs text-gray-400 mt-0.5">
+              {{ $t('admin_calls.closed') }}
+            </p>
           </div>
         </template>
 
@@ -107,7 +109,7 @@
             <button
               v-if="canEditCalls"
               class="text-gray-400 hover:text-navy transition-colors"
-              title="Upraviť"
+              :title="$t('admin_calls.edit')"
               @click="openEditModal(row)"
             >
               <Pencil class="w-4 h-4" />
@@ -121,7 +123,7 @@
         class="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50"
       >
         <span class="text-sm text-gray-500">
-          Celkovo výziev: {{ pagination.total }}
+          {{ $t('admin_calls.total_calls', { count: pagination.total }) }}
         </span>
         <UiPagination
           :current-page="pagination.currentPage"
@@ -140,64 +142,34 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, Pencil, Eye, FileText, X } from 'lucide-vue-next'
+import { Plus, Pencil, FileText, X } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
 })
 
-useHead({ title: 'Výzvy — Admin | NTI' })
+const { t } = useI18n()
+
+useHead({ title: t('admin_calls.page_title') })
 
 interface CallRow {
   id: number
   name: string
   description?: string
-
   application_start?: string
   application_deadline?: string
-
   project_start?: string
   project_end?: string
-
   is_open?: boolean
-
   applicants_count?: number
   applications_count?: number
-
-  status?: {
-    id: number
-    name: string
-  }
-
-  program?: {
-    id: number
-    name: string
-  }
-
-  organization?: {
-    id: number
-    name: string
-  }
-
-  currentStatus?: {
-    id: number
-    name: string
-  }
-
-  currentStatusHistory?: {
-    id: number
-    status: {
-      id: number
-      name: string
-    }
-  }
-
-  call_type?: {
-    id: number
-    name: string
-  }
-
+  status?: { id: number; name: string }
+  program?: { id: number; name: string }
+  organization?: { id: number; name: string }
+  currentStatus?: { id: number; name: string }
+  currentStatusHistory?: { id: number; status: { id: number; name: string } }
+  call_type?: { id: number; name: string }
   callTranslations?: any[]
   callCriteria?: any[]
 }
@@ -207,55 +179,61 @@ const { addToast } = useToast()
 
 // ── Auth & Permissions ────────────────────────────────────────────────────────
 
-const authStore = useAuthStore()
+const authStore      = useAuthStore()
 const canCreateCalls = computed(() => authStore.hasPermission('programs.create'))
-const canEditCalls = computed(() => authStore.hasPermission('programs.edit'))
+const canEditCalls   = computed(() => authStore.hasPermission('programs.edit'))
 
 // ── Filters ───────────────────────────────────────────────────────────────────
 
 const statusFilter = ref('')
 const deadlineFrom = ref('')
-const deadlineTo = ref('')
+const deadlineTo   = ref('')
+const sortBy       = ref<string | null>(null)
+const sortDir      = ref<'asc' | 'desc'>('asc')
 
-const sortBy = ref<string | null>(null)
-const sortDir = ref<'asc' | 'desc'>('asc')
-
-const statusOptions = [
-  { value: '', label: 'Všetky stavy' },
-  { value: 'Draft', label: 'Draft' },
-  { value: 'Publikované', label: 'Publikované' },
-  { value: 'V párovaní', label: 'V párovaní' },
-  { value: 'Pridelené', label: 'Pridelené' },
+const statusOptions = computed(() => [
+  { value: '',             label: t('admin_calls.all_statuses') },
+  { value: 'Draft',        label: 'Draft' },
+  { value: 'Publikované',  label: 'Publikované' },
+  { value: 'V párovaní',   label: 'V párovaní' },
+  { value: 'Pridelené',    label: 'Pridelené' },
   { value: 'V realizácii', label: 'V realizácii' },
-  { value: 'Uzavreté', label: 'Uzavreté' },
-]
+  { value: 'Uzavreté',     label: 'Uzavreté' },
+])
 
 const hasActiveFilters = computed(
   () => !!statusFilter.value || !!deadlineFrom.value || !!deadlineTo.value,
 )
 
 function resetFilters() {
-  statusFilter.value = ''
-  deadlineFrom.value = ''
-  deadlineTo.value = ''
+  statusFilter.value           = ''
+  deadlineFrom.value           = ''
+  deadlineTo.value             = ''
   pagination.value.currentPage = 1
   fetchCalls()
 }
 
-// ── Table columns ─────────────────────────────────────────────────────────────
+// ── Columns ───────────────────────────────────────────────────────────────────
 
-const columns = [
-  { key: 'name', label: 'Názov', sortable: true },
-  { key: 'program', label: 'Program', sortable: true },
-  { key: 'status', label: 'Stav', sortable: true },
-  { key: 'deadline', label: 'Deadline', sortable: true },
-  { key: 'applications', label: 'Prihlášky', sortable: true },
-]
+const columns = computed(() => [
+  { key: 'name',         label: t('admin_calls.col_name'),         sortable: true },
+  { key: 'program',      label: t('admin_calls.col_program'),      sortable: true },
+  { key: 'status',       label: t('admin_calls.col_status') },
+  { key: 'deadline',     label: t('admin_calls.col_deadline'),     sortable: true },
+  { key: 'applications', label: t('admin_calls.col_applications'), sortable: true },
+])
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const loading = ref(false)
-const calls = ref<CallRow[]>([])
+const calls   = ref<CallRow[]>([])
+
+const pagination = ref({
+  currentPage: 1,
+  totalPages:  1,
+  total:       0,
+  perPage:     15,
+})
 
 const currentRows = computed(() => {
   if (!sortBy.value) return calls.value
@@ -269,44 +247,32 @@ const currentRows = computed(() => {
         av = a.name ?? ''
         bv = b.name ?? ''
         break
-
       case 'program':
         av = a.program?.name ?? ''
         bv = b.program?.name ?? ''
         break
-
       case 'deadline':
         av = a.application_deadline ?? ''
         bv = b.application_deadline ?? ''
         break
-
       case 'applications':
         av = a.applicants_count ?? a.applications_count ?? 0
         bv = b.applicants_count ?? b.applications_count ?? 0
         break
-
       default:
         av = ''
         bv = ''
     }
 
-    const comparison =
+    const cmp =
       typeof av === 'number' && typeof bv === 'number'
         ? av - bv
         : String(av).localeCompare(String(bv), 'sk', {
-            numeric: true,
-            sensitivity: 'base',
+            numeric: true, sensitivity: 'base',
           })
 
-    return sortDir.value === 'asc' ? comparison : -comparison
+    return sortDir.value === 'asc' ? cmp : -cmp
   })
-})
-
-const pagination = ref({
-  currentPage: 1,
-  totalPages: 1,
-  total: 0,
-  perPage: 15,
 })
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -316,47 +282,23 @@ async function fetchCalls() {
 
   try {
     const params: Record<string, any> = {
-      page: pagination.value.currentPage,
+      page:     pagination.value.currentPage,
       per_page: pagination.value.perPage,
     }
 
-    if (statusFilter.value) {
-      params.status = statusFilter.value
-    }
-
-    if (deadlineFrom.value) {
-      params.deadline_from = deadlineFrom.value
-    }
-
-    if (deadlineTo.value) {
-      params.deadline_to = deadlineTo.value
-    }
+    if (statusFilter.value) params.status        = statusFilter.value
+    if (deadlineFrom.value) params.deadline_from = deadlineFrom.value
+    if (deadlineTo.value)   params.deadline_to   = deadlineTo.value
 
     const res: any = await api.get('/v1/admin/calls', { params })
 
-    const data = res?.data ?? res
-    calls.value = Array.isArray(data) ? data : []
+    calls.value                  = res?.data         ?? []
+    pagination.value.total       = res?.total        ?? 0
+    pagination.value.currentPage = res?.current_page ?? pagination.value.currentPage
+    pagination.value.totalPages  = res?.last_page    ?? 1
 
-    pagination.value.total =
-      res?.meta?.total ??
-      res?.total ??
-      (Array.isArray(res) ? res.length : 0)
-
-    pagination.value.currentPage =
-      res?.meta?.current_page ??
-      res?.current_page ??
-      pagination.value.currentPage
-
-    pagination.value.totalPages =
-      res?.meta?.last_page ??
-      res?.last_page ??
-      Math.max(1, Math.ceil(pagination.value.total / pagination.value.perPage))
-      
   } catch {
-    addToast({
-      message: 'Nepodarilo sa načítať výzvy.',
-      type: 'error',
-    })
+    addToast({ message: t('admin_calls.fetch_error'), type: 'error' })
   } finally {
     loading.value = false
   }
@@ -381,20 +323,20 @@ function resolveStatusKey(row: CallRow): string {
     row.currentStatus?.name
 
   const lookup: Record<string, string> = {
-    Draft: 'draft',
-    Publikované: 'published',
-    'V párovaní': 'matching',
-    Pridelené: 'assigned',
+    'Draft':        'draft',
+    'Publikované':  'published',
+    'V párovaní':   'matching',
+    'Pridelené':    'assigned',
     'V realizácii': 'in_progress',
-    Uzavreté: 'closed',
+    'Uzavreté':     'closed',
   }
 
   return lookup[statusName ?? ''] ?? 'draft'
 }
 
-// ── Modal state ───────────────────────────────────────────────────────────────
+// ── Modal ─────────────────────────────────────────────────────────────────────
 
-const modalOpen = ref(false)
+const modalOpen    = ref(false)
 const selectedCall = ref<CallRow | null>(null)
 
 function openCreateModal() {
@@ -404,12 +346,12 @@ function openCreateModal() {
 
 async function openEditModal(call: CallRow) {
   try {
-    loading.value = true
-    const full = await api.get(`/calls/${call.id}`) as any
+    loading.value      = true
+    const full: any    = await api.get(`/v1/admin/calls/${call.id}`)
     selectedCall.value = full?.data ?? full
     modalOpen.value    = true
   } catch {
-    addToast({ message: 'Nepodarilo sa načítať výzvu.', type: 'error' })
+    addToast({ message: t('admin_calls.load_error'), type: 'error' })
   } finally {
     loading.value = false
   }
@@ -419,11 +361,8 @@ async function openEditModal(call: CallRow) {
 
 function formatDate(dateStr?: string) {
   if (!dateStr) return '—'
-
   return new Date(dateStr).toLocaleDateString('sk-SK', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
+    day: '2-digit', month: '2-digit', year: 'numeric',
   })
 }
 

@@ -113,6 +113,70 @@
             </div>
           </div>
         </div>
+
+        <div
+          v-if="isEditing"
+          class="flex items-center justify-between rounded-xl border px-4 py-3.5 transition-colors"
+          :class="form.force_closed
+            ? 'border-red-200 bg-red-50'
+            : 'border-gray-200 bg-white'"
+        >
+          <div class="flex items-start gap-3">
+            <div
+              class="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              :class="form.force_closed ? 'bg-red-100' : 'bg-gray-100'"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="w-4 h-4"
+                :class="form.force_closed ? 'text-red-500' : 'text-gray-400'"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <div>
+              <p
+                class="text-sm font-semibold leading-snug"
+                :class="form.force_closed ? 'text-red-700' : 'text-navy'"
+              >
+                Manuálne uzavrieť výzvu
+              </p>
+              <p
+                class="text-xs mt-0.5 leading-relaxed"
+                :class="form.force_closed ? 'text-red-500' : 'text-slate-400'"
+              >
+                {{
+                  form.force_closed
+                    ? 'Výzva je manuálne uzavretá — uchádzači sa nemôžu prihlásiť.'
+                    : 'Výzva sa riadi termínom uzávierky. Zapnutím ju okamžite uzavriete.'
+                }}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            role="switch"
+            :aria-checked="form.force_closed"
+            class="relative ml-4 w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 flex-shrink-0"
+            :class="form.force_closed
+              ? 'bg-red-500 focus:ring-red-400'
+              : 'bg-gray-200 focus:ring-gray-300'"
+            @click="form.force_closed = !form.force_closed"
+          >
+            <span
+              class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"
+              :class="form.force_closed ? 'translate-x-5' : 'translate-x-0'"
+            />
+          </button>
+        </div>
       </div>
 
       <div v-show="activeTab === 'form'" class="space-y-4">
@@ -120,6 +184,7 @@
           Navrhnite polia, ktoré budú uchádzači vypĺňať pri podaní prihlášky.
           Pri <strong>Program A</strong> sú predvyplnené polia pre 6 povinných dokumentov.
         </p>
+        <p v-if="errors._form" class="text-sm font-medium text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2.5">{{ errors._form }}</p>
 
         <div class="space-y-2">
           <div
@@ -237,6 +302,7 @@
           Vyberte hodnotiace kritériá komisie a nastavte ich <strong>váhu (1–10)</strong>.
           Kritériá s príznakom <em>akademický signál</em> sú informatívne — nespôsobujú automatické zamietnutie (§7.2).
         </p>
+        <p v-if="errors._criteria" class="text-sm font-medium text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2.5">{{ errors._criteria }}</p>
 
         <div class="flex items-center justify-between">
           <label class="block text-xs font-semibold text-slate-500">
@@ -417,13 +483,21 @@ interface CallRaw {
   description?: string
   program_id?: number
   status_id?: number
+  force_closed?: boolean | number | string
   application_start?: string
   application_deadline?: string
   project_start?: string
   project_end?: string
   status?: { id: number; name: string }
+  call_translations?: CallTranslation[]
   callTranslations?: CallTranslation[]
   call_criteria?: {
+    id: number
+    name?: string
+    description?: string
+    pivot?: { weight: number; is_academic_signal: boolean }
+  }[]
+  callCriteria?: {
     id: number
     name?: string
     description?: string
@@ -482,9 +556,9 @@ const PROGRAM_A_DEFAULTS: FormField[] = [
 const activeTab = ref<'basic' | 'form' | 'criteria'>('basic')
 
 const TABS = computed(() => [
-  { key: 'basic',    label: 'Základné info',        badge: undefined },
-  { key: 'form',     label: 'Formulár prihlášky',   badge: formFields.value.length },
-  { key: 'criteria', label: 'Kritériá hodnotenia',  badge: form.value.criteria.length },
+  { key: 'basic',    label: 'Základné info',       badge: undefined },
+  { key: 'form',     label: 'Formulár prihlášky',  badge: formFields.value.length },
+  { key: 'criteria', label: 'Kritériá hodnotenia', badge: form.value.criteria.length },
 ])
 
 // ── API / toasts ───────────────────────────────────────────────────────────
@@ -503,14 +577,10 @@ const metaLoading     = ref(false)
 const criteriaLoading = ref(false)
 const isSaving        = ref(false)
 
-// Dynamicky odfiltruje možnosti na základe stavu (vytvorenie vs editácia)
+// Only show Program A when creating; show all programs when editing
 const visibleProgramOptions = computed(() => {
-  if (isEditing.value) {
-    return programOptions.value
-  }
-  return programOptions.value.filter(option => 
-    option.label.toLowerCase().trim() === 'program a'
-  )
+  if (isEditing.value) return programOptions.value
+  return programOptions.value.filter(o => o.label.toLowerCase().trim() === 'program a')
 })
 
 // ── Form ───────────────────────────────────────────────────────────────────
@@ -527,6 +597,7 @@ const emptyForm = () => ({
   application_deadline: '',
   project_start:        '',
   project_end:          '',
+  force_closed:         false,
   criteria:             [] as CriterionPivot[],
 })
 
@@ -553,9 +624,9 @@ function labelToName(label: string): string {
   return /^[a-z]/.test(base) ? base : 'f_' + base
 }
 
-function onLabelInput(field: FormField) { 
+function onLabelInput(field: FormField) {
   isFormDirty.value = true
-  field.name = labelToName(field.label) 
+  field.name = labelToName(field.label)
 }
 
 function onTypeChange(field: FormField) {
@@ -714,7 +785,9 @@ watch(() => props.modelValue, async (open) => {
 
   if (props.call?.id) {
     const c = props.call
-    const primaryTr = c.callTranslations?.[0] ?? null
+    // Support both snake_case and camelCase arrays from backend responses
+    const translations = c.call_translations ?? c.callTranslations ?? []
+    const primaryTr = translations[0] ?? null
 
     form.value = {
       program_id:           c.program_id ?? c.program?.id ?? null,
@@ -726,10 +799,11 @@ watch(() => props.modelValue, async (open) => {
       application_deadline: c.application_deadline?.slice(0, 10) ?? '',
       project_start:        c.project_start?.slice(0, 10)        ?? '',
       project_end:          c.project_end?.slice(0, 10)          ?? '',
-      criteria: (c.call_criteria ?? []).map(cr => ({
+      force_closed:         c.force_closed === true || String(c.force_closed) === '1' || Number(c.force_closed) === 1,
+      criteria: (c.call_criteria ?? c.callCriteria ?? []).map(cr => ({
         id:                 cr.id,
         weight:             cr.pivot?.weight             ?? 5,
-        is_academic_signal: cr.pivot?.is_academic_signal ?? false,
+        is_academic_signal: !!cr.pivot?.is_academic_signal,
       })),
     }
 
@@ -747,7 +821,7 @@ watch(() => props.modelValue, async (open) => {
 
 watch(() => form.value.program_id, (newId) => {
   if (isEditing.value || !newId || isFormDirty.value || formFields.value.length > PROGRAM_A_DEFAULTS.length) return
-  const selected  = programOptions.value.find(p => p.value === newId)
+  const selected   = programOptions.value.find(p => p.value === newId)
   const isProgramA = selected?.label?.toLowerCase() === 'program a'
   if (isProgramA) {
     formFields.value = JSON.parse(JSON.stringify(PROGRAM_A_DEFAULTS))
@@ -761,12 +835,12 @@ function isValid(field: string) { return !errors.value[field] }
 function validate(): boolean {
   errors.value = {}
 
-  // 1. ZÁKLADNÉ INFO (Záložka: 'basic')
-  if (!form.value.program_id)   errors.value.program_id   = 'Vyberte program.'
-  if (!form.value.language_id)  errors.value.language_id  = 'Vyberte jazyk záznamu.'
-  if (!form.value.name.trim())  errors.value.name         = 'Názov výzvy je povinný.'
-  if (!form.value.description.trim()) errors.value.description = 'Popis výzvy je povinný.'
-  
+  // 1. ZÁKLADNÉ INFO
+  if (!form.value.program_id)         errors.value.program_id   = 'Vyberte program.'
+  if (!form.value.language_id)        errors.value.language_id  = 'Vyberte jazyk záznamu.'
+  if (!form.value.name.trim())        errors.value.name         = 'Názov výzvy je povinný.'
+  if (!form.value.description.trim()) errors.value.description  = 'Popis výzvy je povinný.'
+
   if (!form.value.application_start)    errors.value.application_start    = 'Povinné.'
   if (!form.value.application_deadline) errors.value.application_deadline = 'Povinné.'
   if (!form.value.project_start)        errors.value.project_start        = 'Povinné.'
@@ -779,17 +853,16 @@ function validate(): boolean {
 
   if (form.value.project_start && form.value.project_end &&
       form.value.project_end < form.value.project_start) {
-    errors.value.project_end = 'Koniec projektu musí byť po jeho začiatku.'
+    errors.value.project_end = 'Koniec projektu must byť po jeho začiatku.'
   }
 
-  // Ak chýbajú dáta na prvej záložke, okamžite prepneme a vyhodíme toast
   if (Object.keys(errors.value).length > 0) {
     activeTab.value = 'basic'
     addToast({ message: 'Skontrolujte povinné polia v základných informáciách (Názov, Popis, Termíny...).', type: 'error' })
     return false
   }
 
-  // 2. FORMULÁR PRIHLÁŠKY (Záložka: 'form')
+  // 2. FORMULÁR PRIHLÁŠKY
   for (const field of formFields.value) {
     if (!field.label.trim()) {
       activeTab.value = 'form'
@@ -800,7 +873,7 @@ function validate(): boolean {
     if (!field.name.trim() || !/^[a-z][a-z0-9_]*$/.test(field.name)) {
       activeTab.value = 'form'
       errors.value._form = `Pole „${field.label}" má neplatný identifikátor.`
-      addToast({ message: `Chyba identifikátora: Názov poľa „${field.label}“ vyžaduje malé písmená bez diakritiky (a-z, _).`, type: 'error' })
+      addToast({ message: `Chyba identifikátora: Názov poľa „${field.label}" vyžaduje malé písmená bez diakritiky (a-z, _).`, type: 'error' })
       return false
     }
   }
@@ -809,18 +882,18 @@ function validate(): boolean {
   if (names.length !== new Set(names).size) {
     activeTab.value = 'form'
     errors.value._form = 'Formulár obsahuje duplicitné identifikátory polí.'
-    addToast({ message: 'Chyba formulára: Detegovali sa duplicitné identifikátory polí (ID). Každé pole must mať unikátny názov.', type: 'error' })
+    addToast({ message: 'Chyba formulára: Detegovali sa duplicitné identifikátory polí (ID). Každé pole musí mať unikátny názov.', type: 'error' })
     return false
   }
 
-  // 3. KRITÉRIÁ HODNOTENIA (Záložka: 'criteria')
+  // 3. KRITÉRIÁ HODNOTENIA
   if (form.value.criteria.length === 0) {
     activeTab.value = 'criteria'
     errors.value._criteria = 'Musíte vybrať aspoň jedno hodnotiace kritérium.'
     addToast({ message: 'Chyba kritérií: Vyberte aspoň jedno hodnotiace kritérium pre hodnotiacu komisiu.', type: 'error' })
     return false
   }
-  
+
   return true
 }
 
@@ -832,35 +905,37 @@ async function handleSubmit() {
 
   try {
     const sanitizedFields = formFields.value.map(field => ({
-      id: field.id,
-      type: field.type,
-      label: field.label,
-      name: field.name,
+      id:          field.id,
+      type:        field.type,
+      label:       field.label,
+      name:        field.name,
       placeholder: field.placeholder || '',
-      required: !!field.required,
-      help_text: field.help_text || '',
-      options: Array.isArray(field.options) ? field.options.filter(o => o !== '') : [],
-      accept: field.accept || ''
+      required:    !!field.required,
+      help_text:   field.help_text || '',
+      options:     Array.isArray(field.options) ? field.options.filter(o => o !== '') : [],
+      accept:      field.accept || '',
     }))
 
-    const payload: Record<string, any> = {
-      program_id:           form.value.program_id,
-      status_id:            form.value.status_id,
-      language_id:          form.value.language_id,
-      name:                 form.value.name,
-      description:          form.value.description,
-      application_start:    form.value.application_start,
-      application_deadline: form.value.application_deadline,
-      project_start:        form.value.project_start,
-      project_end:          form.value.project_end,
-      criteria:             form.value.criteria,
-      application_form_schema: sanitizedFields.length > 0
-        ? { fields: sanitizedFields }
-        : null,
-    }
+  const payload: Record<string, any> = {
+  program_id:           form.value.program_id,
+  status_id:            form.value.status_id,
+  language_id:          form.value.language_id,
+  name:                 form.value.name,
+  description:          form.value.description,
+  application_start:    form.value.application_start,
+  application_deadline: form.value.application_deadline,
+  project_start:        form.value.project_start,
+  project_end:          form.value.project_end,
+  criteria:             form.value.criteria,
+  force_closed:         Boolean(form.value.force_closed),
+  application_form_schema: sanitizedFields.length > 0
+    ? { fields: sanitizedFields }
+    : null,
+}
 
-    if (isEditing.value) {
-      await api.put(`/v1/admin/calls/${props.call!.id}`, payload)
+    if (props.call?.id) {
+     
+      await api.put(`/v1/admin/calls/${props.call.id}`, payload)
     } else {
       await api.post('/v1/admin/calls', payload)
     }
@@ -874,7 +949,17 @@ async function handleSubmit() {
       errors.value = Object.fromEntries(
         Object.entries(laravelErrors).map(([k, msgs]) => [k, msgs[0]])
       )
-      activeTab.value = 'basic'
+      
+      // Map Laravel array errors cleanly to show user which tab needs attention
+      if (Object.keys(errors.value).some(k => k.startsWith('application_form_schema'))) {
+        activeTab.value = 'form'
+        errors.value._form = 'Na serveri zlyhala validácia schémy formulára.'
+      } else if (Object.keys(errors.value).some(k => k.startsWith('criteria'))) {
+        activeTab.value = 'criteria'
+        errors.value._criteria = 'Na serveri zlyhala validácia kritérií.'
+      } else {
+        activeTab.value = 'basic'
+      }
       addToast({ message: 'Nepodarilo sa uložiť výzvu kvôli chybám validácie na serveri.', type: 'error' })
     } else {
       addToast({ message: 'Nepodarilo sa uložiť výzvu.', type: 'error' })

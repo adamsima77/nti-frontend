@@ -80,12 +80,12 @@
                 <span
                   :class="[
                     'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold mb-4',
-                    call.status === 'open'
+                    isCallOpen(call) === true
                       ? 'bg-green-50 text-green-700'
                       : 'bg-gray-100 text-gray-700',
                   ]"
                 >
-                  {{ call.status === 'open' ? `🟢 ${$t('calls.open')}` : `🔒 ${$t('calls.closed')}` }}
+                  {{ isCallOpen(call) === true ? `🟢 ${$t('calls.open')}` : `🔒 ${$t('calls.closed')}` }}
                 </span>
 
                 <!-- TITLE -->
@@ -202,5 +202,18 @@ const onPageChange = (p: number) => {
 const formatDate = (dateString?: string) => {
   if (!dateString) return '—'
   return new Date(dateString).toLocaleDateString('sk-SK')
+}
+
+const isCallOpen = (call: any) => {
+  const forceClosed = call.force_closed ?? call.forceClosed
+  const deadline = call.application_deadline ?? call.applicationDeadline
+
+  if (forceClosed) return false
+  if (deadline) {
+    const d = new Date(deadline)
+    if (new Date() > d) return false
+  }
+
+  return true
 }
 </script>

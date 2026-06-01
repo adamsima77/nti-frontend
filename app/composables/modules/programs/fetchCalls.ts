@@ -19,9 +19,12 @@ export interface Call {
   startDate: string
   endDate: string
   status: 'open' | 'closed'
-  formSchema: FormSchema
+  is_open: boolean
+  force_closed: boolean
+  formSchema?: any
   applicantsCount?: number
   criteria: CallCriterion[]
+
 }
 
 export const mapCall = (c: any): Call => ({  // ✅ was: const mapCall
@@ -38,7 +41,8 @@ export const mapCall = (c: any): Call => ({  // ✅ was: const mapCall
   status: c.application_deadline && new Date(c.application_deadline) > new Date()
     ? 'open'
     : 'closed',
-  formSchema: c.form_schema ?? { fields: [] },
+  is_open: c.is_open ?? false,
+  force_closed: c.force_closed ?? false,
   applicantsCount: c.applicants_count ?? 0,
   criteria: (c.call_criteria ?? []).map((cr: any) => ({
     id: cr.id,

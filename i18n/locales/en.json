@@ -1852,5 +1852,27 @@
     "cmsOverview": {
       "empty": "No content sections found to display."
     }
-  }
+  },
+ "admin_calls": {
+  "title": "Calls",
+  "subtitle": "Manage calls and application periods",
+  "page_title": "Calls — Admin | NTI",
+  "add_call": "New call",
+  "all_statuses": "All statuses",
+  "deadline_from": "Deadline from",
+  "deadline_to": "Deadline to",
+  "clear_filters": "Clear filters",
+  "total_calls": "Total calls: {count}",
+  "col_name": "Name",
+  "col_program": "Program",
+  "col_organization": "Organization",
+  "col_status": "Status",
+  "col_deadline": "Deadline",
+  "col_applications": "Applications",
+  "edit": "Edit",
+  "open": "Open",
+  "closed": "Closed",
+  "load_error": "Failed to load call.",
+  "fetch_error": "Failed to load calls."
+}
 }
