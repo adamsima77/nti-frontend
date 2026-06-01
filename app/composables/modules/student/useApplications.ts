@@ -51,7 +51,6 @@ interface ApiApplication {
     id?: number
     name: string
   }
-  team_id?: number
   status?: string | { id?: number; name?: string }
   submitted_at: string | null
   team_members_count?: number
@@ -106,7 +105,7 @@ export function mapStatusFromApi(status: ApiApplication['status']): ApplicationS
   if (n.includes('draft')) return 'draft'
   if (n.includes('podan')) return 'submitted'
   if (n.includes('hodnot')) return 'evaluating'
-  if (n.includes('dopln')) return 'submitted'
+  if (n.includes('dopln')) return 'supplement'
   if (n.includes('schválen')) return 'approved'
   if (n.includes('zamiet')) return 'rejected'
   return 'draft'
