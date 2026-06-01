@@ -24,17 +24,17 @@
           ? 'border-danger-300 text-danger-700 focus:ring-danger-500 focus:border-danger-300'
           : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500',
       ]"
-      @input="emit('update:modelValue', $event.target.value)"
+      @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       @blur="validateInput"
     />
 
     <span v-if="hasError" class="text-xs text-danger-600">
-      {{ error || 'Chyba pri vyplnení' }}
+      {{ error || validationError || 'Chyba pri vyplnení' }}
     </span>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, useId } from 'vue'
 
 const props = defineProps({
@@ -45,7 +45,7 @@ const props = defineProps({
   type: {
     type: String,
     default: 'text',
-    validator: (v) => ['text', 'email', 'password', 'number', 'tel', 'url'].includes(v),
+    validator: (v: string) => ['text', 'email', 'password', 'number', 'tel', 'date', 'url'].includes(v),
   },
   label: String,
   placeholder: String,
@@ -57,8 +57,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'error'])
 
-const id = useId() 
-const validationError = ref(null)
+const id = useId()
+const validationError = ref<string | null>(null)
 
 const hasError = computed(() => !!props.error || !!validationError.value)
 

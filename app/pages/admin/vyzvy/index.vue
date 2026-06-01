@@ -6,10 +6,12 @@
         <p class="text-gray-500 mt-1">{{ $t('admin_calls.subtitle') }}</p>
       </div>
       <div class="flex items-center gap-2">
-        <UiButton v-if="canCreateCalls" @click="openCreateModal">
-          <Plus class="w-4 h-4 mr-1" />
-          {{ $t('admin_calls.add_call') }}
-        </UiButton>
+        <ClientOnly>
+          <UiButton v-if="canCreateCalls" @click="openCreateModal">
+            <Plus class="w-4 h-4 mr-1" />
+            {{ $t('admin_calls.add_call') }}
+          </UiButton>
+        </ClientOnly>
       </div>
     </div>
 
@@ -133,11 +135,13 @@
       </div>
     </div>
 
-    <AdminCallModal
-      v-model="modalOpen"
-      :call="selectedCall"
-      @saved="fetchCalls"
-    />
+    <ClientOnly>
+      <AdminCallModal
+        v-model="modalOpen"
+        :call="selectedCall"
+        @saved="fetchCalls"
+      />
+    </ClientOnly>
   </div>
 </template>
 

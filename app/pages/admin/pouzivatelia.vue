@@ -132,6 +132,7 @@
     </div>
 
     <!-- Edit / Create user -->
+       <ClientOnly>
     <AdminUserEditModal
       v-model="showEditModal"
       :user="selectedUser"
@@ -139,20 +140,25 @@
       :statuses="allStatuses"
       @saved="fetchUsers"
     />
+    </ClientOnly>
 
     <!-- GDPR Report generation + download -->
+     <ClientOnly>
     <AdminGdprReportModal
       v-model="showGdprReportModal"
       :user="selectedUser"
       @generated="fetchUsers"
     />
+    </ClientOnly>
 
+    <ClientOnly>
     <!-- GDPR Anonymize -->
     <AdminGdprAnonymizeModal
       v-model="showAnonymizeModal"
       :user="selectedUser"
       @anonymized="fetchUsers"
     />
+    </ClientOnly>
   </div>
 </template>
 

@@ -1793,6 +1793,7 @@
     "all_statuses": "All statuses",
     "clear_filters": "Clear filters",
     "edit": "Edit",
+    "gdpr_download": "GDPR export",
     "gdpr_anonymize": "GDPR anonymization",
     "total_users": "Total: {count} users",
     "col_name": "Name",

@@ -70,6 +70,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  size: {
+    type: String,
+    default: 'md',
+  }
 })
 
 const emit = defineEmits(['update:modelValue'])
