@@ -58,6 +58,90 @@
     "en_title": "English",
     "sk_title": "Slovenčina"
   },
+  "evaluator": {
+    "welcome": "Welcome, {name}!",
+    "subtitle": "Evaluator dashboard",
+    "stats": {
+      "total": "Applications total",
+      "pending": "Pending evaluation",
+      "evaluated": "Evaluated",
+      "decided": "Decided"
+    },
+    "assigned_calls": "Assigned calls",
+    "go_to_list": "Go to list",
+    "deadline_label": "Deadline",
+    "open_applications": "Open applications",
+    "urgent_header": "Waiting for your evaluation",
+    "action": {
+      "evaluate": "Evaluate",
+      "detail": "Detail"
+    },
+    "recent_applications": "Recent applications",
+    "view_all": "View all",
+    "back_to_list": "Back to evaluations",
+    "submitted_label": "Submitted",
+    "commission_avg": "commission average / 100",
+    "scoring_form": "Scoring form",
+    "scoring_instructions": "Rate each criterion from 0 to its maximum points",
+    "max_points": "max {n} pts",
+    "comment_placeholder": "Comment on the criterion: {criterion}...",
+    "total_score": "Total score",
+    "points": "points",
+    "scoring_label": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "sufficient": "Sufficient",
+      "insufficient": "Insufficient"
+    },
+    "overall_comment": "Overall comment and recommendation",
+    "internal_note_label": "Internal note for commission",
+    "internal_note_placeholder": "Notes visible only to commission members...",
+    "recommendation_label": "Recommendation",
+    "recommendations": {
+      "approve": "Approve",
+      "supplement": "Request supplement",
+      "reject": "Reject"
+    },
+    "submit_section": "Submit evaluation",
+    "request_supplement": "Request supplement from the team",
+    "supplement_hint": "The team will receive a notification asking for additional materials",
+    "supplement_placeholder": "What specifically should the team provide...",
+    "save_draft": "Save draft",
+    "submit": "Submit evaluation",
+    "submitting": "Submitting...",
+    "error": {
+      "select_recommendation": "Select a recommendation before submitting"
+    },
+    "submitted_title": "Evaluation submitted",
+    "submitted_message": "Your evaluation has been recorded and is visible to other commission members.",
+    "sidebar": {
+      "commission": "Commission",
+      "average": "Average",
+      "team": "Team",
+      "info": "Information",
+      "program": "Program",
+      "submitted": "Submitted",
+      "evaluation_deadline": "Evaluation deadline",
+      "academic_criteria": "Academic criteria",
+      "documents": "Documents"
+    },
+    "waiting": "waiting",
+    "loading_detail": "Loading application detail...",
+    "auto_saved": "💾 Draft was saved",
+    "academic_flag": {
+      "unverified": "Unverified",
+      "meets": "Meets criteria",
+      "not_meet": "Does not meet criteria"
+    },
+    "errors": {
+      "locked": "Evaluation is locked.",
+      "supplement_empty": "Please enter what the team should supplement.",
+      "invalid_score": "Score for criterion {criterion} is out of range or missing."
+    }
+    ,
+    "program_label": "Program",
+    "application_label": "Application"
+  },
 
   "program-a": {
     "title": "What is Program A",
@@ -1413,7 +1497,12 @@
       "tasks": "Tasks assigned"
     },
     "noEntries": "No entries",
-    "tryFilters": "Try changing filters or add a new consultation"
+    "tryFilters": "Try changing filters or add a new consultation",
+    "types": {
+      "online": "Online",
+      "personal": "In person",
+      "written": "Written"
+    }
   },
   "consultationForm": {
     "pageTitle": "New consultation | NTI Mentor",
@@ -1578,7 +1667,12 @@
       "tasks": "Tasks assigned"
     },
     "noEntries": "No entries",
-    "tryFilters": "Try changing filters or add a new consultation"
+    "tryFilters": "Try changing filters or add a new consultation",
+    "types": {
+      "online": "Online",
+      "personal": "In person",
+      "written": "Written"
+    }
   },
   "consultationForm": {
     "pageTitle": "New consultation | NTI Mentor",
@@ -1661,7 +1755,8 @@
     "errors": {
       "notFound": "The project was not found or you do not have access to it.",
       "loadFailed": "Failed to load project detail.",
-      "saveFailed": "An error occurred while saving."
+      "saveFailed": "An error occurred while saving.",
+      "rejectCommentRequired": "A comment is required when rejecting a milestone (min. 20 characters)."
     }
   }
  },
@@ -1687,170 +1782,5 @@
   "sectionManagement": "Management",
   "sectionContent": "Content",
   "sectionSystem": "System"
-},
-"user_management": {
-    "title": "Users",
-    "subtitle": "Manage registered users and their roles",
-    "page_title": "Users — Admin | NTI",
-    "add_user": "Add user",
-    "search_placeholder": "Search by name or email...",
-    "all_roles": "All roles",
-    "all_statuses": "All statuses",
-    "clear_filters": "Clear filters",
-    "edit": "Edit",
-    "gdpr_anonymize": "GDPR anonymization",
-    "total_users": "Total: {count} users",
-    "col_name": "Name",
-    "col_email": "Email",
-    "col_roles": "Roles",
-    "col_status": "Status",
-    "col_registered": "Registered",
-    "load_error": "Failed to load user",
-     "loading": "Loading...",
-      "tab_basic": "Basic Info",
-      "tab_student": "Student",
-      "tab_organization": "Organization",
-      "profile_photo": "Profile Photo",
-      "field_name": "First Name",
-      "field_surname": "Last Name",
-      "field_email": "Email",
-      "field_job_position": "Job Position",
-      "role_hint": "Only one role can be assigned.",
-      "field_password": "Password",
-      "field_new_password": "New Password",
-      "password_leave_empty": "leave empty to keep current password",
-      "field_password_confirm": "Confirm Password",
-      "loading_lookups": "Loading lookup data...",
-      "field_study_program": "Study Program",
-      "field_study_field": "Study Field",
-      "field_study_year": "Study Year",
-      "field_university": "University",
-      "select_program": "Select program",
-      "select_field": "Select field",
-      "select_year": "Select year",
-      "select_university": "Select university",
-      "field_portfolio_url": "Portfolio URL",
-      "field_academic_flags": "Academic Flags",
-      "no_flags": "No academic flags available",
-      "cv_document": "CV Document",
-      "cv_uploaded": "CV uploaded",
-      "cv_none": "No CV uploaded",
-      "remove": "Remove",
-      "org_member": "Member",
-      "org_name": "Organization Name",
-      "org_name_placeholder": "Enter organization name",
-      "org_ico": "Company ID",
-      "org_phone": "Phone",
-      "org_web": "Website",
-      "org_description": "Description",
-      "org_description_placeholder": "Enter organization description",
-      "org_address": "Address",
-      "addr_street": "Street",
-      "addr_city": "City",
-      "addr_postal": "Postal Code",
-      "addr_country": "Country",
-      "addr_street_placeholder": "Enter street",
-      "addr_city_placeholder": "Enter city",
-      "addr_postal_placeholder": "Enter postal code",
-      "addr_country_placeholder": "Enter country",
-      "org_sectors": "Sectors",
-      "loading_sectors": "Loading sectors...",
-      "new_organization": "New Organization",
-      "close": "Close",
-      "create_user": "Create User",
-      "save_changes": "Save Changes",
-      "edit_user_prefix": "Edit User",
-      "error_loading_lookups": "Failed to load lookup data",
-      "toast_created": "User successfully created",
-      "toast_updated": "User successfully updated",
-      "error_invalid_data": "Invalid form data",
-      "error_create": "Failed to create user",
-      "error_save": "Failed to save changes"
-  },
-    "gdpr_anonymize_modal": {
-    "title": "GDPR — User Anonymization",
-    "irreversible_action": "This action is irreversible!",
-    "confirmation_text_prefix": "Are you sure you want to anonymize the data of user",
-    "confirmation_text_suffix": "All personal data will be permanently removed.",
-    "what_happens_title": "What will happen:",
-    "effect_anonymized_values": "Name and email will be replaced with anonymized values",
-    "effect_profile_deleted": "Personal data in the profile will be deleted",
-    "effect_account_deactivated": "The account will be deactivated",
-    "cancel": "Cancel",
-    "confirm": "Anonymize",
-    "processing": "Anonymizing...",
-    "success_message": "User {name} {surname} has been anonymized",
-    "error_message": "Failed to anonymize user"
-  },
-  "status_labels": {
-    "unknown": "Unknown status",
-    "approved": "Approved",
-    "pending": "Pending information",
-    "rejected": "Rejected",
-    "evaluating": "Under evaluation",
-    "active": "Active",
-    "draft": "Draft",
-    "submitted": "Submitted",
-    "paused": "Paused",
-    "published": "Published",
-    "concept": "Concept",
-    "matching": "Matching",
-    "assigned": "Assigned",
-    "in_progress": "In progress",
-    "completed": "Completed",
-    "closed": "Closed",
-    "inactive": "Inactive",
-    "pending_email": "Pending email verification",
-    "pending_onboarding": "Pending onboarding",
-    "pending_approval": "Pending approval",
-    "banned": "Banned",
-    "anonymized": "Anonymized"
-  },
-  "gdpr_download": {
-    "modal_title": "Export GDPR personal data",
-    "select_format": "Select your preferred format to export the personal data archive:",
-    "fmt_pdf_desc": "Documents & Profiles",
-    "fmt_xlsx_desc": "Structured tables",
-    "fmt_csv_desc": "Raw data vectors",
-    "generating": "Generating your export...",
-    "generating_hint": "Please wait, preparing files and compiling system logs.",
-    "success_title": "Export completed successfully",
-    "success_hint": "The download should have triggered automatically. Check your browser's download folder.",
-    "error_title": "Generation failed",
-    "error_hint": "An unexpected server error occurred while collecting records. Please try again.",
-    "generate_btn": "Generate export",
-    "timeout_hint": "The export generation timed out but may still complete on the server background."
-  },
-  "common": {
-    "cancel": "Cancel",
-    "close": "Close",
-    "retry": "Retry"
-  },
-
-  "admin_dashboard": {
-    "title": "Dashboard",
-    "subtitle": "Overview of platform activities and statistics",
-    "stats": {
-      "applications": "Applications",
-      "activeCalls": "Active Calls",
-      "users": "Users",
-      "teams": "Teams"
-    },
-    "activeCalls": {
-      "title": "Active Calls",
-      "applicationsCount": "{count} applications",
-      "deadline": "Deadline",
-      "empty": "No active calls are currently available."
-    },
-    "pendingApprovals": {
-      "title": "Organizations Pending Approval",
-      "noOrganization": "No organization",
-      "noPosition": "Position not specified",
-      "registration": "Registration",
-      "empty": "No organizations are pending approval."
-    },
-    "cmsOverview": {
-      "empty": "No content sections found to display."
-    }
-  }
+}
 }

@@ -190,19 +190,32 @@ useHead({
 
 const authStore = useAuthStore()
 
-// TODO: remove when backend is available
-if (!authStore.user) {
-  authStore.user = {
-    id: 2,
-    email: 'info@techfirma.sk',
-    organization_name: 'TechFirma s.r.o.',
-    role: 'company',
-  }
-  authStore.token = 'mock-token'
+type TaskApplication = {
+  id: number
+  teamName: string
+  submittedAt: string
+  members: number
+  status: string
+  summary: string
 }
 
-// TODO: fetch from API using route.params.id
-const task = {
+type TaskDetail = {
+  id: number
+  title: string
+  program: string
+  status: string
+  createdAt: string
+  deadline: string | null
+  budget: number
+  spent: number
+  assignedTeam: string | null
+  assignedTeamMembers: number
+  description: string
+  requirements: string[]
+  applications: TaskApplication[]
+}
+
+const task: TaskDetail = {
   id: Number(route.params.id),
   title: 'AI chatbot pre zákaznícku podporu',
   program: 'Program A',
