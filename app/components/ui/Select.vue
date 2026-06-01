@@ -2,20 +2,19 @@
   <div class="flex flex-col gap-1.5">
     <label
       v-if="label"
-      :for="`select-${id}`"
+      :for="id"
       class="text-sm font-medium text-gray-700"
     >
       {{ label }}
       <span
         v-if="required"
         class="text-danger-500"
-        >*</span
-      >
+      >*</span>
     </label>
 
     <div class="relative">
       <select
-        :id="`select-${id}`"
+        :id="id"
         :value="modelValue"
         :disabled="disabled"
         :required="required"
@@ -27,13 +26,12 @@
             ? 'border-danger-300 text-danger-700 focus:ring-danger-500 focus:border-danger-300'
             : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500',
         ]"
-        @change="emit('update:modelValue', $event.target.value)"
+        @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
         @blur="validateInput"
       >
         <option
           value=""
           disabled
-          :selected="!modelValue"
         >
           {{ placeholder }}
         </option>
@@ -58,8 +56,8 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script setup lang="ts">
+import { ref, computed, useId } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -84,13 +82,14 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'error'])
 
-const id = Math.random().toString(36).substr(2, 9)
-const validationError = ref(null)
+// Swapped Math.random() out for Nuxt/Vue secure useId()
+const id = useId()
+const validationError = ref<string | null>(null)
 
 const hasError = computed(() => !!props.error || !!validationError.value)
 
 const normalizedOptions = computed(() =>
-  props.options.map((opt) => (typeof opt === 'string' ? { value: opt, label: opt } : opt)),
+  props.options.map((opt: any) => (typeof opt === 'string' ? { value: opt, label: opt } : opt)),
 )
 
 const validateInput = () => {

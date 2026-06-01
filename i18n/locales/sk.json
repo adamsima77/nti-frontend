@@ -1377,6 +1377,87 @@
         "rejectCommentRequired": "Pri zamietnutí míľnika je povinný komentár (min. 20 znakov)."
       }
     }
+},
+
+  "user_management": {
+    "title": "Používatelia",
+    "subtitle": "Správa registrovaných používateľov a ich rolí",
+    "page_title": "Používatelia — Admin | NTI",
+    "add_user": "Pridať používateľa",
+    "search_placeholder": "Hľadať podľa mena alebo emailu...",
+    "all_roles": "Všetky role",
+    "all_statuses": "Všetky stavy",
+    "clear_filters": "Zrušiť filtre",
+    "edit": "Upraviť",
+    "gdpr_anonymize": "GDPR anonymizácia",
+    "total_users": "Celkovo: {count} používateľov",
+    "col_name": "Meno",
+    "col_email": "Email",
+    "col_roles": "Role",
+    "col_status": "Stav",
+    "col_registered": "Registrácia",
+    "load_error": "Nepodarilo sa načítať používateľa",
+      "loading": "Načítava sa...",
+      "tab_basic": "Základné informácie",
+      "tab_student": "Študent",
+      "tab_organization": "Organizácia",
+      "profile_photo": "Profilová fotografia",
+      "field_name": "Meno",
+      "field_surname": "Priezvisko",
+      "field_email": "E-mail",
+      "field_job_position": "Pracovná pozícia",
+      "role_hint": "Môže byť priradená iba jedna rola.",
+      "field_password": "Heslo",
+      "field_new_password": "Nové heslo",
+      "password_leave_empty": "ponechajte prázdne pre zachovanie aktuálneho hesla",
+      "field_password_confirm": "Potvrdenie hesla",
+      "loading_lookups": "Načítavajú sa údaje...",
+      "field_study_program": "Študijný program",
+      "field_study_field": "Študijný odbor",
+      "field_study_year": "Ročník",
+      "field_university": "Univerzita",
+      "select_program": "Vyberte program",
+      "select_field": "Vyberte odbor",
+      "select_year": "Vyberte ročník",
+      "select_university": "Vyberte univerzitu",
+      "field_portfolio_url": "URL portfólia",
+      "field_academic_flags": "Akademické označenia",
+      "no_flags": "Žiadne akademické označenia",
+      "cv_document": "CV dokument",
+      "cv_uploaded": "CV nahrané",
+      "cv_none": "Žiadne CV nebolo nahrané",
+      "remove": "Odstrániť",
+      "org_member": "Člen",
+      "org_name": "Názov organizácie",
+      "org_name_placeholder": "Zadajte názov organizácie",
+      "org_ico": "IČO",
+      "org_phone": "Telefón",
+      "org_web": "Webstránka",
+      "org_description": "Popis",
+      "org_description_placeholder": "Zadajte popis organizácie",
+      "org_address": "Adresa",
+      "addr_street": "Ulica",
+      "addr_city": "Mesto",
+      "addr_postal": "PSČ",
+      "addr_country": "Krajina",
+      "addr_street_placeholder": "Zadajte ulicu",
+      "addr_city_placeholder": "Zadajte mesto",
+      "addr_postal_placeholder": "Zadajte PSČ",
+      "addr_country_placeholder": "Zadajte krajinu",
+      "org_sectors": "Sektory",
+      "loading_sectors": "Načítavajú sa sektory...",
+      "new_organization": "Nová organizácia",
+      "close": "Zavrieť",
+      "create_user": "Vytvoriť používateľa",
+      "save_changes": "Uložiť zmeny",
+      "edit_user_prefix": "Upraviť používateľa",
+      "error_loading_lookups": "Nepodarilo sa načítať údaje",
+      "toast_created": "Používateľ bol úspešne vytvorený",
+      "toast_updated": "Používateľ bol úspešne aktualizovaný",
+      "error_invalid_data": "Neplatné údaje formulára",
+      "error_create": "Nepodarilo sa vytvoriť používateľa",
+      "gdpr_download": "GDPR export",
+      "error_save": "Nepodarilo sa uložiť zmeny"
   },
   "evaluator": {
     "welcome": "Vitajte, {name}!",
@@ -1413,7 +1494,6 @@
       "sufficient": "Dostatočný",
       "insufficient": "Nedostatočný"
     },
-<<<<<<< HEAD
     "overall_comment": "Celkový komentár a odporúčanie",
     "internal_note_label": "Interná poznámka pre komisiu",
     "internal_note_placeholder": "Poznámky viditeľné iba pre členov komisie...",
@@ -1462,12 +1542,11 @@
     "commission_avg_label": "Priemer komisie",
     "application_label": "Prihláška",
     "program_label": "Program"
-  }
-=======
+  },
     "cmsOverview": {
       "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."
-    }
-  },
+    },
+
    "admin_calls": {
   "title": "Výzvy",
   "subtitle": "Správa výziev a prihlasovacích období",
@@ -1490,5 +1569,4 @@
   "load_error": "Nepodarilo sa načítať výzvu.",
   "fetch_error": "Nepodarilo sa načítať výzvy."
 }
->>>>>>> e263f9342dbe30a3ae99094a5bce7d6af209552b
 }
