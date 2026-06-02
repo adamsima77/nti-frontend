@@ -16,6 +16,19 @@ export interface Evaluation {
   locked: boolean
 }
 
+export interface EvaluationSummary {
+  id: number
+  commission_member_id: number
+  evaluator: {
+    id: number | null
+    name: string
+  }
+  submitted_at: string
+  criteria: EvaluationCriterion[]
+  total_score: number
+  recommendation: 'approve' | 'reject' | 'supplement'
+}
+
 export interface EvaluatorCall {
   id: number
   name: string
@@ -48,6 +61,11 @@ export interface ApplicationSummary {
 }
 
 export interface ApplicationDetail extends ApplicationSummary {
+  applicant_name?: string
+  school?: string
+  study_program?: string
+  study_year?: string
+  form_data?: Record<string, unknown>
   documents: { id: number; type: string; version: number; url: string }[]
   history: { status: string; changed_at: string; changed_by: string }[]
   evaluation?: Evaluation

@@ -1512,6 +1512,23 @@
     },
     "recent_applications": "Nedávne prihlášky",
     "view_all": "Zobraziť všetky",
+    "view_application_detail": "Zobraziť detail prihlášky",
+    "application_detail": "Detail prihlášky",
+    "view_evaluation": "Zobraziť hodnotenie",
+    "application_summary": "Súhrn prihlášky",
+    "student_name": "Meno študenta",
+    "school_program_year": "Škola / Program / Ročník",
+    "call": "Výzva",
+    "current_status": "Aktuálny stav",
+    "application_description": "Popis prihlášky",
+    "team_members": "Členovia tímu",
+    "documents": "Dokumenty",
+    "no_documents": "Žiadne dokumenty",
+    "overall_evaluation": "Celkové hodnotenie",
+    "final_decision": "Finálne rozhodnutie",
+    "submitted_at": "Odoslané dňa",
+    "application_history": "História prihlášky",
+    "no_history": "Žiadna história",
     "back_to_list": "Späť na zoznam hodnotení",
     "submitted_label": "Podané",
     "commission_avg": "Priemer komisie / 100",
@@ -1575,6 +1592,9 @@
     "commission_avg_label": "Priemer komisie",
     "application_label": "Prihláška",
     "program_label": "Program"
+  },
+  "status_labels": {
+    "unknown": "Neznámy"
   },
   "cmsOverview": {
     "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."

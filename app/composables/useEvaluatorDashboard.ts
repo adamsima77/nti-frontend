@@ -3,6 +3,7 @@ import type {
   ApplicationSummary,
   Evaluation,
   EvaluationCriterion,
+  EvaluationSummary,
   EvaluatorCall,
   EvaluatorDashboardResponse,
   EvaluatorDashboardStats,
@@ -212,6 +213,9 @@ export const useEvaluatorDashboard = () => {
   const calls = ref<EvaluatorCall[]>([])
   const applicationsByCallId = ref<Record<number, ApplicationSummary[]>>({})
   const applicationDetailsById = ref<Record<number, ApplicationDetail>>({})
+  const applicationDetail = ref<ApplicationDetail | null>(null)
+  const allEvaluations = ref<EvaluationSummary[]>([])
+  const hasSubmittedEvaluation = ref(false)
 
   const loading = reactive({
     dashboard: false,
@@ -295,6 +299,8 @@ export const useEvaluatorDashboard = () => {
       const res = await api.get(`/evaluator/applications/${applicationId}`) as ApiResponseLike
       const detail = mapApplicationDetail(asObject(res))
       applicationDetailsById.value = { ...applicationDetailsById.value, [applicationId]: detail }
+      applicationDetail.value = detail
+      hasSubmittedEvaluation.value = Boolean(detail.evaluation)
       return detail
     } catch (err) {
       const message = errorMessage(err, 'Nepodarilo sa načítať detail prihlášky.')
@@ -303,6 +309,56 @@ export const useEvaluatorDashboard = () => {
       return null
     } finally {
       loading.applicationDetail[applicationId] = false
+    }
+  }
+
+  const fetchAllEvaluations = async (applicationId: number) => {
+    try {
+      const res = await api.get(`/evaluator/applications/${applicationId}/evaluations`) as ApiResponseLike
+      const list = asList(res).map((item) => {
+        const row = asObject(item)
+        const evaluatorRow = row.evaluator && typeof row.evaluator === 'object'
+          ? row.evaluator as Record<string, unknown>
+          : undefined
+
+        return {
+          id: toNumber(row.id),
+          commission_member_id: toNumber(row.commission_member_id ?? row.commissionMemberId ?? row.member_id ?? evaluatorRow?.id),
+          evaluator: {
+            id: toNumber(evaluatorRow?.id ?? row.evaluator_id ?? null),
+            name: toString(evaluatorRow?.name ?? row.evaluator_name ?? row.name ?? ''),
+          },
+          submitted_at: toString(row.submitted_at ?? row.submittedAt ?? ''),
+          criteria: Array.isArray(row.criteria) ? row.criteria.map(item => mapCriterion(item as Record<string, unknown>)) : [],
+          total_score: toNumber(row.total_score ?? row.totalScore),
+          recommendation: toString(row.recommendation) as EvaluationSummary['recommendation'],
+        }
+      })
+      allEvaluations.value = list
+      hasSubmittedEvaluation.value = list.some((item) => item.commission_member_id === useAuthStore().user?.id)
+      return list
+    } catch (err) {
+      const message = errorMessage(err, 'Nepodarilo sa načítať zoznam hodnotení.')
+      addToast({ message, type: 'error' })
+      return []
+    }
+  }
+
+  const updateApplicationStatus = async (applicationId: number, status: 'schvalene' | 'zamietnute' | 'vyziadane_doplnenie') => {
+    const statusMap: Record<string, string> = {
+      schvalene: 'Schválené',
+      zamietnute: 'Zamietnuté',
+      vyziadane_doplnenie: 'Vyžiadané doplnenie',
+    }
+
+    try {
+      await api.patch(`/applications/${applicationId}/status`, { status_name: statusMap[status] })
+      await fetchApplicationDetail(applicationId)
+      addToast({ message: 'Status prihlášky bol aktualizovaný.', type: 'success' })
+    } catch (err) {
+      const message = errorMessage(err, 'Nepodarilo sa aktualizovať status prihlášky.')
+      addToast({ message, type: 'error' })
+      throw err
     }
   }
 
@@ -328,10 +384,17 @@ export const useEvaluatorDashboard = () => {
                 evaluation,
               },
         }
+        if (applicationDetail.value) {
+          applicationDetail.value = { ...applicationDetail.value, evaluation }
+        }
+        hasSubmittedEvaluation.value = true
       }
       return evaluation
     } catch (err) {
       const message = errorMessage(err, 'Nepodarilo sa uložiť hodnotenie.')
+      if ((err as any)?.response?.status === 422) {
+        hasSubmittedEvaluation.value = true
+      }
       addToast({ message, type: 'error' })
       throw err
     } finally {
@@ -361,10 +424,17 @@ export const useEvaluatorDashboard = () => {
                 evaluation,
               },
         }
+        if (applicationDetail.value) {
+          applicationDetail.value = { ...applicationDetail.value, evaluation }
+        }
+        hasSubmittedEvaluation.value = true
       }
       return evaluation
     } catch (err) {
       const message = errorMessage(err, 'Nepodarilo sa upraviť hodnotenie.')
+      if ((err as any)?.response?.status === 422) {
+        hasSubmittedEvaluation.value = true
+      }
       addToast({ message, type: 'error' })
       throw err
     } finally {
@@ -391,14 +461,19 @@ export const useEvaluatorDashboard = () => {
     calls,
     applicationsByCallId,
     applicationDetailsById,
+    applicationDetail,
+    allEvaluations,
+    hasSubmittedEvaluation,
     loading,
     error,
     fetchDashboard,
     fetchCalls,
     fetchApplications,
     fetchApplicationDetail,
+    fetchAllEvaluations,
     submitEvaluation,
     updateEvaluation,
+    updateApplicationStatus,
     requestSupplement,
   }
 }

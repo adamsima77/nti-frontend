@@ -47,6 +47,7 @@ const ROLE_MAP: Record<string, string> = {
   'organization':   'company',
   'mentor':         'mentor',
   'evaluator':      'evaluator',
+  'predseda_komisie':'predseda_komisie',
   'guest':          'guest',
 }
 
@@ -138,6 +139,7 @@ export const useAuthStore = defineStore('auth', () => {
   if (role === 'admin')      return '/admin'
   if (role === 'cms_editor') return '/cms'
   if (role === 'evaluator')  return '/hodnotenie'
+  if (role === 'predseda_komisie') return '/hodnotenie'
   if (role === 'company')    return '/firma'
   if (role === 'mentor')     return '/mentor'
   if (role === 'student')    return '/student'

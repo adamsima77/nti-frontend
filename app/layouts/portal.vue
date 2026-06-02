@@ -130,9 +130,10 @@ const navItems = computed(() => {
     ]
   }
 
-  if (role === 'evaluator') {
+  if (role === 'evaluator' || role === 'predseda_komisie') {
     return [
       { label: t('portal_sidebar_links.dashboard'),   to: localePath('/hodnotenie'),        icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.profile'),     to: localePath('/profil'),            icon: UserCircle },
       { label: t('portal_sidebar_links.evaluations'), to: localePath('/hodnotenie/zoznam'), icon: ClipboardCheck },
     ]
   }

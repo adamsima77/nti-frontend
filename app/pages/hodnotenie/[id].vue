@@ -56,6 +56,14 @@
             </span>
           </div>
           <p class="text-gray-500 text-sm">{{ application.teamName }} · {{ $t('evaluator.submitted_label') }} {{ formatDate(application.submittedAt) }}</p>
+          <div class="mt-4 sm:mt-2">
+            <NuxtLink
+              :to="localePath(`/hodnotenie/detail/${application.id}`)"
+              class="text-sm font-medium text-blue-600 hover:text-blue-800"
+            >
+              {{ $t('evaluator.view_application_detail') }}
+            </NuxtLink>
+          </div>
         </div>
         <!-- Overall commission score if available -->
           <div
@@ -271,7 +279,7 @@
               </button>
               <button
                 @click="handleSubmit"
-                :disabled="isSubmitting || isReadOnly || !scoringForm.recommendation"
+                :disabled="isSubmitting || isReadOnly || hasSubmittedEvaluation || !scoringForm.recommendation"
                 class="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <svg
@@ -294,7 +302,7 @@
                     d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
                   />
                 </svg>
-                {{ isSubmitting ? $t('evaluator.submitting') : $t('evaluator.submit') }}
+                {{ isSubmitting ? $t('evaluator.submitting') : hasSubmittedEvaluation ? 'Hodnotenie už bolo odoslané.' : $t('evaluator.submit') }}
               </button>
             </div>
             <p
@@ -416,6 +424,57 @@
               <span class="font-medium text-navy">{{ application.documents.length }}</span>
             </div>
           </div>
+
+          <div v-if="isCommissionChair" class="bg-white rounded-lg border border-gray-100 p-5 space-y-4">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">{{ $t('evaluator.chair.title') }}</h3>
+            <p class="text-sm text-gray-600">{{ $t('evaluator.chair.instructions') }}</p>
+            <div class="grid gap-2">
+              <button
+                type="button"
+                @click="handleStatusChange('schvalene')"
+                :disabled="isUpdatingStatus"
+                class="w-full px-3 py-2 rounded-lg text-sm font-medium text-white bg-success-600 hover:bg-success-700 disabled:opacity-50"
+              >
+                {{ $t('evaluator.chair.approve') }}
+              </button>
+              <button
+                type="button"
+                @click="handleStatusChange('zamietnute')"
+                :disabled="isUpdatingStatus"
+                class="w-full px-3 py-2 rounded-lg text-sm font-medium text-white bg-danger-600 hover:bg-danger-700 disabled:opacity-50"
+              >
+                {{ $t('evaluator.chair.reject') }}
+              </button>
+              <button
+                type="button"
+                @click="handleStatusChange('vyziadane_doplnenie')"
+                :disabled="isUpdatingStatus"
+                class="w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+              >
+                {{ $t('evaluator.chair.request_supplement') }}
+              </button>
+            </div>
+            <div v-if="statusError" class="text-sm text-danger-600">{{ statusError }}</div>
+            <div v-if="allEvaluations.length" class="pt-4 border-t border-gray-100">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3">{{ $t('evaluator.chair.evaluations_title') }}</h4>
+              <div class="space-y-3">
+                <div
+                  v-for="evaluation in allEvaluations"
+                  :key="evaluation.id"
+                  class="rounded-lg border border-gray-100 p-3"
+                >
+                  <div class="flex items-center justify-between text-sm">
+                    <div>
+                      <p class="font-medium text-navy">{{ evaluation.evaluator.name }}</p>
+                      <p class="text-xs text-gray-500">{{ formatDate(evaluation.submitted_at) }}</p>
+                    </div>
+                    <span class="text-sm font-semibold text-navy">{{ evaluation.total_score }}</span>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-2">{{ $t(`evaluator.recommendations.${evaluation.recommendation}`) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </template>
@@ -444,19 +503,30 @@ import {
   ThumbsDown,
   RotateCcw,
 } from 'lucide-vue-next'
+import { useAuthStore } from '~/stores/auth'
 import { useEvaluatorDashboard } from '~/composables/useEvaluatorDashboard'
 import type { ApplicationDetail, Evaluation, EvaluationCriterion } from '~/types/evaluator'
 
 definePageMeta({
   layout: 'portal',
   middleware: 'auth',
-  roles: ['evaluator'],
+  roles: ['evaluator', 'predseda_komisie'],
 })
 
 const localePath = useLocalePath()
 const { setLocale, locale, t } = useI18n()
 const { addToast } = useToast()
-const { fetchApplicationDetail, submitEvaluation, updateEvaluation, requestSupplement } = useEvaluatorDashboard()
+const auth = useAuthStore()
+const {
+  fetchApplicationDetail,
+  fetchAllEvaluations,
+  submitEvaluation,
+  updateEvaluation,
+  updateApplicationStatus,
+  requestSupplement,
+  allEvaluations,
+  hasSubmittedEvaluation,
+} = useEvaluatorDashboard()
 
 const route = useRoute()
 const router = useRouter()
@@ -506,9 +576,12 @@ const fallbackCriteria = [
 
 const currentEvaluation = ref<Evaluation | null>(null)
 const isSubmitted = computed(() => currentEvaluation.value?.locked ?? false)
-const isReadOnly = computed(() => isSubmitted.value)
+const isReadOnly = computed(() => isSubmitted.value || hasSubmittedEvaluation.value)
+const isCommissionChair = computed(() => auth.hasRole('predseda_komisie'))
 const isSubmitting = ref(false)
+const isUpdatingStatus = ref(false)
 const submitError = ref<string | null>(null)
+const statusError = ref<string | null>(null)
 const lastAutoSaveTime = ref<string | null>(null)
 
 const mapApplication = (detail: ApplicationDetail): EvaluatorApplicationView => ({
@@ -548,12 +621,17 @@ const syncScoringForm = (detail: ApplicationDetail) => {
 }
 
 const loadApplication = async () => {
-  const detail = await fetchApplicationDetail(Number(route.params.id))
+  const applicationId = Number(route.params.id)
+  const detail = await fetchApplicationDetail(applicationId)
   if (!detail) return
 
   application.value = mapApplication(detail)
   currentEvaluation.value = detail.evaluation ?? null
   syncScoringForm(detail)
+
+  if (isCommissionChair.value) {
+    await fetchAllEvaluations(applicationId)
+  }
 }
 
 const buildPayload = () => ({
@@ -717,6 +795,11 @@ const recommendations: {
 
 // ── Actions ───────────────────────────────────────────────────
 const validate = () => {
+  if (hasSubmittedEvaluation.value) {
+    submitError.value = 'Hodnotenie už bolo odoslané.'
+    return false
+  }
+
   if (isReadOnly.value) {
     submitError.value = t('evaluator.errors.locked')
     return false
@@ -768,6 +851,20 @@ const handleSubmit = async () => {
     submitError.value = 'Nastala chyba pri odosielaní. Skúste znova.'
   } finally {
     isSubmitting.value = false
+  }
+}
+
+const handleStatusChange = async (status: 'schvalene' | 'zamietnute' | 'vyziadane_doplnenie') => {
+  if (!application.value) return
+  statusError.value = null
+  isUpdatingStatus.value = true
+  try {
+    await updateApplicationStatus(application.value.id, status)
+    await loadApplication()
+  } catch (err) {
+    statusError.value = err instanceof Error ? err.message : t('evaluator.chair.status_error')
+  } finally {
+    isUpdatingStatus.value = false
   }
 }
 </script>
