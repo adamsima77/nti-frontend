@@ -55,6 +55,9 @@
               >
                 <X class="w-4 h-4" />
               </button>
+
+              <UiButton @click = "exportCalls"><Download class="w-4 h-4 mr-1" />
+          {{ $t('user_management.export_calls') }}</UiButton>
             </div>
           </div>
         </template>
@@ -142,6 +145,19 @@
         @saved="fetchCalls"
       />
     </ClientOnly>
+
+    <ClientOnly>
+     <AdminExportModal
+  v-model="exportModalOpen"
+  title="Export Výziev"
+  subtitle="Exportuje zoznam výziev na základe zvolených filtrov"
+  endpoint="/calls/export"
+  filename-prefix="calls_export"
+  :allowed-formats="['xlsx', 'csv', 'pdf']"
+  :is-async="true"
+  :filters="exportFilters"
+/>
+    </ClientOnly>
   </div>
 </template>
 
@@ -156,6 +172,12 @@ definePageMeta({
 const { t } = useI18n()
 
 useHead({ title: t('admin_calls.page_title') })
+
+const exportFilters = computed(() => ({
+  status: statusFilter.value || undefined,
+  deadline_from: deadlineFrom.value || undefined,
+  deadline_to: deadlineTo.value || undefined,
+}))
 
 interface CallRow {
   id: number
@@ -278,6 +300,11 @@ const currentRows = computed(() => {
     return sortDir.value === 'asc' ? cmp : -cmp
   })
 })
+
+const exportModalOpen = ref(false)
+const exportCalls = () => {
+  exportModalOpen.value = true
+}
 
 // ── API ───────────────────────────────────────────────────────────────────────
 

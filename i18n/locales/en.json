@@ -1761,6 +1761,7 @@
   }
  },
  "portal_sidebar_links": {
+  "roles": "Roles & Permissions",
   "dashboard": "Dashboard",
   "applications": "My applications",
   "teams": "My teams",
@@ -1784,6 +1785,8 @@
   "sectionSystem": "System"
 },
 "user_management": {
+    "export_calls": "Export calls",
+    "export_users": "Export users",
     "title": "Users",
     "subtitle": "Manage registered users and their roles",
     "page_title": "Users — Admin | NTI",
@@ -1920,7 +1923,9 @@
   "common": {
     "cancel": "Cancel",
     "close": "Close",
-    "retry": "Retry"
+    "retry": "Retry",
+     "select_export_format": "Select export format",
+      "export_btn": "Export data"
   },
 
   "admin_dashboard": {
@@ -1970,5 +1975,68 @@
   "closed": "Closed",
   "load_error": "Failed to load call.",
   "fetch_error": "Failed to load calls."
-}
+},
+
+"superadmin_dashboard": {
+    "page": "Page {current} of {total}",
+     "empty": "No audit logs found",
+    "title": "Super Admin Dashboard",
+    "subtitle": "Global system control, infrastructure metrics, security auditing, and compliance oversight.",
+    "actions": {
+      "systemSettings": "System Settings"
+    },
+    "stats": {
+      "totalUsers": "Total Users (Platform)",
+      "totalOrganizations": "Total Organizations",
+      "systemErrors": "Active System Errors",
+      "securityAlerts": "Security Alerts (24h)"
+    },
+    "auditLogs": {
+      "title": "System Audit Logs & Security Events",
+      "viewAll": "View All Logs",
+      "empty": "No critical audit logs recorded in the last 48 hours.",
+      "page": "Page {current} of {total}",
+      "columns": {
+        "actor": "Actor",
+        "source": "Source",
+        "type": "Type",
+        "severity": "Severity",
+        "message": "Message",
+        "object": "Object",
+        "ipAddress": "IP Address",
+        "timestamp": "Timestamp"
+      }
+    },
+    "gdprOversight": {
+      "title": "GDPR Compliance & Retention",
+      "retentionPruning": "Automated Retention Pruning",
+      "lastExecution": "Last run",
+      "pendingAnonymization": "Pending Anonymizations",
+      "expiredDataPruned": "Expired Records Cleaned"
+    },
+    "integrations": {
+      "title": "Infrastructure & Services Health",
+      "unavailable": "Unavailable"
+    },
+    "modules": {
+      "title": "System Architecture Core Modules",
+      "configure": "Configure Node",
+      "columns": {
+        "moduleName": "Core Module",
+        "status": "Status",
+        "version": "Version",
+        "totalDbRecords": "Database Records"
+      }
+    },
+    "sections": {
+      "identity": "Identity & Access Control (RBAC)",
+      "organizations": "Partners & Organizations",
+      "reporting": "Reporting & Metrics Generator",
+      "notifications": "Notification Engine & Dispatcher",
+      "audit": "System Audit & Compliance Ledger"
+    },
+    "status": {
+      "active": "Active / Healthy"
+    }
+  }
 }

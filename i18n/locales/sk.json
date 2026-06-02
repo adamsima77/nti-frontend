@@ -1187,6 +1187,7 @@
 }
   },
  "portal_sidebar_links": {
+  "roles": "Roly a permisie",
   "dashboard": "Dashboard",
   "applications": "Moje prihlášky",
   "teams": "Moje tímy",
@@ -1380,6 +1381,8 @@
 },
 
   "user_management": {
+    "export_calls": "Exportovať výzvy",
+    "export_users": "Exportovať užívateľov",
     "title": "Používatelia",
     "subtitle": "Správa registrovaných používateľov a ich rolí",
     "page_title": "Používatelia — Admin | NTI",
@@ -1459,6 +1462,36 @@
       "gdpr_download": "GDPR export",
       "error_save": "Nepodarilo sa uložiť zmeny"
   },
+    "gdpr_download": {
+    "modal_title": "Export GDPR osobných údajov",
+    "select_format": "Vyberte preferovaný formát pre export archívu osobných údajov:",
+    "fmt_pdf_desc": "Dokumenty & Profily",
+    "fmt_xlsx_desc": "Štruktúrované tabuľky",
+    "fmt_csv_desc": "Syrové dátové vektory",
+    "generating": "Generujem váš export...",
+    "generating_hint": "Prosím čakajte, pripravujem súbory a kompilujem systémové logy.",
+    "success_title": "Export bol úspešne dokončený",
+    "success_hint": "Export bol úspešne vygenerovaný. Skontrolujte si priečinok so stiahnutými súbormi.",
+    "error_title": "Chyba pri generovaní exportu",
+    "error_hint": "Pri generovaní exportu sa vyskytla chyba. Skúste to prosím znovu.",
+    "generate_btn": "Generovať export",
+    "timeout_hint": "Generovanie môže trvať niekoľko minút, prosím buďte trpezliví."
+  },
+  "gdpr_anonymize_modal": {
+  "title": "GDPR — anonymizácia používateľa",
+  "irreversible_action": "Táto akcia je nezvratná!",
+  "confirmation_text_prefix": "Naozaj chcete anonymizovať údaje používateľa",
+  "confirmation_text_suffix": "Všetky osobné údaje budú trvalo odstránené.",
+  "what_happens_title": "Čo sa stane:",
+  "effect_anonymized_values": "Meno a e-mail budú nahradené anonymizovanými hodnotami",
+  "effect_profile_deleted": "Osobné údaje v profile budú odstránené",
+  "effect_account_deactivated": "Účet bude deaktivovaný",
+  "cancel": "Zrušiť",
+  "confirm": "Anonymizovať",
+  "processing": "Prebieha anonymizácia...",
+  "success_message": "Používateľ {name} {surname} bol anonymizovaný",
+  "error_message": "Nepodarilo sa anonymizovať používateľa"
+},
   "evaluator": {
     "welcome": "Vitajte, {name}!",
     "subtitle": "Prehľad hodnotení",
@@ -1567,5 +1600,77 @@
     "closed": "Uzavretá",
     "load_error": "Nepodarilo sa načítať výzvu.",
     "fetch_error": "Nepodarilo sa načítať výzvy."
+  },
+
+    "common": {
+    "cancel": "Zrušiť",
+    "close": "Zavrieť",
+    "retry": "Skúsiť znova",
+     "select_export_format": "Vyberte formát exportu",
+      "export_btn": "Exportovať dáta"
+      
+  },
+  "superadmin_dashboard": {
+     "page": "Strana {current} z {total}",
+    "empty": "Neboli nájdené žiadne auditné záznamy",
+    "title": "Dashboard Super Administrátora",
+    "subtitle": "Globálne riadenie systému, infraštruktúrne metriky, bezpečnostný audit a dohľad nad dodržiavaním predpisov.",
+    "actions": {
+      "systemSettings": "Systémové nastavenia"
+    },
+    "stats": {
+      "totalUsers": "Používatelia celkovo",
+      "totalOrganizations": "Organizácie celkovo",
+      "systemErrors": "Aktívne chyby systému",
+      "securityAlerts": "Bezpečnostné výstrahy (24h)"
+    },
+    "auditLogs": {
+      "title": "Systémové auditné logy a bezpečnostné udalosti",
+      "viewAll": "Zobraziť všetky záznamy",
+      "empty": "Za posledných 48 hodín neboli zaznamenané žiadne kritické auditné logy.",
+      "page": "Strana {current} z {total}",
+      "columns": {
+         "actor": "Iniciátor",
+      "source": "Zdroj",
+      "type": "Typ",
+      "severity": "Závažnosť",
+      "message": "Správa",
+      "object": "Cieľový objekt",
+      "ipAddress": "IP adresa",
+      "timestamp": "Časová pečiatka"
+      }
+    },
+      
+    "gdprOversight": {
+      "title": "Súlad s GDPR a retencia údajov",
+      "retentionPruning": "Automatické čistenie expirácie",
+      "lastExecution": "Posledné spustenie",
+      "pendingAnonymization": "Čaká na anonymizáciu",
+      "expiredDataPruned": "Premazané expirované záznamy"
+    },
+    "integrations": {
+      "title": "Stav infraštruktúry a služieb",
+      "unavailable": "Nedostupné"
+    },
+    "modules": {
+      "title": "Hlavné moduly systémovej architektúry",
+      "configure": "Konfigurovať uzol",
+      "columns": {
+        "moduleName": "Hlavný modul",
+        "status": "Stav",
+        "version": "Verzia",
+        "totalDbRecords": "Záznamy v databáze"
+      }
+    },
+    "sections": {
+      "identity": "Správa identít a prístupov (RBAC)",
+      "organizations": "Partneri a organizácie",
+      "reporting": "Generátor reportov a metrík",
+      "notifications": "Notifikačný systém a odosielanie",
+      "audit": "Systémový audit a kniha súladu"
+    },
+    "status": {
+      "active": "Aktívny / V poriadku"
+    }
   }
 }

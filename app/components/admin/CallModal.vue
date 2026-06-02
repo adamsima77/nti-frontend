@@ -33,6 +33,7 @@
         </button>
       </div>
 
+      <!-- ══ BASIC TAB ══════════════════════════════════════════════════════ -->
       <div v-show="activeTab === 'basic'" class="space-y-5">
         <div class="grid grid-cols-2 gap-4">
           <div>
@@ -73,7 +74,7 @@
           <textarea
             v-model="form.description"
             rows="3"
-            placeholder="Stručný popis výzvy and jej zamerania..."
+            placeholder="Stručný popis výzvy a jej zamerania..."
             class="w-full rounded-lg border px-3 py-2 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 resize-none"
             :class="errors.description ? 'border-red-400 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-300'"
           />
@@ -82,6 +83,7 @@
 
         <hr class="border-gray-100" />
 
+        <!-- Application dates -->
         <div>
           <p class="text-xs font-semibold text-slate-500 mb-3">Termíny podávania prihlášok</p>
           <div class="grid grid-cols-2 gap-4">
@@ -98,6 +100,7 @@
           </div>
         </div>
 
+        <!-- Project dates -->
         <div>
           <p class="text-xs font-semibold text-slate-500 mb-3">Termíny realizácie projektu</p>
           <div class="grid grid-cols-2 gap-4">
@@ -114,12 +117,11 @@
           </div>
         </div>
 
+        <!-- Force close toggle (edit only) -->
         <div
           v-if="isEditing"
           class="flex items-center justify-between rounded-xl border px-4 py-3.5 transition-colors"
-          :class="form.force_closed
-            ? 'border-red-200 bg-red-50'
-            : 'border-gray-200 bg-white'"
+          :class="form.force_closed ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'"
         >
           <div class="flex items-start gap-3">
             <div
@@ -166,9 +168,7 @@
             role="switch"
             :aria-checked="form.force_closed"
             class="relative ml-4 w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 flex-shrink-0"
-            :class="form.force_closed
-              ? 'bg-red-500 focus:ring-red-400'
-              : 'bg-gray-200 focus:ring-gray-300'"
+            :class="form.force_closed ? 'bg-red-500 focus:ring-red-400' : 'bg-gray-200 focus:ring-gray-300'"
             @click="form.force_closed = !form.force_closed"
           >
             <span
@@ -179,6 +179,7 @@
         </div>
       </div>
 
+      <!-- ══ FORM TAB ═══════════════════════════════════════════════════════ -->
       <div v-show="activeTab === 'form'" class="space-y-4">
         <p class="text-xs text-slate-500 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 leading-relaxed">
           Navrhnite polia, ktoré budú uchádzači vypĺňať pri podaní prihlášky.
@@ -297,6 +298,7 @@
         </div>
       </div>
 
+      <!-- ══ CRITERIA TAB ═══════════════════════════════════════════════════ -->
       <div v-show="activeTab === 'criteria'" class="space-y-4">
         <p class="text-xs text-slate-500 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2.5 leading-relaxed">
           Vyberte hodnotiace kritériá komisie a nastavte ich <strong>váhu (1–10)</strong>.
@@ -312,13 +314,13 @@
 
         <div v-if="criteriaLoading" class="py-8 flex justify-center"><UiLoader size="sm" /></div>
 
-        <div v-else-if="availableCriteria.length === 0" class="text-center py-8 text-sm text-gray-400">
+        <div v-else-if="allDisplayCriteria.length === 0" class="text-center py-8 text-sm text-gray-400">
           Žiadne kritériá nie sú k dispozícii.
         </div>
 
         <div v-else class="space-y-2">
           <div
-            v-for="criterion in availableCriteria"
+            v-for="criterion in allDisplayCriteria"
             :key="criterion.id"
             :class="[
               'rounded-xl border transition-all',
@@ -339,24 +341,44 @@
               </div>
 
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-navy leading-snug">{{ criterion.name }}</p>
+                <div class="flex items-center gap-2">
+                  <p class="text-sm font-semibold text-navy leading-snug">{{ criterion.name }}</p>
+                  <!-- Badge for locally created (unsaved) criteria -->
+                  <span
+                    v-if="criterion.id < 0"
+                    class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-600 flex-shrink-0"
+                  >
+                    Nové
+                  </span>
+                </div>
                 <p v-if="criterion.description" class="text-xs text-slate-500 mt-0.5 leading-relaxed">
                   {{ criterion.description }}
                 </p>
               </div>
 
-              <div
-                v-if="isCriterionSelected(criterion.id)"
-                class="flex-shrink-0 flex items-center gap-1.5 text-xs font-medium"
-                @click.stop
-              >
-                <span class="text-slate-400 text-[11px]">Váha</span>
-                <span
-                  class="px-2 py-0.5 rounded-full text-white text-[11px] font-bold"
-                  :class="weightColor(getCriterion(criterion.id)!.weight)"
+              <div class="flex items-center gap-2 flex-shrink-0" @click.stop>
+                <!-- Weight badge (only when selected) -->
+                <div
+                  v-if="isCriterionSelected(criterion.id)"
+                  class="flex items-center gap-1.5 text-xs font-medium"
                 >
-                  {{ getCriterion(criterion.id)!.weight }}
-                </span>
+                  <span class="text-slate-400 text-[11px]">Váha</span>
+                  <span
+                    class="px-2 py-0.5 rounded-full text-white text-[11px] font-bold"
+                    :class="weightColor(getCriterion(criterion.id)!.weight)"
+                  >
+                    {{ getCriterion(criterion.id)!.weight }}
+                  </span>
+                </div>
+                <!-- Delete button for locally created criteria -->
+                <button
+                  v-if="criterion.id < 0"
+                  class="p-1 rounded hover:bg-red-100 text-gray-300 hover:text-red-500 transition-colors"
+                  title="Odstrániť toto nové kritérium"
+                  @click.stop="removeLocalCriterion(criterion.id)"
+                >
+                  <Trash2 class="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
 
@@ -366,12 +388,8 @@
             >
               <div>
                 <div class="flex items-center justify-between mb-2">
-                  <label class="text-xs font-semibold text-slate-500">
-                    Váha kritéria
-                  </label>
-                  <span class="text-xs text-slate-400">
-                    {{ WEIGHT_LABELS[getCriterion(criterion.id)!.weight - 1] }}
-                  </span>
+                  <label class="text-xs font-semibold text-slate-500">Váha kritéria</label>
+                  <span class="text-xs text-slate-400">{{ WEIGHT_LABELS[getCriterion(criterion.id)!.weight - 1] }}</span>
                 </div>
                 <div class="flex gap-1">
                   <button
@@ -411,10 +429,73 @@
           </div>
         </div>
 
+        <!-- ── Create new criterion inline form ──────────────────────────── -->
+        <div class="pt-1">
+          <button
+            v-if="!showNewCriterionForm"
+            class="flex items-center gap-2 text-sm font-medium text-violet-600 hover:text-violet-800 border border-violet-200 hover:border-violet-400 rounded-lg px-3 py-2 bg-violet-50 hover:bg-violet-100 transition-all"
+            @click="showNewCriterionForm = true"
+          >
+            <Plus class="w-4 h-4" />
+            Vytvoriť nové kritérium
+          </button>
+
+          <div
+            v-else
+            class="rounded-xl border border-violet-300 bg-violet-50/50 p-4 space-y-3"
+          >
+            <p class="text-xs font-semibold text-violet-700">Nové kritérium</p>
+
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">Názov kritéria <span class="text-red-400">*</span></label>
+              <input
+                v-model="newCriterionDraft.name"
+                type="text"
+                placeholder="Napr. Inovačný potenciál"
+                class="w-full rounded-md border px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-violet-300"
+                :class="newCriterionError ? 'border-red-400' : 'border-gray-200'"
+                @keyup.enter="addLocalCriterion"
+              />
+              <p v-if="newCriterionError" class="text-xs text-red-500 mt-1">{{ newCriterionError }}</p>
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">Popis <span class="text-gray-400 font-normal">(voliteľný)</span></label>
+              <input
+                v-model="newCriterionDraft.description"
+                type="text"
+                placeholder="Krátky opis kritéria pre hodnotiteľov..."
+                class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-violet-300"
+                @keyup.enter="addLocalCriterion"
+              />
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+              <button
+                class="flex items-center gap-1.5 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg px-3 py-1.5 transition-colors"
+                @click="addLocalCriterion"
+              >
+                <Check class="w-3.5 h-3.5" />
+                Pridať a vybrať
+              </button>
+              <button
+                class="text-sm text-slate-500 hover:text-slate-700 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                @click="cancelNewCriterion"
+              >
+                Zrušiť
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Summary bar ───────────────────────────────────────────────── -->
         <div v-if="form.criteria.length > 0" class="flex items-center gap-4 text-xs text-slate-500 pt-1">
           <span>
             Vybrané: <strong class="text-slate-700">{{ form.criteria.length }}</strong>
             {{ criteriaCountLabel }}
+          </span>
+          <span v-if="localNewCriteria.filter(nc => isCriterionSelected(nc.id)).length > 0" class="text-violet-600">
+            <strong>{{ localNewCriteria.filter(nc => isCriterionSelected(nc.id)).length }}</strong> nových (budú vytvorené pri uložení)
           </span>
           <span v-if="academicSignalCount > 0" class="text-amber-600">
             <strong>{{ academicSignalCount }}</strong> akademický{{ academicSignalCount === 1 ? '' : 'é' }} signál{{ academicSignalCount === 1 ? '' : 'y' }}
@@ -526,15 +607,15 @@ const emit = defineEmits<{
 // ── Constants ──────────────────────────────────────────────────────────────
 
 const FIELD_TYPE_CONFIG: Record<FieldType, { label: string; icon: any; color: string }> = {
-  text:     { label: 'Krátky text',  icon: Type,        color: 'text-blue-500' },
-  textarea: { label: 'Dlhý text',    icon: AlignLeft,   color: 'text-indigo-500' },
-  number:   { label: 'Číslo',        icon: Hash,        color: 'text-violet-500' },
-  email:    { label: 'E-mail',        icon: Mail,        color: 'text-sky-500' },
+  text:     { label: 'Krátky text',   icon: Type,        color: 'text-blue-500' },
+  textarea: { label: 'Dlhý text',     icon: AlignLeft,   color: 'text-indigo-500' },
+  number:   { label: 'Číslo',         icon: Hash,        color: 'text-violet-500' },
+  email:    { label: 'E-mail',         icon: Mail,        color: 'text-sky-500' },
   select:   { label: 'Výber jedného', icon: ChevronDown, color: 'text-amber-500' },
-  radio:    { label: 'Prepínač',     icon: Circle,      color: 'text-orange-500' },
+  radio:    { label: 'Prepínač',      icon: Circle,      color: 'text-orange-500' },
   checkbox: { label: 'Zaškrtávačky', icon: CheckSquare, color: 'text-emerald-500' },
-  date:     { label: 'Dátum',        icon: Calendar,    color: 'text-rose-500' },
-  file:     { label: 'Príloha',      icon: Paperclip,   color: 'text-teal-500' },
+  date:     { label: 'Dátum',         icon: Calendar,    color: 'text-rose-500' },
+  file:     { label: 'Príloha',       icon: Paperclip,   color: 'text-teal-500' },
 }
 
 const WEIGHT_LABELS = [
@@ -724,6 +805,52 @@ const criteriaCountLabel = computed(() => {
   return 'kritérií'
 })
 
+// ── Local new-criterion form ───────────────────────────────────────────────
+// New criteria use negative temp IDs (never clash with real DB IDs).
+// On submit they are POSTed first; their real IDs are then swapped in.
+
+let _tempIdSeq = -1
+
+const localNewCriteria  = ref<Criterion[]>([])
+const showNewCriterionForm = ref(false)
+const newCriterionDraft    = ref({ name: '', description: '' })
+const newCriterionError    = ref('')
+
+/** Combined list shown in the criteria tab */
+const allDisplayCriteria = computed<Criterion[]>(() => [
+  ...availableCriteria.value,
+  ...localNewCriteria.value,
+])
+
+function addLocalCriterion() {
+  if (!newCriterionDraft.value.name.trim()) {
+    newCriterionError.value = 'Názov kritéria je povinný.'
+    return
+  }
+  newCriterionError.value = ''
+  const tempId = _tempIdSeq--
+  localNewCriteria.value.push({
+    id:          tempId,
+    name:        newCriterionDraft.value.name.trim(),
+    description: newCriterionDraft.value.description.trim(),
+  })
+  // Auto-select with default weight so the admin can tweak it immediately
+  form.value.criteria.push({ id: tempId, weight: 5, is_academic_signal: false })
+  newCriterionDraft.value    = { name: '', description: '' }
+  showNewCriterionForm.value = false
+}
+
+function removeLocalCriterion(tempId: number) {
+  localNewCriteria.value = localNewCriteria.value.filter(nc => nc.id !== tempId)
+  form.value.criteria    = form.value.criteria.filter(c => c.id !== tempId)
+}
+
+function cancelNewCriterion() {
+  showNewCriterionForm.value = false
+  newCriterionDraft.value    = { name: '', description: '' }
+  newCriterionError.value    = ''
+}
+
 // ── Meta fetchers ──────────────────────────────────────────────────────────
 
 async function fetchMeta() {
@@ -736,8 +863,8 @@ async function fetchMeta() {
     ])
     const list = (r: any): any[] => Array.isArray(r) ? r : r?.data ?? []
 
-    programOptions.value  = list(programs).map((p: any) => ({ value: p.id, label: p.typeOfProgram?.name ?? p.name ?? `#${p.id}` }))
-    statusOptions.value   = list(statuses).map((s: any) => ({ value: s.id, label: s.name }))
+    programOptions.value  = list(programs).map((p: any)  => ({ value: p.id, label: p.typeOfProgram?.name ?? p.name ?? `#${p.id}` }))
+    statusOptions.value   = list(statuses).map((s: any)  => ({ value: s.id, label: s.name }))
     languageOptions.value = list(languages).map((l: any) => ({ value: l.id, label: l.name }))
   } catch {
     addToast({ message: 'Nepodarilo sa načítať metadáta.', type: 'error' })
@@ -766,12 +893,17 @@ async function fetchCriteria() {
 watch(() => props.modelValue, async (open) => {
   if (!open) return
 
-  activeTab.value       = 'basic'
-  editingFieldIdx.value = null
-  showFieldPicker.value = false
-  errors.value          = {}
-  touched.value         = {}
-  isFormDirty.value     = false
+  activeTab.value        = 'basic'
+  editingFieldIdx.value  = null
+  showFieldPicker.value  = false
+  errors.value           = {}
+  touched.value          = {}
+  isFormDirty.value      = false
+  // Reset local-criteria state
+  localNewCriteria.value    = []
+  showNewCriterionForm.value = false
+  newCriterionDraft.value    = { name: '', description: '' }
+  newCriterionError.value    = ''
 
   await Promise.all([fetchMeta(), fetchCriteria()])
 
@@ -785,7 +917,6 @@ watch(() => props.modelValue, async (open) => {
 
   if (props.call?.id) {
     const c = props.call
-    // Support both snake_case and camelCase arrays from backend responses
     const translations = c.call_translations ?? c.callTranslations ?? []
     const primaryTr = translations[0] ?? null
 
@@ -828,6 +959,28 @@ watch(() => form.value.program_id, (newId) => {
   }
 })
 
+// ── Real-time date cross-validation ───────────────────────────────────────
+
+watch(
+  [() => form.value.application_start, () => form.value.application_deadline],
+  ([start, end]) => {
+    if (start && end && end < start)
+      errors.value.application_deadline = 'Uzávierka musí byť po začiatku.'
+    else
+      delete errors.value.application_deadline
+  },
+)
+
+watch(
+  [() => form.value.project_start, () => form.value.project_end],
+  ([start, end]) => {
+    if (start && end && end < start)
+      errors.value.project_end = 'Koniec projektu musí byť po jeho začiatku.'
+    else
+      delete errors.value.project_end
+  },
+)
+
 // ── Validation ─────────────────────────────────────────────────────────────
 
 function isValid(field: string) { return !errors.value[field] }
@@ -853,7 +1006,7 @@ function validate(): boolean {
 
   if (form.value.project_start && form.value.project_end &&
       form.value.project_end < form.value.project_start) {
-    errors.value.project_end = 'Koniec projektu must byť po jeho začiatku.'
+    errors.value.project_end = 'Koniec projektu musí byť po jeho začiatku.'
   }
 
   if (Object.keys(errors.value).length > 0) {
@@ -886,7 +1039,17 @@ function validate(): boolean {
     return false
   }
 
-  // 3. KRITÉRIÁ HODNOTENIA
+  // 3. NOVÉ KRITÉRIÁ — musia mať neprázdny názov (safety check)
+  for (const nc of localNewCriteria.value) {
+    if (!nc.name.trim()) {
+      activeTab.value = 'criteria'
+      errors.value._criteria = 'Všetky nové kritériá musia mať vyplnený názov.'
+      addToast({ message: 'Chyba kritérií: Nové kritérium nemá vyplnený názov.', type: 'error' })
+      return false
+    }
+  }
+
+  // 4. KRITÉRIÁ HODNOTENIA — aspoň jedno
   if (form.value.criteria.length === 0) {
     activeTab.value = 'criteria'
     errors.value._criteria = 'Musíte vybrať aspoň jedno hodnotiace kritérium.'
@@ -904,6 +1067,30 @@ async function handleSubmit() {
   isSaving.value = true
 
   try {
+    // ── Step 1: Create any locally drafted criteria and remap their temp IDs ──
+    const selectedLocalCriteria = localNewCriteria.value.filter(nc =>
+      form.value.criteria.some(c => c.id === nc.id),
+    )
+
+   for (const nc of selectedLocalCriteria) {
+  const created: any = await api.post('/v1/admin/criteria', {
+   translations: [
+  {
+    language_id: form.value.language_id,
+    name:        nc.name,
+    description: nc.description || undefined,
+  },
+],
+  })
+  // Response is the criterion object directly (201), id is at the root
+  const realId: number = created?.id ?? created?.data?.id
+  if (!realId) throw new Error(`Nepodarilo sa získať ID pre nové kritérium „${nc.name}".`)
+
+  const pivot = form.value.criteria.find(c => c.id === nc.id)
+  if (pivot) pivot.id = realId
+}
+
+    // ── Step 2: Build payload and save the call ────────────────────────────
     const sanitizedFields = formFields.value.map(field => ({
       id:          field.id,
       type:        field.type,
@@ -916,25 +1103,24 @@ async function handleSubmit() {
       accept:      field.accept || '',
     }))
 
-  const payload: Record<string, any> = {
-  program_id:           form.value.program_id,
-  status_id:            form.value.status_id,
-  language_id:          form.value.language_id,
-  name:                 form.value.name,
-  description:          form.value.description,
-  application_start:    form.value.application_start,
-  application_deadline: form.value.application_deadline,
-  project_start:        form.value.project_start,
-  project_end:          form.value.project_end,
-  criteria:             form.value.criteria,
-  force_closed:         Boolean(form.value.force_closed),
-  application_form_schema: sanitizedFields.length > 0
-    ? { fields: sanitizedFields }
-    : null,
-}
+    const payload: Record<string, any> = {
+      program_id:           form.value.program_id,
+      status_id:            form.value.status_id,
+      language_id:          form.value.language_id,
+      name:                 form.value.name,
+      description:          form.value.description,
+      application_start:    form.value.application_start,
+      application_deadline: form.value.application_deadline,
+      project_start:        form.value.project_start,
+      project_end:          form.value.project_end,
+      criteria:             form.value.criteria,
+      force_closed:         Boolean(form.value.force_closed),
+      application_form_schema: sanitizedFields.length > 0
+        ? { fields: sanitizedFields }
+        : null,
+    }
 
     if (props.call?.id) {
-     
       await api.put(`/v1/admin/calls/${props.call.id}`, payload)
     } else {
       await api.post('/v1/admin/calls', payload)
@@ -949,8 +1135,6 @@ async function handleSubmit() {
       errors.value = Object.fromEntries(
         Object.entries(laravelErrors).map(([k, msgs]) => [k, msgs[0]])
       )
-      
-      // Map Laravel array errors cleanly to show user which tab needs attention
       if (Object.keys(errors.value).some(k => k.startsWith('application_form_schema'))) {
         activeTab.value = 'form'
         errors.value._form = 'Na serveri zlyhala validácia schémy formulára.'
@@ -962,7 +1146,8 @@ async function handleSubmit() {
       }
       addToast({ message: 'Nepodarilo sa uložiť výzvu kvôli chybám validácie na serveri.', type: 'error' })
     } else {
-      addToast({ message: 'Nepodarilo sa uložiť výzvu.', type: 'error' })
+      const msg = e?.message ?? 'Nepodarilo sa uložiť výzvu.'
+      addToast({ message: msg, type: 'error' })
     }
   } finally {
     isSaving.value = false

@@ -79,22 +79,19 @@ const navItems = computed(() => {
       { label: t('portal_sidebar_links.users'),            to: localePath('/admin/pouzivatelia'),      icon: Users,           section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.challenges'),       to: localePath('/admin/vyzvy'),             icon: Megaphone,       section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.adminApplications'),to: localePath('/admin/prihlasky'),         icon: FileText,        section: t('portal_sidebar_links.sectionManagement') },
-      { label: t('portal_sidebar_links.cms'),              to: localePath('/cms/management'),          icon: FileCode,        section: t('portal_sidebar_links.sectionContent') },
-      { label: t('portal_sidebar_links.exports'),          to: localePath('/admin/exporty'),           icon: Download,        section: t('portal_sidebar_links.sectionSystem') },
-     
+      { label: t('portal_sidebar_links.cms'),              to: localePath('/cms/management'),          icon: FileCode,        section: t('portal_sidebar_links.sectionContent') }, 
     ]
   }
 
   if(role === 'superadmin') {
     return [
-      { label: t('portal_sidebar_links.dashboard'),        to: localePath('/superadmin'),              icon: LayoutDashboard, section: t('portal_sidebar_links.sectionManagement') },
+      { label: t('portal_sidebar_links.dashboard'),        to: localePath('/super-admin'),              icon: LayoutDashboard, section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.users'),            to: localePath('/admin/pouzivatelia'),      icon: Users,           section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.challenges'),       to: localePath('/admin/vyzvy'),             icon: Megaphone,       section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.adminApplications'),to: localePath('/admin/prihlasky'),         icon: FileText,        section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.cms'),              to: localePath('/cms/management'),          icon: FileCode,        section: t('portal_sidebar_links.sectionContent') },
-      { label: t('portal_sidebar_links.roles'),            to: localePath('/superadmin/role'),         icon: ShieldCheck,     section: t('portal_sidebar_links.sectionSystem') },
-      { label: t('portal_sidebar_links.exports'),          to: localePath('/admin/exporty'),           icon: Download,        section: t('portal_sidebar_links.sectionSystem') },
-      { label: t('portal_sidebar_links.auditLog'),         to: localePath('/admin/audit-log'),         icon: Shield,          section: t('portal_sidebar_links.sectionSystem') },
+      { label: t('portal_sidebar_links.roles'),            to: localePath('/super-admin/role'),         icon: ShieldCheck,     section: t('portal_sidebar_links.sectionSystem') },
+      { label: t('portal_sidebar_links.auditLog'),         to: localePath('/admin/audit-logs'),         icon: Shield,          section: t('portal_sidebar_links.sectionSystem') },
       
     ]
   }
