@@ -767,8 +767,10 @@
         "search_placeholder": "Hľadať podľa názvu...",
         "status": "Stav",
         "program": "Program",
+        "category": "Kategória",
         "all_statuses": "Všetky stavy",
-        "all_programs": "Všetky programy"
+        "all_programs": "Všetky programy",
+        "all_categories": "Všetky kategórie"
       },
       "status": {
         "draft": "Rozpracovaná",
@@ -790,6 +792,7 @@
         "in_progress": "V progrese",
         "pending": "Čakajúce",
         "information": "Informácie",
+        "category": "Kategória",
         "members": "Členov",
         "submitted_at": "Podané dňa",
         "status_history": "História stavov",
@@ -1516,6 +1519,9 @@
     "application_detail": "Detail prihlášky",
     "view_evaluation": "Zobraziť hodnotenie",
     "application_summary": "Súhrn prihlášky",
+    "category": "Kategória",
+    "filter_by_category": "Filtrovať podľa kategórie",
+    "all_categories": "Všetky kategórie",
     "student_name": "Meno študenta",
     "school_program_year": "Škola / Program / Ročník",
     "call": "Výzva",

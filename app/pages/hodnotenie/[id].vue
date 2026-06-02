@@ -43,6 +43,12 @@
             <h1 class="text-2xl font-bold text-navy">{{ application.projectName }}</h1>
             <UiStatusBadge :status="application.status" />
             <span
+              v-if="application.category"
+              class="text-xs px-2 py-0.5 rounded-full font-medium bg-slate-100 text-slate-700"
+            >
+              {{ application.category.name }}
+            </span>
+            <span
               class="text-xs px-2 py-0.5 rounded-full font-medium"
               :class="application.program === 'A' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'"
             >
@@ -394,6 +400,10 @@
               <span class="text-gray-500">{{ $t('evaluator.sidebar.program') }}</span>
               <span class="font-medium text-navy">{{ $t('evaluator.program_label') }} {{ application.program }}</span>
             </div>
+            <div v-if="application.category" class="flex justify-between text-sm">
+              <span class="text-gray-500">{{ $t('evaluator.category') }}</span>
+              <span class="font-medium text-navy">{{ application.category.name }}</span>
+            </div>
             <div class="flex justify-between text-sm">
               <span class="text-gray-500">{{ $t('evaluator.sidebar.submitted') }}</span>
               <span class="font-medium text-navy">{{ formatDate(application.submittedAt) }}</span>
@@ -547,6 +557,7 @@ type EvaluatorApplicationView = {
   teamMembers: { id: number; name: string; role: string }[]
   commissionMembers: { id: number; name: string; score: number | null }[]
   academic_flag: boolean | null
+  category?: { id: number; name: string } | null
 }
 
 type ScoringCriterionView = {
@@ -598,6 +609,7 @@ const mapApplication = (detail: ApplicationDetail): EvaluatorApplicationView => 
   teamMembers: (detail.teamMembers ?? []).map(member => ({ id: member.id, name: member.name, role: member.role })),
   commissionMembers: (detail.commissionMembers ?? []).map(member => ({ id: member.id, name: member.name, score: member.score })),
   academic_flag: detail.academic_flag ?? null,
+  category: detail.category ?? null,
 })
 
 const syncScoringForm = (detail: ApplicationDetail) => {

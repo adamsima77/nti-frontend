@@ -58,6 +58,10 @@ export interface ApplicationSummary {
   deadline?: string | null
   avgScore?: number | null
   call_id?: number | null
+  category?: {
+    id: number
+    name: string
+  } | null
 }
 
 export interface ApplicationDetail extends ApplicationSummary {

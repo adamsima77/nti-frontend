@@ -190,6 +190,10 @@
                 <dd class="text-sm font-medium text-navy">{{ application.program }}</dd>
               </div>
               <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.applications.detail.category') }}</dt>
+                <dd class="text-sm font-medium text-navy">{{ application.category || t('student_dashboard.common.not_available') }}</dd>
+              </div>
+              <div class="flex justify-between">
                 <dt class="text-sm text-gray-500">{{ t('student_dashboard.applications.team') }}</dt>
                 <dd class="text-sm font-medium text-navy">{{ application.team }}</dd>
               </div>

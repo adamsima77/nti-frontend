@@ -58,6 +58,10 @@ interface ApiApplication {
   documents?: ApiDocumentItem[]
   milestones?: ApiMilestoneRaw[]
   status_history?: ApiStatusHistoryItem[]
+  category?: {
+    id?: number
+    name?: string
+  }
   description?: string | null
 }
 
@@ -168,6 +172,7 @@ export const mapApplication = (app: ApiApplication): Application => {
     submittedAt: app.submitted_at,
     members: app.team_members_count ?? 0,
     documents: docCount,
+    category: app.category?.name ?? '',
     milestones: mapMilestones(app),
     description: app.description ?? '',
     documentRows,

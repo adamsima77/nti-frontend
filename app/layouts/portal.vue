@@ -139,7 +139,7 @@ const navItems = computed(() => {
   }
 
   return [
-    { label: t('portal_sidebar_links.dashboard'), to: localePath('/dashboard'), icon: LayoutDashboard },
+    { label: t('portal_sidebar_links.dashboard'), to: localePath('/'), icon: LayoutDashboard },
   ]
 })
 </script>

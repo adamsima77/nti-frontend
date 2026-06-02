@@ -97,6 +97,7 @@ function mapCall(row: Record<string, unknown>): EvaluatorCall {
 function mapApplicationSummary(row: Record<string, unknown>): ApplicationSummary {
   const teamRecord = row.team && typeof row.team === 'object' ? row.team as Record<string, unknown> : undefined
   const team: Record<string, unknown> = teamRecord ?? {}
+  const categoryRecord = row.category && typeof row.category === 'object' ? row.category as Record<string, unknown> : undefined
   const teamMembersCount = toNumber(team.members_count ?? row.members_count ?? row.team_members_count, 0)
   const academicFlag = row.academic_flag ?? row.academicFlag ?? teamRecord?.academic_flag ?? teamRecord?.academicFlag
 
@@ -117,6 +118,10 @@ function mapApplicationSummary(row: Record<string, unknown>): ApplicationSummary
     deadline: row.deadline == null ? null : toString(row.deadline),
     avgScore: row.avg_score == null && row.avgScore == null ? null : toNumber(row.avg_score ?? row.avgScore, 0),
     call_id: row.call_id == null ? null : toNumber(row.call_id),
+    category: categoryRecord ? {
+      id: toNumber(categoryRecord.id),
+      name: toString(categoryRecord.name ?? ''),
+    } : null,
   }
 }
 

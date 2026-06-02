@@ -41,6 +41,27 @@
     </div>
 
     <div
+      v-if="selectedCallCategories.length"
+      class="flex flex-wrap items-center gap-3 mb-6"
+    >
+      <label class="text-sm font-medium text-gray-700" for="category-filter">{{ t('evaluator.filter_by_category') }}</label>
+      <select
+        id="category-filter"
+        v-model="selectedCategoryId"
+        class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
+      >
+        <option :value="null">{{ t('evaluator.all_categories') }}</option>
+        <option
+          v-for="category in selectedCallCategories"
+          :key="category.id"
+          :value="category.id"
+        >
+          {{ category.name }}
+        </option>
+      </select>
+    </div>
+
+    <div
       v-if="loading.applications[selectedCallId ?? 0]"
       class="bg-white rounded-lg border border-gray-100 p-6 text-sm text-gray-500"
     >
@@ -58,6 +79,12 @@
             <div class="flex items-center gap-2 mb-1 flex-wrap">
               <h3 class="font-semibold text-navy text-base">{{ app.projectName ?? `Prihláška #${app.id}` }}</h3>
               <UiStatusBadge :status="app.status" />
+              <span
+                v-if="app.category"
+                class="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-slate-100 text-slate-700"
+              >
+                {{ app.category.name }}
+              </span>
               <span
                 v-if="app.program"
                 class="text-xs px-2 py-0.5 rounded-full font-medium"
@@ -116,6 +143,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Star, ClipboardCheck } from 'lucide-vue-next'
 import { useEvaluatorDashboard } from '~/composables/useEvaluatorDashboard'
 
@@ -128,9 +156,11 @@ definePageMeta({
 useHead({ title: 'Hodnotenia | NTI Komisia' })
 
 const route = useRoute()
+const { t } = useI18n()
 const { calls, applicationsByCallId, loading, fetchDashboard, fetchCalls, fetchApplications } = useEvaluatorDashboard()
 
 const selectedCallId = ref<number | null>(null)
+const selectedCategoryId = ref<number | null>(null)
 
 const activeCallId = computed(() => selectedCallId.value ?? calls.value[0]?.id ?? null)
 
@@ -139,9 +169,27 @@ const selectedCall = computed(() => {
   return calls.value.find(call => call.id === activeCallId.value) ?? calls.value[0] ?? null
 })
 
-const selectedCallApplications = computed(() => {
+const selectedCallApplicationsRaw = computed(() => {
   if (activeCallId.value == null) return []
   return applicationsByCallId.value[activeCallId.value] ?? []
+})
+
+const selectedCallCategories = computed(() => {
+  const unique = new Map<number, { id: number; name: string }>()
+  for (const app of selectedCallApplicationsRaw.value) {
+    if (app.category?.id != null && app.category?.name) {
+      unique.set(app.category.id, { id: app.category.id, name: app.category.name })
+    }
+  }
+  return Array.from(unique.values())
+})
+
+const selectedCallApplications = computed(() => {
+  if (selectedCategoryId.value == null) {
+    return selectedCallApplicationsRaw.value
+  }
+
+  return selectedCallApplicationsRaw.value.filter(app => app.category?.id === selectedCategoryId.value)
 })
 
 const avgMyScore = computed(() => {

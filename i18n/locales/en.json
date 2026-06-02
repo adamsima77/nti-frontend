@@ -82,6 +82,9 @@
     "application_detail": "Application detail",
     "view_evaluation": "View evaluation",
     "application_summary": "Application summary",
+    "category": "Category",
+    "filter_by_category": "Filter by category",
+    "all_categories": "All categories",
     "student_name": "Student name",
     "school_program_year": "School / Program / Year",
     "call": "Call",
@@ -1018,8 +1021,10 @@
         "search_placeholder": "Search by title...",
         "status": "Status",
         "program": "Program",
+        "category": "Category",
         "all_statuses": "All statuses",
-        "all_programs": "All programs"
+        "all_programs": "All programs",
+        "all_categories": "All categories"
       },
       "status": {
         "draft": "Draft",
@@ -1041,6 +1046,7 @@
         "in_progress": "In progress",
         "pending": "Pending",
         "information": "Information",
+        "category": "Category",
         "members": "Members",
         "submitted_at": "Submitted at",
         "status_history": "Status history",

@@ -50,6 +50,7 @@ export interface Application {
   /** Z API (deduplikácia konceptov) */
   callId?: number
   teamId?: number
+  category?: string
 }
 
 export interface ApplicationWithProgress extends Application {
