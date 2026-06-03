@@ -61,23 +61,23 @@
           </div>
 
           <div class="bg-white rounded-lg border border-gray-100 p-6">
-            <h2 class="text-base font-semibold text-navy mb-4">{{ $t('academic_record.title') }}</h2>
+            <h2 class="text-base font-semibold text-navy mb-4">{{ $t('evaluator.academic_record.title') }}</h2>
             <div class="grid grid-cols-1 gap-4 text-sm text-gray-700">
               <div>
-                <p class="font-medium text-gray-900">{{ $t('academic_record.honor_declaration') }}</p>
+                <p class="font-medium text-gray-900">{{ $t('evaluator.academic_record.honor_declaration') }}</p>
                 <p>
-                  <span v-if="applicationDetail.academic_record?.honor_declaration">✅ {{ $t('academic_record.yes') }}</span>
-                  <span v-else>❌ {{ $t('academic_record.no') }}</span>
+                  <span v-if="applicationDetail.academic_record?.honor_declaration">✅ {{ $t('evaluator.academic_record.yes') }}</span>
+                  <span v-else>❌ {{ $t('evaluator.academic_record.no') }}</span>
                 </p>
                 <p class="text-xs text-gray-500 mt-1">
                   <span v-if="applicationDetail.academic_record?.honor_declaration">
-                    {{ $t('academic_record.signed_at') }} {{ formatDate(applicationDetail.academic_record?.honor_declaration_signed_at) }}
+                    {{ $t('evaluator.academic_record.signed_at') }} {{ formatDate(applicationDetail.academic_record?.honor_declaration_signed_at) }}
                   </span>
-                  <span v-else>{{ $t('academic_record.not_signed') }}</span>
+                  <span v-else>{{ $t('evaluator.academic_record.not_signed') }}</span>
                 </p>
               </div>
               <div>
-                <p class="font-medium text-gray-900">{{ $t('academic_record.transcript') }}</p>
+                <p class="font-medium text-gray-900">{{ $t('evaluator.academic_record.transcript') }}</p>
                 <div v-if="applicationDetail.academic_record?.transcript_file">
                   <a
                     :href="applicationDetail.academic_record?.transcript_file"
@@ -85,10 +85,10 @@
                     rel="noopener noreferrer"
                     class="text-blue-600 hover:underline"
                   >
-                    {{ $t('academic_record.download') }}
+                    {{ $t('evaluator.academic_record.download') }}
                   </a>
                 </div>
-                <div v-else class="text-gray-500">{{ $t('academic_record.not_uploaded') }}</div>
+                <div v-else class="text-gray-500">{{ $t('evaluator.academic_record.not_uploaded') }}</div>
               </div>
               <div>
                 <p class="font-medium text-gray-900">{{ $t('student_dashboard.profile.university') }}</p>

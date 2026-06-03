@@ -145,6 +145,17 @@
       "academic_criteria": "Academic criteria",
       "documents": "Documents"
     },
+    "academic_record": {
+      "title": "Academic record",
+      "honor_declaration": "Honor declaration",
+      "signed_at": "Signed at",
+      "not_signed": "Not signed",
+      "transcript": "Grade transcript",
+      "download": "Download",
+      "not_uploaded": "Not uploaded",
+      "yes": "Yes",
+      "no": "No"
+    },
     "waiting": "waiting",
     "loading_detail": "Loading application detail...",
     "auto_saved": "💾 Draft was saved",

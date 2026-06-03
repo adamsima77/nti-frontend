@@ -1622,6 +1622,17 @@
       "academic_criteria": "Akademické kritériá",
       "documents": "Dokumenty"
     },
+    "academic_record": {
+      "title": "Akademický záznam",
+      "honor_declaration": "Čestné vyhlásenie",
+      "signed_at": "Podpísané dňa",
+      "not_signed": "Nepodpísané",
+      "transcript": "Výpis známok",
+      "download": "Stiahnuť",
+      "not_uploaded": "Nenahrané",
+      "yes": "Áno",
+      "no": "Nie"
+    },
     "error": {
       "select_recommendation": "Pred odoslaním vyberte odporúčanie"
     },
