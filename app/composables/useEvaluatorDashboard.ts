@@ -128,7 +128,7 @@ function mapApplicationSummary(row: Record<string, unknown>): ApplicationSummary
 function mapApplicationDetail(row: Record<string, unknown>): ApplicationDetail {
   const summary = mapApplicationSummary(row)
   const documentsSource: unknown[] = Array.isArray(row.documents) ? row.documents : []
-  const historySource: unknown[] = Array.isArray(row.history) ? row.history : []
+  const historySource: unknown[] = Array.isArray(row.status_history) ? row.status_history : (Array.isArray(row.history) ? row.history : [])
   const teamRecord = row.team && typeof row.team === 'object' ? row.team as Record<string, unknown> : undefined
   const teamMembersSource: Record<string, unknown>[] = Array.isArray(row.teamMembers)
     ? row.teamMembers as Record<string, unknown>[]
@@ -163,6 +163,16 @@ function mapApplicationDetail(row: Record<string, unknown>): ApplicationDetail {
         status: toString(rowHistory.status ?? ''),
         changed_at: toString(rowHistory.changed_at ?? rowHistory.changedAt ?? ''),
         changed_by: toString(rowHistory.changed_by ?? rowHistory.changedBy ?? ''),
+        note: rowHistory.note == null ? '' : toString(rowHistory.note),
+      }
+    }),
+    status_history: historySource.map((item) => {
+      const rowHistory = item as Record<string, unknown>
+      return {
+        status: toString(rowHistory.status ?? ''),
+        changed_at: toString(rowHistory.changed_at ?? rowHistory.changedAt ?? ''),
+        changed_by: toString(rowHistory.changed_by ?? rowHistory.changedBy ?? ''),
+        note: rowHistory.note == null ? '' : toString(rowHistory.note),
       }
     }),
     evaluation: row.evaluation && typeof row.evaluation === 'object'

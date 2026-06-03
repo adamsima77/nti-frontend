@@ -78,7 +78,8 @@ export interface ApplicationDetail extends ApplicationSummary {
   study_year?: string
   form_data?: Record<string, unknown>
   documents: { id: number; type: string; version: number; url: string }[]
-  history: { status: string; changed_at: string; changed_by: string }[]
+  history: { status: string; changed_at: string; changed_by: string; note?: string }[]
+  status_history: { status: string; changed_at: string; changed_by: string; note?: string }[]
   evaluation?: Evaluation
   call?: EvaluatorCall | null
   teamMembers?: { id: number; name: string; role: string }[]

@@ -161,11 +161,15 @@
           <div class="bg-white rounded-lg border border-gray-100 p-5">
             <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ $t('evaluator.application_history') }}</h3>
             <div class="space-y-3 text-sm text-gray-700">
-              <div v-for="item in applicationDetail.history" :key="item.changed_at + item.status" class="border border-gray-100 rounded-lg p-3">
-                <p class="font-medium text-navy">{{ item.status }}</p>
-                <p class="text-xs text-gray-500">{{ formatDate(item.changed_at) }} · {{ item.changed_by }}</p>
+              <div v-for="item in applicationDetail.status_history" :key="item.changed_at + item.status" class="border border-gray-100 rounded-lg p-3">
+                <div class="flex items-start justify-between gap-3">
+                  <UiStatusBadge :status="item.status" class="shrink-0" />
+                  <p class="text-xs text-gray-500">{{ formatDate(item.changed_at) }}</p>
+                </div>
+                <p class="text-sm font-medium text-navy mt-2">{{ item.changed_by }}</p>
+                <p v-if="item.note" class="text-sm text-gray-600 mt-1">{{ item.note }}</p>
               </div>
-              <div v-if="!applicationDetail.history.length" class="text-xs text-gray-400">{{ $t('evaluator.no_history') }}</div>
+              <div v-if="!applicationDetail.status_history.length" class="text-xs text-gray-400">{{ $t('evaluator.no_history') }}</div>
             </div>
           </div>
         </div>
