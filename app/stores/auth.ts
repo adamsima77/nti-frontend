@@ -47,7 +47,7 @@ const ROLE_MAP: Record<string, string> = {
   'organization':   'company',
   'mentor':         'mentor',
   'evaluator':      'evaluator',
-  'predseda_komisie':'predseda_komisie',
+  'predseda_komisie':'evaluator',
   'guest':          'guest',
 }
 
@@ -56,6 +56,7 @@ const ROLE_ALIASES: Record<string, string[]> = {
   organization: ['partner'],
   cms_editor: ['content-manager'],
   'content-manager': ['cms_editor'],
+  evaluator: ['predseda_komisie'],
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -114,7 +115,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const hasPermission = (permission: string): boolean => {
-    if (hasRole(['nti_superadmin', 'nti_admin'])) return true
+    if (hasRole(['nti_superadmin', 'nti_admin', 'predseda_komisie'])) return true
     return userPermissions.value.includes(permission)
   }
 

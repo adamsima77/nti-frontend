@@ -148,6 +148,19 @@ function mapApplicationDetail(row: Record<string, unknown>): ApplicationDetail {
     school: row.school == null ? undefined : toString(row.school),
     study_program: row.study_program == null ? undefined : toString(row.study_program),
     study_year: row.study_year == null ? undefined : toString(row.study_year),
+    form_data: row.form_data && typeof row.form_data === 'object' && !Array.isArray(row.form_data)
+      ? row.form_data as Record<string, unknown>
+      : {},
+    form_fields: Array.isArray(row.form_fields)
+      ? (row.form_fields as Record<string, unknown>[]).map((field) => ({
+          name: toString(field.name ?? ''),
+          label: toString(field.label ?? field.name ?? ''),
+          type: toString(field.type ?? 'text'),
+          placeholder: field.placeholder == null ? undefined : toString(field.placeholder),
+          description: field.description == null ? undefined : toString(field.description),
+          options: field.options,
+        }))
+      : [],
     documents: documentsSource.map((doc) => {
       const rowDoc = doc as Record<string, unknown>
       return {
@@ -183,26 +196,23 @@ function mapApplicationDetail(row: Record<string, unknown>): ApplicationDetail {
       : null,
     teamMembers: teamMembersSource.map((member) => {
       const rowMember = member as Record<string, unknown>
+      const studentId = rowMember.student_id == null ? undefined : toNumber(rowMember.student_id, 0)
+      const transcriptFile = rowMember.transcript_file
+      const signedAt = rowMember.honor_declaration_signed_at
+
       return {
         id: toNumber(rowMember.id),
+        student_id: studentId,
         name: toString(rowMember.name ?? ''),
         role: toString(rowMember.role ?? ''),
+        honor_declaration: toBoolean(rowMember.honor_declaration) ?? false,
+        honor_declaration_signed_at: signedAt == null ? null : toString(signedAt),
+        transcript_file: transcriptFile == null ? null : toString(transcriptFile),
+        school: rowMember.school == null ? undefined : toString(rowMember.school),
+        study_program: rowMember.study_program == null ? undefined : toString(rowMember.study_program),
+        study_year: rowMember.study_year == null ? undefined : toString(rowMember.study_year),
       }
     }),
-    academic_record: row.academic_record && typeof row.academic_record === 'object'
-      ? (() => {
-        const record = row.academic_record as Record<string, unknown>
-        const transcriptFile = record.transcript_file
-        const signedAt = record.honor_declaration_signed_at
-
-        return {
-          student_id: toNumber(record.student_id),
-          transcript_file: transcriptFile == null ? null : toString(transcriptFile),
-          honor_declaration: Boolean(record.honor_declaration),
-          honor_declaration_signed_at: signedAt == null ? null : toString(signedAt),
-        }
-      })()
-      : null,
     commissionMembers: commissionMembersSource.map((member) => {
       const rowMember = member as Record<string, unknown>
       return {

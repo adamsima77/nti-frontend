@@ -71,18 +71,41 @@ export interface AcademicRecord {
   honor_declaration_signed_at?: string | null
 }
 
+export interface ApplicationTeamMember {
+  id: number
+  student_id?: number | null
+  name: string
+  role: string
+  honor_declaration?: boolean
+  honor_declaration_signed_at?: string | null
+  transcript_file?: string | null
+  school?: string
+  study_program?: string
+  study_year?: string
+}
+
+export interface ApplicationFormField {
+  name: string
+  label: string
+  type: string
+  placeholder?: string | null
+  description?: string | null
+  options?: unknown
+}
+
 export interface ApplicationDetail extends ApplicationSummary {
   applicant_name?: string
   school?: string
   study_program?: string
   study_year?: string
   form_data?: Record<string, unknown>
+  form_fields?: ApplicationFormField[]
   documents: { id: number; type: string; version: number; url: string }[]
   history: { status: string; changed_at: string; changed_by: string; note?: string }[]
   status_history: { status: string; changed_at: string; changed_by: string; note?: string }[]
   evaluation?: Evaluation
   call?: EvaluatorCall | null
-  teamMembers?: { id: number; name: string; role: string }[]
+  teamMembers?: ApplicationTeamMember[]
   commissionMembers?: { id: number; name: string; score: number | null }[]
   description?: string
   academic_record?: AcademicRecord | null

@@ -41,10 +41,6 @@
                 <p>{{ applicationDetail.applicant_name ?? applicationDetail.teamName ?? applicationDetail.team?.name ?? '—' }}</p>
               </div>
               <div>
-                <p class="font-medium text-gray-900">{{ $t('evaluator.school_program_year') }}</p>
-                <p>{{ studentEducation }}</p>
-              </div>
-              <div>
                 <p class="font-medium text-gray-900">{{ $t('evaluator.call') }}</p>
                 <p>{{ applicationDetail.call?.name ?? '-' }}</p>
               </div>
@@ -61,57 +57,81 @@
           </div>
 
           <div class="bg-white rounded-lg border border-gray-100 p-6">
-            <h2 class="text-base font-semibold text-navy mb-4">{{ $t('evaluator.academic_record.title') }}</h2>
-            <div class="grid grid-cols-1 gap-4 text-sm text-gray-700">
-              <div>
-                <p class="font-medium text-gray-900">{{ $t('evaluator.academic_record.honor_declaration') }}</p>
-                <p>
-                  <span v-if="applicationDetail.academic_record?.honor_declaration">✅ {{ $t('evaluator.academic_record.yes') }}</span>
-                  <span v-else>❌ {{ $t('evaluator.academic_record.no') }}</span>
-                </p>
-                <p class="text-xs text-gray-500 mt-1">
-                  <span v-if="applicationDetail.academic_record?.honor_declaration">
-                    {{ $t('evaluator.academic_record.signed_at') }} {{ formatDate(applicationDetail.academic_record?.honor_declaration_signed_at) }}
-                  </span>
-                  <span v-else>{{ $t('evaluator.academic_record.not_signed') }}</span>
-                </p>
-              </div>
-              <div>
-                <p class="font-medium text-gray-900">{{ $t('evaluator.academic_record.transcript') }}</p>
-                <div v-if="applicationDetail.academic_record?.transcript_file">
-                  <a
-                    :href="applicationDetail.academic_record?.transcript_file"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-blue-600 hover:underline"
-                  >
-                    {{ $t('evaluator.academic_record.download') }}
-                  </a>
+            <h2 class="text-base font-semibold text-navy mb-4">{{ $t('evaluator.form_responses') }}</h2>
+            <div class="space-y-4 text-sm text-gray-700">
+              <template v-if="applicationDetail.form_fields?.length">
+                <div
+                  v-for="field in applicationDetail.form_fields"
+                  :key="field.name"
+                  class="space-y-1"
+                >
+                  <p class="font-medium text-gray-900">{{ field.label }}</p>
+                  <p class="text-sm text-gray-600 break-words">{{ formatFormDataValue(applicationDetail.form_data?.[field.name]) }}</p>
                 </div>
-                <div v-else class="text-gray-500">{{ $t('evaluator.academic_record.not_uploaded') }}</div>
-              </div>
-              <div>
-                <p class="font-medium text-gray-900">{{ $t('student_dashboard.profile.university') }}</p>
-                <p>{{ applicationDetail.school ?? '—' }}</p>
-              </div>
-              <div>
-                <p class="font-medium text-gray-900">{{ $t('student_dashboard.profile.study_program') }}</p>
-                <p>{{ applicationDetail.study_program ?? '—' }}</p>
-              </div>
-              <div>
-                <p class="font-medium text-gray-900">{{ $t('student_dashboard.profile.study_year') }}</p>
-                <p>{{ applicationDetail.study_year ?? '—' }}</p>
-              </div>
+              </template>
+              <template v-else-if="applicationDetail.form_data && Object.keys(applicationDetail.form_data).length">
+                <div
+                  v-for="(value, key) in applicationDetail.form_data"
+                  :key="key"
+                  class="space-y-1"
+                >
+                  <p class="font-medium text-gray-900">{{ key }}</p>
+                  <p class="text-sm text-gray-600 break-words">{{ formatFormDataValue(value) }}</p>
+                </div>
+              </template>
+              <div v-else class="text-xs text-gray-400">{{ $t('evaluator.no_form_responses') }}</div>
             </div>
           </div>
 
           <div class="bg-white rounded-lg border border-gray-100 p-6">
             <h2 class="text-base font-semibold text-navy mb-4">{{ $t('evaluator.team_members') }}</h2>
-            <div class="space-y-3 text-sm">
-              <div v-for="member in applicationDetail.teamMembers ?? []" :key="member.id" class="flex items-center justify-between gap-3">
-                <div>
-                  <p class="font-medium text-navy">{{ member.name }}</p>
-                  <p class="text-xs text-gray-500">{{ member.role }}</p>
+            <div class="space-y-4 text-sm">
+              <div
+                v-for="member in applicationDetail.teamMembers ?? []"
+                :key="member.id"
+                class="border border-gray-100 rounded-2xl p-4"
+              >
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <p class="font-medium text-navy">{{ member.name }}</p>
+                    <p class="text-xs text-gray-500">{{ member.role }}</p>
+                    <p v-if="member.school || member.study_program || member.study_year" class="mt-2 text-xs text-gray-500">
+                      {{ [member.school, member.study_program, member.study_year].filter(Boolean).join(' / ') }}
+                    </p>
+                  </div>
+                  <NuxtLink
+                    v-if="member.student_id"
+                    :to="localePath(`/hodnotenie/student/${member.student_id}`)"
+                    class="text-sm font-medium text-blue-600 hover:text-blue-800"
+                  >
+                    {{ $t('evaluator.student_profile') }}
+                  </NuxtLink>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm text-gray-700">
+                  <div>
+                    <p class="font-medium text-gray-900">{{ $t('evaluator.academic_record.honor_declaration') }}</p>
+                    <p>
+                      <span v-if="member.honor_declaration">✅ {{ $t('evaluator.academic_record.yes') }}</span>
+                      <span v-else>❌ {{ $t('evaluator.academic_record.no') }}</span>
+                    </p>
+                    <p v-if="member.honor_declaration && member.honor_declaration_signed_at" class="text-xs text-gray-500 mt-1">
+                      {{ $t('evaluator.academic_record.signed_at') }} {{ formatDate(member.honor_declaration_signed_at) }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="font-medium text-gray-900">{{ $t('evaluator.academic_record.transcript') }}</p>
+                    <div v-if="member.transcript_file">
+                      <a
+                        :href="member.transcript_file"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-blue-600 hover:underline"
+                      >
+                        {{ $t('evaluator.academic_record.download') }}
+                      </a>
+                    </div>
+                    <div v-else class="text-gray-500">{{ $t('evaluator.academic_record.not_uploaded') }}</div>
+                  </div>
                 </div>
               </div>
               <div v-if="!(applicationDetail.teamMembers?.length ?? 0)" class="text-xs text-gray-400">{{ $t('evaluator.no_team_members') }}</div>
@@ -208,14 +228,6 @@ const applicationTitle = computed(() => {
   return applicationDetail.value.projectName ?? applicationDetail.value.teamName ?? applicationDetail.value.team?.name ?? `${t('evaluator.application')} #${applicationDetail.value.id}`
 })
 
-const studentEducation = computed(() => {
-  const parts: string[] = []
-  if (applicationDetail.value?.school) parts.push(applicationDetail.value.school)
-  if (applicationDetail.value?.study_program) parts.push(applicationDetail.value.study_program)
-  if (applicationDetail.value?.study_year) parts.push(applicationDetail.value.study_year)
-  return parts.length ? parts.join(' / ') : '—'
-})
-
 const evaluationRecommendation = computed(() => {
   if (!applicationDetail.value?.evaluation?.recommendation) return '—'
   return t(`evaluator.recommendations.${applicationDetail.value.evaluation.recommendation}`)
@@ -228,6 +240,44 @@ const formatDate = (dateString?: string | null) => {
   const day = String(date.getDate()).padStart(2, '0')
   const month = String(date.getMonth() + 1).padStart(2, '0')
   return `${day}.${month}.${date.getFullYear()}`
+}
+
+const formatFormDataValue = (value: unknown): string => {
+  if (value == null || value === '') {
+    return '—'
+  }
+
+  if (typeof value === 'boolean') {
+    return value ? t('evaluator.academic_record.yes') : t('evaluator.academic_record.no')
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => formatFormDataValue(item)).join(', ')
+  }
+
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value)
+    } catch {
+      return String(value)
+    }
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if ((trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('{') && trimmed.endsWith('}'))) {
+      try {
+        const parsed = JSON.parse(trimmed)
+        return formatFormDataValue(parsed)
+      } catch {
+        return trimmed
+      }
+    }
+
+    return trimmed || '—'
+  }
+
+  return String(value)
 }
 
 const loadApplication = async () => {
