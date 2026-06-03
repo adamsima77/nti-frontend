@@ -5,6 +5,7 @@
     <template v-if="!news_pending">
       <UiMainArticle
         :image="main_article?.image_url"
+        :main_description = "main_article?.news_translations?.[0]?.main_description"
         :alt="main_article?.news_translations?.[0]?.title"
         :title="main_article?.news_translations?.[0]?.title"
         :category="main_article?.category.category_translations?.[0].name"
@@ -68,6 +69,7 @@
             :image="article?.image_url"
             :alt="article?.news_translations?.[0]?.title"
             :link="localePath(`/novinky/${article.slug}`)"
+            :main_description = "article?.news_translations?.[0]?.main_description"
           />
         </template>
 

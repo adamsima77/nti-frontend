@@ -259,7 +259,7 @@ const emit = defineEmits<{
 const step = ref(1)
 const loading = ref(false)
 const fileError = ref('')
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const progress = computed(() => ((step.value - 1) / 3) * 100)
 
 const form = reactive({
@@ -289,9 +289,9 @@ const transcriptError = ref('')
 
 onMounted(async () => {
   const universitiesResult: any = await api.get('/university')
-  const studyProgramsResult: any = await api.get(`/study-programs-public/lang/${useI18n().locale.value}`)
-  const studyFieldsResult: any = await api.get(`/study-fields-public/lang/${useI18n().locale.value}`)
-  const studyYearsResult: any = await api.get(`/study-years-public/lang/${useI18n().locale.value}`)
+  const studyProgramsResult: any = await api.get(`/study-programs-public/lang/${locale.value}`)
+  const studyFieldsResult: any = await api.get(`/study-fields-public/lang/${locale.value}`)
+  const studyYearsResult: any = await api.get(`/study-years-public/lang/${locale.value}`)
 
   universities.value = universitiesResult
   studyPrograms.value = studyProgramsResult

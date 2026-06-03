@@ -26,7 +26,9 @@
         {{ category }}
       </NuxtLink>
 
-      
+      <p class="text-lg text-gray-600 mb-4">
+        {{ (main_description ?? '').substring(0, 250) + (main_description?.length > 250 ? '...' : '') }}
+      </p>
 
       <NuxtLink
         :to="link"
@@ -43,6 +45,7 @@ const props = defineProps({
   image: { type: String, required: true },
   alt: { type: String, default: 'Featured article' },
   title: { type: String, required: true },
+  main_description: { type: String, default: '' },
   category: { type: String, default: '' },
   description: { type: String, required: true },
   link: { type: String, required: true },

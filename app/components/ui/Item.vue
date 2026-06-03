@@ -19,7 +19,10 @@
         class="text-sm text-blue-600 font-semibold mb-2"
         >{{ category }}</NuxtLink
       >
-     
+
+     <p class="text-lg text-gray-600 mb-4">
+  {{ (main_description ?? '').substring(0, 250) + (main_description?.length > 250 ? '...' : '') }}
+</p>
 
       <NuxtLink
         :to="link"
@@ -37,6 +40,7 @@ const props = defineProps({
   description: String,
   category: String,
   image: String,
+  main_description: { type: String, default: '' },
   alt: String,
   link: String,
 })

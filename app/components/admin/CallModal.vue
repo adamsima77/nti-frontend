@@ -1,7 +1,7 @@
 <template>
   <UiModal
     :model-value="modelValue"
-    :title="isEditing ? 'Upraviť výzvu' : 'Nová výzva'"
+    :title="isEditing ? $t('callModal.titleEdit') : $t('callModal.titleNew')"
     size="xl"
     @update:model-value="emit('update:modelValue', $event)"
   >
@@ -10,6 +10,32 @@
     </div>
 
     <template v-else>
+      <div
+        v-if="activeTab !== 'form' && languageOptions.length > 1"
+        class="flex items-center gap-2 mb-4 pb-3.5 border-b border-gray-100 -mx-6 px-6"
+      >
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mr-1.5">{{ $t('callModal.language') }}</span>
+        <button
+          v-for="lang in languageOptions"
+          :key="lang.value"
+          type="button"
+          class="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold tracking-wide transition-all"
+          :class="activeLang === lang.value
+            ? 'bg-blue-600 text-white shadow-sm'
+            : 'bg-gray-100 text-slate-500 hover:bg-gray-200'"
+          @click="activeLang = lang.value"
+        >
+          {{ lang.code.toUpperCase() }}
+          <span
+            v-if="activeLang !== lang.value && hasLangErrors(lang.value)"
+            class="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"
+          />
+        </button>
+        <span class="ml-auto text-[11px] text-slate-300 italic">
+          {{ $t('callModal.languageSwitcherHint') }}
+        </span>
+      </div>
+
       <div class="flex gap-0 border-b border-gray-200 -mx-6 px-6 mb-6">
         <button
           v-for="tab in TABS"
@@ -33,91 +59,98 @@
         </button>
       </div>
 
-      <!-- ══ BASIC TAB ══════════════════════════════════════════════════════ -->
       <div v-show="activeTab === 'basic'" class="space-y-5">
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-slate-500 mb-1.5">
-              Program <span class="text-red-400">*</span>
+              {{ $t('callModal.program') }} <span class="text-red-400">*</span>
             </label>
-            <UiSelect v-model="form.program_id" :options="visibleProgramOptions" placeholder="Vybrať program" />
+            <UiSelect v-model="form.program_id" :options="visibleProgramOptions" :placeholder="$t('callModal.selectProgram')" />
             <p v-if="errors.program_id" class="text-xs text-red-500 mt-1">{{ errors.program_id }}</p>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Stav</label>
+            <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('callModal.status') }}</label>
             <UiSelect v-model="form.status_id" :options="statusOptions" />
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1.5">
-            Jazyk záznamu <span class="text-red-400">*</span>
-          </label>
-          <UiSelect v-model="form.language_id" :options="languageOptions" placeholder="Vybrať jazyk" />
-          <p v-if="errors.language_id" class="text-xs text-red-500 mt-1">{{ errors.language_id }}</p>
-        </div>
-
-        <UiFormField
-          v-model="form.name"
-          label="Názov výzvy"
-          field="name"
-          placeholder="Napr. Jarný inkubátor 2026"
-          :touched="touched"
-          :is-valid="isValid"
-          :error="errors.name"
-        />
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1.5">
-            Popis <span class="text-red-400">*</span>
-          </label>
-          <textarea
-            v-model="form.description"
-            rows="3"
-            placeholder="Stručný popis výzvy a jej zamerania..."
-            class="w-full rounded-lg border px-3 py-2 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 resize-none"
-            :class="errors.description ? 'border-red-400 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-300'"
+          <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('callModal.qualificationStack') }}</label>
+          <UiSelect
+            v-model="form.qualification_stack_id"
+            :options="qualificationStackOptions"
+            :placeholder="$t('callModal.noStackOptional')"
           />
-          <p v-if="errors.description" class="text-xs text-red-500 mt-1">{{ errors.description }}</p>
+          <p v-if="errors.qualification_stack_id" class="text-xs text-red-500 mt-1">{{ errors.qualification_stack_id }}</p>
         </div>
 
+        <div class="rounded-xl border border-blue-100 bg-blue-50/30 p-4 space-y-4">
+          <p class="text-[11px] font-semibold text-blue-500 uppercase tracking-wide -mb-1">
+            {{ $t('callModal.contentInLanguage') }}: <span class="font-extrabold">{{ currentLangLabel }}</span>
+          </p>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1.5">
+              {{ $t('callModal.callName') }} <span class="text-red-400">*</span>
+            </label>
+            <input
+              v-model="currentName"
+              type="text"
+              :placeholder="$t('callModal.callNamePlaceholder')"
+              class="w-full rounded-lg border px-3 py-2 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors"
+              :class="errors[`name_${activeLang}`] ? 'border-red-400 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-300'"
+            />
+            <p v-if="errors[`name_${activeLang}`]" class="text-xs text-red-500 mt-1">{{ errors[`name_${activeLang}`] }}</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1.5">
+              {{ $t('callModal.description') }} <span class="text-red-400">*</span>
+            </label>
+            <textarea
+              v-model="currentDescription"
+              rows="3"
+              :placeholder="$t('callModal.descriptionPlaceholder')"
+              class="w-full rounded-lg border px-3 py-2 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 resize-none transition-colors"
+              :class="errors[`description_${activeLang}`] ? 'border-red-400 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-300'"
+            />
+            <p v-if="errors[`description_${activeLang}`]" class="text-xs text-red-500 mt-1">{{ errors[`description_${activeLang}`] }}</p>
+          </div>
+        </div>
         <hr class="border-gray-100" />
 
-        <!-- Application dates -->
         <div>
-          <p class="text-xs font-semibold text-slate-500 mb-3">Termíny podávania prihlášok</p>
+          <p class="text-xs font-semibold text-slate-500 mb-3">{{ $t('callModal.applicationDatesHeading') }}</p>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs text-slate-500 mb-1.5">Začiatok <span class="text-red-400">*</span></label>
+              <label class="block text-xs text-slate-500 mb-1.5">{{ $t('callModal.dateStart') }} <span class="text-red-400">*</span></label>
               <input v-model="form.application_start" type="date" :class="dateInputClass('application_start')" />
               <p v-if="errors.application_start" class="text-xs text-red-500 mt-1">{{ errors.application_start }}</p>
             </div>
             <div>
-              <label class="block text-xs text-slate-500 mb-1.5">Uzávierka <span class="text-red-400">*</span></label>
+              <label class="block text-xs text-slate-500 mb-1.5">{{ $t('callModal.dateDeadline') }} <span class="text-red-400">*</span></label>
               <input v-model="form.application_deadline" type="date" :class="dateInputClass('application_deadline')" />
               <p v-if="errors.application_deadline" class="text-xs text-red-500 mt-1">{{ errors.application_deadline }}</p>
             </div>
           </div>
         </div>
 
-        <!-- Project dates -->
         <div>
-          <p class="text-xs font-semibold text-slate-500 mb-3">Termíny realizácie projektu</p>
+          <p class="text-xs font-semibold text-slate-500 mb-3">{{ $t('callModal.projectDatesHeading') }}</p>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs text-slate-500 mb-1.5">Začiatok projektu <span class="text-red-400">*</span></label>
+              <label class="block text-xs text-slate-500 mb-1.5">{{ $t('callModal.projectStart') }} <span class="text-red-400">*</span></label>
               <input v-model="form.project_start" type="date" :class="dateInputClass('project_start')" />
               <p v-if="errors.project_start" class="text-xs text-red-500 mt-1">{{ errors.project_start }}</p>
             </div>
             <div>
-              <label class="block text-xs text-slate-500 mb-1.5">Koniec projektu <span class="text-red-400">*</span></label>
+              <label class="block text-xs text-slate-500 mb-1.5">{{ $t('callModal.projectEnd') }} <span class="text-red-400">*</span></label>
               <input v-model="form.project_end" type="date" :class="dateInputClass('project_end')" />
               <p v-if="errors.project_end" class="text-xs text-red-500 mt-1">{{ errors.project_end }}</p>
             </div>
           </div>
         </div>
 
-        <!-- Force close toggle (edit only) -->
         <div
           v-if="isEditing"
           class="flex items-center justify-between rounded-xl border px-4 py-3.5 transition-colors"
@@ -128,36 +161,20 @@
               class="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
               :class="form.force_closed ? 'bg-red-100' : 'bg-gray-100'"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="w-4 h-4"
-                :class="form.force_closed ? 'text-red-500' : 'text-gray-400'"
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" :class="form.force_closed ? 'text-red-500' : 'text-gray-400'">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
             </div>
             <div>
-              <p
-                class="text-sm font-semibold leading-snug"
-                :class="form.force_closed ? 'text-red-700' : 'text-navy'"
-              >
-                Manuálne uzavrieť výzvu
+              <p class="text-sm font-semibold leading-snug" :class="form.force_closed ? 'text-red-700' : 'text-navy'">
+                {{ $t('callModal.forceCloseTitle') }}
               </p>
-              <p
-                class="text-xs mt-0.5 leading-relaxed"
-                :class="form.force_closed ? 'text-red-500' : 'text-slate-400'"
-              >
+              <p class="text-xs mt-0.5 leading-relaxed" :class="form.force_closed ? 'text-red-500' : 'text-slate-400'">
                 {{
                   form.force_closed
-                    ? 'Výzva je manuálne uzavretá — uchádzači sa nemôžu prihlásiť.'
-                    : 'Výzva sa riadi termínom uzávierky. Zapnutím ju okamžite uzavriete.'
+                    ? $t('callModal.forceCloseActiveHint')
+                    : $t('callModal.forceCloseInactiveHint')
                 }}
               </p>
             </div>
@@ -179,12 +196,8 @@
         </div>
       </div>
 
-      <!-- ══ FORM TAB ═══════════════════════════════════════════════════════ -->
       <div v-show="activeTab === 'form'" class="space-y-4">
-        <p class="text-xs text-slate-500 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 leading-relaxed">
-          Navrhnite polia, ktoré budú uchádzači vypĺňať pri podaní prihlášky.
-          Pri <strong>Program A</strong> sú predvyplnené polia pre 6 povinných dokumentov.
-        </p>
+        <p class="text-xs text-slate-500 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 leading-relaxed" v-html="$t('callModal.formTabHint')"></p>
         <p v-if="errors._form" class="text-sm font-medium text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2.5">{{ errors._form }}</p>
 
         <div class="space-y-2">
@@ -198,13 +211,13 @@
               <GripVertical class="w-4 h-4 text-gray-300 flex-shrink-0 cursor-grab" />
               <component :is="FIELD_TYPE_CONFIG[field.type].icon" class="w-4 h-4 flex-shrink-0" :class="FIELD_TYPE_CONFIG[field.type].color" />
               <span class="flex-1 text-sm font-medium text-navy truncate min-w-0">
-                {{ field.label || `Pole ${idx + 1}` }}
+                {{ field.label || $t('callModal.fieldDefaultLabel', { num: idx + 1 }) }}
               </span>
               <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 flex-shrink-0">
-                {{ FIELD_TYPE_CONFIG[field.type].label }}
+                {{ $t(FIELD_TYPE_CONFIG[field.type].labelKey) }}
               </span>
               <span v-if="field.required" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-red-50 text-red-500 flex-shrink-0">
-                povinné
+                {{ $t('callModal.fieldRequiredBadge') }}
               </span>
               <div class="flex items-center gap-0.5 ml-1 flex-shrink-0">
                 <button :disabled="idx === 0" class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" @click="moveField(idx, idx - 1)">
@@ -225,97 +238,93 @@
             <div v-if="editingFieldIdx === idx" class="border-t border-blue-200 px-4 pb-4 pt-3 space-y-3">
               <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-xs text-slate-500 mb-1">Názov poľa <span class="text-red-400">*</span></label>
-                  <input v-model="field.label" type="text" placeholder="Napr. Popis projektu" class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300" @input="onLabelInput(field)" />
+                  <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.fieldNameLabel') }} <span class="text-red-400">*</span></label>
+                  <input v-model="field.label" type="text" :placeholder="$t('callModal.fieldNamePlaceholder')" class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300" @input="onLabelInput(field)" />
                 </div>
                 <div>
-                  <label class="block text-xs text-slate-500 mb-1">Typ poľa</label>
+                  <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.fieldTypeLabel') }}</label>
                   <select v-model="field.type" class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" @change="onTypeChange(field)">
-                    <option v-for="(cfg, key) in FIELD_TYPE_CONFIG" :key="key" :value="key">{{ cfg.label }}</option>
+                    <option v-for="(cfg, key) in FIELD_TYPE_CONFIG" :key="key" :value="key">{{ $t(cfg.labelKey) }}</option>
                   </select>
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-xs text-slate-500 mb-1">Identifikátor <span class="text-gray-400 font-normal">(automatický)</span></label>
+                  <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.fieldIdentifierLabel') }} <span class="text-gray-400 font-normal">({{ $t('callModal.automatic') }})</span></label>
                   <input v-model="field.name" type="text" placeholder="napr. project_name" class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm font-mono text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-300" />
                 </div>
                 <div v-if="field.type !== 'file' && field.type !== 'checkbox' && field.type !== 'radio'">
-                  <label class="block text-xs text-slate-500 mb-1">Vzorový text (placeholder)</label>
-                  <input v-model="field.placeholder" type="text" placeholder="Napr. Zadajte názov..." class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.fieldSampleTextLabel') }}</label>
+                  <input v-model="field.placeholder" type="text" :placeholder="$t('callModal.fieldSampleTextPlaceholder')" class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300" />
                 </div>
                 <div v-if="field.type === 'file'">
-                  <label class="block text-xs text-slate-500 mb-1">Povolené formáty</label>
+                  <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.fieldAllowedFormatsLabel') }}</label>
                   <input v-model="field.accept" type="text" placeholder=".pdf,.doc,.docx" class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm font-mono text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-300" />
                 </div>
               </div>
 
               <div>
-                <label class="block text-xs text-slate-500 mb-1">Pomocný text</label>
-                <input v-model="field.help_text" type="text" placeholder="Krátky opis, čo má uchádzač vyplniť..." class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.fieldHelpTextLabel') }}</label>
+                <input v-model="field.help_text" type="text" :placeholder="$t('callModal.fieldHelpTextPlaceholder')" class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300" />
               </div>
 
               <div v-if="['select', 'radio', 'checkbox'].includes(field.type)">
-                <label class="block text-xs text-slate-500 mb-1.5">Možnosti výberu</label>
+                <label class="block text-xs text-slate-500 mb-1.5">{{ $t('callModal.fieldOptionsLabel') }}</label>
                 <div class="space-y-1.5">
                   <div v-for="(opt, oi) in field.options" :key="oi" class="flex items-center gap-2">
-                    <input :value="opt" type="text" placeholder="Možnosť..." class="flex-1 rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300" @input="field.options[oi] = ($event.target as HTMLInputElement).value" />
+                    <input :value="opt" type="text" :placeholder="$t('callModal.fieldOptionPlaceholder')" class="flex-1 rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300" @input="field.options[oi] = ($event.target as HTMLInputElement).value" />
                     <button class="p-1 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" @click="field.options.splice(oi, 1)"><X class="w-3.5 h-3.5" /></button>
                   </div>
                   <button class="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-1" @click="field.options.push('')">
-                    <Plus class="w-3 h-3" /> Pridať možnosť
+                    <Plus class="w-3 h-3" /> {{ $t('callModal.fieldAddOption') }}
                   </button>
                 </div>
               </div>
 
               <label class="flex items-center gap-2 cursor-pointer w-fit">
                 <input v-model="field.required" type="checkbox" class="accent-blue-600 w-3.5 h-3.5" />
-                <span class="text-xs text-slate-600">Povinné pole</span>
+                <span class="text-xs text-slate-600">{{ $t('callModal.fieldRequiredLabel') }}</span>
               </label>
             </div>
           </div>
 
           <div v-if="formFields.length === 0" class="text-center py-10 border-2 border-dashed border-gray-200 rounded-lg">
             <FileText class="w-8 h-8 mx-auto text-gray-300 mb-2" />
-            <p class="text-sm text-gray-400">Formulár je prázdny</p>
-            <p class="text-xs text-gray-300 mt-1">Pridajte polia pomocou tlačidla nižšie</p>
+            <p class="text-sm text-gray-400">{{ $t('callModal.formEmptyTitle') }}</p>
+            <p class="text-xs text-gray-300 mt-1">{{ $t('callModal.formEmptySubtitle') }}</p>
           </div>
         </div>
 
         <div class="relative">
           <button class="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 border border-blue-200 hover:border-blue-400 rounded-lg px-3 py-2 bg-blue-50 hover:bg-blue-100 transition-all" @click="showFieldPicker = !showFieldPicker">
             <Plus class="w-4 h-4" />
-            Pridať pole
+            {{ $t('callModal.fieldAddButton') }}
             <ChevronDown class="w-3.5 h-3.5 ml-1 transition-transform" :class="showFieldPicker && 'rotate-180'" />
           </button>
           <div v-if="showFieldPicker" class="absolute top-full left-0 mt-1.5 z-20 bg-white border border-gray-200 rounded-xl shadow-lg p-2 grid grid-cols-3 gap-1 w-72">
             <button v-for="(cfg, key) in FIELD_TYPE_CONFIG" :key="key" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-left transition-colors" @click="addField(key as FieldType); showFieldPicker = false">
               <component :is="cfg.icon" class="w-4 h-4 flex-shrink-0" :class="cfg.color" />
-              <span class="text-xs text-slate-700">{{ cfg.label }}</span>
+              <span class="text-xs text-slate-700">{{ $t(cfg.labelKey) }}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- ══ CRITERIA TAB ═══════════════════════════════════════════════════ -->
       <div v-show="activeTab === 'criteria'" class="space-y-4">
-        <p class="text-xs text-slate-500 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2.5 leading-relaxed">
-          Vyberte hodnotiace kritériá komisie a nastavte ich <strong>váhu (1–10)</strong>.
-          Kritériá s príznakom <em>akademický signál</em> sú informatívne — nespôsobujú automatické zamietnutie (§7.2).
-        </p>
+        <p class="text-xs text-slate-500 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2.5 leading-relaxed" v-html="$t('callModal.criteriaTabHint')"></p>
         <p v-if="errors._criteria" class="text-sm font-medium text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2.5">{{ errors._criteria }}</p>
 
         <div class="flex items-center justify-between">
           <label class="block text-xs font-semibold text-slate-500">
-            Dostupné kritériá <span class="text-red-400">* (Vyberte aspoň jedno)</span>
+            {{ $t('callModal.availableCriteriaLabel') }} <span class="text-red-400">* ({{ $t('callModal.selectAtLeastOne') }})</span>
           </label>
         </div>
 
         <div v-if="criteriaLoading" class="py-8 flex justify-center"><UiLoader size="sm" /></div>
 
         <div v-else-if="allDisplayCriteria.length === 0" class="text-center py-8 text-sm text-gray-400">
-          Žiadne kritériá nie sú k dispozícii.
+          {{ $t('callModal.noCriteriaAvailable') }}
         </div>
 
         <div v-else class="space-y-2">
@@ -342,27 +351,33 @@
 
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <p class="text-sm font-semibold text-navy leading-snug">{{ criterion.name }}</p>
-                  <!-- Badge for locally created (unsaved) criteria -->
+                  <p class="text-sm font-semibold text-navy leading-snug">
+                    {{ criterionDisplayName(criterion) }}
+                  </p>
+                  <span
+                    v-if="activeLang && !criterion.translations[activeLang]?.name"
+                    class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-500 flex-shrink-0"
+                  >
+                    {{ $t('callModal.noTranslationBadge') }}
+                  </span>
                   <span
                     v-if="criterion.id < 0"
                     class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-600 flex-shrink-0"
                   >
-                    Nové
+                    {{ $t('callModal.newCriterionBadge') }}
                   </span>
                 </div>
-                <p v-if="criterion.description" class="text-xs text-slate-500 mt-0.5 leading-relaxed">
-                  {{ criterion.description }}
+                <p v-if="criterionDescription(criterion)" class="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                  {{ criterionDescription(criterion) }}
                 </p>
               </div>
 
               <div class="flex items-center gap-2 flex-shrink-0" @click.stop>
-                <!-- Weight badge (only when selected) -->
                 <div
                   v-if="isCriterionSelected(criterion.id)"
                   class="flex items-center gap-1.5 text-xs font-medium"
                 >
-                  <span class="text-slate-400 text-[11px]">Váha</span>
+                  <span class="text-slate-400 text-[11px]">{{ $t('callModal.weight') }}</span>
                   <span
                     class="px-2 py-0.5 rounded-full text-white text-[11px] font-bold"
                     :class="weightColor(getCriterion(criterion.id)!.weight)"
@@ -370,11 +385,10 @@
                     {{ getCriterion(criterion.id)!.weight }}
                   </span>
                 </div>
-                <!-- Delete button for locally created criteria -->
                 <button
                   v-if="criterion.id < 0"
                   class="p-1 rounded hover:bg-red-100 text-gray-300 hover:text-red-500 transition-colors"
-                  title="Odstrániť toto nové kritérium"
+                  :title="$t('callModal.removeNewCriterionTooltip')"
                   @click.stop="removeLocalCriterion(criterion.id)"
                 >
                   <Trash2 class="w-3.5 h-3.5" />
@@ -388,8 +402,8 @@
             >
               <div>
                 <div class="flex items-center justify-between mb-2">
-                  <label class="text-xs font-semibold text-slate-500">Váha kritéria</label>
-                  <span class="text-xs text-slate-400">{{ WEIGHT_LABELS[getCriterion(criterion.id)!.weight - 1] }}</span>
+                  <label class="text-xs font-semibold text-slate-500">{{ $t('callModal.criterionWeightLabel') }}</label>
+                  <span class="text-xs text-slate-400">{{ $t(`callModal.weightLabels.${getCriterion(criterion.id)!.weight - 1}`) }}</span>
                 </div>
                 <div class="flex gap-1">
                   <button
@@ -401,7 +415,7 @@
                         ? weightButtonActive(w)
                         : 'bg-gray-100 text-gray-400 hover:bg-gray-200',
                     ]"
-                    :title="`Váha ${w} — ${WEIGHT_LABELS[w - 1]}`"
+                    :title="`Váha ${w} — ${$t(`callModal.weightLabels.${w - 1}`)}`"
                     @click="setCriterionWeight(criterion.id, w)"
                   >
                     {{ w }}
@@ -421,54 +435,65 @@
                   />
                 </div>
                 <span class="text-xs text-slate-600">
-                  Akademický signál
-                  <span class="text-slate-400 ml-1">(informatívny, neodmieta prihlášku)</span>
+                  {{ $t('callModal.academicSignal') }}
+                  <span class="text-slate-400 ml-1">({{ $t('callModal.academicSignalHint') }})</span>
                 </span>
               </label>
             </div>
           </div>
         </div>
 
-        <!-- ── Create new criterion inline form ──────────────────────────── -->
         <div class="pt-1">
           <button
             v-if="!showNewCriterionForm"
             class="flex items-center gap-2 text-sm font-medium text-violet-600 hover:text-violet-800 border border-violet-200 hover:border-violet-400 rounded-lg px-3 py-2 bg-violet-50 hover:bg-violet-100 transition-all"
-            @click="showNewCriterionForm = true"
+            @click="openNewCriterionForm"
           >
             <Plus class="w-4 h-4" />
-            Vytvoriť nové kritérium
+            {{ $t('callModal.createNewCriterionButton') }}
           </button>
 
           <div
             v-else
-            class="rounded-xl border border-violet-300 bg-violet-50/50 p-4 space-y-3"
+            class="rounded-xl border border-violet-300 bg-violet-50/50 p-4 space-y-4"
           >
-            <p class="text-xs font-semibold text-violet-700">Nové kritérium</p>
+            <p class="text-xs font-semibold text-violet-700">{{ $t('callModal.newCriterionFormTitle') }}</p>
 
-            <div>
-              <label class="block text-xs text-slate-500 mb-1">Názov kritéria <span class="text-red-400">*</span></label>
-              <input
-                v-model="newCriterionDraft.name"
-                type="text"
-                placeholder="Napr. Inovačný potenciál"
-                class="w-full rounded-md border px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-violet-300"
-                :class="newCriterionError ? 'border-red-400' : 'border-gray-200'"
-                @keyup.enter="addLocalCriterion"
-              />
-              <p v-if="newCriterionError" class="text-xs text-red-500 mt-1">{{ newCriterionError }}</p>
+            <div
+              v-for="lang in languageOptions"
+              :key="`nc_lang_${lang.value}`"
+              class="space-y-2.5 rounded-lg bg-white border border-violet-100 p-3"
+            >
+              <p class="text-[11px] font-bold text-violet-500 uppercase tracking-wide">
+                {{ lang.code.toUpperCase() }} — {{ lang.label }}
+                <span v-if="lang.value === languageOptions[0]?.value" class="text-red-400 font-normal normal-case tracking-normal ml-1">({{ $t('callModal.required') }})</span>
+              </p>
+
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.criterionNameInputLabel') }}</label>
+                <input
+                  v-model="newCriterionDraft.translations[lang.value].name"
+                  type="text"
+                  :placeholder="lang.value === languageOptions[0]?.value ? $t('callModal.criterionNamePlaceholderSK') : $t('callModal.criterionNamePlaceholderEN')"
+                  class="w-full rounded-md border px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-violet-300"
+                  :class="newCriterionError && lang.value === languageOptions[0]?.value ? 'border-red-400' : 'border-gray-200'"
+                  @keyup.enter="addLocalCriterion"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.criterionDescriptionInputLabel') }} <span class="text-gray-400 font-normal">({{ $t('callModal.optional') }})</span></label>
+                <input
+                  v-model="newCriterionDraft.translations[lang.value].description"
+                  type="text"
+                  :placeholder="lang.value === languageOptions[0]?.value ? $t('callModal.criterionDescriptionPlaceholderSK') : $t('callModal.criterionDescriptionPlaceholderEN')"
+                  class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-violet-300"
+                  @keyup.enter="addLocalCriterion"
+                />
+              </div>
             </div>
 
-            <div>
-              <label class="block text-xs text-slate-500 mb-1">Popis <span class="text-gray-400 font-normal">(voliteľný)</span></label>
-              <input
-                v-model="newCriterionDraft.description"
-                type="text"
-                placeholder="Krátky opis kritéria pre hodnotiteľov..."
-                class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-violet-300"
-                @keyup.enter="addLocalCriterion"
-              />
-            </div>
+            <p v-if="newCriterionError" class="text-xs text-red-500">{{ newCriterionError }}</p>
 
             <div class="flex items-center gap-2 pt-1">
               <button
@@ -476,41 +501,40 @@
                 @click="addLocalCriterion"
               >
                 <Check class="w-3.5 h-3.5" />
-                Pridať a vybrať
+                {{ $t('callModal.addAndSelectButton') }}
               </button>
               <button
                 class="text-sm text-slate-500 hover:text-slate-700 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                 @click="cancelNewCriterion"
               >
-                Zrušiť
+                {{ $t('callModal.cancel') }}
               </button>
             </div>
           </div>
         </div>
 
-        <!-- ── Summary bar ───────────────────────────────────────────────── -->
         <div v-if="form.criteria.length > 0" class="flex items-center gap-4 text-xs text-slate-500 pt-1">
           <span>
-            Vybrané: <strong class="text-slate-700">{{ form.criteria.length }}</strong>
+            {{ $t('callModal.selectedLabel') }}: <strong class="text-slate-700">{{ form.criteria.length }}</strong>
             {{ criteriaCountLabel }}
           </span>
           <span v-if="localNewCriteria.filter(nc => isCriterionSelected(nc.id)).length > 0" class="text-violet-600">
-            <strong>{{ localNewCriteria.filter(nc => isCriterionSelected(nc.id)).length }}</strong> nových (budú vytvorené pri uložení)
+            <strong>{{ localNewCriteria.filter(nc => isCriterionSelected(nc.id)).length }}</strong> {{ $t('callModal.newCriteriaSummarySuffix') }}
           </span>
           <span v-if="academicSignalCount > 0" class="text-amber-600">
-            <strong>{{ academicSignalCount }}</strong> akademický{{ academicSignalCount === 1 ? '' : 'é' }} signál{{ academicSignalCount === 1 ? '' : 'y' }}
+            <strong>{{ academicSignalCount }}</strong> {{ academicSignalCountLabel }}
           </span>
           <span class="ml-auto text-slate-400">
-            Priemerná váha: <strong class="text-slate-600">{{ averageWeight }}</strong>
+            {{ $t('callModal.averageWeightLabel') }}: <strong class="text-slate-600">{{ averageWeight }}</strong>
           </span>
         </div>
       </div>
     </template>
 
     <template #actions>
-      <UiButton variant="ghost" @click="emit('update:modelValue', false)">Zrušiť</UiButton>
+      <UiButton variant="ghost" @click="emit('update:modelValue', false)">{{ $t('callModal.cancel') }}</UiButton>
       <UiButton :disabled="isSaving || metaLoading" @click="handleSubmit">
-        {{ isSaving ? 'Ukladám…' : 'Uložiť' }}
+        {{ isSaving ? $t('callModal.savingStatus') : $t('callModal.saveButton') }}
       </UiButton>
     </template>
   </UiModal>
@@ -518,11 +542,14 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   Type, AlignLeft, Hash, Mail, ChevronDown, ChevronUp,
   Circle, CheckSquare, Calendar, Paperclip,
   Plus, Trash2, GripVertical, X, Pencil, FileText, Check,
 } from 'lucide-vue-next'
+
+const { t } = useI18n()
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -540,10 +567,18 @@ interface FormField {
   accept: string
 }
 
+/** Translation entry for a single language */
+interface TranslationDraft {
+  name: string
+  description: string
+}
+
+/** A criterion from the server or locally created — always keyed by language_id */
 interface Criterion {
   id: number
-  name: string
-  description?: string
+  translations: Record<number, TranslationDraft>
+  /** Fallback display string when no translation exists for active lang */
+  fallback: string
 }
 
 interface CriterionPivot {
@@ -558,12 +593,20 @@ interface CallTranslation {
   description?: string
 }
 
+interface LanguageOption {
+  value: number
+  label: string
+  /** Derived short code e.g. "sk", "en" */
+  code: string
+}
+
 interface CallRaw {
   id?: number
   name?: string
   description?: string
   program_id?: number
   status_id?: number
+  qualification_stack_id?: number | null
   force_closed?: boolean | number | string
   application_start?: string
   application_deadline?: string
@@ -586,10 +629,8 @@ interface CallRaw {
   }[]
   application_form_schema?: { fields?: FormField[] }
   form_schema?: { fields?: FormField[] }
-  program?: {
-    id: number
-    name: string
-  }
+  program?: { id: number; name: string }
+  qualification_stack?: { id: number; name?: string }
 }
 
 // ── Props / emits ──────────────────────────────────────────────────────────
@@ -606,22 +647,17 @@ const emit = defineEmits<{
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
-const FIELD_TYPE_CONFIG: Record<FieldType, { label: string; icon: any; color: string }> = {
-  text:     { label: 'Krátky text',   icon: Type,        color: 'text-blue-500' },
-  textarea: { label: 'Dlhý text',     icon: AlignLeft,   color: 'text-indigo-500' },
-  number:   { label: 'Číslo',         icon: Hash,        color: 'text-violet-500' },
-  email:    { label: 'E-mail',         icon: Mail,        color: 'text-sky-500' },
-  select:   { label: 'Výber jedného', icon: ChevronDown, color: 'text-amber-500' },
-  radio:    { label: 'Prepínač',      icon: Circle,      color: 'text-orange-500' },
-  checkbox: { label: 'Zaškrtávačky', icon: CheckSquare, color: 'text-emerald-500' },
-  date:     { label: 'Dátum',         icon: Calendar,    color: 'text-rose-500' },
-  file:     { label: 'Príloha',       icon: Paperclip,   color: 'text-teal-500' },
+const FIELD_TYPE_CONFIG: Record<FieldType, { labelKey: string; icon: any; color: string }> = {
+  text:     { labelKey: 'callModal.fieldTypes.text',     icon: Type,        color: 'text-blue-500' },
+  textarea: { labelKey: 'callModal.fieldTypes.textarea', icon: AlignLeft,   color: 'text-indigo-500' },
+  number:   { labelKey: 'callModal.fieldTypes.number',   icon: Hash,        color: 'text-violet-500' },
+  email:    { labelKey: 'callModal.fieldTypes.email',    icon: Mail,        color: 'text-sky-500' },
+  select:   { labelKey: 'callModal.fieldTypes.select',   icon: ChevronDown, color: 'text-amber-500' },
+  radio:    { labelKey: 'callModal.fieldTypes.radio',    icon: Circle,      color: 'text-orange-500' },
+  checkbox: { labelKey: 'callModal.fieldTypes.checkbox', icon: CheckSquare, color: 'text-emerald-500' },
+  date:     { labelKey: 'callModal.fieldTypes.date',     icon: Calendar,    color: 'text-rose-500' },
+  file:     { labelKey: 'callModal.fieldTypes.file',     icon: Paperclip,   color: 'text-teal-500' },
 }
-
-const WEIGHT_LABELS = [
-  'Veľmi nízka', 'Nízka', 'Podpriemerná', 'Mierne nízka', 'Stredná',
-  'Mierne vysoká', 'Nadpriemerná', 'Vysoká', 'Veľmi vysoká', 'Kritická',
-]
 
 const PROGRAM_A_DEFAULTS: FormField[] = [
   { id: 'doc_executive_summary',      type: 'file', label: 'Executive Summary',      name: 'executive_summary',      required: true, help_text: 'Stručný opis problému, riešenia, trhu a prínosu', placeholder: '', options: [], accept: '.pdf,.doc,.docx' },
@@ -637,9 +673,9 @@ const PROGRAM_A_DEFAULTS: FormField[] = [
 const activeTab = ref<'basic' | 'form' | 'criteria'>('basic')
 
 const TABS = computed(() => [
-  { key: 'basic',    label: 'Základné info',       badge: undefined },
-  { key: 'form',     label: 'Formulár prihlášky',  badge: formFields.value.length },
-  { key: 'criteria', label: 'Kritériá hodnotenia', badge: form.value.criteria.length },
+  { key: 'basic',    label: t('callModal.tabs.basic'),    badge: undefined },
+  { key: 'form',     label: t('callModal.tabs.form'),     badge: formFields.value.length },
+  { key: 'criteria', label: t('callModal.tabs.criteria'), badge: form.value.criteria.length },
 ])
 
 // ── API / toasts ───────────────────────────────────────────────────────────
@@ -649,42 +685,81 @@ const { addToast } = useToast()
 
 // ── Options ────────────────────────────────────────────────────────────────
 
-const programOptions    = ref<{ value: number; label: string }[]>([])
-const statusOptions     = ref<{ value: number; label: string }[]>([])
-const languageOptions   = ref<{ value: number; label: string }[]>([])
-const availableCriteria = ref<Criterion[]>([])
+const programOptions           = ref<{ value: number; label: string }[]>([])
+const statusOptions            = ref<{ value: number; label: string }[]>([])
+const languageOptions          = ref<LanguageOption[]>([])
+const qualificationStackOptions = ref<{ value: number; label: string }[]>([])
+const availableCriteria        = ref<Criterion[]>([])
 
 const metaLoading     = ref(false)
 const criteriaLoading = ref(false)
 const isSaving        = ref(false)
 
-// Only show Program A when creating; show all programs when editing
+/** Currently active language tab (language_id) */
+const activeLang = ref<number | null>(null)
+
+// Only show Program A when creating; show all when editing
 const visibleProgramOptions = computed(() => {
   if (isEditing.value) return programOptions.value
   return programOptions.value.filter(o => o.label.toLowerCase().trim() === 'program a')
 })
+
+/** Label for the currently active language */
+const currentLangLabel = computed(() =>
+  languageOptions.value.find(l => l.value === activeLang.value)?.label ?? '—'
+)
 
 // ── Form ───────────────────────────────────────────────────────────────────
 
 const isEditing = computed(() => !!props.call?.id)
 
 const emptyForm = () => ({
-  program_id:           null as number | null,
-  status_id:            null as number | null,
-  language_id:          null as number | null,
-  name:                 '',
-  description:          '',
-  application_start:    '',
-  application_deadline: '',
-  project_start:        '',
-  project_end:          '',
-  force_closed:         false,
-  criteria:             [] as CriterionPivot[],
+  program_id:              null as number | null,
+  status_id:               null as number | null,
+  qualification_stack_id:  null as number | null,
+  /** Map of language_id → { name, description } */
+  translations:            {} as Record<number, TranslationDraft>,
+  application_start:       '',
+  application_deadline:    '',
+  project_start:           '',
+  project_end:             '',
+  force_closed:            false,
+  criteria:                [] as CriterionPivot[],
 })
 
 const form    = ref(emptyForm())
 const errors  = ref<Record<string, string>>({})
 const touched = ref<Record<string, boolean>>({})
+
+// ── Writable computeds for current-language name & description ─────────────
+
+const currentName = computed({
+  get: () => activeLang.value != null
+    ? (form.value.translations[activeLang.value]?.name ?? '')
+    : '',
+  set: (val: string) => {
+    if (activeLang.value != null) {
+      if (!form.value.translations[activeLang.value]) {
+        form.value.translations[activeLang.value] = { name: '', description: '' }
+      }
+      form.value.translations[activeLang.value].name = val
+    }
+  },
+})
+
+const currentDescription = computed({
+  get: () => activeLang.value != null
+    ? (form.value.translations[activeLang.value]?.description ?? '')
+    : '',
+  set: (val: string) => {
+    if (activeLang.value != null) {
+      if (!form.value.translations[activeLang.value]) {
+        form.value.translations[activeLang.value] = { name: '', description: '' }
+      }
+      form.value.translations[activeLang.value].description = val
+    }
+  },
+})
 
 // ── Form builder ───────────────────────────────────────────────────────────
 
@@ -743,7 +818,29 @@ function moveField(from: number, to: number) {
   if (editingFieldIdx.value === from) editingFieldIdx.value = to
 }
 
-// ── Criteria helpers ───────────────────────────────────────────────────────
+// ── Criteria display helpers ───────────────────────────────────────────────
+
+/**
+ * Returns the criterion name in activeLang, falling back to the first
+ * available translation, then to a generic label.
+ */
+function criterionDisplayName(criterion: Criterion): string {
+  if (activeLang.value != null && criterion.translations[activeLang.value]?.name) {
+    return criterion.translations[activeLang.value].name
+  }
+  const first = Object.values(criterion.translations).find(t => t.name)
+  return first?.name ?? criterion.fallback ?? `${t('callModal.criterionFallbackPrefix')} #${criterion.id}`
+}
+
+function criterionDescription(criterion: Criterion): string | undefined {
+  if (activeLang.value != null && criterion.translations[activeLang.value]?.description) {
+    return criterion.translations[activeLang.value].description
+  }
+  const first = Object.values(criterion.translations).find(t => t.description)
+  return first?.description ?? undefined
+}
+
+// ── Criteria pivot helpers ─────────────────────────────────────────────────
 
 function getCriterion(id: number): CriterionPivot | undefined {
   return form.value.criteria.find(c => c.id === id)
@@ -800,43 +897,66 @@ const averageWeight = computed(() => {
 
 const criteriaCountLabel = computed(() => {
   const n = form.value.criteria.length
-  if (n === 1) return 'kritérium'
-  if (n < 5)   return 'kritériá'
-  return 'kritérií'
+  if (n === 1) return t('callModal.criteriaCountSingular')
+  if (n < 5)   return t('callModal.criteriaCountPluralFew')
+  return t('callModal.criteriaCountPluralMany')
+})
+
+const academicSignalCountLabel = computed(() => {
+  const n = academicSignalCount.value
+  if (n === 1) return t('callModal.academicSignalCountSingular')
+  if (n < 5)   return t('callModal.academicSignalCountPluralFew')
+  return t('callModal.academicSignalCountPluralMany')
 })
 
 // ── Local new-criterion form ───────────────────────────────────────────────
 // New criteria use negative temp IDs (never clash with real DB IDs).
-// On submit they are POSTed first; their real IDs are then swapped in.
+// On submit they are POSTed first; real IDs are swapped in before the call save.
 
 let _tempIdSeq = -1
 
-const localNewCriteria  = ref<Criterion[]>([])
+const localNewCriteria     = ref<Criterion[]>([])
 const showNewCriterionForm = ref(false)
-const newCriterionDraft    = ref({ name: '', description: '' })
+const newCriterionDraft    = ref<{ translations: Record<number, TranslationDraft> }>({ translations: {} })
 const newCriterionError    = ref('')
 
-/** Combined list shown in the criteria tab */
+/** Combined list: server criteria + locally drafted ones */
 const allDisplayCriteria = computed<Criterion[]>(() => [
   ...availableCriteria.value,
   ...localNewCriteria.value,
 ])
 
+function openNewCriterionForm() {
+  // Ensure draft translations object has keys for all loaded languages
+  newCriterionDraft.value = {
+    translations: Object.fromEntries(
+      languageOptions.value.map(l => [l.value, { name: '', description: '' }])
+    ),
+  }
+  showNewCriterionForm.value = true
+}
+
 function addLocalCriterion() {
-  if (!newCriterionDraft.value.name.trim()) {
-    newCriterionError.value = 'Názov kritéria je povinný.'
+  const primaryLangId = languageOptions.value[0]?.value
+  if (!primaryLangId || !newCriterionDraft.value.translations[primaryLangId]?.name?.trim()) {
+    newCriterionError.value = t('callModal.validation.newCriterionPrimaryRequired', { lang: languageOptions.value[0]?.label ?? t('callModal.primaryLanguageFallback') })
     return
   }
   newCriterionError.value = ''
   const tempId = _tempIdSeq--
+
+  // Deep-copy draft translations
+  const translations: Record<number, TranslationDraft> = {}
+  for (const [langId, tr] of Object.entries(newCriterionDraft.value.translations)) {
+    translations[Number(langId)] = { name: tr.name.trim(), description: tr.description.trim() }
+  }
+
   localNewCriteria.value.push({
-    id:          tempId,
-    name:        newCriterionDraft.value.name.trim(),
-    description: newCriterionDraft.value.description.trim(),
+    id:           tempId,
+    translations,
+    fallback:     translations[primaryLangId]?.name ?? `${t('callModal.criterionFallbackPrefix')} #${Math.abs(tempId)}`,
   })
-  // Auto-select with default weight so the admin can tweak it immediately
   form.value.criteria.push({ id: tempId, weight: 5, is_academic_signal: false })
-  newCriterionDraft.value    = { name: '', description: '' }
   showNewCriterionForm.value = false
 }
 
@@ -847,8 +967,31 @@ function removeLocalCriterion(tempId: number) {
 
 function cancelNewCriterion() {
   showNewCriterionForm.value = false
-  newCriterionDraft.value    = { name: '', description: '' }
   newCriterionError.value    = ''
+}
+
+// ── Language helpers ───────────────────────────────────────────────────────
+
+/** Derive a short language code from a full label */
+function deriveLangCode(label: string): string {
+  const l = label.toLowerCase()
+  if (l === 'sk' || l.includes('sloven'))                         return 'sk'
+  if (l === 'en' || l.includes('english') || l.includes('anglič')) return 'en'
+  if (l === 'cs' || l.includes('češtin') || l.includes('czech'))  return 'cs'
+  if (l === 'de' || l.includes('deutsch') || l.includes('nemčina')) return 'de'
+  return label.length <= 3 ? label.toLowerCase() : label.slice(0, 2).toLowerCase()
+}
+
+/** Whether a given language has any active validation errors */
+function hasLangErrors(langId: number): boolean {
+  return !!errors.value[`name_${langId}`] || !!errors.value[`description_${langId}`]
+}
+
+/** Initialize the form.translations map for all loaded languages */
+function initTranslations() {
+  form.value.translations = Object.fromEntries(
+    languageOptions.value.map(l => [l.value, { name: '', description: '' }])
+  )
 }
 
 // ── Meta fetchers ──────────────────────────────────────────────────────────
@@ -857,17 +1000,50 @@ async function fetchMeta() {
   metaLoading.value = true
   try {
     const [programs, statuses, languages] = await Promise.all([
-      api.get('/program-types') as Promise<any>,
-      api.get('/call-statuses') as Promise<any>,
-      api.get('/languages')     as Promise<any>,
+      api.get('/program-types')  as Promise<any>,
+      api.get('/call-statuses')  as Promise<any>,
+      api.get('/languages')      as Promise<any>,
     ])
     const list = (r: any): any[] => Array.isArray(r) ? r : r?.data ?? []
 
-    programOptions.value  = list(programs).map((p: any)  => ({ value: p.id, label: p.typeOfProgram?.name ?? p.name ?? `#${p.id}` }))
-    statusOptions.value   = list(statuses).map((s: any)  => ({ value: s.id, label: s.name }))
-    languageOptions.value = list(languages).map((l: any) => ({ value: l.id, label: l.name }))
+    programOptions.value = list(programs).map((p: any) => ({
+      value: p.id,
+      label: p.typeOfProgram?.name ?? p.name ?? `#${p.id}`,
+    }))
+    statusOptions.value = list(statuses).map((s: any) => ({
+      value: s.id,
+      label: s.name,
+    }))
+    languageOptions.value = list(languages).map((l: any) => ({
+      value: l.id,
+      label: l.name,
+      code:  deriveLangCode(l.name),
+    }))
+
+    // Set active language BEFORE metaLoading flips to false so the template
+    // never renders with activeLang === null.
+    activeLang.value = languageOptions.value[0]?.value ?? null
+
+    // Fetch qualification stacks using the primary language code (best-effort).
+    // Normalize labels by preferring the primary language translation when present.
+    const primaryCode = languageOptions.value[0]?.code ?? 'sk'
+    const primaryLangId = languageOptions.value[0]?.value ?? null
+    try {
+      const stacksRes: any = await api.get(`/qualification-stacks/lang/${primaryCode}`)
+      const stacksList: any[] = Array.isArray(stacksRes) ? stacksRes : stacksRes?.data ?? []
+      qualificationStackOptions.value = stacksList.map((s: any) => {
+        // translations may be an array of { language_id, name }
+        const trs: any[] = s.translations ?? s.translation ?? s.translations_ ?? []
+        let label = trs?.find((tr: any) => {
+          const lid = tr.language_id ?? tr.languageId ?? tr.language?.id
+          return primaryLangId != null && lid === primaryLangId
+        })?.name
+        label = label ?? trs?.[0]?.name ?? s.name ?? `#${s.id}`
+        return { value: s.id, label }
+      })
+    } catch { /* non-fatal — stacks are optional */ }
   } catch {
-    addToast({ message: 'Nepodarilo sa načítať metadáta.', type: 'error' })
+    addToast({ message: t('callModal.toasts.metaError'), type: 'error' })
   } finally {
     metaLoading.value = false
   }
@@ -878,59 +1054,95 @@ async function fetchCriteria() {
   try {
     const res: any = await api.get('/v1/admin/criteria')
     const list: any[] = Array.isArray(res) ? res : res?.data ?? []
-    availableCriteria.value = list.map((c: any) => ({
-      id:          c.id,
-      name:        c.name ?? c.criterionTranslations?.[0]?.name ?? `Kritérium #${c.id}`,
-      description: c.description ?? c.criterionTranslations?.[0]?.description ?? null,
-    }))
+
+    availableCriteria.value = list.map((c: any) => {
+      // Accept multiple possible translation keys returned by different endpoints
+      const rawTrs: any[] = c.criterionTranslations ?? c.criterion_translations ?? c.translations ?? c.translation ?? []
+      const translations: Record<number, TranslationDraft> = {}
+      for (const tr of rawTrs) {
+        const langId = tr.language_id ?? tr.languageId ?? tr.language?.id
+        if (langId) {
+          translations[Number(langId)] = {
+            name:        tr.name        ?? tr.title ?? '',
+            description: tr.description ?? tr.desc  ?? '',
+          }
+        }
+      }
+      // Fallback name when translations are empty (e.g. legacy data)
+      const fallback = c.name ?? rawTrs[0]?.name ?? rawTrs[0]?.title ?? `${t('callModal.criterionFallbackPrefix')} #${c.id}`
+      return { id: c.id, translations, fallback } as Criterion
+    })
   } catch { /* non-fatal */ } finally {
     criteriaLoading.value = false
   }
 }
 
 // ── Watch: modal open/close ────────────────────────────────────────────────
-
+const fullCallData = ref<CallRaw | null>(null)
 watch(() => props.modelValue, async (open) => {
   if (!open) return
 
+  // ── Reset all transient state ──────────────────────────────────────────
   activeTab.value        = 'basic'
+  activeLang.value       = null   // will be set inside fetchMeta
   editingFieldIdx.value  = null
   showFieldPicker.value  = false
   errors.value           = {}
   touched.value          = {}
   isFormDirty.value      = false
-  // Reset local-criteria state
   localNewCriteria.value    = []
   showNewCriterionForm.value = false
-  newCriterionDraft.value    = { name: '', description: '' }
   newCriterionError.value    = ''
 
-  await Promise.all([fetchMeta(), fetchCriteria()])
+ await Promise.all([fetchMeta(), fetchCriteria()])
 
+  // ── Derive default status & initialize translation slots ──────────────
   const defaultStatusId =
     statusOptions.value.find(s => s.label.toLowerCase().includes('koncept'))?.value
     ?? statusOptions.value[0]?.value ?? null
 
-  const defaultLanguageId =
-    languageOptions.value.find(l => l.label.toLowerCase().startsWith('sk') || l.label.toLowerCase().includes('slovenčina'))?.value
-    ?? languageOptions.value[0]?.value ?? null
+  const allLangIds = languageOptions.value.map(l => l.value)
 
   if (props.call?.id) {
-    const c = props.call
-    const translations = c.call_translations ?? c.callTranslations ?? []
-    const primaryTr = translations[0] ?? null
+    // ── EDIT MODE ──────────────────────────────────────────────────────
+    // Prefer a full resource from the API when possible — list endpoints
+    // often return a shallow/trimmed item. Merge the fetched resource
+    // over the provided `props.call` so we keep any locally-present
+    // fields while preferring the server's canonical representation.
+    let c: any = props.call
+    try {
+      const fullRes: any = await api.get(`/v1/admin/calls/${props.call.id}`)
+      const fetched = Array.isArray(fullRes) ? fullRes[0] : fullRes?.data ?? fullRes
+      if (fetched) c = { ...(props.call ?? {}), ...(fetched ?? {}) }
+    } catch {
+      // Non-fatal: fall back to the passed-in prop if fetch fails
+      c = props.call
+    }
+
+    // Initialize all language slots to empty, then fill from existing translations
+    const translations: Record<number, TranslationDraft> = Object.fromEntries(
+      allLangIds.map(id => [id, { name: '', description: '' }])
+    )
+    const callTrs = c.call_translations ?? c.callTranslations ?? []
+    for (const tr of callTrs) {
+      if (tr.language_id && allLangIds.includes(tr.language_id)) {
+        translations[tr.language_id] = {
+          name:        tr.name        ?? '',
+          description: tr.description ?? '',
+        }
+      }
+    }
 
     form.value = {
-      program_id:           c.program_id ?? c.program?.id ?? null,
-      status_id:            c.status_id  ?? c.status?.id  ?? null,
-      language_id:          primaryTr?.language_id ?? defaultLanguageId,
-      name:                 primaryTr?.name        ?? c.name        ?? '',
-      description:          primaryTr?.description ?? c.description ?? '',
-      application_start:    c.application_start?.slice(0, 10)    ?? '',
-      application_deadline: c.application_deadline?.slice(0, 10) ?? '',
-      project_start:        c.project_start?.slice(0, 10)        ?? '',
-      project_end:          c.project_end?.slice(0, 10)          ?? '',
-      force_closed:         c.force_closed === true || String(c.force_closed) === '1' || Number(c.force_closed) === 1,
+      program_id:             c.program_id ?? c.program?.id ?? null,
+      status_id:              c.status_id  ?? c.status?.id  ?? null,
+     qualification_stack_id: c.qualification_stack_id ?? c.qualification_stack?.id ?? null,
+      translations,
+      application_start:      c.application_start?.slice(0, 10)    ?? '',
+      application_deadline:   c.application_deadline?.slice(0, 10) ?? '',
+      project_start:          c.project_start?.slice(0, 10)        ?? '',
+      project_end:            c.project_end?.slice(0, 10)          ?? '',
+      force_closed:           c.force_closed === true || String(c.force_closed) === '1' || Number(c.force_closed) === 1,
       criteria: (c.call_criteria ?? c.callCriteria ?? []).map(cr => ({
         id:                 cr.id,
         weight:             cr.pivot?.weight             ?? 5,
@@ -941,7 +1153,12 @@ watch(() => props.modelValue, async (open) => {
     const rawFields = c.application_form_schema?.fields ?? c.form_schema?.fields ?? []
     formFields.value = rawFields.length > 0 ? JSON.parse(JSON.stringify(rawFields)) : []
   } else {
-    form.value = { ...emptyForm(), status_id: defaultStatusId, language_id: defaultLanguageId }
+    // ── CREATE MODE ────────────────────────────────────────────────────
+    form.value = {
+      ...emptyForm(),
+      status_id:    defaultStatusId,
+      translations: Object.fromEntries(allLangIds.map(id => [id, { name: '', description: '' }])),
+    }
     formFields.value = JSON.parse(JSON.stringify(PROGRAM_A_DEFAULTS))
 
     if (visibleProgramOptions.value.length === 1) {
@@ -965,7 +1182,7 @@ watch(
   [() => form.value.application_start, () => form.value.application_deadline],
   ([start, end]) => {
     if (start && end && end < start)
-      errors.value.application_deadline = 'Uzávierka musí byť po začiatku.'
+      errors.value.application_deadline = t('callModal.validation.deadlineOrder')
     else
       delete errors.value.application_deadline
   },
@@ -975,7 +1192,7 @@ watch(
   [() => form.value.project_start, () => form.value.project_end],
   ([start, end]) => {
     if (start && end && end < start)
-      errors.value.project_end = 'Koniec projektu musí byť po jeho začiatku.'
+      errors.value.project_end = t('callModal.validation.projectEndOrder')
     else
       delete errors.value.project_end
   },
@@ -988,72 +1205,84 @@ function isValid(field: string) { return !errors.value[field] }
 function validate(): boolean {
   errors.value = {}
 
-  // 1. ZÁKLADNÉ INFO
-  if (!form.value.program_id)         errors.value.program_id   = 'Vyberte program.'
-  if (!form.value.language_id)        errors.value.language_id  = 'Vyberte jazyk záznamu.'
-  if (!form.value.name.trim())        errors.value.name         = 'Názov výzvy je povinný.'
-  if (!form.value.description.trim()) errors.value.description  = 'Popis výzvy je povinný.'
+  // 1. ZÁKLADNÉ INFO — non-translatable fields
+  if (!form.value.program_id) errors.value.program_id = t('callModal.validation.programRequired')
 
-  if (!form.value.application_start)    errors.value.application_start    = 'Povinné.'
-  if (!form.value.application_deadline) errors.value.application_deadline = 'Povinné.'
-  if (!form.value.project_start)        errors.value.project_start        = 'Povinné.'
-  if (!form.value.project_end)          errors.value.project_end          = 'Povinné.'
+  if (!form.value.application_start)    errors.value.application_start    = t('callModal.validation.requiredField')
+  if (!form.value.application_deadline) errors.value.application_deadline = t('callModal.validation.requiredField')
+  if (!form.value.project_start)        errors.value.project_start        = t('callModal.validation.requiredField')
+  if (!form.value.project_end)          errors.value.project_end          = t('callModal.validation.requiredField')
 
   if (form.value.application_start && form.value.application_deadline &&
       form.value.application_deadline < form.value.application_start) {
-    errors.value.application_deadline = 'Uzávierka musí byť po začiatku.'
+    errors.value.application_deadline = t('callModal.validation.deadlineOrder')
   }
-
   if (form.value.project_start && form.value.project_end &&
       form.value.project_end < form.value.project_start) {
-    errors.value.project_end = 'Koniec projektu musí byť po jeho začiatku.'
+    errors.value.project_end = t('callModal.validation.projectEndOrder')
+  }
+
+  // 2. ZÁKLADNÉ INFO — translatable fields (all languages)
+  for (const lang of languageOptions.value) {
+    const tr = form.value.translations[lang.value] ?? { name: '', description: '' }
+    if (!tr.name.trim()) {
+      errors.value[`name_${lang.value}`] = t('callModal.validation.nameTranslatableRequired', { code: lang.code.toUpperCase() })
+    }
+    if (!tr.description.trim()) {
+      errors.value[`description_${lang.value}`] = t('callModal.validation.descriptionTranslatableRequired', { code: lang.code.toUpperCase() })
+    }
   }
 
   if (Object.keys(errors.value).length > 0) {
     activeTab.value = 'basic'
-    addToast({ message: 'Skontrolujte povinné polia v základných informáciách (Názov, Popis, Termíny...).', type: 'error' })
+    // Automatically switch to the first language tab that has errors
+    const firstErrorLang = languageOptions.value.find(l =>
+      errors.value[`name_${l.value}`] || errors.value[`description_${l.value}`]
+    )
+    if (firstErrorLang) activeLang.value = firstErrorLang.value
+    addToast({ message: t('callModal.toasts.validationBasicError'), type: 'error' })
     return false
   }
 
-  // 2. FORMULÁR PRIHLÁŠKY
+  // 3. FORMULÁR PRIHLÁŠKY
   for (const field of formFields.value) {
     if (!field.label.trim()) {
       activeTab.value = 'form'
-      errors.value._form = 'Všetky polia musia mať vyplnený názov.'
-      addToast({ message: 'Chyba formulára: Všetky polia musia mať vyplnený názov.', type: 'error' })
+      errors.value._form = t('callModal.validation.formFieldNameRequired')
+      addToast({ message: t('callModal.toasts.formFieldNameError'), type: 'error' })
       return false
     }
     if (!field.name.trim() || !/^[a-z][a-z0-9_]*$/.test(field.name)) {
       activeTab.value = 'form'
-      errors.value._form = `Pole „${field.label}" má neplatný identifikátor.`
-      addToast({ message: `Chyba identifikátora: Názov poľa „${field.label}" vyžaduje malé písmená bez diakritiky (a-z, _).`, type: 'error' })
+      errors.value._form = t('callModal.validation.formFieldIdentifierInvalid', { label: field.label })
+      addToast({ message: t('callModal.toasts.formFieldIdentifierError', { label: field.label }), type: 'error' })
       return false
     }
   }
-
   const names = formFields.value.map(f => f.name)
   if (names.length !== new Set(names).size) {
     activeTab.value = 'form'
-    errors.value._form = 'Formulár obsahuje duplicitné identifikátory polí.'
-    addToast({ message: 'Chyba formulára: Detegovali sa duplicitné identifikátory polí (ID). Každé pole musí mať unikátny názov.', type: 'error' })
+    errors.value._form = t('callModal.validation.formFieldDuplicate')
+    addToast({ message: t('callModal.toasts.formFieldDuplicateError'), type: 'error' })
     return false
   }
 
-  // 3. NOVÉ KRITÉRIÁ — musia mať neprázdny názov (safety check)
+  // 4. NOVÉ KRITÉRIÁ — primary language name required
+  const primaryLangId = languageOptions.value[0]?.value
   for (const nc of localNewCriteria.value) {
-    if (!nc.name.trim()) {
+    if (primaryLangId && !nc.translations[primaryLangId]?.name?.trim()) {
       activeTab.value = 'criteria'
-      errors.value._criteria = 'Všetky nové kritériá musia mať vyplnený názov.'
-      addToast({ message: 'Chyba kritérií: Nové kritérium nemá vyplnený názov.', type: 'error' })
+      errors.value._criteria = t('callModal.validation.newCriteriaPrimaryNameRequired')
+      addToast({ message: t('callModal.toasts.newCriteriaPrimaryTranslationError'), type: 'error' })
       return false
     }
   }
 
-  // 4. KRITÉRIÁ HODNOTENIA — aspoň jedno
+  // 5. KRITÉRIÁ HODNOTENIA — aspoň jedno
   if (form.value.criteria.length === 0) {
     activeTab.value = 'criteria'
-    errors.value._criteria = 'Musíte vybrať aspoň jedno hodnotiace kritérium.'
-    addToast({ message: 'Chyba kritérií: Vyberte aspoň jedno hodnotiace kritérium pre hodnotiacu komisiu.', type: 'error' })
+    errors.value._criteria = t('callModal.validation.atLeastOneCriterion')
+    addToast({ message: t('callModal.toasts.atLeastOneCriterionError'), type: 'error' })
     return false
   }
 
@@ -1067,30 +1296,39 @@ async function handleSubmit() {
   isSaving.value = true
 
   try {
-    // ── Step 1: Create any locally drafted criteria and remap their temp IDs ──
+    // ── Step 1: Create locally drafted criteria, swap in real IDs ─────────
     const selectedLocalCriteria = localNewCriteria.value.filter(nc =>
       form.value.criteria.some(c => c.id === nc.id),
     )
 
-   for (const nc of selectedLocalCriteria) {
-  const created: any = await api.post('/v1/admin/criteria', {
-   translations: [
-  {
-    language_id: form.value.language_id,
-    name:        nc.name,
-    description: nc.description || undefined,
-  },
-],
-  })
-  // Response is the criterion object directly (201), id is at the root
-  const realId: number = created?.id ?? created?.data?.id
-  if (!realId) throw new Error(`Nepodarilo sa získať ID pre nové kritérium „${nc.name}".`)
+    for (const nc of selectedLocalCriteria) {
+      // Send all language translations that have a name
+      const criterionTranslations = languageOptions.value
+        .map(l => {
+          const tr = nc.translations[l.value] ?? { name: '', description: '' }
+          return {
+            language_id: l.value,
+            name:        tr.name.trim() || undefined,
+            description: tr.description.trim() || undefined,
+          }
+        })
+        .filter(t => t.name)
 
-  const pivot = form.value.criteria.find(c => c.id === nc.id)
-  if (pivot) pivot.id = realId
-}
+      const created: any = await api.post('/v1/admin/criteria', {
+        translations: criterionTranslations,
+      })
 
-    // ── Step 2: Build payload and save the call ────────────────────────────
+      const realId: number = created?.id ?? created?.data?.id
+      if (!realId) throw new Error(t('callModal.errors.criterionIdFetchFailed', { fallback: nc.fallback }))
+
+      const pivot = form.value.criteria.find(c => c.id === nc.id)
+      if (pivot) pivot.id = realId
+    }
+
+    // ── Step 2: Build full payload ────────────────────────────────────────
+    const primaryLangId = languageOptions.value[0]?.value
+    const primaryTr     = form.value.translations[primaryLangId ?? 0] ?? { name: '', description: '' }
+
     const sanitizedFields = formFields.value.map(field => ({
       id:          field.id,
       type:        field.type,
@@ -1104,17 +1342,29 @@ async function handleSubmit() {
     }))
 
     const payload: Record<string, any> = {
-      program_id:           form.value.program_id,
-      status_id:            form.value.status_id,
-      language_id:          form.value.language_id,
-      name:                 form.value.name,
-      description:          form.value.description,
-      application_start:    form.value.application_start,
-      application_deadline: form.value.application_deadline,
-      project_start:        form.value.project_start,
-      project_end:          form.value.project_end,
-      criteria:             form.value.criteria,
-      force_closed:         Boolean(form.value.force_closed),
+      // Primary translation (required by backend as top-level fields)
+      language_id:  primaryLangId,
+      name:         primaryTr.name,
+      description:  primaryTr.description,
+
+      // All remaining languages go into the translations array
+      translations: languageOptions.value
+        .filter(l => l.value !== primaryLangId)
+        .map(l => ({
+          language_id: l.value,
+          name:        form.value.translations[l.value]?.name        ?? '',
+          description: form.value.translations[l.value]?.description ?? '',
+        })),
+
+      program_id:             form.value.program_id,
+      status_id:              form.value.status_id,
+      qualification_stack_id: form.value.qualification_stack_id ?? null,
+      application_start:      form.value.application_start,
+      application_deadline:   form.value.application_deadline,
+      project_start:          form.value.project_start,
+      project_end:            form.value.project_end,
+      criteria:               form.value.criteria,
+      force_closed:           Boolean(form.value.force_closed),
       application_form_schema: sanitizedFields.length > 0
         ? { fields: sanitizedFields }
         : null,
@@ -1126,7 +1376,7 @@ async function handleSubmit() {
       await api.post('/v1/admin/calls', payload)
     }
 
-    addToast({ message: 'Výzva bola úspešne uložená.', type: 'success' })
+    addToast({ message: t('callModal.toasts.saveSuccess'), type: 'success' })
     emit('saved')
     emit('update:modelValue', false)
   } catch (e: any) {
@@ -1137,17 +1387,16 @@ async function handleSubmit() {
       )
       if (Object.keys(errors.value).some(k => k.startsWith('application_form_schema'))) {
         activeTab.value = 'form'
-        errors.value._form = 'Na serveri zlyhala validácia schémy formulára.'
+        errors.value._form = t('callModal.validation.serverFormSchemaValidationFailed')
       } else if (Object.keys(errors.value).some(k => k.startsWith('criteria'))) {
         activeTab.value = 'criteria'
-        errors.value._criteria = 'Na serveri zlyhala validácia kritérií.'
+        errors.value._criteria = t('callModal.validation.serverCriteriaValidationFailed')
       } else {
         activeTab.value = 'basic'
       }
-      addToast({ message: 'Nepodarilo sa uložiť výzvu kvôli chybám validácie na serveri.', type: 'error' })
+      addToast({ message: t('callModal.toasts.serverValidationError'), type: 'error' })
     } else {
-      const msg = e?.message ?? 'Nepodarilo sa uložiť výzvu.'
-      addToast({ message: msg, type: 'error' })
+      addToast({ message: e?.message ?? t('callModal.toasts.saveGenericError'), type: 'error' })
     }
   } finally {
     isSaving.value = false

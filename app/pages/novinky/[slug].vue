@@ -72,9 +72,11 @@
 
         <div class="w-full h-1 bg-gray-300 my-6" />
 
-        <div class="text-justify font-sans text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed" v-html = "newsDetail?.news_translations?.[0]?.description ">
-         
-        </div>
+       <div 
+  class="hugerte-content text-justify font-sans text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed" 
+  v-html="newsDetail?.news_translations?.[0]?.description"
+>
+</div>
 
         <div class="w-full h-1 bg-gray-300 my-6" />
 
@@ -95,6 +97,7 @@
           :image="article?.image_url"
           :alt="article?.news_translations?.[0]?.title"
           :link="localePath(`/novinky/${article.slug}`)"
+          :main_description = "article?.news_translations?.[0]?.main_description"
         />
       </div>
 
@@ -154,3 +157,120 @@ onMounted(() => {
   onUnmounted(() => observer.disconnect())
 })
 </script>
+
+<style>
+/* ==========================================
+   HugeRTE Rich Text Styles (Tailwind v4 Theme)
+   ========================================== */
+
+/* 1. Structural Layout & Typography */
+.hugerte-content {
+  font-family: var(--font-sans) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.hugerte-content p {
+  margin-bottom: 1.25rem !important;
+}
+
+/* Headings matching your primary navy brand colors */
+.hugerte-content h1, 
+.hugerte-content h2, 
+.hugerte-content h3, 
+.hugerte-content h4 {
+  font-family: var(--font-sans) !important;
+  color: var(--color-navy) !important;
+  font-weight: 800 !important;
+  margin-top: 2rem !important;
+  margin-bottom: 0.75rem !important;
+}
+.hugerte-content h1 { font-size: 2.25rem !important; line-height: 2.5rem !important; }
+.hugerte-content h2 { font-size: 1.75rem !important; line-height: 2rem !important; }
+.hugerte-content h3 { font-size: 1.5rem !important; line-height: 1.75rem !important; }
+
+/* Inline Styles & formatting emphasis */
+.hugerte-content strong, .hugerte-content b { font-weight: 800 !important; }
+.hugerte-content em, .hugerte-content i { font-style: italic !important; }
+
+/* 2. Hyperlinks (Matching your theme brand blue) */
+.hugerte-content a {
+  font-family: var(--font-sans) !important;
+  color: var(--color-blue-600) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 4px;
+  font-weight: 600 !important;
+  transition: color 0.2s ease-in-out;
+}
+
+.hugerte-content a:hover {
+  color: var(--color-blue-700) !important;
+}
+
+/* 3. HTML Tables (Formatted cleanly using your borders & gray scales) */
+.hugerte-content table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  font-size: 0.95rem !important;
+  background-color: var(--color-white) !important;
+  border: 1px solid var(--color-border-primary) !important;
+  border-radius: var(--radius-md) !important;
+  overflow: hidden !important; /* Forces rounded corner consistency */
+}
+
+/* Table Headings */
+.hugerte-content th {
+  background-color: var(--color-gray-100) !important;
+  color: var(--color-navy) !important;
+  font-weight: 700 !important;
+  text-align: left !important;
+  padding: var(--spacing-3) var(--spacing-4) !important;
+  border-bottom: 2px solid var(--color-border-primary) !important;
+}
+
+/* Table Body Cells */
+.hugerte-content td {
+  padding: var(--spacing-3) var(--spacing-4) !important;
+  border-bottom: 1px solid var(--color-border-primary) !important;
+  color: var(--color-text-secondary) !important;
+}
+
+/* Subtle row shading (Zebra striping) */
+.hugerte-content tr:nth-child(even) {
+  background-color: var(--color-gray-50) !important;
+}
+
+/* Ensure last row doesn't have an underline leaking past corners */
+.hugerte-content tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* 4. Lists & Bullet Layouts */
+.hugerte-content ul, .hugerte-content ol {
+  padding-left: 2rem !important;
+  margin-bottom: 1.25rem !important;
+}
+.hugerte-content ul { list-style-type: disc !important; }
+.hugerte-content ol { list-style-type: decimal !important; }
+.hugerte-content li { 
+  margin-bottom: 0.5rem !important; 
+  font-family: var(--font-sans) !important;
+}
+
+/* 5. Blockquotes (For highlighted editor callouts) */
+.hugerte-content blockquote {
+  border-left: 4px solid var(--color-blue-500) !important;
+  background-color: var(--color-gray-50) !important;
+  padding: var(--spacing-3) var(--spacing-4) !important;
+  margin: 1.5rem 0 !important;
+  font-style: italic !important;
+  color: var(--color-text-secondary) !important;
+}
+
+/* 6. Text Realignment Mechanics */
+.hugerte-content [style*="text-align: left"] { text-align: left !important; }
+.hugerte-content [style*="text-align: center"] { text-align: center !important; }
+.hugerte-content [style*="text-align: right"] { text-align: right !important; }
+.hugerte-content [style*="text-align: justify"] { text-align: justify !important; }
+</style>

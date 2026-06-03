@@ -175,9 +175,10 @@
           :title="article.news_translations?.[0]?.title"
           :description="article.news_translations?.[0]?.description"
           :category="article.category?.slug ? capitalize(article.category.slug) : ''"
-          :image="article.news_translations?.[0]?.image_url"
+           :image="article?.image_url"
           :alt="article.news_translations?.[0]?.title"
           :link="localePath(`/novinky/${article.slug}`)"
+          :main_description="article?.news_translations?.[0]?.main_description"
         />
       </div>
       <div v-if="loading" class="min-w-[280px] flex items-center justify-center">

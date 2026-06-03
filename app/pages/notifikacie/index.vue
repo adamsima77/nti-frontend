@@ -73,7 +73,7 @@ import { Users, MessageSquare, Flag, AlertTriangle, Clock } from 'lucide-vue-nex
 
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth'
+  middleware: 'auth'
 })
 
 useHead({ title: 'Notifikácie | NTI' })

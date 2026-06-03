@@ -1683,6 +1683,32 @@
       "export_btn": "Exportovať dáta"
       
   },
+  "admin_dashboard": {
+  "title": "Prehľad",
+  "subtitle": "Prehľad aktivít a štatistík platformy",
+  "stats": {
+    "applications": "Žiadosti",
+    "activeCalls": "Aktívne výzvy",
+    "users": "Používatelia",
+    "teams": "Tímy"
+  },
+  "activeCalls": {
+    "title": "Aktívne výzvy",
+    "applicationsCount": "{count} žiadostí",
+    "deadline": "Termín uzávierky",
+    "empty": "Momentálne nie sú k dispozícii žiadne aktívne výzvy."
+  },
+  "pendingApprovals": {
+    "title": "Organizácie čakajúce na schválenie",
+    "noOrganization": "Žiadna organizácia",
+    "noPosition": "Pozícia nie je uvedená",
+    "registration": "Registrácia",
+    "empty": "Žiadne organizácie nečakajú na schválenie."
+  },
+  "cmsOverview": {
+    "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."
+  }
+},
   "superadmin_dashboard": {
      "page": "Strana {current} z {total}",
     "empty": "Neboli nájdené žiadne auditné záznamy",
@@ -1699,9 +1725,11 @@
     },
     "auditLogs": {
       "title": "Systémové auditné logy a bezpečnostné udalosti",
+      "title_1": "Systémové auditné logy a bezpečnostné udalosti",
       "viewAll": "Zobraziť všetky záznamy",
       "empty": "Za posledných 48 hodín neboli zaznamenané žiadne kritické auditné logy.",
       "page": "Strana {current} z {total}",
+      "subtitle": "Podrobný prehľad o operáciách vykonaných v systéme a chybových stavoch.",
       "columns": {
          "actor": "Iniciátor",
       "source": "Zdroj",
@@ -1745,5 +1773,181 @@
     "status": {
       "active": "Aktívny / V poriadku"
     }
+  },
+  "filters": {
+    "year": "Rok",
+    "day": "Deň",
+    "time": "Čas",
+    "any": "Všetky",
+    "apply": "Aplikovať filtre",
+    "clear": "Vymazať"
+  },
+  "callModal": {
+    "titleNew": "Nová výzva",
+    "titleEdit": "Upraviť výzvu",
+    "language": "Jazyk",
+    "languageSwitcherHint": "Prepínajte jazyk pre editáciu prekladov",
+    "program": "Program",
+    "selectProgram": "Vybrať program",
+    "status": "Stav",
+    "qualificationStack": "Kvalifikačný zásobník",
+    "noStackOptional": "Bez zásobníka (voliteľné)",
+    "contentInLanguage": "Obsah v jazyku",
+    "callName": "Názov výzvy",
+    "callNamePlaceholder": "Napr. Jarný inkubátor 2026",
+    "description": "Popis",
+    "descriptionPlaceholder": "Stručný popis výzvy a jej zamerania...",
+    "applicationDatesHeading": "Termíny podávania prihlášok",
+    "projectDatesHeading": "Termíny realizácie projektu",
+    "dateStart": "Začiatok",
+    "dateDeadline": "Uzávierka",
+    "projectStart": "Začiatok projektu",
+    "projectEnd": "Koniec projektu",
+    "forceCloseTitle": "Manuálne uzavrieť výzvu",
+    "forceCloseActiveHint": "Výzva je manuálne uzavretá — uchádzači sa nemôžu prihlásiť.",
+    "forceCloseInactiveHint": "Výzva sa riadi termínom uzávierky. Zapnutím ju okamžite uzavriete.",
+    "formTabHint": {
+      "prefix": "Navrhnite polia, ktoré budú uchádzači vypĺňať pri podaní prihlášky. Pri ",
+      "highlight": "Program A",
+      "suffix": " sú predvyplnené polia pre 6 povinných dokumentov."
+    },
+    "fieldDefaultLabel": "Pole {num}",
+    "fieldRequiredBadge": "povinné",
+    "fieldNameLabel": "Názov poľa",
+    "fieldNamePlaceholder": "Napr. Popis projektu",
+    "fieldTypeLabel": "Typ poľa",
+    "fieldIdentifierLabel": "Identifikátor",
+    "automatic": "automatický",
+    "fieldSampleTextLabel": "Vzorový text (placeholder)",
+    "fieldSampleTextPlaceholder": "Napr. Zadajte názov...",
+    "fieldAllowedFormatsLabel": "Povolené formáty",
+    "fieldHelpTextLabel": "Pomocný text",
+    "fieldHelpTextPlaceholder": "Krátky opis, čo má uchádzač vyplniť...",
+    "fieldOptionsLabel": "Možnosti výberu",
+    "fieldOptionPlaceholder": "Možnosť...",
+    "fieldAddOption": "Pridať možnosť",
+    "fieldRequiredLabel": "Povinné pole",
+    "formEmptyTitle": "Formulár je prázdny",
+    "formEmptySubtitle": "Pridajte polia pomocou tlačidla nižšie",
+    "fieldAddButton": "Pridať pole",
+    "criteriaTabHint": {
+      "prefix": "Vyberte hodnotiace kritériá komisie a nastavte ich ",
+      "highlightWeight": "váhu (1–10)",
+      "middle": ". Kritériá s príznakom ",
+      "highlightSignal": "akademický signál",
+      "suffix": " sú informatívne — nespôsobujú automatické zamietnutie (§7.2)."
+    },
+    "availableCriteriaLabel": "Dostupné kritériá",
+    "selectAtLeastOne": "Vyberte aspoň jedno",
+    "noCriteriaAvailable": "Žiadne kritériá nie sú k dispozícii.",
+    "noTranslationBadge": "Bez prekladu",
+    "newCriterionBadge": "Nové",
+    "weight": "Váha",
+    "removeNewCriterionTooltip": "Odstrániť toto nové kritérium",
+    "criterionWeightLabel": "Váha kritéria",
+    "academicSignal": "Akademický signál",
+    "academicSignalHint": "informatívny, neodmieta prihlášku",
+    "createNewCriterionButton": "Vytvoriť nové kritérium",
+    "newCriterionFormTitle": "Nové kritérium — vyplňte pre každý jazyk",
+    "required": "povinné",
+    "optional": "voliteľný",
+    "criterionNameInputLabel": "Názov kritéria",
+    "criterionNamePlaceholderSK": "Napr. Inovačný potenciál",
+    "criterionNamePlaceholderEN": "E.g. Innovation potential",
+    "criterionDescriptionInputLabel": "Popis",
+    "criterionDescriptionPlaceholderSK": "Krátky opis pre hodnotiteľov...",
+    "criterionDescriptionPlaceholderEN": "Short description for evaluators...",
+    "addAndSelectButton": "Pridať a vybrať",
+    "cancel": "Zrušiť",
+    "saveButton": "Uložiť",
+    "savingStatus": "Ukladám…",
+    "selectedLabel": "Vybrané",
+    "newCriteriaSummarySuffix": "nových (budú vytvorené pri uložení)",
+    "averageWeightLabel": "Priemerná váha",
+    "primaryLanguageFallback": "primárnom jazyku",
+    "criterionFallbackPrefix": "Kritérium",
+    "tabs": {
+      "basic": "Základné info",
+      "form": "Formulár prihlášky",
+      "criteria": "Kritériá hodnotenia"
+    },
+    "fieldTypes": {
+      "text": "Krátky text",
+      "textarea": "Dlhý text",
+      "number": "Číslo",
+      "email": "E-mail",
+      "select": "Výber jedného",
+      "radio": "Prepínač",
+      "checkbox": "Zaškrtávačky",
+      "date": "Dátum",
+      "file": "Príloha"
+    },
+    "weightLabels": [
+      "Veľmi nízka",
+      "Nízka",
+      "Podpriemerná",
+      "Mierne nízka",
+      "Stredná",
+      "Mierne vysoká",
+      "Nadpriemerná",
+      "Vysoká",
+      "Veľmi vysoká",
+      "Kritická"
+    ],
+    "criteriaCountSingular": "kritérium",
+    "criteriaCountPluralFew": "kritériá",
+    "criteriaCountPluralMany": "kritérií",
+    "academicSignalCountSingular": "akademický signál",
+    "academicSignalCountPluralFew": "akademické signály",
+    "academicSignalCountPluralMany": "akademických signálov",
+    "validation": {
+      "deadlineOrder": "Uzávierka musí byť po začiatku.",
+      "projectEndOrder": "Koniec projektu musí byť po jeho začiatku.",
+      "programRequired": "Vyberte program.",
+      "requiredField": "Povinné.",
+      "nameTranslatableRequired": "Názov ({code}) je povinný.",
+      "descriptionTranslatableRequired": "Popis ({code}) je povinný.",
+      "formFieldNameRequired": "Všetky polia musia mať vyplnený názov.",
+      "formFieldIdentifierInvalid": "Pole „{label}“ má neplatný identifikátor.",
+      "formFieldDuplicate": "Formulár obsahuje duplicitné identifikátory polí.",
+      "newCriteriaPrimaryNameRequired": "Nové kritériá musia habt vyplnený názov v primárnom jazyku.",
+      "atLeastOneCriterion": "Musíte vybrať aspoň jedno hodnotiace kritérium.",
+      "newCriterionPrimaryRequired": "Názov v {lang} je povinný.",
+      "serverFormSchemaValidationFailed": "Na serveri zlyhala validácia schémy formulára.",
+      "serverCriteriaValidationFailed": "Na serveri zlyhala validácia kritérií."
+    },
+    "toasts": {
+      "metaError": "Nepodarilo sa načítať metadáta.",
+      "validationBasicError": "Skontrolujte povinné polia — vyplňte obsah pre všetky jazyky.",
+      "formFieldNameError": "Chyba formulára: Všetky polia musia mať vyplnený názov.",
+      "formFieldIdentifierError": "Chyba identifikátora: Pole „{label}“ vyžaduje malé písmená bez diakritiky.",
+      "formFieldDuplicateError": "Chyba formulára: Duplicitné identifikátory polí.",
+      "newCriteriaPrimaryTranslationError": "Chyba kritérií: Nové kritérium nemá vyplnený primárny preklad.",
+      "atLeastOneCriterionError": "Chyba kritérií: Vyberte aspoň jedno hodnotiace kritérium.",
+      "saveSuccess": "Výzva bola úspešne uložená.",
+      "serverValidationError": "Nepodarilo sa uložiť výzvu kvôli chybám validácie na serveri.",
+      "saveGenericError": "Nepodarilo sa uložiť výzvu."
+    },
+    "errors": {
+      "criterionIdFetchFailed": "Nepodarilo sa získať ID pre nové kritérium „{fallback}“."
+    }
+  },
+
+  "superadmin_permissions": {
+    "page_title": "Matrica oprávnení",
+    "title": "Matrica oprávnení",
+    "subtitle": "Spravujte priradené práva pre jednotlivé systémové roly.",
+    "save_changes": "Uložiť zmeny",
+    "system_roles": "Systémové roly",
+    "permissions_count": "{count} oprávnení",
+    "search_placeholder": "Vyhľadať oprávnenie...",
+    "assign_all": "Priradiť všetky viditeľné",
+    "unassign_all": "Odobrať všetky viditeľné",
+    "empty_state": "Nenašli sa žiadne oprávnenia zodpovedajúce filtru.",
+    "module_label": "Modul: {name}",
+    "items_count": "{count} položiek",
+    "load_error": "Chyba pri načítaní matice oprávnení.",
+    "save_success": "Zmeny boli úspešne uložené.",
+    "save_error": "Chyba počas ukladania konfigurácie."
   }
 }

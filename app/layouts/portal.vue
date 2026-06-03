@@ -91,7 +91,7 @@ const navItems = computed(() => {
       { label: t('portal_sidebar_links.adminApplications'),to: localePath('/admin/prihlasky'),         icon: FileText,        section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.cms'),              to: localePath('/cms/management'),          icon: FileCode,        section: t('portal_sidebar_links.sectionContent') },
       { label: t('portal_sidebar_links.roles'),            to: localePath('/super-admin/role'),         icon: ShieldCheck,     section: t('portal_sidebar_links.sectionSystem') },
-      { label: t('portal_sidebar_links.auditLog'),         to: localePath('/admin/audit-logs'),         icon: Shield,          section: t('portal_sidebar_links.sectionSystem') },
+      { label: t('portal_sidebar_links.auditLog'),         to: localePath('/super-admin/audit-logs'),   icon: Shield,          section: t('portal_sidebar_links.sectionSystem') },
       
     ]
   }

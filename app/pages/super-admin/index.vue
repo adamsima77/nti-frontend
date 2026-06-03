@@ -42,7 +42,7 @@
             {{ $t('superadmin_dashboard.auditLogs.title') }}
           </h2>
           <NuxtLink
-            :to="localePath('/superadmin/audit-logs')"
+            :to="localePath('/super-admin/audit-logs')"
             class="text-xs font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-0.5"
           >
             {{ $t('superadmin_dashboard.auditLogs.viewAll') }}

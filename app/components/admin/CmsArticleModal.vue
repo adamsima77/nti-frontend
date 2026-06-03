@@ -67,6 +67,16 @@
       />
 
       <div>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Main description</label>
+        <textarea
+          v-model="form.main_description"
+          rows="4"
+          class="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+          placeholder="Optional main description"
+        />
+      </div>
+
+      <div>
         <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ $t('cms_modals.news.fieldImage') }}</label>
         <UiFileUpload
           v-model="form.image"
@@ -124,6 +134,7 @@ interface ArticleRaw {
   category_id?: number
   status_id?: number
   image_url?: string
+  main_description?: string
   cms_status?: { id: number; name: string }
   news_translations?: NewsTranslation[]
 }
@@ -191,14 +202,15 @@ const touched      = ref<Record<string, boolean>>({})
 const activeLangId = ref<number | null>(null)
 
 const emptyForm = () => ({
-  slug:        '',
-  category_id: null as number | null,
-  language_id: null as number | null,
-  image:       null as File | null,
-  image_url:   '',
-  title:       '',
-  description: '',
-  status_id:   null as number | null,
+  slug:             '',
+  category_id:      null as number | null,
+  language_id:      null as number | null,
+  image:            null as File | null,
+  image_url:        '',
+  main_description: '',
+  title:            '',
+  description:      '',
+  status_id:        null as number | null,
 })
 
 const form = ref(emptyForm())
@@ -275,14 +287,15 @@ watch(
 function fillFormForLang(article: ArticleRaw, langId: number) {
   const tr = article.news_translations?.find((x) => x.language_id === langId) ?? null
   form.value = {
-    slug:        article.slug        ?? '',
-    category_id: article.category_id ?? null,
-    language_id: langId,
-    image:       null,
-    image_url:   article.image_url   ?? '',
-    title:       tr?.title           ?? '',
-    description: tr?.description     ?? '',
-    status_id:   article.status_id   ?? article.cms_status?.id ?? null,
+    slug:             article.slug        ?? '',
+    category_id:      article.category_id ?? null,
+    language_id:      langId,
+    image:            null,
+    image_url:        article.image_url   ?? '',
+    main_description: tr?.main_description ?? '',
+    title:            tr?.title           ?? '',
+    description:      tr?.description     ?? '',
+    status_id:        article.status_id   ?? article.cms_status?.id ?? null,
   }
 }
 
@@ -361,6 +374,9 @@ async function handleSubmit() {
     payload.append('language_id', String(isEditing.value ? (activeLangId.value ?? '') : (form.value.language_id ?? '')))
     payload.append('title', form.value.title)
     payload.append('description', form.value.description)
+    if (form.value.main_description?.trim()) {
+      payload.append('main_description', form.value.main_description)
+    }
     if (form.value.status_id !== null) payload.append('status_id', String(form.value.status_id))
 
     if (form.value.image instanceof File) {
