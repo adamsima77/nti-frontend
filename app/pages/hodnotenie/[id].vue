@@ -387,13 +387,17 @@
           <!-- Team info -->
           <div class="bg-white rounded-lg border border-gray-100 p-5">
             <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ $t('evaluator.sidebar.team') }}</h3>
-            <div class="space-y-2">
+            <div class="space-y-4">
               <div
                 v-for="member in application.teamMembers"
                 :key="member.id"
+                class="border border-gray-100 rounded-lg p-3"
               >
                 <p class="text-sm font-medium text-navy">{{ member.name }}</p>
-                <p class="text-xs text-gray-400">{{ member.role }}</p>
+                <p class="text-xs text-gray-400 mb-2">{{ member.role }}</p>
+                <p v-if="member.school || member.study_program || member.study_year" class="text-xs text-gray-500">
+                  {{ [member.school, member.study_program, member.study_year].filter(Boolean).join(' / ') }}
+                </p>
               </div>
             </div>
           </div>
@@ -559,7 +563,14 @@ type EvaluatorApplicationView = {
   avgScore: number | null
   description: string
   documents: { name: string; url: string }[]
-  teamMembers: { id: number; name: string; role: string }[]
+  teamMembers: Array<{
+    id: number
+    name: string
+    role: string
+    school?: string | null
+    study_program?: string | null
+    study_year?: string | null
+  }>
   commissionMembers: { id: number; name: string; score: number | null }[]
   academic_flag: boolean | null
   category?: { id: number; name: string } | null
@@ -611,7 +622,14 @@ const mapApplication = (detail: ApplicationDetail): EvaluatorApplicationView => 
   avgScore: detail.avgScore ?? detail.evaluation?.total_score ?? null,
   description: detail.description ?? '',
   documents: detail.documents.map(document => ({ name: document.type, url: document.url })),
-  teamMembers: (detail.teamMembers ?? []).map(member => ({ id: member.id, name: member.name, role: member.role })),
+  teamMembers: (detail.teamMembers ?? []).map(member => ({
+    id: member.id,
+    name: member.name,
+    role: member.role,
+    school: member.school,
+    study_program: member.study_program,
+    study_year: member.study_year,
+  })),
   commissionMembers: (detail.commissionMembers ?? []).map(member => ({ id: member.id, name: member.name, score: member.score })),
   academic_flag: detail.academic_flag ?? null,
   category: detail.category ?? null,
