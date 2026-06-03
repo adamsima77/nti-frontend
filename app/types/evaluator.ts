@@ -64,6 +64,13 @@ export interface ApplicationSummary {
   } | null
 }
 
+export interface AcademicRecord {
+  student_id: number
+  transcript_file?: string | null
+  honor_declaration: boolean
+  honor_declaration_signed_at?: string | null
+}
+
 export interface ApplicationDetail extends ApplicationSummary {
   applicant_name?: string
   school?: string
@@ -77,6 +84,7 @@ export interface ApplicationDetail extends ApplicationSummary {
   teamMembers?: { id: number; name: string; role: string }[]
   commissionMembers?: { id: number; name: string; score: number | null }[]
   description?: string
+  academic_record?: AcademicRecord | null
   academic_flag?: boolean | null
 }
 

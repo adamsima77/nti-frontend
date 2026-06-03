@@ -145,6 +145,9 @@ function mapApplicationDetail(row: Record<string, unknown>): ApplicationDetail {
 
   return {
     ...summary,
+    school: row.school == null ? undefined : toString(row.school),
+    study_program: row.study_program == null ? undefined : toString(row.study_program),
+    study_year: row.study_year == null ? undefined : toString(row.study_year),
     documents: documentsSource.map((doc) => {
       const rowDoc = doc as Record<string, unknown>
       return {
@@ -176,6 +179,20 @@ function mapApplicationDetail(row: Record<string, unknown>): ApplicationDetail {
         role: toString(rowMember.role ?? ''),
       }
     }),
+    academic_record: row.academic_record && typeof row.academic_record === 'object'
+      ? (() => {
+        const record = row.academic_record as Record<string, unknown>
+        const transcriptFile = record.transcript_file
+        const signedAt = record.honor_declaration_signed_at
+
+        return {
+          student_id: toNumber(record.student_id),
+          transcript_file: transcriptFile == null ? null : toString(transcriptFile),
+          honor_declaration: Boolean(record.honor_declaration),
+          honor_declaration_signed_at: signedAt == null ? null : toString(signedAt),
+        }
+      })()
+      : null,
     commissionMembers: commissionMembersSource.map((member) => {
       const rowMember = member as Record<string, unknown>
       return {

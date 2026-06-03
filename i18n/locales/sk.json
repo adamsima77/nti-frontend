@@ -823,6 +823,12 @@
       "study_field": "Študijný odbor",
       "study_year": "Ročník",
       "portfolio": "Portfólio",
+      "select_university": "Vyberte univerzitu",
+      "select_program": "Vyberte program",
+      "select_field": "Vyberte odbor",
+      "select_year": "Vyberte ročník",
+      "save_student_record": "Uložiť študentský záznam",
+      "saving_record": "Ukladá sa študentský záznam...",
       "teams_count": "{count} tímov",
       "applications_count": "{count} prihlášok",
       "no_student_record": "Študentský záznam v databáze zatiaľ nemáte (napr. po onboardingu sa vytvorí cez API študenta).",
@@ -836,9 +842,39 @@
         "invalid_photo_type": "Povolené sú len obrázky JPEG alebo PNG.",
         "photo_too_large": "Súbor je príliš veľký (max. 4 MB).",
         "photo_saved": "Profilová fotka bola uložená.",
-        "photo_error": "Nahrávanie fotky zlyhalo."
+        "photo_error": "Nahrávanie fotky zlyhalo.",
+        "save_failed": "Uloženie študentského záznamu zlyhalo."
       }
+    
+    },
+    "academic_record": {
+      "title": "Akademický záznam",
+      "honor_declaration": "Čestné prehlásenie",
+      "honor_declaration_text": "Čestne vyhlasujem že nemám prenášané predmety a môj priemer profilových predmetov spĺňa podmienky programu",
+      "honor_declaration_required": "Musíte potvrdiť čestné vyhlásenie na pokračovanie.",
+      "transcript_label": "Výpis známok",
+      "transcript_upload": "Nahrať prepis",
+      "upload_transcript": "Nahrať výpis známok (PDF)",
+      "save_button": "Uložiť akademický záznam",
+      "signed_at": "Podpísané dňa",
+      "not_signed": "Nepodpísané",
+      "transcript_error": "Nahrajte PDF prepis.",
+      "download": "Stiahnuť výpis",
+      "not_uploaded": "Výpis nebol nahratý",
+      "privacy_required": "Musíte súhlasiť s ochranou osobných údajov.",
+      "yes": "Áno",
+      "no": "Nie",
+      "status_confirmed": "Čestné prehlásenie potvrdené",
+      "status_not_confirmed": "Čestné prehlásenie nepotvrdené",
+      "status_not_provided": "Čestné prehlásenie nebolo poskytnuté",
+      "saving": "Ukladám...",
+      "saved": "Akademický záznam bol uložený."
     }
+  },
+
+  "privacy": {
+    "consent": "Súhlasím s",
+    "policy_link": "Zásadami ochrany osobných údajov"
   },
 
   "pending_approval": {
