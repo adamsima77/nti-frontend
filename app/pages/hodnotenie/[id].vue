@@ -108,6 +108,11 @@
             </div>
           </div>
 
+          <!-- ── Evaluator section ── -->
+          <div class="mb-4">
+            <h2 class="text-lg font-semibold text-navy">Vaše hodnotenie</h2>
+          </div>
+
           <!-- ── Scoring form ── -->
           <div class="bg-white rounded-lg border border-gray-100 p-6">
             <h2 class="text-base font-semibold text-navy mb-1 flex items-center gap-2">
@@ -436,7 +441,7 @@
           </div>
 
           <div v-if="isCommissionChair" class="bg-white rounded-lg border border-gray-100 p-5 space-y-4">
-            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">{{ $t('evaluator.chair.title') }}</h3>
+            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Rozhodnutie predsedu komisie</h3>
             <p class="text-sm text-gray-600">{{ $t('evaluator.chair.instructions') }}</p>
             <div class="grid gap-2">
               <button
