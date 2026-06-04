@@ -1,10 +1,3 @@
-Už je to jasné! Tvoj komponent <UiLoader /> je navrhnutý ako samostatný prekrývací prvok (overlay) a nemá v sebe slot, takže namiesto obalenia celej mriežky ho musíme použiť ako samostatný tag s podmienkou v-if="isLoading".
-
-Keď bol použitý ako wrapper (obalový tag) a vnútri nemal naprogramovaný <slot />, tak kompletne skryl a zahodil celé svoje vnútro a zostal len točiť loader.
-
-Tu je kompletne upravený a opravený súbor. Presunul som <UiLoader v-if="isLoading" /> na začiatok a mriežku s obsahom nechal voľne v HTML. Taktiež som v bloku catch pre istotu opravil syntax chybu (finally), ktorú som spravil v rýchlosti v minulej správe.
-
-Útržok kódu
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10 relative">
     
