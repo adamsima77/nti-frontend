@@ -173,31 +173,19 @@ import { Calendar, Users, FileText } from 'lucide-vue-next'
 import type { Call } from '~/stores/calls'
 import type { FormSchema } from '~/stores/applications'
 
+// ── Helpers ────────────────────────────────────────────────────────────────
+
 function parseUploadedDocumentIds(val: unknown): number[] {
-  if (val == null || val === '') {
-    return []
-  }
-  if (typeof val === 'number' && Number.isFinite(val) && val > 0) {
-    return [val]
-  }
-  if (Array.isArray(val)) {
-    return val
-      .map((x) => Number(x))
-      .filter((n) => Number.isFinite(n) && n > 0)
-  }
+  if (val == null || val === '') return []
+  if (typeof val === 'number' && Number.isFinite(val) && val > 0) return [val]
+  if (Array.isArray(val)) return val.map((x) => Number(x)).filter((n) => Number.isFinite(n) && n > 0)
   if (typeof val === 'string') {
     try {
       const parsed = JSON.parse(val) as unknown
-      if (Array.isArray(parsed)) {
-        return parsed.map((x) => Number(x)).filter((n) => Number.isFinite(n) && n > 0)
-      }
-      if (typeof parsed === 'number' && parsed > 0) {
-        return [parsed]
-      }
+      if (Array.isArray(parsed)) return parsed.map((x) => Number(x)).filter((n) => Number.isFinite(n) && n > 0)
+      if (typeof parsed === 'number' && parsed > 0) return [parsed]
     } catch {
-      if (/^\d+$/.test(val)) {
-        return [Number(val)]
-      }
+      if (/^\d+$/.test(val)) return [Number(val)]
     }
   }
   return []
@@ -206,16 +194,16 @@ function parseUploadedDocumentIds(val: unknown): number[] {
 function collectDocumentIdsFromForm(schema: FormSchema, data: Record<string, unknown>): number[] {
   const set = new Set<number>()
   for (const f of schema.fields) {
-    if (f.type !== 'file') {
-      continue
-    }
-    for (const id of parseUploadedDocumentIds(data[f.name])) {
-      set.add(id)
-    }
+    if (f.type !== 'file') continue
+    for (const id of parseUploadedDocumentIds(data[f.name])) set.add(id)
   }
   return [...set].sort((a, b) => a - b)
 }
 
+/**
+ * Serialise formData to Record<string, string> for the backend.
+ * File fields become JSON-stringified arrays of document IDs.
+ */
 function serializeFormDataForApi(schema: FormSchema, data: Record<string, unknown>): Record<string, string> {
   const out: Record<string, string> = {}
   for (const field of schema.fields) {
@@ -236,32 +224,45 @@ function serializeFormDataForApi(schema: FormSchema, data: Record<string, unknow
   return out
 }
 
+// ── Page meta ──────────────────────────────────────────────────────────────
+
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
+  roles: ['student'],
 })
+
+// ── Composables ────────────────────────────────────────────────────────────
+
 const { t } = useI18n()
 useHead({ title: t('student_dashboard.applications.new_seo_title') })
 
 const router = useRouter()
 const route = useRoute()
 const localePath = useLocalePath()
+const api = useApi()
 
 const callsStore = useCallsStore()
 const teamsStore = useTeamsStore()
 const applicationsStore = useApplicationsStore()
 const { addToast } = useToast()
 
-const selectedCall = ref<Call | null>(null)
+// ── State ──────────────────────────────────────────────────────────────────
+
+const selectedCall   = ref<Call | null>(null)
 const selectedTeamId = ref<number | null>(null)
-const draftData = ref<Record<string, any>>({})
-const isSubmitting = ref(false)
+const draftData      = ref<Record<string, any>>({})
+const isSubmitting   = ref(false)
+const isSavingDraft  = ref(false)
+
+// ── Computed ───────────────────────────────────────────────────────────────
 
 const eligibleTeams = computed(() =>
   teamsStore.teams.filter((team) => Array.isArray(team.members) && team.members.length >= 3),
 )
 
-// Load calls and teams on mount; optional ?team=&call= z rozpracovanej prihlášky
+// ── Lifecycle ──────────────────────────────────────────────────────────────
+
 onMounted(async () => {
   await Promise.all([callsStore.fetchOpenCalls(), teamsStore.fetchTeams()])
 
@@ -280,38 +281,34 @@ onMounted(async () => {
       const draft = applicationsStore.getDraft(teamId, callId)
       if (draft) {
         draftData.value = draft.data
-        addToast({
-          message: t('student_dashboard.applications.toasts.loading_draft'),
-          type: 'info',
-        })
+        addToast({ message: t('student_dashboard.applications.toasts.loading_draft'), type: 'info' })
       }
     }
   }
 })
+
+// ── Call selection ─────────────────────────────────────────────────────────
 
 const selectCall = async (call: Call) => {
   await callsStore.fetchCallById(call.id)
   selectedCall.value = callsStore.currentCall ?? call
   selectedTeamId.value = null
 
-  // Načítaj rozpracovanú verziu pre túto výzvu (ľubovoľný tím, kde existuje draft)
+  // Restore any locally-persisted draft for this call
   for (const team of teamsStore.teams) {
     const draft = applicationsStore.getDraft(team.id, selectedCall.value.id)
     if (draft) {
       draftData.value = draft.data
-      if (team.members.length >= 3) {
-        selectedTeamId.value = team.id
-      }
-      addToast({
-        message: t('student_dashboard.applications.toasts.loading_draft'),
-        type: 'info',
-      })
+      if (team.members.length >= 3) selectedTeamId.value = team.id
+      addToast({ message: t('student_dashboard.applications.toasts.loading_draft'), type: 'info' })
       break
     }
   }
 }
 
-const handleSaveDraft = (data: Record<string, any>) => {
+// ── Draft save ─────────────────────────────────────────────────────────────
+
+const handleSaveDraft = async (data: Record<string, any>) => {
   if (!selectedCall.value) return
 
   if (!selectedTeamId.value) {
@@ -322,12 +319,35 @@ const handleSaveDraft = (data: Record<string, any>) => {
     return
   }
 
-  applicationsStore.saveDraft(selectedTeamId.value, selectedCall.value.id, data)
-  addToast({
-    message: t('student_dashboard.applications.toasts.draft_saved'),
-    type: 'success',
-  })
+  const schema = selectedCall.value.formSchema
+  if (!schema?.fields?.length) return
+
+  isSavingDraft.value = true
+
+  try {
+    await api.post('/applications/draft', {
+      call_id:   selectedCall.value.id,
+      team_id:   Number(selectedTeamId.value),
+      // Serialise: file fields → JSON array of document IDs, rest → strings
+      form_data: serializeFormDataForApi(schema, data as Record<string, unknown>),
+    })
+
+    // Mirror into local store so navigating away and back restores the form
+    applicationsStore.saveDraft(Number(selectedTeamId.value), selectedCall.value.id, data)
+
+    addToast({
+      message: t('student_dashboard.applications.toasts.draft_saved'),
+      type: 'success',
+    })
+  } catch (err: any) {
+    const msg = err?.data?.message ?? err?.message ?? t('student_dashboard.applications.toasts.submit_failed')
+    addToast({ message: msg, type: 'error' })
+  } finally {
+    isSavingDraft.value = false
+  }
 }
+
+// ── Submit ─────────────────────────────────────────────────────────────────
 
 const handleSubmit = async (data: Record<string, any>) => {
   if (!selectedTeamId.value || !selectedCall.value) {
@@ -341,8 +361,8 @@ const handleSubmit = async (data: Record<string, any>) => {
     return
   }
 
-  const formPayload = serializeFormDataForApi(schema, data as Record<string, unknown>)
-  const documentIds = collectDocumentIdsFromForm(schema, data as Record<string, unknown>)
+  const formPayload  = serializeFormDataForApi(schema, data as Record<string, unknown>)
+  const documentIds  = collectDocumentIdsFromForm(schema, data as Record<string, unknown>)
 
   if (documentIds.length === 0) {
     addToast({
@@ -356,16 +376,13 @@ const handleSubmit = async (data: Record<string, any>) => {
 
   try {
     const application = await applicationsStore.createApplication({
-      callId: selectedCall.value.id,
-      teamId: Number(selectedTeamId.value),
+      callId:      selectedCall.value.id,
+      teamId:      Number(selectedTeamId.value),
       documentIds,
-      formData: formPayload,
+      formData:    formPayload,
     })
 
-    addToast({
-      message: t('student_dashboard.applications.toasts.created'),
-      type: 'success',
-    })
+    addToast({ message: t('student_dashboard.applications.toasts.created'), type: 'success' })
 
     applicationsStore.clearDraft(Number(selectedTeamId.value), selectedCall.value.id)
 
@@ -378,16 +395,19 @@ const handleSubmit = async (data: Record<string, any>) => {
   }
 }
 
+// ── Cancel ─────────────────────────────────────────────────────────────────
+
 const handleCancel = () => {
   if (confirm(t('student_dashboard.applications.cancel_confirm'))) {
-    selectedCall.value = null
+    selectedCall.value   = null
     selectedTeamId.value = null
-    draftData.value = {}
+    draftData.value      = {}
     router.push(localePath('/student/prihlasky'))
   }
 }
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('sk-SK')
-}
+// ── Formatters ─────────────────────────────────────────────────────────────
+
+const formatDate = (dateString: string) =>
+  new Date(dateString).toLocaleDateString('sk-SK')
 </script>

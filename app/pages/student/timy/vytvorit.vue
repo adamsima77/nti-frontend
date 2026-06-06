@@ -1,8 +1,8 @@
-<template>
+html<template>
   <div class="max-w-2xl mx-auto px-6 py-10">
     <!-- Breadcrumbs -->
     <div class="mb-8">
-        <UiBreadcrumbs :items="[{ label: t('student_dashboard.teams.title'), to: localePath('/student/timy') }, { label: t('student_dashboard.teams.create_new_title') }]" />
+      <UiBreadcrumbs :items="[{ label: t('student_dashboard.teams.title'), to: localePath('/student/timy') }, { label: t('student_dashboard.teams.create_new_title') }]" />
     </div>
 
     <!-- Header -->
@@ -50,16 +50,35 @@
           <div
             v-for="(member, index) in formData.members"
             :key="index"
-            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+            class="flex items-center gap-3 p-3 rounded-lg"
+            :class="invalidMemberEmails.has(member.email.toLowerCase())
+              ? 'bg-red-50 border border-red-200'
+              : 'bg-gray-50'"
           >
             <div class="flex-1">
-              <p class="text-sm font-medium text-navy">{{ member.email }}</p>
-              <p class="text-xs text-gray-500">{{ member.role }}</p>
+              <p
+                class="text-sm font-medium"
+                :class="invalidMemberEmails.has(member.email.toLowerCase()) ? 'text-red-700' : 'text-navy'"
+              >
+                {{ member.email }}
+              </p>
+              <p
+                class="text-xs"
+                :class="invalidMemberEmails.has(member.email.toLowerCase()) ? 'text-red-500' : 'text-gray-500'"
+              >
+                {{ invalidMemberEmails.has(member.email.toLowerCase())
+                    ? t('student_dashboard.teams.errors.not_registered_student')
+                    : member.role
+                }}
+              </p>
             </div>
             <button
               type="button"
               @click="removeMember(index)"
-              class="p-1 text-red-600 hover:bg-red-50 rounded transition"
+              class="p-1 rounded transition"
+              :class="invalidMemberEmails.has(member.email.toLowerCase())
+                ? 'text-red-600 hover:bg-red-100'
+                : 'text-red-600 hover:bg-red-50'"
             >
               <X class="w-4 h-4" />
             </button>
@@ -99,7 +118,7 @@
       <!-- Form actions -->
       <div class="flex gap-3 pt-6 border-t">
         <NuxtLink
-          to="/timy"
+          :to="localePath('/timy')"
           class="px-6 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
         >
           {{ t('student_dashboard.common.cancel') }}
@@ -126,7 +145,8 @@ const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
-  // middleware: 'auth', // TODO: re-enable when backend is available
+   middleware: ['auth'],
+   roles: ['student'],
 })
 
 useSeoMeta({
@@ -215,10 +235,19 @@ const removeMember = (index: number) => {
   formData.members.splice(index, 1)
 }
 
+const invalidMemberEmails = ref<Set<string>>(new Set())
 const handleSubmit = async () => {
   if (!validateForm()) return
 
+  // Auto-add any email typed but not yet pushed to the list
+  if (newMember.email.trim()) {
+    addMember()
+    // addMember sets errors.memberEmail if invalid — bail out
+    if (errors.memberEmail) return
+  }
+
   isSubmitting.value = true
+  invalidMemberEmails.value = new Set()
 
   try {
     const team = await teamsStore.createTeam({
@@ -234,13 +263,24 @@ const handleSubmit = async () => {
 
     await router.push(`/student/timy/${team.id}`)
   } catch (err: any) {
-    const message = err?.data?.message ?? t('student_dashboard.teams.toasts.create_error')
-    addToast({
-      message,
-      type: 'error',
-    })
+    if (err?.type === 'invalid_members' && err.invalidEmails?.length) {
+      invalidMemberEmails.value = new Set(
+        err.invalidEmails.map((e: string) => e.toLowerCase())
+      )
+      addToast({
+        message: err.message ?? t('student_dashboard.teams.errors.invalid_members'),
+        type: 'error',
+      })
+    } else {
+      addToast({
+        message: err?.data?.message ?? t('student_dashboard.teams.toasts.create_error'),
+        type: 'error',
+      })
+    }
   } finally {
     isSubmitting.value = false
   }
 }
+
+
 </script>

@@ -32,7 +32,8 @@ import { ref, onMounted } from 'vue'
 
 definePageMeta({
   layout: 'portal',
-  middleware: ['auth'],
+   middleware: ['auth'],
+   roles: ['student'],
 })
 
 const { t } = useI18n()

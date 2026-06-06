@@ -165,7 +165,7 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6 mt-10">
           <h2 class="text-lg font-bold text-navy mb-5">{{ t('student_dashboard.academic_record.title') }}</h2>
           <div class="space-y-5">
             <label class="flex items-start gap-3 cursor-pointer">
@@ -192,15 +192,13 @@
                     <p class="text-xs text-gray-500">{{ academicForm.transcript ? t('student_dashboard.academic_record.new_transcript') : t('student_dashboard.academic_record.current_transcript') }}</p>
                   </div>
                   <div class="flex flex-wrap gap-2">
-                    <a
-                      v-if="academicRecord?.transcript_file && !academicForm.transcript"
-                      :href="academicRecord.transcript_file"
-                      target="_blank"
+                    <Button
+                      @click = "downloadTranscript"
                       rel="noopener noreferrer"
                       class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50"
                     >
                       {{ t('student_dashboard.academic_record.download') }}
-                    </a>
+                  </Button>
                     <UiButton type="button" size="sm" variant="secondary" @click="transcriptInputRef?.click()">
                       {{ academicRecord?.transcript_file ? t('student_dashboard.academic_record.replace') : t('student_dashboard.academic_record.upload_transcript') }}
                     </UiButton>
@@ -266,6 +264,7 @@ const { t } = useI18n()
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
+   roles: ['student'],
 })
 
 useHead({ title: t('student_dashboard.profile.seo_title') })
@@ -356,6 +355,40 @@ onMounted(async () => {
   }
 })
 
+
+async function downloadTranscript() {
+  if (!academicRecord.value?.transcript_file) return
+
+  try {
+  
+    const res = await api.get(`/get-academic-record/${academicRecord.value.transcript_file}`, {
+      responseType: 'blob'
+    }) as any
+
+   
+    const fileName = `transcript_${academicRecord.value.transcript_file}.pdf`
+
+
+    const blobUrl = window.URL.createObjectURL(new Blob([res]))
+    
+   
+    const link = document.createElement('a')
+    link.href = blobUrl
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    
+  
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(blobUrl)
+
+    addToast({ message: t('student_dashboard.academic_record.download_success') ?? 'Súbor bol stiahnutý.', type: 'success' })
+  } catch (e: any) {
+    const msg = e?.data?.message ?? e?.message ?? t('student_dashboard.academic_record.download_error')
+    addToast({ message: msg, type: 'error' })
+  }
+}
+
 async function loadStudentMe() {
   try {
     const res = await api.get('/students/me') as { student?: any }
@@ -415,7 +448,19 @@ async function loadAcademicRecord() {
 
 const transcriptFileName = computed(() => {
   if (academicForm.transcript) return academicForm.transcript.name
-  return academicRecord.value?.transcript_file?.split('/').pop() ?? ''
+  
+  const fileProp = academicRecord.value?.transcript_file
+  
+  // Handled cleanly: if it's just an ID number from the backend
+  if (typeof fileProp === 'number') {
+    return `Uložený dokument v systéme (ID: ${fileProp})` 
+  }
+  
+  if (typeof fileProp === 'string') {
+    return fileProp.split('/').pop() ?? ''
+  }
+
+  return ''
 })
 
 function onTranscriptFile(ev: Event) {
@@ -455,7 +500,8 @@ async function saveAcademicRecord() {
   try {
     const formData = new FormData()
     formData.append('honor_declaration', academicForm.honor_declaration ? '1' : '0')
-    if (academicForm.transcript) {
+    
+    if (academicForm.transcript instanceof File) {
       formData.append('transcript_file', academicForm.transcript)
     }
 

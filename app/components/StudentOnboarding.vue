@@ -374,23 +374,31 @@ async function submit() {
   touch('honor_declaration')
   touch('privacyAccepted')
   touch('transcript')
+  
   if (!isStepValid.value) return
+  
   loading.value = true
   fileError.value = ''
+  
   try {
     const data = new FormData()
+    
     Object.entries(form).forEach(([k, v]) => {
-      if (v !== null && v !== '' && v !== undefined) data.append(k, v as any)
+      
+      if (k === 'transcript' || k === 'honor_declaration') return
+      
+      if (v !== null && v !== '' && v !== undefined) {
+        data.append(k, v as any)
+      }
     })
-    await api.post('/auth/student-onboarding', data)
-
-    const transcriptForm = new FormData()
-    transcriptForm.append('honor_declaration', '1')
+    
     if (form.transcript) {
-      transcriptForm.append('transcript_file', form.transcript)
+      data.append('transcript_file', form.transcript) 
     }
+ 
+    data.append('honor_declaration', form.honor_declaration ? '1' : '0')
 
-    await api.post('/student/academic-record', transcriptForm)
+    await api.post('/auth/student-onboarding', data)
     emit('completed')
   } catch (e: any) {
     if (e?.response?.status === 422) {

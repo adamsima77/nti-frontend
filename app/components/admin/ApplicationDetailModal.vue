@@ -1,0 +1,993 @@
+<template>
+  <Teleport to="body">
+    <Transition name="modal-fade">
+      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="close" />
+
+        <div
+          class="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
+          style="min-height: 500px;" 
+        >
+          <!-- ── Loading skeleton ───────────────────────────────────────────── -->
+          <div v-if="isFetching" class="flex-1 flex items-center justify-center py-24">
+            <div class="flex flex-col items-center gap-3 text-gray-400">
+              <div class="w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+              <span class="text-sm">Načítavam prihlášku…</span>
+            </div>
+          </div>
+
+          <template v-else-if="application">
+            <!-- ── Header ─────────────────────────────────────────────────── -->
+            <div class="flex items-start justify-between px-6 pt-5 pb-4 border-b border-gray-100">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                  <FileText class="w-5 h-5 text-blue-600" />
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h2 class="text-lg font-semibold text-navy truncate">
+                      {{ application.team?.name ?? '—' }}
+                    </h2>
+                    <span class="text-gray-400 text-sm font-mono">{{ application.reference ?? '' }}</span>
+                    <UiStatusBadge :status="statusSlug" />
+                  </div>
+                  <p class="text-sm text-gray-500 mt-0.5 truncate">
+                    {{ application.call?.name ?? '—' }}
+                  </p>
+                </div>
+              </div>
+              <button
+                class="ml-4 flex-shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
+                @click="close"
+              >
+                <X class="w-5 h-5" />
+              </button>
+            </div>
+
+            <!-- ── Tabs ───────────────────────────────────────────────────── -->
+            <div class="flex border-b border-gray-100 px-6 gap-1 overflow-x-auto">
+              <button
+                v-for="tab in tabs"
+                :key="tab.id"
+                :class="[
+                  'flex items-center gap-1.5 px-3 py-3 text-sm font-medium border-b-2 transition whitespace-nowrap',
+                  activeTab === tab.id
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700',
+                ]"
+                @click="activeTab = tab.id"
+              >
+                <component :is="tab.icon" class="w-4 h-4" />
+                {{ tab.label }}
+                <span
+                  v-if="tab.badge"
+                  class="ml-0.5 px-1.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700"
+                >
+                  {{ tab.badge }}
+                </span>
+              </button>
+            </div>
+
+            <!-- ── Tab content ─────────────────────────────────────────────── -->
+            <div class="flex-1 overflow-y-auto">
+
+              <!-- ═══════════ INFO TAB ═══════════ -->
+              <div v-if="activeTab === 'info'" class="p-6 space-y-6">
+
+                <!-- Quick stats row -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div v-for="stat in quickStats" :key="stat.label"
+                    class="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3"
+                  >
+                    <p class="text-xs text-gray-400 mb-1">{{ stat.label }}</p>
+                    <p class="text-sm font-semibold text-navy truncate">{{ stat.value }}</p>
+                  </div>
+                </div>
+
+                <!-- Team members -->
+                <div v-if="application.team?.members?.length" class="rounded-xl border border-gray-100 overflow-hidden">
+                  <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
+                    <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
+                      <Users class="w-4 h-4 text-gray-400" />
+                      Členovia tímu
+                    </h3>
+                  </div>
+                  <div class="divide-y divide-gray-50">
+                    <div
+                      v-for="member in application.team.members"
+                      :key="member.user_id ?? member.id"
+                      class="flex items-center gap-3 px-4 py-2.5"
+                    >
+                      <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <span class="text-xs font-semibold text-blue-700">
+                          {{ initials(memberFullName(member)) }}
+                        </span>
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <p class="text-sm font-medium text-navy truncate">
+                          {{ memberFullName(member) }}
+                        </p>
+                      </div>
+                      <!-- Rola člena tímu -->
+                      <span
+                        v-if="member.role_name || member.role_id"
+                        :class="[
+                          'flex-shrink-0 text-xs font-medium px-2 py-0.5 rounded-full',
+                          member.role_id === 1
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-gray-100 text-gray-500',
+                        ]"
+                      >
+                        {{ member.role_name ?? memberRoleLabel(member.role_id) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Assigned mentor(s) -->
+                <div v-if="application.mentorships?.length" class="rounded-xl border border-gray-100 overflow-hidden">
+                  <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
+                    <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
+                      <GraduationCap class="w-4 h-4 text-gray-400" />
+                      Pridelení mentori
+                    </h3>
+                  </div>
+                  <div class="divide-y divide-gray-50">
+                    <div
+                      v-for="ms in application.mentorships"
+                      :key="ms.id"
+                      class="flex items-center gap-3 px-4 py-2.5"
+                    >
+                      <div class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                        <span class="text-xs font-semibold text-emerald-700">
+                          {{ initials(`${ms.mentor?.name ?? ''} ${ms.mentor?.surname ?? ''}`) }}
+                        </span>
+                      </div>
+                      <p class="text-sm font-medium text-navy truncate">
+                        {{ ms.mentor?.name }} {{ ms.mentor?.surname }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Status history timeline -->
+                <div v-if="application.statusHistory?.length" class="rounded-xl border border-gray-100 overflow-hidden">
+                  <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
+                    <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
+                      <History class="w-4 h-4 text-gray-400" />
+                      História stavov
+                    </h3>
+                  </div>
+                  <div class="px-4 py-3 space-y-0">
+                    <div
+                      v-for="(entry, i) in application.statusHistory"
+                      :key="entry.id"
+                      class="flex gap-3"
+                    >
+                      <div class="flex flex-col items-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
+                        <div v-if="i < application.statusHistory.length - 1" class="w-px flex-1 bg-gray-200 my-1" />
+                      </div>
+                      <div class="pb-3 min-w-0">
+                        <p class="text-sm font-medium text-navy">{{ entry.status?.name ?? '—' }}</p>
+                        <p v-if="entry.note" class="text-xs text-gray-400 mt-0.5">{{ entry.note }}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                          {{ formatDate(entry.created_at) }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- ═══════════ ANSWERS TAB ═══════════ -->
+              <div v-else-if="activeTab === 'answers'" class="p-6 max-w-4xl mx-auto">
+  
+                <div v-if="isFetchingAnswers" class="flex flex-col items-center justify-center py-16 text-slate-400 gap-3">
+                  <div class="w-8 h-8 border-3 border-slate-200 border-t-indigo-600 rounded-full animate-spin" />
+                  <span class="text-sm font-medium">Načítavam odpovede…</span>
+                </div>
+
+                <div v-else-if="!formData || Object.keys(formData).length === 0"
+                  class="flex flex-col items-center justify-center py-16 text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50"
+                >
+                  <FileText class="w-12 h-12 mb-3 text-slate-300 opacity-80" />
+                  <p class="text-sm font-medium text-slate-500">Žiadne odpovede vo formulári</p>
+                </div>
+
+                <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div
+                    v-for="(value, key) in formData"
+                    :key="key"
+                    :class="[
+                      'bg-white rounded-xl border border-slate-100 p-5 shadow-sm transition-all duration-200 hover:shadow-md',
+                      typeof value === 'string' && value.length > 60 ? 'md:col-span-2' : ''
+                    ]"
+                  >
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                      {{ key }}
+                    </p>
+                    
+                    <div v-if="Array.isArray(value)" class="flex flex-wrap gap-2 mt-1.5">
+                      <span
+                        v-for="item in value"
+                        :key="item"
+                        class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-sm"
+                      >
+                        {{ item }}
+                      </span>
+                    </div>
+
+                    <p 
+                      v-else-if="typeof value === 'string' && value.length > 60" 
+                      class="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed mt-1.5 bg-slate-50 p-4 rounded-xl border border-slate-100"
+                    >
+                      {{ value }}
+                    </p>
+
+                    <p v-else class="text-base font-semibold text-slate-700 mt-1">
+                      {{ value ?? '—' }}
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- ═══════════ MANAGEMENT TAB ═══════════ -->
+              <div v-else-if="activeTab === 'manage'" class="p-6 space-y-6">
+
+                <!-- ── Status change ──────────────────────────────────────── -->
+                <div class="rounded-xl border border-gray-100 overflow-hidden">
+                  <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
+                    <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
+                      <RefreshCw class="w-4 h-4 text-gray-400" />
+                      Zmena stavu
+                    </h3>
+                  </div>
+                  <div class="px-4 py-4 space-y-3">
+                    <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                      <span>Aktuálny stav:</span>
+                      <UiStatusBadge :status="statusSlug" />
+                    </div>
+
+                    <div class="space-y-1">
+                      <label class="block text-xs font-medium text-gray-500">Nový stav</label>
+                      <UiSelect
+                        v-model="statusForm.status_id"
+                        :options="statusOptions"
+                        :disabled="currentStatusName === STATE_IN_EVALUATION || isChangingStatus"
+                        placeholder="Vyberte nový stav..."
+                      />
+                    </div>
+
+                    <div class="space-y-1">
+                      <label class="block text-xs font-medium text-gray-500">Interná poznámka (voliteľná)</label>
+                      <textarea
+                        v-model="statusForm.note"
+                        rows="2"
+                        placeholder="Napr. dôvod zmeny stavu, požiadavky na doplnenie…"
+                        class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none transition"
+                      />
+                    </div>
+
+                    <div v-if="statusError" class="text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle class="w-3.5 h-3.5" />
+                      {{ statusError }}
+                    </div>
+
+                    <button
+                      :disabled="!statusForm.status_id || isChangingStatus"
+                      class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-2"
+                      @click="changeStatus"
+                    >
+                      <span v-if="isChangingStatus" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Potvrdiť zmenu stavu
+                    </button>
+                  </div>
+                </div>
+
+                <!-- ── Committee assignment (len v stave Podané) ── -->
+                <div
+                  v-if="showCommitteeSection"
+                  class="rounded-xl border border-amber-100 bg-amber-50/40 overflow-hidden"
+                >
+                  <div class="px-4 py-3 bg-amber-50 border-b border-amber-100">
+                    <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
+                      <Scale class="w-4 h-4 text-amber-500" />
+                      Hodnotiaca komisia
+                    </h3>
+                  </div>
+                  <div class="px-4 py-4 space-y-3">
+
+                    <!-- Komisia už priradená → len info banner, žiadny formulár -->
+                    <template v-if="assignedCommittee">
+                      <div class="flex items-center gap-3 p-3 rounded-xl bg-amber-100/60 border border-amber-200">
+                        <Scale class="w-4 h-4 text-amber-600 flex-shrink-0" />
+                        <div class="flex-1 min-w-0">
+                          <p class="text-xs font-medium text-amber-700 mb-0.5">Priradená komisia</p>
+                          <p class="text-sm font-semibold text-amber-900 truncate">{{ assignedCommittee.name }}</p>
+                        </div>
+                        <button
+                          class="flex-shrink-0 p-1 rounded-lg hover:bg-amber-200 text-amber-600 hover:text-red-600 transition"
+                          title="Odstrániť komisiu"
+                          @click="removeCommittee(assignedCommittee.id)"
+                        >
+                          <X class="w-4 h-4" />
+                        </button>
+                      </div>
+                      <p class="text-xs text-gray-400 flex items-center gap-1">
+                        <Info class="w-3.5 h-3.5" />
+                        Ku prihláške je možné priradiť iba jednu komisiu.
+                      </p>
+                    </template>
+
+                    <!-- Žiadna komisia → zobraziť select + tlačidlo -->
+                    <template v-else>
+                      <p class="text-xs text-gray-500">
+                        Prihláška je v stave hodnotenia. Vyberte komisiu, ktorá prihláška posúdi.
+                      </p>
+
+                      <div v-if="isFetchingCommittees" class="flex items-center gap-2 text-xs text-gray-400 py-2">
+                        <div class="w-4 h-4 border-2 border-gray-200 border-t-amber-500 rounded-full animate-spin" />
+                        Načítavam komisie…
+                      </div>
+
+                      <div v-else class="flex gap-2">
+                        <div class="flex-1">
+                          <UiSelect
+                            v-model="committeeForm.committee_id"
+                            :options="committeeOptions"
+                            placeholder="Vyberte komisiu…"
+                          />
+                        </div>
+                        <button
+                          :disabled="!committeeForm.committee_id || isAssigningCommittee"
+                          class="px-3 py-2 text-sm font-medium text-white bg-amber-500 rounded-lg hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1.5"
+                          @click="assignCommittee"
+                        >
+                          <span v-if="isAssigningCommittee" class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <Plus v-else class="w-3.5 h-3.5" />
+                          Priradiť
+                        </button>
+                      </div>
+                    </template>
+
+                    <div v-if="committeeError" class="text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle class="w-3.5 h-3.5" />
+                      {{ committeeError }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ── Mentor assignment (len v stave Onboarding) ── -->
+                <div
+                  v-if="showMentorSection"
+                  class="rounded-xl border border-emerald-100 bg-emerald-50/40 overflow-hidden"
+                >
+                  <div class="px-4 py-3 bg-emerald-50 border-b border-emerald-100">
+                    <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
+                      <GraduationCap class="w-4 h-4 text-emerald-600" />
+                      Priradiť mentora
+                    </h3>
+                  </div>
+                  <div class="px-4 py-4 space-y-3">
+                    <p class="text-xs text-gray-500">
+                      Projekt vstúpil do onboardingu. Priraďte mentora, ktorý bude tím sprevádzať.
+                    </p>
+
+                    <div v-if="isFetchingMentors" class="flex items-center gap-2 text-xs text-gray-400 py-2">
+                      <div class="w-4 h-4 border-2 border-gray-200 border-t-emerald-500 rounded-full animate-spin" />
+                      Načítavam mentorov…
+                    </div>
+
+                    <!-- Currently assigned mentors -->
+                    <div v-if="application.mentorships?.length" class="space-y-1.5">
+                      <p class="text-xs font-medium text-gray-500">Priradení mentori:</p>
+                      <div class="flex flex-wrap gap-2">
+                        <div
+                          v-for="ms in application.mentorships"
+                          :key="ms.id"
+                          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-medium"
+                        >
+                          <GraduationCap class="w-3 h-3" />
+                          {{ ms.mentor?.name }} {{ ms.mentor?.surname }}
+                          <button
+                            class="ml-0.5 hover:text-red-600 transition"
+                            title="Odstrániť mentora"
+                            @click="removeMentor(ms.id)"
+                          >
+                            <X class="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                      <div class="flex-1">
+                        <UiSelect
+                          v-model="mentorForm.mentor_id"
+                          :options="mentorOptions"
+                          placeholder="Vyberte mentora…"
+                        />
+                      </div>
+                      <button
+                        :disabled="!mentorForm.mentor_id || isAssigningMentor"
+                        class="px-3 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1.5"
+                        @click="assignMentor"
+                      >
+                        <span v-if="isAssigningMentor" class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <Plus v-else class="w-3.5 h-3.5" />
+                        Priradiť
+                      </button>
+                    </div>
+
+                    <div v-if="mentorError" class="text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle class="w-3.5 h-3.5" />
+                      {{ mentorError }}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+            <!-- ── Footer ─────────────────────────────────────────────────── -->
+            <div class="px-6 py-3 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+              <span class="text-xs text-gray-400">
+                Aktualizované: {{ formatDate(application.last_update) }}
+              </span>
+              <button
+                class="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition"
+                @click="close"
+              >
+                Zatvoriť
+              </button>
+            </div>
+          </template>
+
+          <!-- ── Error state ────────────────────────────────────────────── -->
+          <div v-else class="flex-1 flex flex-col items-center justify-center py-20 text-gray-400">
+            <AlertCircle class="w-10 h-10 mb-3 opacity-40" />
+            <p class="text-sm">Prihlášku sa nepodarilo načítať.</p>
+            <button class="mt-3 text-xs text-blue-600 hover:underline" @click="fetchApplication">
+              Skúsiť znova
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+</template>
+
+<script setup lang="ts">
+import { reactive, ref, computed, watch } from 'vue'
+import {
+  X,
+  FileText,
+  Users,
+  GraduationCap,
+  History,
+  RefreshCw,
+  Scale,
+  AlertCircle,
+  Plus,
+  Info,
+  MessageSquare,
+  Settings,
+} from 'lucide-vue-next'
+
+const api = useApi()
+const toast = useToast()
+
+// ── Types ─────────────────────────────────────────────────────────────────
+
+interface Mentor {
+  id: number
+  name: string
+  surname: string
+}
+
+interface Mentorship {
+  id: number
+  mentor: Mentor | null
+  commission?: Committee | null
+}
+
+interface Committee {
+  id: number
+  name: string
+}
+
+interface TeamMember {
+  id?: number
+  user_id?: number
+  name?: string
+  surname?: string
+  role_id?: number
+  role_name?: string   // voliteľné — backend môže poslať priamo textovú hodnotu
+  student?: {
+    id?: number
+    name?: string
+  } | null
+}
+
+interface ApplicationDetail {
+  id: number
+  reference: string | null
+  submitted_at: string | null
+  last_update: string | null
+  form_data: Record<string, any> | null
+
+  call: {
+    id: number
+    name: string
+  } | null
+
+  status: {
+    id: number
+    name: string
+  } | null
+
+  team: {
+    id: number
+    name: string
+    members: TeamMember[]
+  } | null
+
+  mentorships: Mentorship[]
+  committee: Committee | null
+
+  statusHistory: Array<{
+    id: number
+    status: {
+      id: number
+      name: string
+    } | null
+    note?: string
+    created_at: string
+  }>
+}
+
+// ── STATUS Konštanty ─────────────────────────────────────────────────────
+
+const STATE_DRAFT                = 'Draft'
+const STATE_SUBMITTED            = 'Podané'
+const STATE_IN_EVALUATION        = 'V hodnotení'
+const STATE_SUPPLEMENT_REQUESTED = 'Vyžiadané doplnenie'
+const STATE_APPROVED             = 'Schválené'
+const STATE_REJECTED             = 'Zamietnuté'
+const STATE_PAUSED               = 'Pozastavené'
+const STATE_ONBOARDING           = 'Onboarding'
+const STATE_ACTIVE_PROJECT       = 'Aktívny projekt'
+const STATE_COMPLETED            = 'Ukončené'
+
+const STATUS_SLUG: Record<string, string> = {
+  [STATE_DRAFT]: 'draft',
+  [STATE_SUBMITTED]: 'submitted',
+  [STATE_IN_EVALUATION]: 'evaluating',
+  [STATE_SUPPLEMENT_REQUESTED]: 'pending',
+  [STATE_APPROVED]: 'approved',
+  [STATE_REJECTED]: 'rejected',
+  [STATE_PAUSED]: 'paused',
+  [STATE_ONBOARDING]: 'onboarding',
+  [STATE_ACTIVE_PROJECT]: 'active',
+  [STATE_COMPLETED]: 'completed',
+}
+
+const BACKEND_TRANSITIONS: Record<string, string[]> = {
+  [STATE_DRAFT]: [STATE_SUBMITTED],
+  [STATE_SUBMITTED]: [STATE_IN_EVALUATION, STATE_SUPPLEMENT_REQUESTED],
+  [STATE_SUPPLEMENT_REQUESTED]: [STATE_SUBMITTED],
+  [STATE_IN_EVALUATION]: [STATE_APPROVED, STATE_REJECTED, STATE_SUPPLEMENT_REQUESTED],
+  [STATE_APPROVED]: [STATE_ONBOARDING],
+  [STATE_ONBOARDING]: [STATE_ACTIVE_PROJECT],
+  [STATE_ACTIVE_PROJECT]: [STATE_PAUSED, STATE_COMPLETED],
+  [STATE_PAUSED]: [STATE_ACTIVE_PROJECT, STATE_COMPLETED],
+  [STATE_REJECTED]: [],
+  [STATE_COMPLETED]: [],
+}
+
+// Komisia: len v stave Podané (odtiaľ vedie prechod na V hodnotení)
+const COMMITTEE_STATUSES = [STATE_SUBMITTED]
+
+// Mentor: len v stave Onboarding (odtiaľ vedie prechod na Aktívny projekt)
+const MENTOR_STATUSES = [STATE_ONBOARDING]
+
+// ── Props / emits ──────────────────────────────────────────────────────────
+
+const props = defineProps<{
+  modelValue: boolean
+  applicationId: number | null
+}>()
+
+const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+  'refreshed': []
+}>()
+
+// ── Core state ─────────────────────────────────────────────────────────────
+
+const isFetching = ref(false)
+const application = ref<ApplicationDetail | null>(null)
+const activeTab = ref<'info' | 'answers' | 'manage'>('info')
+
+// ── Derived ────────────────────────────────────────────────────────────────
+
+const currentStatusName = computed(() => application.value?.status?.name ?? STATE_DRAFT)
+const statusSlug = computed(() => STATUS_SLUG[currentStatusName.value] ?? 'draft')
+
+const showCommitteeSection = computed(() =>
+  COMMITTEE_STATUSES.includes(currentStatusName.value),
+)
+
+const showMentorSection = computed(() =>
+  MENTOR_STATUSES.includes(currentStatusName.value),
+)
+
+const assignedCommittee = computed((): Committee | null => {
+  if (application.value?.committee) return application.value.committee
+  for (const ms of application.value?.mentorships ?? []) {
+    if (ms.commission) return ms.commission
+  }
+  return null
+})
+
+const quickStats = computed(() => [
+  { label: 'Referencia', value: application.value?.reference ?? '—' },
+  { label: 'Tím', value: application.value?.team?.name ?? '—' },
+  { label: 'Výzva', value: application.value?.call?.name ?? '—' },
+  {
+    label: 'Dátum podania',
+    value: application.value?.submitted_at
+      ? new Date(application.value.submitted_at).toLocaleDateString('sk-SK')
+      : '—',
+  },
+])
+
+const tabs = computed(() => [
+  { id: 'info', label: 'Informácie', icon: Info, badge: null },
+  { id: 'answers', label: 'Odpovede', icon: MessageSquare, badge: null },
+  {
+    id: 'manage',
+    label: 'Správa',
+    icon: Settings,
+    badge: showCommitteeSection.value || showMentorSection.value ? '!' : null,
+  },
+])
+
+// ── Fetch application ──────────────────────────────────────────────────────
+
+async function fetchApplication() {
+  if (!props.applicationId) return
+  isFetching.value = true
+
+  try {
+    const res = await api.get(`/applications/${props.applicationId}`)
+    const data = res?.application ?? res
+    if (!data) throw new Error('No data received')
+
+    const topLevelCommittee: Committee | null =
+      Array.isArray(data.committees) && data.committees.length > 0
+        ? data.committees[0]
+        : null
+
+    const mentorshipCommittee: Committee | null =
+      !topLevelCommittee && Array.isArray(data.mentorships)
+        ? (data.mentorships.find((ms: any) => ms.commission)?.commission ?? null)
+        : null
+
+    application.value = {
+      ...data,
+      call: data.call ?? null,
+      status: data.status ?? null,
+      team: data.team
+        ? {
+            ...data.team,
+            name: data.team.name ?? '—',
+            members: data.team_members ?? data.team.members ?? [],
+          }
+        : null,
+      statusHistory: data.status_history ?? [],
+      committee: topLevelCommittee ?? mentorshipCommittee,
+      mentorships: data.mentorships ?? [],
+    }
+  } catch (error) {
+    console.error('Fetch error:', error)
+    application.value = null
+    toast.addToast({
+      message: 'Nepodarilo sa načítať detail prihlášky.',
+      type: 'error',
+    })
+  } finally {
+    isFetching.value = false
+  }
+}
+
+// ── Form answers ───────────────────────────────────────────────────────────
+
+const isFetchingAnswers = ref(false)
+const formData = ref<Record<string, any> | null>(null)
+
+async function fetchAnswers() {
+  if (!props.applicationId || !application.value) return
+  isFetchingAnswers.value = true
+  try {
+    const res = await api.get(`/application-answer/${props.applicationId}`)
+    const raw = res.data ?? res
+
+    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      formData.value = raw
+    } else if (Array.isArray(raw)) {
+      const map: Record<string, any> = {}
+      for (const entry of raw) {
+        const label = entry.form_field?.name ?? entry.form_field_id
+        map[label] = entry.value
+      }
+      formData.value = map
+    } else {
+      formData.value = null
+    }
+  } catch {
+    formData.value = application.value?.form_data ?? null
+  } finally {
+    isFetchingAnswers.value = false
+  }
+}
+
+// ── Statuses list & Options ──────────────────────────────────────────────────
+
+const allStatuses = ref<Array<{ id: number; name: string }>>([])
+
+const statusOptions = computed(() => {
+  if (currentStatusName.value === STATE_IN_EVALUATION) return []
+  const allowedTargetStates = BACKEND_TRANSITIONS[currentStatusName.value] ?? []
+  return allStatuses.value
+    .filter(s => s.name !== currentStatusName.value && allowedTargetStates.includes(s.name))
+    .map(s => ({ value: s.id, label: s.name }))
+})
+
+async function fetchStatuses() {
+  try {
+    const res = await api.get('/admin-app-statuses')
+    allStatuses.value = res.statuses ?? []
+  } catch {
+    // non-critical
+  }
+}
+
+// ── Status change ──────────────────────────────────────────────────────────
+
+const statusForm = reactive({ status_id: null as number | null, note: '' })
+const isChangingStatus = ref(false)
+const statusError = ref<string | null>(null)
+
+async function changeStatus() {
+  if (!statusForm.status_id || !props.applicationId) return
+  statusError.value = null
+  isChangingStatus.value = true
+
+  try {
+    const res = await api.post(`/change-app-state/${props.applicationId}/admin`, {
+      state_id: statusForm.status_id,
+      note: statusForm.note || undefined,
+    })
+
+    application.value = res.data ?? res
+    statusForm.status_id = null
+    statusForm.note = ''
+    toast.addToast({ message: 'Stav prihlášky bol úspešne zmenený.', type: 'success' })
+    emit('refreshed')
+     close()
+  } catch (err: any) {
+    statusError.value = err?.data?.message ?? 'Nepodarilo sa zmeniť stav.'
+  } finally {
+    isChangingStatus.value = false
+  }
+}
+
+// ── Committees ─────────────────────────────────────────────────────────────
+
+const committees = ref<Committee[]>([])
+const isFetchingCommittees = ref(false)
+const committeeForm = reactive({ committee_id: null as number | null })
+const isAssigningCommittee = ref(false)
+const committeeError = ref<string | null>(null)
+
+const committeeOptions = computed(() => {
+  if (assignedCommittee.value) return []
+  return committees.value.map(c => ({ value: c.id, label: c.name }))
+})
+
+async function fetchCommittees() {
+  isFetchingCommittees.value = true
+  try {
+    const res = await api.get('/evaluator/fetch-commissions')
+    committees.value = res.commissions ?? res.data ?? []
+  } catch {
+    // non-critical
+  } finally {
+    isFetchingCommittees.value = false
+  }
+}
+
+async function assignCommittee() {
+  if (!committeeForm.committee_id || !props.applicationId) return
+  committeeError.value = null
+  isAssigningCommittee.value = true
+  try {
+    await api.post(
+      `/add-committee/${props.applicationId}/committee/${committeeForm.committee_id}`,
+    )
+    await fetchApplication()
+    committeeForm.committee_id = null
+    toast.addToast({ message: 'Komisia bola priradená.', type: 'success' })
+    emit('refreshed')
+  } catch (err: any) {
+    committeeError.value = err?.data?.message ?? 'Priradenie komisie zlyhalo.'
+  } finally {
+    isAssigningCommittee.value = false
+  }
+}
+
+async function removeCommittee(committeeId: number) {
+  if (!props.applicationId) return
+  try {
+    await api.delete(`/remove-committee/${props.applicationId}`)
+
+    if (application.value) {
+      application.value.committee = null
+      application.value.mentorships = application.value.mentorships.map(ms => ({
+        ...ms,
+        commission: ms.commission?.id === committeeId ? null : ms.commission,
+      }))
+    }
+
+    toast.addToast({ message: 'Komisia bola odstránená.', type: 'success' })
+    emit('refreshed')
+  } catch (err) {
+    console.error(err)
+    toast.addToast({ message: 'Nepodarilo sa odstrániť komisiu.', type: 'error' })
+  }
+}
+
+// ── Mentors ────────────────────────────────────────────────────────────────
+
+const mentors = ref<Mentor[]>([])
+const isFetchingMentors = ref(false)
+const mentorForm = reactive({ mentor_id: null as number | null })
+const isAssigningMentor = ref(false)
+const mentorError = ref<string | null>(null)
+
+const mentorOptions = computed(() =>
+  mentors.value
+    .filter(m => !application.value?.mentorships?.some(ms => ms.mentor?.id === m.id))
+    .map(m => ({ value: m.id, label: `${m.name} ${m.surname}`.trim() })),
+)
+
+async function fetchMentors() {
+  isFetchingMentors.value = true
+  try {
+    const res = await api.get('/mentors')
+    mentors.value = res.mentors ?? res.data ?? []
+  } catch {
+    // non-critical
+  } finally {
+    isFetchingMentors.value = false
+  }
+}
+
+async function assignMentor() {
+  if (!mentorForm.mentor_id || !props.applicationId) return
+  mentorError.value = null
+  isAssigningMentor.value = true
+  try {
+    const res = await api.post(
+      `/mentor/admin/applications/${props.applicationId}/mentors/${mentorForm.mentor_id}`,
+    )
+
+    if (res.data) application.value = res.data
+    else await fetchApplication()
+
+    mentorForm.mentor_id = null
+    toast.addToast({ message: 'Mentor bol priradený.', type: 'success' })
+    emit('refreshed')
+  } catch (err: any) {
+    mentorError.value = err?.data?.message ?? 'Priradenie mentora zlyhalo.'
+  } finally {
+    isAssigningMentor.value = false
+  }
+}
+
+async function removeMentor(mentorshipId: number) {
+  if (!props.applicationId) return
+  try {
+    await api.delete(`/admin/applications/${props.applicationId}/mentorships/${mentorshipId}`)
+    if (application.value?.mentorships) {
+      application.value.mentorships = application.value.mentorships.filter(
+        ms => ms.id !== mentorshipId,
+      )
+    }
+    toast.addToast({ message: 'Mentor bol odstránený.', type: 'success' })
+    emit('refreshed')
+  } catch {
+    toast.addToast({ message: 'Nepodarilo sa odstrániť mentora.', type: 'error' })
+  }
+}
+
+// ── Lifecycle ──────────────────────────────────────────────────────────────
+
+watch(
+  [() => props.modelValue, () => props.applicationId],
+  async ([open, id]) => {
+    if (!open || !id) return
+
+    activeTab.value = 'info'
+    formData.value = null
+
+    await fetchApplication()
+    await fetchStatuses()
+
+    await Promise.allSettled([
+      fetchAnswers(),
+      fetchCommittees(),
+      fetchMentors(),
+    ])
+  },
+  { immediate: true },
+)
+
+watch(
+  () => application.value?.status?.name,
+  async (name) => {
+    if (!name) return
+    if (COMMITTEE_STATUSES.includes(name)) fetchCommittees()
+    if (MENTOR_STATUSES.includes(name)) fetchMentors()
+  },
+)
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function close() {
+  emit('update:modelValue', false)
+}
+
+/**
+ * Textový label roly podľa role_id.
+ * Fallback ak backend neposiela role_name priamo.
+ */
+function memberRoleLabel(roleId?: number): string {
+  if (roleId === 1) return 'Vedúci tímu'
+  if (roleId === 2) return 'Člen'
+  return ''
+}
+
+function memberFullName(member: TeamMember): string {
+  const parts = [member.name, member.surname].filter(Boolean)
+  if (parts.length) return parts.join(' ')
+  return member.student?.name ?? '—'
+}
+
+function initials(name: string): string {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+}
+
+function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return '—'
+  return new Date(dateStr).toLocaleString('sk-SK', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+</script>

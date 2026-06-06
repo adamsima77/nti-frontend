@@ -278,6 +278,7 @@ const { t } = useI18n()
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
+   roles: ['student'],
 })
 
 useHead({

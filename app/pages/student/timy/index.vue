@@ -113,7 +113,8 @@ const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
-  // middleware: 'auth', // TODO: re-enable when backend is available
+   middleware: ['auth'],
+   roles: ['student'],
 })
 
 useSeoMeta({

@@ -1,230 +1,348 @@
 <template>
-  <div class="max-w-7xl mx-auto px-6 py-10">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-navy">{{ t('student_dashboard.applications.title') }}</h1>
-      <NuxtLink :to="localePath('/student/prihlasky/nova')">
-        <UiButton>
-          <Plus class="w-4 h-4" />
-          {{ t('student_dashboard.applications.new_application') }}
-        </UiButton>
-      </NuxtLink>
-    </div>
-
-    <div
-      v-if="pending"
-      class="grid grid-cols-1 lg:grid-cols-2 gap-4"
-    >
-      <div
-        v-for="i in 4"
-        :key="i"
-        class="bg-white rounded-lg border border-gray-100 h-48 animate-pulse"
-      />
-    </div>
-
-    <template v-else>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <UiInput
-          v-model="searchQuery"
-          :placeholder="t('student_dashboard.applications.filters.search_placeholder')"
-          type="text"
-        />
-        <UiSelect
-          v-model="statusFilter"
-          :options="statusOptions"
-          :placeholder="t('student_dashboard.applications.filters.status')"
-        />
-        <UiSelect
-          v-model="programFilter"
-          :options="programOptions"
-          :placeholder="t('student_dashboard.applications.filters.program')"
-        />
-        <UiSelect
-          v-model="categoryFilter"
-          :options="categoryOptions"
-          :placeholder="t('student_dashboard.applications.filters.category')"
-        />
-      </div>
-
-      <div
-        v-if="filteredApplications.length"
-        class="grid grid-cols-1 lg:grid-cols-2 gap-4"
-      >
-        <div
-          v-for="app in filteredApplications"
-          :key="app.id"
-          class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow"
+  <div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+ 
+      <!-- Header -->
+      <div class="mb-8 flex items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-semibold text-gray-900">Moje žiadosti</h1>
+          <p class="mt-1 text-sm text-gray-500">Prehľad všetkých vašich žiadostí o program</p>
+        </div>
+        <NuxtLink
+          :to="localePath('/student/prihlasky/nova')"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap shadow-sm"
         >
-          <div class="flex items-start justify-between mb-2">
-            <h3 class="font-semibold text-navy text-base leading-tight">{{ app.title }}</h3>
-            <UiStatusBadge :status="app.status" />
+          <Plus class="w-4 h-4" />
+          Nová žiadosť
+        </NuxtLink>
+      </div>
+ 
+      <!-- Filters -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
+        <div class="flex flex-col sm:flex-row gap-3">
+ 
+          <!-- Search -->
+          <div class="relative flex-1">
+            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <input
+              v-model="filters.search"
+              type="text"
+              placeholder="Hľadať podľa názvu výzvy…"
+              class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            />
           </div>
-          <p class="text-sm text-gray-500 mb-2">
-            {{ app.team }} · {{ app.program }}
-            <span
-              v-if="app.category"
-              class="inline-flex items-center rounded-full bg-gray-100 text-gray-600 px-2 py-0.5 text-xs font-medium ml-2"
+ 
+          <!-- Program type -->
+          <div class="relative sm:w-56">
+            <LayoutGrid class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <select
+              v-model="filters.program_type_id"
+              class="w-full appearance-none pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
-              {{ app.category }}
-            </span>
-            <span v-if="app.submittedAt"> · {{ app.submittedAt }}</span>
-          </p>
-          <p
-            v-if="app.description"
-            class="text-sm text-gray-600 mb-4 truncate"
+              <option value="">Všetky programy</option>
+              <option
+                v-for="pt in programTypes"
+                :key="pt.id"
+                :value="pt.id"
+              >
+                {{ pt.name }}
+              </option>
+            </select>
+            <ChevronDown class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          </div>
+ 
+          <!-- Status -->
+          <div class="relative sm:w-52">
+            <Tag class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <select
+              v-model="filters.status_id"
+              class="w-full appearance-none pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            >
+              <option value="">Všetky stavy</option>
+              <option
+                v-for="s in statuses"
+                :key="s.id"
+                :value="s.id"
+              >
+                {{ s.name }}
+              </option>
+            </select>
+            <ChevronDown class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          </div>
+ 
+          <!-- Clear -->
+          <button
+            v-if="hasActiveFilters"
+            class="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors whitespace-nowrap"
+            @click="clearFilters"
           >
-            {{ app.description }}
-          </p>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4 text-sm text-gray-400">
-              <span class="flex items-center gap-1">
-                <Users class="w-4 h-4" />
-                {{ app.members }}
-              </span>
-              <span class="flex items-center gap-1">
-                <Paperclip class="w-4 h-4" />
-                {{ app.documents }}
-              </span>
-            </div>
-            <NuxtLink
-              :to="detailLink(app)"
-              class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
-            >
-              {{ app.isDraft ? t('student_dashboard.applications.continue_draft') : t('student_dashboard.common.view_detail') }}
-              <ChevronRight class="w-4 h-4" />
-            </NuxtLink>
-          </div>
+            <X class="w-4 h-4" />
+            Zrušiť filtre
+          </button>
         </div>
       </div>
-
-      <div
-        v-else
-        class="bg-white rounded-lg shadow-sm border border-gray-100"
-      >
-        <UiEmptyState
-          :icon="FileText"
-          :title="t('student_dashboard.applications.empty_title')"
-          :description="t('student_dashboard.applications.empty_description')"
+ 
+      <!-- Table -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+ 
+        <!-- Loading overlay -->
+        <div
+          v-if="loading"
+          class="flex items-center justify-center py-24"
         >
-          <NuxtLink :to="localePath('/student/prihlasky/nova')">
-            <UiButton size="sm">{{ t('student_dashboard.applications.new_application') }}</UiButton>
-          </NuxtLink>
-        </UiEmptyState>
+          <div class="flex flex-col items-center gap-3">
+            <Loader2 class="w-7 h-7 text-blue-500 animate-spin" />
+            <span class="text-sm text-gray-400">Načítavam žiadosti…</span>
+          </div>
+        </div>
+ 
+        <!-- Empty state -->
+        <div
+          v-else-if="!applications.length"
+          class="flex flex-col items-center justify-center py-24 px-4 text-center"
+        >
+          <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+            <FileX class="w-6 h-6 text-gray-400" />
+          </div>
+          <p class="text-sm font-medium text-gray-700">Žiadne žiadosti nenájdené</p>
+          <p class="text-xs text-gray-400 mt-1">
+            {{ hasActiveFilters ? 'Skúste upraviť filtre' : 'Zatiaľ ste nepodali žiadnu žiadosť' }}
+          </p>
+        </div>
+ 
+        <!-- Table content -->
+        <template v-else>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-100 bg-gray-50/60">
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">#</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Výzva</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Tím</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Kategória</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Stav</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Dokumenty</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Vytvorené</th>
+                  <th class="px-5 py-3" />
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                <tr
+                  v-for="app in applications"
+                  :key="app.id"
+                  class="hover:bg-gray-50/70 transition-colors group"
+                >
+                  <td class="px-5 py-4 text-gray-400 font-mono text-xs">
+                    {{ app.id }}
+                  </td>
+                  <td class="px-5 py-4">
+                    <span class="font-medium text-gray-900">{{ app.call?.name ?? '—' }}</span>
+                  </td>
+                  <td class="px-5 py-4 text-gray-600">
+                    {{ app.team?.name ?? '—' }}
+                  </td>
+                  <td class="px-5 py-4 text-gray-600">
+                    {{ categoryName(app) }}
+                  </td>
+                  <td class="px-5 py-4">
+                    <UiStatusBadge :status="app.status.name" />
+                  </td>
+                  <td class="px-5 py-4 text-gray-500">
+                    {{ app.documents?.length ?? 0 }}
+                  </td>
+                  <td class="px-5 py-4 text-gray-400 text-xs whitespace-nowrap">
+  {{ formatDate(app.submitted_at) }}
+</td>
+                  <td class="px-5 py-4">
+                   <NuxtLink
+  :to="localePath(`/student/prihlasky/${app.id}`)"
+  class="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-opacity"
+>
+  Detail
+  <ArrowRight class="w-3 h-3" />
+</NuxtLink>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+ 
+          <!-- Footer: count + pagination -->
+          <div class="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50/40">
+            <p class="text-xs text-gray-400">
+              {{ paginationMeta.from }}–{{ paginationMeta.to }} z {{ paginationMeta.total }} žiadostí
+            </p>
+            <UiPagination
+              :current-page="currentPage"
+              :total-pages="totalPages"
+              :max-visible="5"
+              @update:current-page="currentPage = $event"
+            />
+          </div>
+        </template>
       </div>
-    </template>
+    </div>
   </div>
 </template>
-
+ 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { Plus, Users, Paperclip, ChevronRight, FileText } from 'lucide-vue-next'
-import type { Application } from '../../../composables/modules/student/types'
-import { useApplications } from '~/composables/modules/student/useApplications'
-import type { ApplicationDraft } from '~/stores/applications'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
+import {
+  Search,
+  LayoutGrid,
+  Tag,
+  ChevronDown,
+  X,
+  Loader2,
+  FileX,
+  ArrowRight,
+  Plus,
+} from 'lucide-vue-next'
+import { useApi } from '~/composables/useApi'
 
 const localePath = useLocalePath()
-const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
+   roles: ['student'],
 })
-
-useHead({ title: t('student_dashboard.applications.seo_title') })
-
-const { applications, pending } = useApplications()
-const appsStore = useApplicationsStore()
-const teamsStore = useTeamsStore()
-const callsStore = useCallsStore()
-
-onMounted(async () => {
-  await Promise.all([teamsStore.fetchTeams(), callsStore.fetchOpenCalls()])
-})
-
-const searchQuery = ref('')
-const statusFilter = ref('')
-const programFilter = ref('')
-const categoryFilter = ref('')
-
-function draftToApplication(draft: ApplicationDraft): Application {
-  const team = teamsStore.teams.find((x) => x.id === draft.teamId)
-  const call = callsStore.calls.find((c) => c.id === draft.callId)
-  return {
-    id: -(draft.teamId * 1_000_000 + draft.callId),
-    title: call?.title ?? `${t('student_dashboard.applications.application')} #${draft.callId}`,
-    program: call?.programName ?? '',
-    team: team?.name ?? `${t('student_dashboard.applications.team')} #${draft.teamId}`,
-    status: 'draft',
-    submittedAt: draft.lastSavedAt ?? null,
-    members: team?.members?.length ?? 0,
-    documents: 0,
-    milestones: [],
-    isDraft: true,
-    draftTeamId: draft.teamId,
-    draftCallId: draft.callId,
-  }
+ 
+// ─── Types ───────────────────────────────────────────────────────────────────
+ 
+interface ProgramType {
+  id: number
+  name: string
 }
-
-const combinedApplications = computed(() => {
-  void appsStore.draftRevision
-  const apiList = applications.value
-  const pair = (teamId?: number, callId?: number) =>
-    teamId != null && callId != null ? `${teamId}_${callId}` : null
-  const submittedPairs = new Set(
-    apiList
-      .map((a) => pair(a.teamId, a.callId))
-      .filter((x): x is string => x != null),
+ 
+interface ApplicationStatus {
+  id: number
+  name: string
+}
+ 
+interface Application {
+  id: number
+  submitted_at: string       
+  last_update: string
+  reference: string
+  academic_flag: boolean
+  call?: { id: number; name: string }
+  status?: { id: number; name: string }
+  team?: { id: number; name: string }
+  documents?: { id: number; name: string; uploaded_at: string }[]
+  category: {
+    id: number
+    categoryTranslations?: { id: number; category_id: number; language_id: number; name: string }[]
+  } | null                   // Explicitly allow null to prevent runtime type crashes
+}
+ 
+interface PaginationMeta {
+  from: number
+  to: number
+  total: number
+  last_page: number
+}
+ 
+// ─── State ───────────────────────────────────────────────────────────────────
+ 
+const api = useApi()
+ 
+const programTypes = ref<ProgramType[]>([])
+const statuses = ref<ApplicationStatus[]>([])
+const applications = ref<Application[]>([])
+const loading = ref(false)
+const currentPage = ref(1)
+const totalPages = ref(1)
+const paginationMeta = reactive<PaginationMeta>({ from: 0, to: 0, total: 0, last_page: 1 })
+ 
+const filters = reactive({
+  search: '',
+  program_type_id: '' as number | '',
+  status_id: '' as number | '',
+})
+ 
+// ─── Computed ─────────────────────────────────────────────────────────────────
+ 
+const hasActiveFilters = computed(
+  () => filters.search !== '' || filters.program_type_id !== '' || filters.status_id !== '',
+)
+ 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+ 
+function categoryName(app: Application): string {
+  const translation = app.category?.categoryTranslations?.[0]
+  return translation?.name ?? '—'
+}
+ 
+function formatDate(iso?: string): string {
+  if (!iso) return '—'
+  return new Intl.DateTimeFormat('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(
+    new Date(iso),
   )
-  const drafts = appsStore
-    .listDraftsFromStorage()
-    .filter((d) => !submittedPairs.has(`${d.teamId}_${d.callId}`))
-    .map(draftToApplication)
-  return [...drafts, ...apiList]
-})
-
-function detailLink(app: Application): string {
-  if (app.isDraft && app.draftTeamId != null && app.draftCallId != null) {
-    const q = new URLSearchParams({
-      team: String(app.draftTeamId),
-      call: String(app.draftCallId),
-    })
-    return localePath(`/student/prihlasky/nova?${q.toString()}`)
-  }
-  return localePath(`/student/prihlasky/${app.id}`)
 }
-
-const statusOptions = [
-  { value: '', label: t('student_dashboard.applications.filters.all_statuses') },
-  { value: 'draft', label: t('student_dashboard.applications.status.draft') },
-  { value: 'submitted', label: t('student_dashboard.applications.status.submitted') },
-  { value: 'evaluating', label: t('student_dashboard.applications.status.evaluating') },
-  { value: 'approved', label: t('student_dashboard.applications.status.approved') },
-  { value: 'rejected', label: t('student_dashboard.applications.status.rejected') },
-]
-
-const programOptions = computed(() => {
-  const programs = new Set<string>()
-  for (const a of combinedApplications.value) {
-    if (a.program) programs.add(a.program)
+ 
+function clearFilters() {
+  filters.search = ''
+  filters.program_type_id = ''
+  filters.status_id = ''
+  currentPage.value = 1
+}
+ 
+// ─── Fetch helpers ────────────────────────────────────────────────────────────
+ 
+async function fetchLookups() {
+  const [ptRes, stRes] = await Promise.all([
+    api.get('/program-types'),
+    api.get('/status-of-applications'),
+  ])
+  programTypes.value = ptRes ?? []
+  statuses.value = stRes.statuses ?? []
+}
+ 
+async function fetchApplications() {
+  loading.value = true
+  try {
+    const params: Record<string, string | number> = {
+      per_page: 15,
+      page: currentPage.value,
+    }
+    if (filters.search) params.search = filters.search
+    if (filters.program_type_id !== '') params.program_type_id = filters.program_type_id
+    if (filters.status_id !== '') params.status_id = filters.status_id
+ 
+    const res = await api.get<any>('/applications', { params })
+ 
+    // Secure binding fallback depending on whether useApi unpacks the network response wrapper
+    const rawPayload = res.data && res.meta ? res : res.data;
+    
+    applications.value = rawPayload?.data ?? []
+ 
+    const meta = rawPayload?.meta ?? {}
+    paginationMeta.from = meta.from ?? 0
+    paginationMeta.to = meta.to ?? 0
+    paginationMeta.total = meta.total ?? 0
+    paginationMeta.last_page = meta.last_page ?? 1
+    totalPages.value = meta.last_page ?? 1
+  } catch (error) {
+    console.error("Failed fetching applications:", error)
+  } finally {
+    loading.value = false
   }
-  return [{ value: '', label: t('student_dashboard.applications.filters.all_programs') }, ...[...programs].sort().map((p) => ({ value: p, label: p }))]
+}
+ 
+// Immediate filter changes — reset page then fetch
+watch([() => filters.program_type_id, () => filters.status_id], () => {
+  currentPage.value = 1
+  fetchApplications()
 })
-
-const categoryOptions = computed(() => {
-  const categories = new Set<string>()
-  for (const a of combinedApplications.value) {
-    if (a.category) categories.add(a.category)
-  }
-  return [{ value: '', label: t('student_dashboard.applications.filters.all_categories') }, ...[...categories].sort().map((category) => ({ value: category, label: category }))]
-})
-
-const filteredApplications = computed(() => {
-  return combinedApplications.value.filter((app: Application) => {
-    const matchesSearch =
-      !searchQuery.value || app.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const matchesStatus = !statusFilter.value || app.status === statusFilter.value
-    const matchesProgram = !programFilter.value || app.program === programFilter.value
-    const matchesCategory = !categoryFilter.value || app.category === categoryFilter.value
-    return matchesSearch && matchesStatus && matchesProgram && matchesCategory
-  })
+ 
+// Page change
+watch(currentPage, fetchApplications)
+ 
+// ─── Init ─────────────────────────────────────────────────────────────────────
+ 
+onMounted(async () => {
+  await fetchLookups()
+  await fetchApplications()
 })
 </script>

@@ -37,9 +37,26 @@ interface ApiDocumentItem {
 
 interface ApiApplication {
   id: number
-  name?: string
-  team_id?: number
-  call_id?: number
+
+  reference?: string
+  academic_flag?: boolean
+
+  team_members?: any[]
+
+  form_data?: Record<string, unknown>
+
+  documents?: ApiDocumentItem[]
+
+  mentorships?: any[]
+  milestones?: ApiMilestoneRaw[]
+
+  status_history?: ApiStatusHistoryItem[]
+
+  category?: {
+    id?: number
+    name?: string
+  } | null
+
   call?: {
     id?: number
     name: string
@@ -47,22 +64,18 @@ interface ApiApplication {
       name: string
     }
   }
+
   team?: {
     id?: number
     name: string
   }
-  status?: string | { id?: number; name?: string }
-  submitted_at: string | null
-  team_members_count?: number
-  documents_count?: number
-  documents?: ApiDocumentItem[]
-  milestones?: ApiMilestoneRaw[]
-  status_history?: ApiStatusHistoryItem[]
-  category?: {
+
+  status?: string | {
     id?: number
     name?: string
   }
-  description?: string | null
+
+  submitted_at: string | null
 }
 
 function extractApplicationsList(res: unknown): ApiApplication[] {
@@ -89,12 +102,34 @@ function extractApplicationsList(res: unknown): ApiApplication[] {
 
 function extractSingleApplication(res: unknown): ApiApplication | null {
   if (!res || typeof res !== 'object') return null
+
   const r = res as Record<string, unknown>
-  if (typeof r.id === 'number') return r as unknown as ApiApplication
-  const inner = r.data
-  if (inner && typeof inner === 'object' && !Array.isArray(inner) && typeof (inner as ApiApplication).id === 'number') {
-    return inner as ApiApplication
+
+  // { id: 1, ... }
+  if (typeof r.id === 'number') {
+    return r as unknown as ApiApplication
   }
+
+  // { application: { id: 1, ... } }
+  if (
+    r.application &&
+    typeof r.application === 'object' &&
+    !Array.isArray(r.application) &&
+    typeof (r.application as ApiApplication).id === 'number'
+  ) {
+    return r.application as ApiApplication
+  }
+
+  // { data: { id: 1, ... } }
+  if (
+    r.data &&
+    typeof r.data === 'object' &&
+    !Array.isArray(r.data) &&
+    typeof (r.data as ApiApplication).id === 'number'
+  ) {
+    return r.data as ApiApplication
+  }
+
   return null
 }
 
@@ -169,6 +204,8 @@ export const mapApplication = (app: ApiApplication): Application => {
     teamId: app.team_id,
     callId: app.call?.id ?? app.call_id,
     status: mapStatusFromApi(app.status),
+     teamMembers: app.team_members ?? [],
+  formData: app.form_data ?? {},
     submittedAt: app.submitted_at,
     members: app.team_members_count ?? 0,
     documents: docCount,

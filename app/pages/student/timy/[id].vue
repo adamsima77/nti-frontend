@@ -56,6 +56,7 @@
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-navy">{{ t('student_dashboard.teams.members_section') }}</h2>
               <button
+                v-if="teamsStore.currentTeam.myRole === 'Team Lead'"
                 @click="showInviteModal = true"
                 class="text-sm font-medium text-blue-600 hover:text-blue-800"
               >
@@ -200,6 +201,7 @@ const { t } = useI18n()
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
+   roles: ['student'],
 })
 
 const route = useRoute()

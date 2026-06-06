@@ -10,9 +10,14 @@
         :columns="columns"
         :rows="filteredApplications"
         :loading="isLoading"
+        :paginated="totalPages > 1"
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        row-key="id"
+        @update:current-page="onPageChange"
       >
         <template #header>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 border-b border-gray-100">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 border-b border-gray-100">
             <UiInput
               v-model="search"
               placeholder="Hľadať podľa tímu alebo ID..."
@@ -20,12 +25,7 @@
             <UiSelect
               v-model="statusFilter"
               :options="statusOptions"
-              placeholder="Všetky stavy"
-            />
-            <UiSelect
-              v-model="programFilter"
-              :options="programOptions"
-              placeholder="Všetky programy"
+              placeholder="Vyberte stav"
             />
           </div>
         </template>
@@ -34,48 +34,29 @@
           <UiStatusBadge :status="value" />
         </template>
 
-        <template #cell-mentor="{ row }">
-          <span
-            v-if="row.mentor"
-            class="text-sm text-gray-700"
-          >
-            {{ row.mentor.name }}
-          </span>
-          <span
-            v-else
-            class="text-xs text-gray-400"
-          >
-            —
-          </span>
-        </template>
+       
 
-        <template #row-actions="{ row }">
-          <div class="flex items-center gap-2">
-            <button
-              class="text-blue-600 hover:text-blue-800"
-              title="Zobraziť"
-            >
-              <Eye class="w-4 h-4" />
-            </button>
-            <button
-              v-if="row.status === 'approved' || row.status === 'active'"
-              class="text-purple-600 hover:text-purple-800"
-              title="Priradiť mentora / PO"
-              @click="openMentorModal(row)"
-            >
-              <UserPlus class="w-4 h-4" />
-            </button>
-          </div>
-        </template>
-      </UiDataTable>
-    </div>
-
-    <AdminMentorAssignModal
-      v-model="showMentorModal"
-      :application="selectedApplication"
-      @assigned="fetchApplications"
-    />
+      <template #row-actions="{ row }">
+  <div class="flex items-center gap-2">
+    <button
+      class="text-blue-600 hover:text-blue-800 transition"
+      title="Zobraziť detail"
+      @click="openDetail(row)"
+    >
+      <Eye class="w-4 h-4" />
+    </button>
   </div>
+</template>
+      </UiDataTable>
+ 
+    </div>
+ 
+  </div>
+    <AdminApplicationDetailModal
+  v-model="showDetailModal"
+  :application-id="selectedApplicationId"
+  @refreshed="fetchApplications"
+/>
 </template>
 
 <script setup lang="ts">
@@ -85,167 +66,140 @@ import type { AdminApplication } from '~/types/admin'
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
-  roles: ['nti_admin', 'nti_superadmin'] 
+  roles: ['nti_admin', 'nti_superadmin'],
 })
 
 useHead({ title: 'Prihlášky — Admin | NTI' })
 
 const api = useApi()
+
+// ── Filters ────────────────────────────────────────────────────────────────
 const search = ref('')
-const statusFilter = ref('')
-const programFilter = ref('')
+const statusFilter = ref<number | ''>('')
+
+// ── Table state ────────────────────────────────────────────────────────────
 const isLoading = ref(false)
+const applications = ref<any[]>([])
+const currentPage = ref(1)
+const totalPages = ref(1)
 
 const columns = [
-  { key: 'appId', label: 'ID', sortable: true },
-  { key: 'team', label: 'Tím', sortable: true },
-  { key: 'call', label: 'Výzva', sortable: true },
-  { key: 'program', label: 'Program', sortable: true },
-  { key: 'status', label: 'Stav', sortable: true },
-  { key: 'mentor', label: 'Mentor' },
-  { key: 'date', label: 'Dátum', sortable: true },
+  { key: 'reference',   label: 'ID',      sortable: true },
+  { key: 'team',        label: 'Tím',     sortable: true },
+  { key: 'call',        label: 'Výzva',   sortable: true },
+  { key: 'status',      label: 'Stav' },
+  { key: 'mentor',      label: 'Mentor' },
+  { key: 'submittedAt', label: 'Dátum',   sortable: true },
 ]
 
-const statusOptions = [
-  { value: '', label: 'Všetky stavy' },
-  { value: 'submitted', label: 'Podané' },
-  { value: 'evaluating', label: 'V hodnotení' },
-  { value: 'approved', label: 'Schválené' },
-  { value: 'rejected', label: 'Zamietnuté' },
-  { value: 'pending', label: 'Čaká na doplnenie' },
-]
+// ── Filter options ─────────────────────────────────────────────────────────
+const statusOptions = ref<{ value: number | ''; label: string }[]>([])
 
-const programOptions = [
-  { value: '', label: 'Všetky programy' },
-  { value: 'Program A', label: 'Program A' },
-  { value: 'Program B', label: 'Program B' },
-]
+// ── Status slug map ────────────────────────────────────────────────────────
+const STATUS_MAP: Record<string, string> = {
+  'Draft':               'draft',
+  'Podané':              'submitted',
+  'V hodnotení':         'evaluating',
+  'Vyžiadané doplnenie': 'pending',
+  'Schválené':           'approved',
+  'Zamietnuté':          'rejected',
+  'Pozastavené':         'paused',
+  'Onboarding':          'onboarding',
+  'Aktívny projekt':     'active',
+  'Ukončené':            'completed',
+}
 
-const mockApplications: AdminApplication[] = [
-  {
-    id: 1,
-    appId: 'APP-001',
-    team: 'EcoTech',
-    call: 'Jarný inkubátor 2026',
-    program: 'Program A',
-    status: 'submitted',
-    date: '28.03.2026',
-    mentor: null,
-    product_owner: null,
-  },
-  {
-    id: 2,
-    appId: 'APP-002',
-    team: 'SmartCampus',
-    call: 'Jarný inkubátor 2026',
-    program: 'Program A',
-    status: 'evaluating',
-    date: '25.03.2026',
-    mentor: null,
-    product_owner: null,
-  },
-  {
-    id: 3,
-    appId: 'APP-003',
-    team: 'DataFlow',
-    call: 'Jarný inkubátor 2026',
-    program: 'Program A',
-    status: 'approved',
-    date: '20.03.2026',
-    mentor: { id: 5, name: 'Tomáš Beneš' },
-    product_owner: null,
-  },
-  {
-    id: 4,
-    appId: 'APP-004',
-    team: 'HealthBot',
-    call: 'Letný šprint',
-    program: 'Program B',
-    status: 'rejected',
-    date: '18.03.2026',
-    mentor: null,
-    product_owner: null,
-  },
-  {
-    id: 5,
-    appId: 'APP-005',
-    team: 'GreenEnergy',
-    call: 'Jarný inkubátor 2026',
-    program: 'Program A',
-    status: 'pending',
-    date: '15.03.2026',
-    mentor: null,
-    product_owner: null,
-  },
-  {
-    id: 6,
-    appId: 'APP-006',
-    team: 'EduApp',
-    call: 'Letný šprint',
-    program: 'Program B',
-    status: 'approved',
-    date: '27.03.2026',
-    mentor: null,
-    product_owner: null,
-  },
-  {
-    id: 7,
-    appId: 'APP-007',
-    team: 'CityGuide',
-    call: 'Jarný inkubátor 2026',
-    program: 'Program A',
-    status: 'evaluating',
-    date: '22.03.2026',
-    mentor: null,
-    product_owner: null,
-  },
-  {
-    id: 8,
-    appId: 'APP-008',
-    team: 'FoodShare',
-    call: 'Letný šprint',
-    program: 'Program B',
-    status: 'active',
-    date: '10.03.2026',
-    mentor: { id: 5, name: 'Tomáš Beneš' },
-    product_owner: { id: 4, name: 'Eva Svobodová' },
-  },
-]
+// ── Row mapping ────────────────────────────────────────────────────────────
+const mappedApplications = computed(() =>
+  applications.value.map((a) => {
+    const firstMentor = a.mentorships?.[0]?.mentor
+    return {
+      id:              a.id,
+      reference:       a.reference ?? '—',
+      team:            a.team?.name ?? '—',
+      call:            a.call?.name ?? '—',
+      status:          STATUS_MAP[a.status?.name] ?? 'draft',
+      mentor:          firstMentor
+                         ? `${firstMentor.name} ${firstMentor.surname}`.trim()
+                         : null,
+      submittedAt:     a.submitted_at
+                         ? new Date(a.submitted_at).toLocaleDateString('sk-SK')
+                         : '—',
+      canAssignMentor: ['Schválené', 'Aktívny projekt'].includes(a.status?.name ?? ''),
+      _raw:            a,
+    }
+  }),
+)
 
-const applications = ref<AdminApplication[]>([...mockApplications])
-
+// ── Client-side search only (status is server-side) ────────────────────────
 const filteredApplications = computed(() => {
-  return applications.value.filter((a) => {
-    const matchSearch =
-      !search.value ||
-      a.team.toLowerCase().includes(search.value.toLowerCase()) ||
-      a.appId.toLowerCase().includes(search.value.toLowerCase())
-    const matchStatus = !statusFilter.value || a.status === statusFilter.value
-    const matchProgram = !programFilter.value || a.program === programFilter.value
-    return matchSearch && matchStatus && matchProgram
-  })
+  const q = search.value.toLowerCase().trim()
+  if (!q) return mappedApplications.value
+
+  return mappedApplications.value.filter((a) =>
+    a.reference.toLowerCase().includes(q) ||
+    a.team.toLowerCase().includes(q),
+  )
 })
 
+// ── Data fetching ──────────────────────────────────────────────────────────
 async function fetchApplications() {
   isLoading.value = true
   try {
-    const response = await api.get('/v1/admin/applications')
-    applications.value = response.data || response || []
+    const [appsRes, statusRes] = await Promise.all([
+      api.get('/admin/applications', {
+        params: {
+          page: currentPage.value,
+          ...(statusFilter.value !== '' && { status_id: statusFilter.value }),
+        },
+      }),
+      api.get('/status-of-applications'),
+    ])
+
+    const paginator = appsRes.applications
+    applications.value = paginator.data ?? []
+    currentPage.value  = paginator.current_page
+    totalPages.value   = paginator.last_page
+
+   const rawStatuses: any[] = statusRes.statuses ?? []
+statusOptions.value = [
+  { value: '', label: 'Všetky stavy' },  
+  ...rawStatuses.map((s) => ({ value: s.id, label: s.name })),
+]
   } catch {
-    // Keep existing data
+    useToast().error('Nepodarilo sa načítať prihlášky. Skúste to neskôr.')
   } finally {
     isLoading.value = false
   }
 }
 
+// search → client-side only, no API call, no debounce needed
+// status → server-side, reset page and refetch
+watch(statusFilter, () => {
+  currentPage.value = 1
+  fetchApplications()
+})
+
+async function onPageChange(page: number) {
+  currentPage.value = page
+  await fetchApplications()
+}
+
 onMounted(() => fetchApplications())
 
-// Mentor assignment
-const showMentorModal = ref(false)
+
 const selectedApplication = ref<AdminApplication | null>(null)
 
-function openMentorModal(app: AdminApplication) {
-  selectedApplication.value = app
-  showMentorModal.value = true
+  const showDetailModal = ref(false)
+// selectedApplication is already declared as ref<AdminApplication | null>(null)
+ 
+const selectedApplicationId = ref<number | null>(null)
+
+function openDetail(row: any) {
+  selectedApplicationId.value = row.id
+  showDetailModal.value = true
 }
+
+
+
 </script>

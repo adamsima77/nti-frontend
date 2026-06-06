@@ -705,6 +705,7 @@ async function handleSave() {
       type: 'success',
     })
     emit('saved')
+    resetForm()
     open.value = false
   } catch (e: any) {
     const laravelErrors = e?.data?.errors ?? e?.response?.data?.errors

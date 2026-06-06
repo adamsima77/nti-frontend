@@ -46,7 +46,7 @@ function mapApiCallToCall(raw: Record<string, unknown>): Call {
   const program = raw.program as Record<string, unknown> | undefined
   const status = raw.status as Record<string, unknown> | undefined
   const isOpen = Boolean(raw.is_open)
-  const formSchema = (raw.form_schema ?? raw.formSchema) as FormSchema | undefined
+  const formSchema = (raw.application_form_schema ?? raw.form_schema ?? raw.formSchema) as FormSchema | undefined
 
   return {
     id: Number(raw.id),
