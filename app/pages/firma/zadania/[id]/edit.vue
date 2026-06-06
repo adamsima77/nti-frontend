@@ -57,10 +57,7 @@
         @click="showDeleteModal = false"
       />
       <div class="relative bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
-        <h3 class="font-semibold text-navy mb-2">Zmazať zadanie?</h3>
-        <p class="text-sm text-gray-500 mb-6">
-          Táto akcia je nevratná. Zadanie a všetky prihlášky budú trvalo odstránené.
-        </p>
+        <h3 class="font-semibold text-navy mb-2">Naozaj chcete zmazať zadanie?</h3>
         <div class="flex gap-3">
           <button
             @click="showDeleteModal = false"
@@ -84,6 +81,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { ChevronLeft } from 'lucide-vue-next'
 import ZadanieForm from '~/components/ui/ZadanieForm.vue'
+import { normalizeTaskStatus } from '~/composables/useTaskStatus'
 
 definePageMeta({
   layout: 'portal',
@@ -94,38 +92,56 @@ definePageMeta({
 useHead({ title: 'Upraviť zadanie | NTI Firma' })
 
 const authStore = useAuthStore()
-
-
+const api = useApi()
 const route = useRoute()
 const router = useRouter()
-const canDeleteTask = computed(() => authStore.hasPermission('organizations.edit_own'))
+const { addToast } = useToast()
+
+const canDeleteTask = computed(() => {
+  if (!taskData.value) return false
+  
+  const hasPermission = authStore.hasPermission('organizations.edit_own')
+
+  const deletableStatuses = ['Draft', 'Čaká na schválenie']
+  const isCorrectStatus = deletableStatuses.includes(taskData.value.rawStatus)
+  
+  return hasPermission && isCorrectStatus
+})
 
 const isLoading = ref(true)
 const showDeleteModal = ref(false)
 const taskData = ref<Record<string, any> | null>(null)
 
+const mapCallToFormData = (call: any) => ({
+  id: call.id,
+  title: call.name,
+  description: call.description ?? '',
+  program: call.program?.id ? String(call.program.id) : '',
+  deadline: call.application_deadline ? call.application_deadline.slice(0, 10) : '',
+  tech_spec: call.tech_spec ?? '',
+  requirements: call.call_criteria?.map((c: any) => c.name).filter(Boolean) ?? [''],
+  tech_tags: call.tech_tags ?? [],
+  attachments: [],
+  po_name: call.product_owner?.name ?? '',
+  po_email: call.product_owner?.email ?? '',
+  budget: call.budget ? Number(call.budget) : null,
+  budget_type: call.budget_type ?? 'milestone',
+  max_teams: call.max_teams ?? 1,
+  status: normalizeTaskStatus(call.status?.name ?? ''),
+  rawStatus: call.status?.name ?? '',
+})
+
 onMounted(async () => {
-  // TODO: const data = await api.get(`/firma/zadania/${route.params.id}`)
-  await new Promise((r) => setTimeout(r, 400))
-  taskData.value = {
-    id: route.params.id,
-    title: 'AI chatbot pre zákaznícku podporu',
-    description: 'Vyvíjate inteligentného chatbota schopného riešiť bežné otázky zákazníkov.',
-    program: 'B',
-    deadline: '2026-06-30',
-    tech_spec: 'Riešenie musí byť integrované do existujúceho Salesforce CRM cez REST API.',
-    requirements: ['Skúsenosti s NLP/LLM frameworkmi', 'Znalosť REST API integrácie', 'Minimálne 3 členovia tímu'],
-    tech_tags: ['Python', 'OpenAI API', 'Salesforce', 'FastAPI'],
-    po_name: 'Peter Kováč',
-    po_email: 'peter.kovac@techfirma.sk',
-    po_phone: '+421 905 123 456',
-    po_position: 'CTO',
-    budget: 8000,
-    budget_type: 'milestone',
-    max_teams: 1,
-    status: 'published',
+  try {
+    const rawResponse = await api.get(`/v1/admin/calls/${route.params.id}`) as any
+    const call = rawResponse?.data ?? rawResponse
+    if (!call?.id) { taskData.value = null; return }
+    taskData.value = mapCallToFormData(call)
+  } catch {
+    taskData.value = null
+  } finally {
+    isLoading.value = false
   }
-  isLoading.value = false
 })
 
 const handleSaved = () => {
@@ -137,9 +153,23 @@ const handleDelete = () => {
 }
 
 const confirmDelete = async () => {
-  // TODO: await api.delete(`/firma/zadania/${route.params.id}`)
-  await new Promise((r) => setTimeout(r, 600))
-  showDeleteModal.value = false
-  router.push('/firma/zadania')
+  try {
+    await api.delete(`/v1/admin/calls/${route.params.id}`)
+    addToast({ 
+      message: 'Zadanie bolo úspešne zmazané.', 
+      type: 'success' 
+    })
+    showDeleteModal.value = false
+    router.push('/firma/zadania')
+  } catch (err: any) {
+    showDeleteModal.value = false
+
+    const errorMsg = err?.data?.message ?? 'Zadanie sa nepodarilo zmazať.'
+
+    addToast({ 
+      message: errorMsg, 
+      type: 'error' 
+    })
+  }
 }
 </script>

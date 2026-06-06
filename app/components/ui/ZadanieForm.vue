@@ -86,16 +86,6 @@
         />
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
-            :field="{
-              name: 'program',
-              type: 'select',
-              label: 'Program',
-              required: true,
-              options: [{ value: 'B', label: 'Program B — Živá prax' }],
-            }"
-            v-model="form.program"
-          />
-          <FormField
             :field="{ name: 'deadline', type: 'date', label: 'Deadline realizácie', required: true }"
             v-model="form.deadline"
             :error="errors.deadline ?? undefined"
@@ -240,20 +230,6 @@
           v-model="form.po_email"
           :error="errors.po_email ?? undefined"
           @blur="validatePoEmail"
-        />
-        <FormField
-          :field="{ name: 'po_phone', type: 'text', label: 'Telefón', placeholder: '+421 900 000 000', required: true }"
-          v-model="form.po_phone"
-        />
-        <FormField
-          :field="{
-            name: 'po_position',
-            type: 'text',
-            label: 'Pozícia v organizácii',
-            placeholder: 'CTO, Project Manager...',
-            required: true,
-          }"
-          v-model="form.po_position"
         />
       </div>
     </div>
@@ -404,7 +380,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { apiTaskStatusState } from '~/composables/useTaskStatus'
+import { ref, reactive, computed, onMounted } from 'vue'
 import {
   ChevronRight,
   FileText,
@@ -416,7 +393,12 @@ import {
   CheckCircle,
   AlertCircle,
   Trash2,
+  MirrorRectangularIcon,
 } from 'lucide-vue-next'
+
+const { locale } = useI18n()
+
+const langId = computed(() => locale.value === 'sk' ? 1 : 2)
 
 const props = withDefaults(defineProps<{
   isNew: boolean
@@ -431,9 +413,39 @@ const emit = defineEmits<{
   (e: 'delete'): void
 }>()
 
-// ── Status flow (spec 8.2) ───────────────────────────────────
+const api = useApi()
+
+const getProgramLabel = (program: any) => {
+  return (
+    program?.programTranslations?.[0]?.name ??
+    program?.program_translations?.[0]?.name ??
+    program?.name ??
+    program?.typeOfProgram?.name ??
+    'Program'
+  )
+}
+
+const loadPrograms = async () => {
+  if (form.program) MirrorRectangularIcon
+  try {
+    const response = await api.get('/programs/lang/sk') as any
+    const all = (response ?? [])
+    const programB = all.find((p: any) => {
+      const name = getProgramLabel(p).toLowerCase()
+      return name.includes('program b') || name.includes('živá prax') || name.includes('ziva prax')
+    }) ?? all.find((p: any) => p.id === 2)
+    
+    if (programB) {
+      form.program = String(programB.id)
+    }
+  } catch {}
+}
+
+onMounted(loadPrograms)
+
 const statusFlow = [
   { value: 'draft', label: 'Draft' },
+  { value: 'pending',   label: 'Čaká na schválenie' },
   { value: 'published', label: 'Publikované' },
   { value: 'matching', label: 'V párovaní' },
   { value: 'assigned', label: 'Pridelené' },
@@ -442,9 +454,7 @@ const statusFlow = [
 ]
 
 const statusTransitions: Record<string, { to: string; label: string; class: string }[]> = {
-  draft: [{ to: 'published', label: 'Zverejniť', class: 'bg-blue-600 text-white hover:bg-blue-700' }],
-  published: [{ to: 'draft', label: 'Stiahnuť', class: 'bg-gray-100 text-gray-600 hover:bg-gray-200' }],
-  in_progress: [{ to: 'closed', label: 'Uzavrieť', class: 'bg-navy text-white hover:opacity-90' }],
+  draft:       [{ to: 'pending', label: 'Odoslať na schválenie', class: 'bg-blue-600 text-white hover:bg-blue-700' }],
 }
 
 const statusStepClass = (stepValue: string) => {
@@ -461,7 +471,7 @@ const availableActions = computed(() => statusTransitions[form.status] ?? [])
 const form = reactive({
   title: props.initialData?.title ?? '',
   description: props.initialData?.description ?? '',
-  program: props.initialData?.program ?? 'B',
+  program: props.initialData?.program ? String(props.initialData.program) : '',
   deadline: props.initialData?.deadline ?? '',
   tech_spec: props.initialData?.tech_spec ?? '',
   requirements: props.initialData?.requirements ?? ([''] as string[]),
@@ -469,8 +479,6 @@ const form = reactive({
   attachments: props.initialData?.attachments ?? ([] as any[]),
   po_name: props.initialData?.po_name ?? '',
   po_email: props.initialData?.po_email ?? '',
-  po_phone: props.initialData?.po_phone ?? '',
-  po_position: props.initialData?.po_position ?? '',
   budget: props.initialData?.budget ?? (null as number | null),
   budget_type: props.initialData?.budget_type ?? 'milestone',
   max_teams: props.initialData?.max_teams ?? 1,
@@ -507,6 +515,7 @@ const validate = () => {
   errors.title = form.title ? null : 'Názov je povinný'
   errors.description = form.description ? null : 'Popis je povinný'
   errors.budget = form.budget && form.budget > 0 ? null : 'Zadajte rozpočet'
+  errors.deadline = form.deadline ? null : 'Deadline je povinný'
   validatePoEmail()
   return !Object.values(errors).some(Boolean)
 }
@@ -516,16 +525,50 @@ const save = async (asDraft = false) => {
   if (!asDraft && !validate()) return
   isSaving.value = true
   saveError.value = null
+
+  let programId = Number(form.program)
+    if (!programId) {
+      try {
+        const response = await api.get('/programs/lang/sk') as any
+        const all = response ?? []
+        const programB = all.find((p: any) => {
+          const name = getProgramLabel(p).toLowerCase()
+          return name.includes('živá prax') || name.includes('ziva prax') || name.includes('program b')
+        })
+        programId = programB?.id ?? all[0]?.id ?? 0
+      } catch {}
+    }
+
   try {
     if (asDraft) form.status = 'draft'
-    // TODO: await api.post/put('/firma/zadania', form)
-    await new Promise((r) => setTimeout(r, 800))
+
+    const payload = {
+      name: form.title,
+      description: form.description,
+      program_id: programId,
+      application_start: form.deadline ? new Date().toISOString() : null,
+      application_deadline: form.deadline || null,
+      project_start: form.deadline ? new Date().toISOString() : null,
+      project_end: form.deadline ? new Date(form.deadline).toISOString() : null,
+      budget: form.budget,
+      budget_type: form.budget_type,
+      max_teams: form.max_teams,
+      tech_spec: form.tech_spec,
+      tech_tags: form.tech_tags,
+      po_email: form.po_email || null,
+      language_id: langId.value,
+    }
+
+    const response = props.isNew
+      ? await api.post('/v1/admin/calls', payload)
+      : await api.put(`/v1/admin/calls/${props.initialData?.id}`, payload)
+
     saveSuccess.value = true
     setTimeout(() => {
       saveSuccess.value = false
     }, 4000)
-    emit('saved', props.initialData?.id ?? null)
-  } catch {
+    emit('saved', (response as any)?.id ?? props.initialData?.id ?? null)
+  } catch (error) {
     saveError.value = 'Nastala chyba pri ukladaní.'
   } finally {
     isSaving.value = false
@@ -537,10 +580,12 @@ const handleSaveDraft = () => save(true)
 
 // ── Status change ─────────────────────────────────────────────
 const handleStatusChange = async (newStatus: string) => {
+  if (!props.initialData?.id) return
   isActionLoading.value = true
   try {
-    // TODO: await api.patch(`/firma/zadania/${props.initialData?.id}/status`, { status: newStatus })
-    await new Promise((r) => setTimeout(r, 600))
+    await api.patch(`/v1/calls/${props.initialData.id}/workflow`, {
+      state: apiTaskStatusState(newStatus),
+    })
     form.status = newStatus
   } catch {
     saveError.value = 'Zmena stavu zlyhala.'

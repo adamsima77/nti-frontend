@@ -122,8 +122,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Users, FileText, Calendar, ChevronRight, Plus, ClipboardList } from 'lucide-vue-next'
+import { normalizeTaskStatus } from '~/composables/useTaskStatus'
 
 definePageMeta({
   layout: 'portal',
@@ -135,93 +136,95 @@ useHead({
   title: 'Zadania | NTI Firma',
 })
 
+const api = useApi()
 const authStore = useAuthStore()
 
-// TODO: remove when backend is available
-if (!authStore.user) {
-  authStore.user = {
-    id: 2,
-    email: 'info@techfirma.sk',
-    organization_name: 'TechFirma s.r.o.',
-    role: 'company',
-  }
-  authStore.token = 'mock-token'
-}
-
+const tasks = ref<any[]>([])
+const isLoading = ref(true)
+const error = ref<string | null>(null)
 const activeFilter = ref('all')
 
-const mockTasks = [
-  {
-    id: 1,
-    title: 'AI chatbot pre zákaznícku podporu',
-    program: 'Program A',
-    description:
-      'Vyvíjate inteligentného chatbota schopného riešiť bežné otázky zákazníkov, integrovať sa s CRM systémom a eskalovať komplexné prípady na živého operátora.',
-    budget: 8000,
-    spent: 3200,
-    status: 'active',
-    createdAt: '10.01.2026',
-    deadline: '30.06.2026',
-    teamsCount: 1,
-    applicationsCount: 3,
-  },
-  {
-    id: 2,
-    title: 'Optimalizácia logistického softvéru',
-    program: 'Program B',
-    description:
-      'Analýza a zefektívnenie existujúceho softvéru pre správu skladových zásob a plánovanie prepravy s cieľom znížiť prevádzkové náklady o 20 %.',
-    budget: 12000,
-    spent: 9800,
-    status: 'active',
-    createdAt: '15.01.2026',
-    deadline: '31.05.2026',
-    teamsCount: 1,
-    applicationsCount: 2,
-  },
-  {
-    id: 3,
-    title: 'Mobilná aplikácia pre HR',
-    program: 'Program A',
-    description:
-      'Mobilná aplikácia umožňujúca zamestnancom spravovať dovolenky, dochádzku a benefity priamo zo smartfónu.',
-    budget: 6000,
-    spent: 6000,
-    status: 'completed',
-    createdAt: '05.11.2025',
-    deadline: '28.02.2026',
-    teamsCount: 1,
-    applicationsCount: 5,
-  },
-  {
-    id: 4,
-    title: 'Dashboard pre analýzu predajov',
-    program: 'Program B',
-    description:
-      'Interaktívny dashboard zobrazujúci kľúčové predajné metriky v reálnom čase s možnosťou filtrovania podľa regiónu, produktu a obchodného zástupcu.',
-    budget: 5000,
-    spent: 0,
-    status: 'draft',
-    createdAt: '28.03.2026',
-    deadline: null,
-    teamsCount: 0,
-    applicationsCount: 2,
-  },
-]
+const loadTasks = async () => {
+  isLoading.value = true
+  error.value = null
+
+  try {
+    await authStore.getCurrentUser()
+    const response = await api.get('/v1/admin/calls', { params: { per_page: 100 } }) as any
+    const items = response?.data ?? []
+    tasks.value = items.map((call: any) => ({
+      id: call.id,
+      title: call.name,
+      program: call.program?.name ?? 'Program',
+      description: call.description ?? '',
+      budget: call.budget ? Number(call.budget) : null,
+      spent: 0,
+      status: normalizeTaskStatus(call.status?.name ?? ''),
+      rawStatus: call.status?.name ?? '',
+      createdAt: call.created_at ? new Date(call.created_at).toLocaleDateString('sk-SK') : '',
+      deadline: call.application_deadline ? new Date(call.application_deadline).toLocaleDateString('sk-SK') : null,
+      teamsCount: 0,
+      applicationsCount: Number(call.applicants_count ?? 0),
+    }))
+  } catch (err: any) {
+    error.value = err?.data?.message ?? err?.message ?? 'Nastala chyba pri načítaní zadaní.'
+    tasks.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(loadTasks)
+
+const getStatusCategory = (statusName: string) => {
+  if (!statusName) return 'draft'
+  
+  const s = statusName.toLowerCase()
+  
+  if (['publikované', 'v párovaní', 'pridelené', 'v realizácii'].includes(s)) {
+    return 'active'
+  }
+  if (['uzavreté'].includes(s)) {
+    return 'closed'
+  }
+  if (['draft', 'čaká na schválenie'].includes(s)) {
+    return 'draft'
+  }
+  return 'draft'
+}
 
 const filters = computed(() => [
-  { label: 'Všetky', value: 'all', count: mockTasks.length },
-  { label: 'Aktívne', value: 'active', count: mockTasks.filter((t) => t.status === 'active').length },
-  { label: 'Dokončené', value: 'completed', count: mockTasks.filter((t) => t.status === 'completed').length },
-  { label: 'Drafty', value: 'draft', count: mockTasks.filter((t) => t.status === 'draft').length },
+  { 
+    label: 'Všetky', 
+    value: 'all', 
+    count: tasks.value.length 
+  },
+  { 
+    label: 'Aktívne', 
+    value: 'active', 
+    count: tasks.value.filter(t => getStatusCategory(t.rawStatus) === 'active').length 
+  },
+  { 
+    label: 'Dokončené', 
+    value: 'closed', 
+    count: tasks.value.filter(t => getStatusCategory(t.rawStatus) === 'closed').length 
+  },
+  { 
+    label: 'Drafty / Na schválenie', 
+    value: 'draft', 
+    count: tasks.value.filter(t => getStatusCategory(t.rawStatus) === 'draft').length 
+  },
 ])
 
-const filteredTasks = computed(() =>
-  activeFilter.value === 'all' ? mockTasks : mockTasks.filter((t) => t.status === activeFilter.value),
-)
+const filteredTasks = computed(() => {
+  if (activeFilter.value === 'all') return tasks.value
+  return tasks.value.filter(t => getStatusCategory(t.rawStatus) === activeFilter.value)
+})
 
-const formatCurrency = (val: number) =>
-  new Intl.NumberFormat('sk-SK', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val)
+const formatCurrency = (val: number | null | undefined) =>
+  typeof val === 'number'
+    ? new Intl.NumberFormat('sk-SK', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val)
+    : '—'
 
 const budgetBarColor = (ratio: number) => {
   if (ratio >= 1) return 'bg-danger-500'

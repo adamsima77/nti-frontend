@@ -12,6 +12,11 @@ interface Role {
   permissions: Permission[]
 }
 
+interface OrganizationReference {
+  id: number
+  name: string
+}
+
 interface User {
   id: number
   name: string
@@ -24,6 +29,7 @@ interface User {
   /** Relatívna cesta na disku (napr. avatars/...) z Laravel public disku. */
   avatar?: string | null
   organization_name: string | null
+  organizations?: OrganizationReference[]
 }
 
 const enum UserStatus {
@@ -92,6 +98,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
     return null
   })
+
+  const userOrganizationId = computed(() =>
+    user.value?.organizations?.[0]?.id ?? null
+  )
 
   const userPermissions = computed(() =>
     user.value?.roles?.flatMap(r => r.permissions?.map(p => p.name) ?? []) ?? []
@@ -269,6 +279,7 @@ export const useAuthStore = defineStore('auth', () => {
     userRoles,
     userRole,
     userPermissions,
+    userOrganizationId,
 
     hasRole,
     hasPermission,

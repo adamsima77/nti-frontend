@@ -29,7 +29,7 @@
 
     <!-- Required actions -->
     <div
-      v-if="mockActions.length"
+      v-if="actions.length"
       class="mb-8 bg-amber-50 border border-amber-200 rounded-lg p-5"
     >
       <div class="flex items-center gap-2 mb-3">
@@ -38,7 +38,7 @@
       </div>
       <ul class="space-y-2">
         <li
-          v-for="action in mockActions"
+          v-for="action in actions"
           :key="action.id"
           class="flex items-center justify-between"
         >
@@ -71,7 +71,7 @@
             </thead>
             <tbody class="divide-y divide-gray-50">
               <tr
-                v-for="task in mockTasks"
+                v-for="task in tasks"
                 :key="task.id"
                 class="hover:bg-gray-50 transition-colors"
               >
@@ -130,7 +130,7 @@
         </div>
         <div class="space-y-3">
           <div
-            v-for="team in mockAssignedTeams"
+            v-for="team in assignedTeams"
             :key="team.id"
             class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center gap-4"
           >
@@ -151,7 +151,7 @@
             </div>
           </div>
           <p
-            v-if="!mockAssignedTeams.length"
+            v-if="!assignedTeams.length"
             class="text-sm text-gray-400 text-center py-6"
           >
             Zatiaľ žiadne priradené tímy
@@ -173,7 +173,7 @@
         </div>
         <div class="space-y-3">
           <div
-            v-for="app in mockPendingApplications"
+            v-for="app in pendingApplications"
             :key="app.id"
             class="bg-white rounded-lg shadow-sm border border-gray-100 p-4"
           >
@@ -195,7 +195,7 @@
             </div>
           </div>
           <p
-            v-if="!mockPendingApplications.length"
+            v-if="!pendingApplications.length"
             class="text-sm text-gray-400 text-center py-6"
           >
             Žiadne čakajúce prihlášky
@@ -209,7 +209,7 @@
       <h2 class="text-xl font-bold text-navy mb-4">Blížiace sa termíny</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div
-          v-for="d in mockDeadlines"
+          v-for="d in upcomingDeadlines"
           :key="d.id"
           class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 flex items-center gap-4"
         >
@@ -231,8 +231,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Users, Calendar, AlertTriangle, ChevronRight } from 'lucide-vue-next'
+import { normalizeTaskStatus } from '~/composables/useTaskStatus'
+
 definePageMeta({
   layout: 'portal',
   middleware: 'auth',
@@ -244,6 +246,7 @@ useHead({
 })
 
 const authStore = useAuthStore()
+const api = useApi()
 
 const userDisplayName = computed(() => {
   const u = authStore.user
@@ -251,92 +254,63 @@ const userDisplayName = computed(() => {
   return u.organization_name || u.email || 'Organizácia'
 })
 
-// ── Mock data ──────────────────────────────────────────────
-
-const mockTasks = [
-  {
-    id: 1,
-    title: 'AI chatbot pre zákaznícku podporu',
-    program: 'Program A',
-    budget: 8000,
-    spent: 3200,
-    status: 'active',
-    createdAt: '10.01.2026',
-  },
-  {
-    id: 2,
-    title: 'Optimalizácia logistického softvéru',
-    program: 'Program B',
-    budget: 12000,
-    spent: 9800,
-    status: 'active',
-    createdAt: '15.01.2026',
-  },
-  {
-    id: 3,
-    title: 'Mobilná aplikácia pre HR',
-    program: 'Program A',
-    budget: 6000,
-    spent: 6000,
-    status: 'completed',
-    createdAt: '05.11.2025',
-  },
-  {
-    id: 4,
-    title: 'Dashboard pre analýzu predajov',
-    program: 'Program B',
-    budget: 5000,
-    spent: 0,
-    status: 'draft',
-    createdAt: '28.03.2026',
-  },
-]
-
-const mockAssignedTeams = [
-  { id: 1, name: 'AI Innovators', task: 'AI chatbot pre zákaznícku podporu', members: 3, progress: 40 },
-  { id: 2, name: 'LogiTech tím', task: 'Optimalizácia logistického softvéru', members: 4, progress: 82 },
-]
-
-const mockPendingApplications = [
-  {
-    id: 11,
-    teamName: 'DataFlow tím',
-    task: 'Dashboard pre analýzu predajov',
-    submittedAt: '30.03.2026',
-    status: 'submitted',
-  },
-  {
-    id: 12,
-    teamName: 'CodeCraft',
-    task: 'Dashboard pre analýzu predajov',
-    submittedAt: '01.04.2026',
-    status: 'submitted',
-  },
-]
-
-const mockDeadlines = [
-  { id: 1, title: 'Uzávierka zadaní — Program A', deadline: '2026-04-20', daysLeft: 18 },
-  { id: 2, title: 'Výber tímov — Program B', deadline: '2026-05-05', daysLeft: 33 },
-]
-
-const mockActions = [
-  { id: 1, message: 'Vyhodnoťte prihlášky tímov na zadanie "Dashboard pre analýzu predajov"', link: '' },
-  { id: 2, message: 'Doplňte rozpočet k zadaniu "Dashboard pre analýzu predajov"', link: '/firma/zadania/4' },
-]
-
-// ── Computed ───────────────────────────────────────────────
+const tasks = ref<any[]>([])
+const isLoading = ref(true)
+const error = ref<string | null>(null)
 
 const stats = computed(() => ({
-  totalTasks: mockTasks.length,
-  activeTasks: mockTasks.filter((t) => t.status === 'active').length,
-  assignedTeams: mockAssignedTeams.length,
-  pendingApplications: mockPendingApplications.length,
+  totalTasks: tasks.value.length,
+  activeTasks: tasks.value.filter((task) => task.isOpen).length,
+  assignedTeams: tasks.value.filter((task) => task.applicationsCount > 0).length,
+  pendingApplications: tasks.value.reduce((sum, task) => sum + (task.applicationsCount ?? 0), 0),
 }))
 
-const totalBudget = computed(() => mockTasks.reduce((s, t) => s + t.budget, 0))
-const totalSpent = computed(() => mockTasks.reduce((s, t) => s + t.spent, 0))
+const assignedTeams = computed(() =>
+  tasks.value
+    .filter((task) => task.applicationsCount > 0)
+    .map((task) => ({
+      id: task.id,
+      name: task.program || 'Zadanie',
+      task: task.title || task.name || 'Zadanie',
+      members: task.applicationsCount,
+      progress: Math.min(100, (task.applicationsCount ?? 0) * 20),
+    }))
+)
 
-// ── Helpers ────────────────────────────────────────────────
+const pendingApplications = computed(() =>
+  tasks.value
+    .filter((task) => task.applicationsCount > 0)
+    .slice(0, 4)
+    .map((task) => ({
+      id: task.id,
+      teamName: task.program || 'Tím',
+      task: task.title || task.name || 'Zadanie',
+      submittedAt: task.createdAt || task.created_at || 'dnes',
+      status: task.status || 'published',
+    }))
+)
+
+const actions = computed(() => {
+  if (!tasks.value.length) {
+    return [
+      {
+        id: 'create-task',
+        message: 'Nemáte ešte žiadne zverejnené zadania. Vytvorte prvé zadanie pre váš tím.',
+        link: '/firma/zadania/nove',
+      },
+    ]
+  }
+
+  return []
+})
+
+const budgetTasks = computed(() => tasks.value.slice(0, 3))
+const upcomingDeadlines = computed(() =>
+  tasks.value
+    .filter((task) => task.deadline)
+    .sort((a, b) => (a.deadline > b.deadline ? 1 : -1))
+    .slice(0, 4)
+)
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('sk-SK', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val)
@@ -346,6 +320,61 @@ const budgetBarColor = (ratio: number) => {
   if (ratio >= 0.8) return 'bg-warning-500'
   return 'bg-blue-500'
 }
+
+const loadTasks = async () => {
+  isLoading.value = true
+  error.value = null
+
+  try {
+    await authStore.getCurrentUser()
+    if (!authStore.userOrganizationId) {
+      tasks.value = []
+      return
+    }
+
+    const response = await api.get('/v1/admin/calls', { params: { per_page: 100 } }) as any
+    const items = Array.isArray(response?.data) ? response.data : []
+    tasks.value = items.map((call: any) => ({
+      id: call.id,
+      title: call.name,
+      program: call.program?.name ?? 'Program',
+      description: call.description ?? '',
+      createdAt: call.created_at ? call.created_at.slice(0, 10) : (call.application_start ? call.application_start.slice(0, 10) : ''),
+      deadline: call.application_deadline ? call.application_deadline.slice(0, 10) : null,
+      status: normalizeTaskStatus(call.status?.name ?? ''),
+      statusLabel: call.status?.name ?? '',
+      applicationsCount: Number(call.applicants_count ?? 0),
+      isOpen: Boolean(call.is_open),
+      budget: Number(call.budget ?? 0),
+      spent: Number(call.spent ?? 0),
+    }))
+  } catch (err: any) {
+    error.value = err?.data?.message ?? err?.message ?? 'Nastala chyba pri načítaní zadaní.'
+    tasks.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(loadTasks)
+
+const filters = computed(() => [
+  { label: 'Všetky', value: 'all', count: tasks.value.length },
+  { label: 'Otvorené', value: 'active', count: tasks.value.filter((task) => task.isOpen).length },
+  { label: 'Dokončené', value: 'closed', count: tasks.value.filter((task) => task.status === 'closed').length },
+  { label: 'Drafty', value: 'draft', count: tasks.value.filter((task) => task.status === 'draft').length },
+])
+
+const activeFilter = ref('all')
+
+const filteredTasks = computed(() => {
+  if (activeFilter.value === 'all') return tasks.value
+  if (activeFilter.value === 'active') return tasks.value.filter((task) => task.isOpen)
+  return tasks.value.filter((task) => task.status === activeFilter.value)
+})
+
+const totalBudget = computed(() => tasks.value.reduce((sum, task) => sum + (task.budget ?? 0), 0))
+const totalSpent = computed(() => tasks.value.reduce((sum, task) => sum + (task.spent ?? 0), 0))
 
 const teamProgressClass = (progress: number) => {
   if (progress >= 80) return 'bg-success-50 text-success-500'

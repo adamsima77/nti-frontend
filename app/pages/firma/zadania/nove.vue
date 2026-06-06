@@ -33,19 +33,6 @@ definePageMeta({
 
 useHead({ title: 'Nové zadanie | NTI Firma' })
 
-const authStore = useAuthStore()
-
-// TODO: remove when backend is available
-if (!authStore.user) {
-  authStore.user = {
-    id: 2,
-    email: 'info@techfirma.sk',
-    organization_name: 'TechFirma s.r.o.',
-    role: 'company',
-  }
-  authStore.token = 'mock-token'
-}
-
 const router = useRouter()
 
 const handleSaved = () => {
