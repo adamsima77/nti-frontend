@@ -14,7 +14,7 @@ export interface ApplicationDocumentRow {
   uploadedAt?: string | null
 }
 
-export type ApplicationStatus = 'approved' | 'evaluating' | 'submitted' | 'draft' | 'rejected'
+export type ApplicationStatus = 'approved' | 'evaluating' | 'submitted' | 'draft' | 'rejected' | 'supplement'
 
 export interface ApplicationHistoryEntry {
   status: ApplicationStatus
@@ -50,6 +50,7 @@ export interface Application {
   /** Z API (deduplikácia konceptov) */
   callId?: number
   teamId?: number
+  category?: string
 }
 
 export interface ApplicationWithProgress extends Application {

@@ -1,3 +1,5 @@
+import { computed } from 'vue'
+
 export type PortalNotification = {
   id: number
   title: string
@@ -11,7 +13,7 @@ const mapNotification = (row: Record<string, unknown>): PortalNotification => ({
   id: Number(row.id),
   title: String(row.title ?? ''),
   body: String(row.body ?? ''),
-  read: Boolean(row.is_read),
+  read: Boolean(row.is_read ?? row.isRead ?? false),
   createdAt: row.created_at ? String(row.created_at) : null,
   category: row.category && typeof row.category === 'object'
     ? String((row.category as { slug?: string }).slug ?? '')
@@ -58,3 +60,5 @@ export const useNotifications = () => {
     markAllAsRead,
   }
 }
+
+export default useNotifications

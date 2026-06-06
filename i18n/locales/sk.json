@@ -767,8 +767,10 @@
         "search_placeholder": "Hľadať podľa názvu...",
         "status": "Stav",
         "program": "Program",
+        "category": "Kategória",
         "all_statuses": "Všetky stavy",
-        "all_programs": "Všetky programy"
+        "all_programs": "Všetky programy",
+        "all_categories": "Všetky kategórie"
       },
       "status": {
         "draft": "Rozpracovaná",
@@ -790,6 +792,7 @@
         "in_progress": "V progrese",
         "pending": "Čakajúce",
         "information": "Informácie",
+        "category": "Kategória",
         "members": "Členov",
         "submitted_at": "Podané dňa",
         "status_history": "História stavov",
@@ -820,6 +823,12 @@
       "study_field": "Študijný odbor",
       "study_year": "Ročník",
       "portfolio": "Portfólio",
+      "select_university": "Vyberte univerzitu",
+      "select_program": "Vyberte program",
+      "select_field": "Vyberte odbor",
+      "select_year": "Vyberte ročník",
+      "save_student_record": "Uložiť študentský záznam",
+      "saving_record": "Ukladá sa študentský záznam...",
       "teams_count": "{count} tímov",
       "applications_count": "{count} prihlášok",
       "no_student_record": "Študentský záznam v databáze zatiaľ nemáte (napr. po onboardingu sa vytvorí cez API študenta).",
@@ -833,9 +842,39 @@
         "invalid_photo_type": "Povolené sú len obrázky JPEG alebo PNG.",
         "photo_too_large": "Súbor je príliš veľký (max. 4 MB).",
         "photo_saved": "Profilová fotka bola uložená.",
-        "photo_error": "Nahrávanie fotky zlyhalo."
+        "photo_error": "Nahrávanie fotky zlyhalo.",
+        "save_failed": "Uloženie študentského záznamu zlyhalo."
       }
+    
+    },
+    "academic_record": {
+      "title": "Akademický záznam",
+      "honor_declaration": "Čestné prehlásenie",
+      "honor_declaration_text": "Čestne vyhlasujem že nemám prenášané predmety a môj priemer profilových predmetov spĺňa podmienky programu",
+      "honor_declaration_required": "Musíte potvrdiť čestné vyhlásenie na pokračovanie.",
+      "transcript_label": "Výpis známok",
+      "transcript_upload": "Nahrať prepis",
+      "upload_transcript": "Nahrať výpis známok (PDF)",
+      "save_button": "Uložiť akademický záznam",
+      "signed_at": "Podpísané dňa",
+      "not_signed": "Nepodpísané",
+      "transcript_error": "Nahrajte PDF prepis.",
+      "download": "Stiahnuť výpis",
+      "not_uploaded": "Výpis nebol nahratý",
+      "privacy_required": "Musíte súhlasiť s ochranou osobných údajov.",
+      "yes": "Áno",
+      "no": "Nie",
+      "status_confirmed": "Čestné prehlásenie potvrdené",
+      "status_not_confirmed": "Čestné prehlásenie nepotvrdené",
+      "status_not_provided": "Čestné prehlásenie nebolo poskytnuté",
+      "saving": "Ukladám...",
+      "saved": "Akademický záznam bol uložený."
     }
+  },
+
+  "privacy": {
+    "consent": "Súhlasím s",
+    "policy_link": "Zásadami ochrany osobných údajov"
   },
 
   "pending_approval": {
@@ -1187,6 +1226,7 @@
 }
   },
  "portal_sidebar_links": {
+  "roles": "Roly a permisie",
   "dashboard": "Dashboard",
   "applications": "Moje prihlášky",
   "teams": "Moje tímy",
@@ -1380,6 +1420,8 @@
 },
 
   "user_management": {
+    "export_calls": "Exportovať výzvy",
+    "export_users": "Exportovať užívateľov",
     "title": "Používatelia",
     "subtitle": "Správa registrovaných používateľov a ich rolí",
     "page_title": "Používatelia — Admin | NTI",
@@ -1456,65 +1498,460 @@
       "toast_updated": "Používateľ bol úspešne aktualizovaný",
       "error_invalid_data": "Neplatné údaje formulára",
       "error_create": "Nepodarilo sa vytvoriť používateľa",
+      "gdpr_download": "GDPR export",
       "error_save": "Nepodarilo sa uložiť zmeny"
   },
-    "gdpr_anonymize_modal": {
-    "title": "GDPR — Anonymizácia používateľa",
-    "irreversible_action": "Táto akcia je nevratná!",
-    "confirmation_text_prefix": "Naozaj chcete anonymizovať dáta používateľa",
-    "confirmation_text_suffix": "Všetky osobné údaje budú trvalo odstránené.",
-    "what_happens_title": "Čo sa stane:",
-    "effect_anonymized_values": "Meno a email budú nahradené anonymizovanými hodnotami",
-    "effect_profile_deleted": "Osobné údaje v profile budú vymazané",
-    "effect_account_deactivated": "Účet bude deaktivovaný",
-    "cancel": "Zrušiť",
-    "confirm": "Anonymizovať",
-    "processing": "Anonymizácia...",
-    "success_message": "Používateľ {name} {surname} bol anonymizovaný",
-    "error_message": "Nepodarilo sa anonymizovať používateľa"
+    "gdpr_download": {
+    "modal_title": "Export GDPR osobných údajov",
+    "select_format": "Vyberte preferovaný formát pre export archívu osobných údajov:",
+    "fmt_pdf_desc": "Dokumenty & Profily",
+    "fmt_xlsx_desc": "Štruktúrované tabuľky",
+    "fmt_csv_desc": "Syrové dátové vektory",
+    "generating": "Generujem váš export...",
+    "generating_hint": "Prosím čakajte, pripravujem súbory a kompilujem systémové logy.",
+    "success_title": "Export bol úspešne dokončený",
+    "success_hint": "Export bol úspešne vygenerovaný. Skontrolujte si priečinok so stiahnutými súbormi.",
+    "error_title": "Chyba pri generovaní exportu",
+    "error_hint": "Pri generovaní exportu sa vyskytla chyba. Skúste to prosím znovu.",
+    "generate_btn": "Generovať export",
+    "timeout_hint": "Generovanie môže trvať niekoľko minút, prosím buďte trpezliví."
+  },
+  "gdpr_anonymize_modal": {
+  "title": "GDPR — anonymizácia používateľa",
+  "irreversible_action": "Táto akcia je nezvratná!",
+  "confirmation_text_prefix": "Naozaj chcete anonymizovať údaje používateľa",
+  "confirmation_text_suffix": "Všetky osobné údaje budú trvalo odstránené.",
+  "what_happens_title": "Čo sa stane:",
+  "effect_anonymized_values": "Meno a e-mail budú nahradené anonymizovanými hodnotami",
+  "effect_profile_deleted": "Osobné údaje v profile budú odstránené",
+  "effect_account_deactivated": "Účet bude deaktivovaný",
+  "cancel": "Zrušiť",
+  "confirm": "Anonymizovať",
+  "processing": "Prebieha anonymizácia...",
+  "success_message": "Používateľ {name} {surname} bol anonymizovaný",
+  "error_message": "Nepodarilo sa anonymizovať používateľa"
+},
+  "evaluator": {
+    "welcome": "Vitajte, {name}!",
+    "subtitle": "Prehľad hodnotení",
+    "stats": {
+      "total": "Celkom",
+      "pending": "Čakajúce",
+      "evaluated": "Ohodnotené",
+      "decided": "Rozhodnuté"
+    },
+    "assigned_calls": "Pridelené výzvy",
+    "go_to_list": "Prejsť na zoznam",
+    "deadline_label": "Termín",
+    "open_applications": "Otvoriť prihlášky",
+    "urgent_header": "Čaká na vaše hodnotenie",
+    "action": {
+      "evaluate": "Ohodnotiť",
+      "detail": "Detail"
+    },
+    "recent_applications": "Nedávne prihlášky",
+    "view_all": "Zobraziť všetky",
+    "view_application_detail": "Zobraziť detail prihlášky",
+    "application_detail": "Detail prihlášky",
+    "view_evaluation": "Zobraziť hodnotenie",
+    "application_summary": "Súhrn prihlášky",
+    "category": "Kategória",
+    "filter_by_category": "Filtrovať podľa kategórie",
+    "all_categories": "Všetky kategórie",
+    "student_name": "Meno študenta",
+    "school_program_year": "Škola / Program / Ročník",
+    "call": "Výzva",
+    "current_status": "Aktuálny stav",
+    "application_description": "Popis prihlášky",
+    "form_responses": "Odpovede z formulára",
+    "no_form_responses": "Žiadne odpovede z formulára",
+
+    "team_members": "Členovia tímu",
+    "student_profile": "Študentský profil",
+    "documents": "Dokumenty",
+    "no_documents": "Žiadne dokumenty",
+    "overall_evaluation": "Celkové hodnotenie",
+    "final_decision": "Finálne rozhodnutie",
+    "submitted_at": "Odoslané dňa",
+    "application_history": "História prihlášky",
+    "no_history": "Žiadna história",
+    "back_to_list": "Späť na zoznam hodnotení",
+    "submitted_label": "Podané",
+    "commission_avg": "Priemer komisie / 100",
+    "scoring_form": "Hodnotiaci formulár",
+    "scoring_instructions": "Ohodnoťte každé kritérium od 0 do jeho maxima",
+    "max_points": "max {n} b.",
+    "comment_placeholder": "Komentár ku kritériu: {criterion}...",
+    "total_score": "Celkové skóre",
+    "points": "bodov",
+    "scoring_label": {
+      "excellent": "Výborný",
+      "good": "Dobrý",
+      "sufficient": "Dostatočný",
+      "insufficient": "Nedostatočný"
+    },
+    "overall_comment": "Celkový komentár a odporúčanie",
+    "internal_note_label": "Interná poznámka pre komisiu",
+    "internal_note_placeholder": "Poznámky viditeľné iba pre členov komisie...",
+    "recommendation_label": "Odporúčanie",
+    "recommendations": {
+      "approve": "Schváliť",
+      "supplement": "Žiadať doplnenie",
+      "reject": "Zamietnuť"
+    },
+    "submit_section": "Odoslanie hodnotenia",
+    "request_supplement": "Vyžiadať doplnenie prihlášky",
+    "supplement_hint": "Tím dostane notifikáciu s požiadavkou na doplnenie podkladov",
+    "supplement_placeholder": "Čo konkrétne má tím doplniť...",
+    "save_draft": "Uložiť koncept",
+    "submit": "Odoslať hodnotenie",
+    "submitting": "Odosielam...",
+    "submitted_title": "Hodnotenie bolo odoslané",
+    "submitted_message": "Vaše hodnotenie bolo zaznamenané a je viditeľné pre ostatných členov komisie.",
+    "waiting": "Čaká na hodnotenie",
+    "loading_detail": "Načítavam detail...",
+    "academic_flag": {
+      "unverified": "Neoverené",
+      "verified": "Spĺňa kritériá",
+      "failed": "Nespĺňa kritériá"
+    },
+    "sidebar": {
+      "commission": "Komisia",
+      "average": "Priemerné skóre",
+      "team": "Tím",
+      "info": "Informácie",
+      "program": "Program",
+      "submitted": "Dátum podania",
+      "evaluation_deadline": "Deadline hodnotenia",
+      "academic_criteria": "Akademické kritériá",
+      "documents": "Dokumenty"
+    },
+    "academic_record": {
+      "title": "Akademický záznam",
+      "honor_declaration": "Čestné vyhlásenie",
+      "signed_at": "Podpísané dňa",
+      "not_signed": "Nepodpísané",
+      "transcript": "Výpis známok",
+      "download": "Stiahnuť",
+      "not_uploaded": "Nenahrané",
+      "yes": "Áno",
+      "no": "Nie"
+    },
+    "error": {
+      "select_recommendation": "Pred odoslaním vyberte odporúčanie"
+    },
+    "errors": {
+      "locked": "Hodnotenie je uzamknuté.",
+      "supplement_empty": "Zadajte čo má tím doplniť.",
+      "invalid_score": "Skóre pre kritérium {criterion} je mimo rozsahu alebo nie je vyplnené."
+    },
+    "auto_saved": "💾 Rozpracované bolo uložené",
+    "commission_avg_label": "Priemer komisie",
+    "application_label": "Prihláška",
+    "program_label": "Program"
   },
   "status_labels": {
-    "unknown": "Neznámy stav",
-    "approved": "Schválené",
-    "pending": "Čaká na doplnenie",
-    "rejected": "Zamietnuté",
-    "evaluating": "V hodnotení",
-    "active": "Aktívny",
-    "draft": "Draft",
-    "submitted": "Podané",
-    "paused": "Pozastavené",
-    "published": "Publikované",
-    "concept": "Koncept",
-    "matching": "V párovaní",
-    "assigned": "Pridelené",
-    "in_progress": "V realizácii",
-    "completed": "Dokončené",
-    "closed": "Uzavreté",
-    "inactive": "Neaktívny",
-    "pending_email": "Čaká na overenie emailu",
-    "pending_onboarding": "Čaká na onboarding",
-    "pending_approval": "Čaká na schválenie",
-    "banned": "Zablokovaný",
-    "anonymized": "Anonymizovaný"
+    "unknown": "Neznámy"
   },
-  "gdpr_download": {
-    "modal_title": "Export osobných údajov (GDPR)",
-    "select_format": "Zvoľte preferovaný formát pre export archívu osobných údajov:",
-    "fmt_pdf_desc": "Dokumenty a profily",
-    "fmt_xlsx_desc": "Štruktúrované tabuľky",
-    "fmt_csv_desc": "Surové dátové vektory",
-    "generating": "Generuje sa export...",
-    "generating_hint": "Prosím čakajte, pripravujú sa súbory a zostavujú sa systémové záznamy.",
-    "success_title": "Export bol úspešne dokončený",
-    "success_hint": "Sťahovanie by sa malo spustiť automaticky. Skontrolujte priečinok so stiahnutými súbormi vo vašom prehliadači.",
-    "error_title": "Generovanie zlyhalo",
-    "error_hint": "Pri zhromažďovaní záznamov sa vyskytla neočakávaná chyba servera. Skúste to znova.",
-    "generate_btn": "Vygenerovať export",
-    "timeout_hint": "Časový limit na vygenerovanie exportu vypršal, ale proces môže stále bežať na pozadí servera."
+  "cmsOverview": {
+    "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."
   },
-  "common": {
+  "admin_calls": {
+    "title": "Výzvy",
+    "subtitle": "Správa výziev a prihlasovacích období",
+    "page_title": "Výzvy — Admin | NTI",
+    "add_call": "Nová výzva",
+    "all_statuses": "Všetky stavy",
+    "deadline_from": "Deadline od",
+    "deadline_to": "Deadline do",
+    "clear_filters": "Zrušiť filtre",
+    "total_calls": "Celkovo výziev: {count}",
+    "col_name": "Názov",
+    "col_program": "Program",
+    "col_organization": "Organizácia",
+    "col_status": "Stav",
+    "col_deadline": "Deadline",
+    "col_applications": "Prihlášky",
+    "edit": "Upraviť",
+    "open": "Otvorená",
+    "closed": "Uzavretá",
+    "load_error": "Nepodarilo sa načítať výzvu.",
+    "fetch_error": "Nepodarilo sa načítať výzvy."
+  },
+
+    "common": {
     "cancel": "Zrušiť",
-    "close": "Zatvoriť",
-    "retry": "Skúsiť znova"
+    "close": "Zavrieť",
+    "retry": "Skúsiť znova",
+     "select_export_format": "Vyberte formát exportu",
+      "export_btn": "Exportovať dáta"
+      
+  },
+  "admin_dashboard": {
+  "title": "Prehľad",
+  "subtitle": "Prehľad aktivít a štatistík platformy",
+  "stats": {
+    "applications": "Žiadosti",
+    "activeCalls": "Aktívne výzvy",
+    "users": "Používatelia",
+    "teams": "Tímy"
+  },
+  "activeCalls": {
+    "title": "Aktívne výzvy",
+    "applicationsCount": "{count} žiadostí",
+    "deadline": "Termín uzávierky",
+    "empty": "Momentálne nie sú k dispozícii žiadne aktívne výzvy."
+  },
+  "pendingApprovals": {
+    "title": "Organizácie čakajúce na schválenie",
+    "noOrganization": "Žiadna organizácia",
+    "noPosition": "Pozícia nie je uvedená",
+    "registration": "Registrácia",
+    "empty": "Žiadne organizácie nečakajú na schválenie."
+  },
+  "cmsOverview": {
+    "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."
+  }
+},
+  "superadmin_dashboard": {
+     "page": "Strana {current} z {total}",
+    "empty": "Neboli nájdené žiadne auditné záznamy",
+    "title": "Dashboard Super Administrátora",
+    "subtitle": "Globálne riadenie systému, infraštruktúrne metriky, bezpečnostný audit a dohľad nad dodržiavaním predpisov.",
+    "actions": {
+      "systemSettings": "Systémové nastavenia"
+    },
+    "stats": {
+      "totalUsers": "Používatelia celkovo",
+      "totalOrganizations": "Organizácie celkovo",
+      "systemErrors": "Aktívne chyby systému",
+      "securityAlerts": "Bezpečnostné výstrahy (24h)"
+    },
+    "auditLogs": {
+      "title": "Systémové auditné logy a bezpečnostné udalosti",
+      "title_1": "Systémové auditné logy a bezpečnostné udalosti",
+      "viewAll": "Zobraziť všetky záznamy",
+      "empty": "Za posledných 48 hodín neboli zaznamenané žiadne kritické auditné logy.",
+      "page": "Strana {current} z {total}",
+      "subtitle": "Podrobný prehľad o operáciách vykonaných v systéme a chybových stavoch.",
+      "columns": {
+         "actor": "Iniciátor",
+      "source": "Zdroj",
+      "type": "Typ",
+      "severity": "Závažnosť",
+      "message": "Správa",
+      "object": "Cieľový objekt",
+      "ipAddress": "IP adresa",
+      "timestamp": "Časová pečiatka"
+      }
+    },
+      
+    "gdprOversight": {
+      "title": "Súlad s GDPR a retencia údajov",
+      "retentionPruning": "Automatické čistenie expirácie",
+      "lastExecution": "Posledné spustenie",
+      "pendingAnonymization": "Čaká na anonymizáciu",
+      "expiredDataPruned": "Premazané expirované záznamy"
+    },
+    "integrations": {
+      "title": "Stav infraštruktúry a služieb",
+      "unavailable": "Nedostupné"
+    },
+    "modules": {
+      "title": "Hlavné moduly systémovej architektúry",
+      "configure": "Konfigurovať uzol",
+      "columns": {
+        "moduleName": "Hlavný modul",
+        "status": "Stav",
+        "version": "Verzia",
+        "totalDbRecords": "Záznamy v databáze"
+      }
+    },
+    "sections": {
+      "identity": "Správa identít a prístupov (RBAC)",
+      "organizations": "Partneri a organizácie",
+      "reporting": "Generátor reportov a metrík",
+      "notifications": "Notifikačný systém a odosielanie",
+      "audit": "Systémový audit a kniha súladu"
+    },
+    "status": {
+      "active": "Aktívny / V poriadku"
+    }
+  },
+  "filters": {
+    "year": "Rok",
+    "day": "Deň",
+    "time": "Čas",
+    "any": "Všetky",
+    "apply": "Aplikovať filtre",
+    "clear": "Vymazať"
+  },
+  "callModal": {
+    "titleNew": "Nová výzva",
+    "titleEdit": "Upraviť výzvu",
+    "language": "Jazyk",
+    "languageSwitcherHint": "Prepínajte jazyk pre editáciu prekladov",
+    "program": "Program",
+    "selectProgram": "Vybrať program",
+    "status": "Stav",
+    "qualificationStack": "Kvalifikačný zásobník",
+    "noStackOptional": "Bez zásobníka (voliteľné)",
+    "contentInLanguage": "Obsah v jazyku",
+    "callName": "Názov výzvy",
+    "callNamePlaceholder": "Napr. Jarný inkubátor 2026",
+    "description": "Popis",
+    "descriptionPlaceholder": "Stručný popis výzvy a jej zamerania...",
+    "applicationDatesHeading": "Termíny podávania prihlášok",
+    "projectDatesHeading": "Termíny realizácie projektu",
+    "dateStart": "Začiatok",
+    "dateDeadline": "Uzávierka",
+    "projectStart": "Začiatok projektu",
+    "projectEnd": "Koniec projektu",
+    "forceCloseTitle": "Manuálne uzavrieť výzvu",
+    "forceCloseActiveHint": "Výzva je manuálne uzavretá — uchádzači sa nemôžu prihlásiť.",
+    "forceCloseInactiveHint": "Výzva sa riadi termínom uzávierky. Zapnutím ju okamžite uzavriete.",
+    "formTabHint": {
+      "prefix": "Navrhnite polia, ktoré budú uchádzači vypĺňať pri podaní prihlášky. Pri ",
+      "highlight": "Program A",
+      "suffix": " sú predvyplnené polia pre 6 povinných dokumentov."
+    },
+    "fieldDefaultLabel": "Pole {num}",
+    "fieldRequiredBadge": "povinné",
+    "fieldNameLabel": "Názov poľa",
+    "fieldNamePlaceholder": "Napr. Popis projektu",
+    "fieldTypeLabel": "Typ poľa",
+    "fieldIdentifierLabel": "Identifikátor",
+    "automatic": "automatický",
+    "fieldSampleTextLabel": "Vzorový text (placeholder)",
+    "fieldSampleTextPlaceholder": "Napr. Zadajte názov...",
+    "fieldAllowedFormatsLabel": "Povolené formáty",
+    "fieldHelpTextLabel": "Pomocný text",
+    "fieldHelpTextPlaceholder": "Krátky opis, čo má uchádzač vyplniť...",
+    "fieldOptionsLabel": "Možnosti výberu",
+    "fieldOptionPlaceholder": "Možnosť...",
+    "fieldAddOption": "Pridať možnosť",
+    "fieldRequiredLabel": "Povinné pole",
+    "formEmptyTitle": "Formulár je prázdny",
+    "formEmptySubtitle": "Pridajte polia pomocou tlačidla nižšie",
+    "fieldAddButton": "Pridať pole",
+    "criteriaTabHint": {
+      "prefix": "Vyberte hodnotiace kritériá komisie a nastavte ich ",
+      "highlightWeight": "váhu (1–10)",
+      "middle": ". Kritériá s príznakom ",
+      "highlightSignal": "akademický signál",
+      "suffix": " sú informatívne — nespôsobujú automatické zamietnutie (§7.2)."
+    },
+    "availableCriteriaLabel": "Dostupné kritériá",
+    "selectAtLeastOne": "Vyberte aspoň jedno",
+    "noCriteriaAvailable": "Žiadne kritériá nie sú k dispozícii.",
+    "noTranslationBadge": "Bez prekladu",
+    "newCriterionBadge": "Nové",
+    "weight": "Váha",
+    "removeNewCriterionTooltip": "Odstrániť toto nové kritérium",
+    "criterionWeightLabel": "Váha kritéria",
+    "academicSignal": "Akademický signál",
+    "academicSignalHint": "informatívny, neodmieta prihlášku",
+    "createNewCriterionButton": "Vytvoriť nové kritérium",
+    "newCriterionFormTitle": "Nové kritérium — vyplňte pre každý jazyk",
+    "required": "povinné",
+    "optional": "voliteľný",
+    "criterionNameInputLabel": "Názov kritéria",
+    "criterionNamePlaceholderSK": "Napr. Inovačný potenciál",
+    "criterionNamePlaceholderEN": "E.g. Innovation potential",
+    "criterionDescriptionInputLabel": "Popis",
+    "criterionDescriptionPlaceholderSK": "Krátky opis pre hodnotiteľov...",
+    "criterionDescriptionPlaceholderEN": "Short description for evaluators...",
+    "addAndSelectButton": "Pridať a vybrať",
+    "cancel": "Zrušiť",
+    "saveButton": "Uložiť",
+    "savingStatus": "Ukladám…",
+    "selectedLabel": "Vybrané",
+    "newCriteriaSummarySuffix": "nových (budú vytvorené pri uložení)",
+    "averageWeightLabel": "Priemerná váha",
+    "primaryLanguageFallback": "primárnom jazyku",
+    "criterionFallbackPrefix": "Kritérium",
+    "tabs": {
+      "basic": "Základné info",
+      "form": "Formulár prihlášky",
+      "criteria": "Kritériá hodnotenia"
+    },
+    "fieldTypes": {
+      "text": "Krátky text",
+      "textarea": "Dlhý text",
+      "number": "Číslo",
+      "email": "E-mail",
+      "select": "Výber jedného",
+      "radio": "Prepínač",
+      "checkbox": "Zaškrtávačky",
+      "date": "Dátum",
+      "file": "Príloha"
+    },
+    "weightLabels": [
+      "Veľmi nízka",
+      "Nízka",
+      "Podpriemerná",
+      "Mierne nízka",
+      "Stredná",
+      "Mierne vysoká",
+      "Nadpriemerná",
+      "Vysoká",
+      "Veľmi vysoká",
+      "Kritická"
+    ],
+    "criteriaCountSingular": "kritérium",
+    "criteriaCountPluralFew": "kritériá",
+    "criteriaCountPluralMany": "kritérií",
+    "academicSignalCountSingular": "akademický signál",
+    "academicSignalCountPluralFew": "akademické signály",
+    "academicSignalCountPluralMany": "akademických signálov",
+    "validation": {
+      "deadlineOrder": "Uzávierka musí byť po začiatku.",
+      "projectEndOrder": "Koniec projektu musí byť po jeho začiatku.",
+      "programRequired": "Vyberte program.",
+      "requiredField": "Povinné.",
+      "nameTranslatableRequired": "Názov ({code}) je povinný.",
+      "descriptionTranslatableRequired": "Popis ({code}) je povinný.",
+      "formFieldNameRequired": "Všetky polia musia mať vyplnený názov.",
+      "formFieldIdentifierInvalid": "Pole „{label}“ má neplatný identifikátor.",
+      "formFieldDuplicate": "Formulár obsahuje duplicitné identifikátory polí.",
+      "newCriteriaPrimaryNameRequired": "Nové kritériá musia habt vyplnený názov v primárnom jazyku.",
+      "atLeastOneCriterion": "Musíte vybrať aspoň jedno hodnotiace kritérium.",
+      "newCriterionPrimaryRequired": "Názov v {lang} je povinný.",
+      "serverFormSchemaValidationFailed": "Na serveri zlyhala validácia schémy formulára.",
+      "serverCriteriaValidationFailed": "Na serveri zlyhala validácia kritérií."
+    },
+    "toasts": {
+      "metaError": "Nepodarilo sa načítať metadáta.",
+      "validationBasicError": "Skontrolujte povinné polia — vyplňte obsah pre všetky jazyky.",
+      "formFieldNameError": "Chyba formulára: Všetky polia musia mať vyplnený názov.",
+      "formFieldIdentifierError": "Chyba identifikátora: Pole „{label}“ vyžaduje malé písmená bez diakritiky.",
+      "formFieldDuplicateError": "Chyba formulára: Duplicitné identifikátory polí.",
+      "newCriteriaPrimaryTranslationError": "Chyba kritérií: Nové kritérium nemá vyplnený primárny preklad.",
+      "atLeastOneCriterionError": "Chyba kritérií: Vyberte aspoň jedno hodnotiace kritérium.",
+      "saveSuccess": "Výzva bola úspešne uložená.",
+      "serverValidationError": "Nepodarilo sa uložiť výzvu kvôli chybám validácie na serveri.",
+      "saveGenericError": "Nepodarilo sa uložiť výzvu."
+    },
+    "errors": {
+      "criterionIdFetchFailed": "Nepodarilo sa získať ID pre nové kritérium „{fallback}“."
+    }
+  },
+
+  "superadmin_permissions": {
+    "page_title": "Matrica oprávnení",
+    "title": "Matrica oprávnení",
+    "subtitle": "Spravujte priradené práva pre jednotlivé systémové roly.",
+    "save_changes": "Uložiť zmeny",
+    "system_roles": "Systémové roly",
+    "permissions_count": "{count} oprávnení",
+    "search_placeholder": "Vyhľadať oprávnenie...",
+    "assign_all": "Priradiť všetky viditeľné",
+    "unassign_all": "Odobrať všetky viditeľné",
+    "empty_state": "Nenašli sa žiadne oprávnenia zodpovedajúce filtru.",
+    "module_label": "Modul: {name}",
+    "items_count": "{count} položiek",
+    "load_error": "Chyba pri načítaní matice oprávnení.",
+    "save_success": "Zmeny boli úspešne uložené.",
+    "save_error": "Chyba počas ukladania konfigurácie."
   }
 }

@@ -137,10 +137,8 @@
               </div>
             </div>
             <span class="text-sm text-gray-600 leading-snug">
-              {{ $t('auth.register.terms.text') }}
-              <NuxtLink to="#" class="text-blue-600 hover:underline">{{ $t('auth.register.terms.terms') }}</NuxtLink>
-              {{ ' a ' }}
-              <NuxtLink to="#" class="text-blue-600 hover:underline">{{ $t('auth.register.terms.privacy') }}</NuxtLink>
+              {{ $t('privacy.consent') }}
+              <NuxtLink to="/privacy-policy" class="text-blue-600 hover:underline">{{ $t('privacy.policy_link') }}</NuxtLink>
             </span>
           </label>
           <p v-if="errors.terms" class="text-xs text-red-600">{{ errors.terms }}</p>
@@ -242,7 +240,7 @@ const isSubmitting   = ref(false)
 const isResending    = ref(false)
 const resendSuccess  = ref(false)
 const turnstileToken = ref('')
-const turnstile      = ref(null)
+const turnstile      = ref<{ reset?: () => void } | null>(null)
 
 const formData = reactive({
   email:                 '',

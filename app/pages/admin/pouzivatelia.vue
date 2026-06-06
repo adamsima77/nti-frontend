@@ -5,10 +5,12 @@
         <h1 class="text-2xl font-bold text-navy">{{ $t('user_management.title') }}</h1>
         <p class="text-gray-500 mt-1">{{ $t('user_management.subtitle') }}</p>
       </div>
-      <UiButton @click="openCreateModal">
-        <Plus class="w-4 h-4 mr-1" />
-        {{ $t('user_management.add_user') }}
-      </UiButton>
+      <div class="flex items-center gap-3">
+        <UiButton @click="openCreateModal">
+          <Plus class="w-4 h-4 mr-1" />
+          {{ $t('user_management.add_user') }}
+        </UiButton>
+      </div>
     </div>
 
     <div class="bg-white rounded-lg border border-gray-200">
@@ -50,6 +52,11 @@
               >
                 <X class="w-4 h-4" />
               </button>
+
+              <UiButton v-if="canExportUsers" @click="exportUsers">
+          <Download class="w-4 h-4 mr-1" />
+          {{ $t('user_management.export_users') }}
+        </UiButton>
             </div>
           </div>
         </template>
@@ -132,6 +139,7 @@
     </div>
 
     <!-- Edit / Create user -->
+       <ClientOnly>
     <AdminUserEditModal
       v-model="showEditModal"
       :user="selectedUser"
@@ -139,20 +147,38 @@
       :statuses="allStatuses"
       @saved="fetchUsers"
     />
+    </ClientOnly>
 
     <!-- GDPR Report generation + download -->
+     <ClientOnly>
     <AdminGdprReportModal
       v-model="showGdprReportModal"
       :user="selectedUser"
       @generated="fetchUsers"
     />
+    </ClientOnly>
 
+    <ClientOnly>
     <!-- GDPR Anonymize -->
     <AdminGdprAnonymizeModal
       v-model="showAnonymizeModal"
       :user="selectedUser"
       @anonymized="fetchUsers"
     />
+    </ClientOnly>
+
+    <ClientOnly>
+      <AdminExportModal
+        v-model="exportModalOpen"
+        title="Export používateľov"
+        subtitle="Exportuje zoznam používateľov podľa zvolených filtrov"
+        endpoint="/users/export"
+        filename-prefix="users_export"
+        :allowed-formats="['xlsx', 'csv', 'pdf']"
+        :is-async="true"
+        :filters="exportFilters"
+      />
+    </ClientOnly>
   </div>
 </template>
 
@@ -253,6 +279,22 @@ const columns = [
 const canEditUsers = computed(() => authStore.hasPermission('identityaccess.users.edit'))
 const canGenerateGdprReport = computed(() => authStore.hasPermission('audit.manage_gdpr'))
 const canAnonymizeUsers = computed(() => authStore.hasPermission('audit.anonymize_users'))
+const canExportUsers = computed(() =>
+  authStore.hasPermission('reporting.export_xlsx') ||
+  authStore.hasPermission('reporting.export_csv') ||
+  authStore.hasPermission('reporting.export_pdf')
+)
+
+const exportModalOpen = ref(false)
+const exportFilters = computed(() => ({
+  search: search.value || undefined,
+  role: roleFilter.value || undefined,
+  status: statusFilter.value || undefined,
+}))
+
+function exportUsers() {
+  exportModalOpen.value = true
+}
 
 // ── Table data ───────────────────────────────────────────────────────────────
 

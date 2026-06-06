@@ -4,7 +4,7 @@
     <!-- HEADER -->
     <div class="text-center mb-7">
       <div class="inline-block px-3 py-0.5 bg-blue-50 text-blue-500 rounded-full text-xs font-semibold tracking-wide mb-2.5">
-        {{ $t('auth.student-onboarding.step') }} {{ step }} {{ $t('auth.student-onboarding.of') }} 3
+        {{ $t('auth.student-onboarding.step') }} {{ step }} {{ $t('auth.student-onboarding.of') }} 4
       </div>
       <h1 class="text-[22px] font-bold text-slate-900 mb-1">{{ $t('auth.student-onboarding.complete_profile') }}</h1>
       <p class="text-sm text-slate-400">{{ $t('auth.student-onboarding.setup_message') }}</p>
@@ -18,7 +18,7 @@
       />
       <div class="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-0.5">
         <div
-          v-for="s in 3"
+          v-for="s in 4"
           :key="s"
           class="w-3 h-3 rounded-full border-2 border-white transition-all duration-300"
           :class="{
@@ -140,7 +140,7 @@
       </div>
 
       <!-- STEP 3 — CV upload -->
-      <div v-else key="s3" class="py-1">
+      <div v-else-if="step === 3" key="s3" class="py-1">
         <div class="flex items-center gap-3 mb-6">
           <span class="text-[28px] leading-none">📄</span>
           <div>
@@ -151,20 +151,65 @@
 
         <UiFileUpload
           v-model="form.cv"
-          :label="$t('auth.student-onboarding.cv') "
+          :label="$t('auth.student-onboarding.cv')"
           accept=".pdf,.docx"
           @error="fileError = $event"
         />
 
         <p v-if="fileError" class="text-xs text-red-500 mt-2">{{ fileError }}</p>
         <p v-if="touched.cv && !isValid('cv')" class="text-xs text-red-500 mt-2">{{ $t('auth.student-onboarding.cv_err') }}</p>
-        <p class="text-xs text-slate-400 mt-4 leading-relaxed">
-  {{ $t('auth.student-onboarding.consent_notice') }}
-  <NuxtLink to="/privacy-policy" class="text-blue-500 hover:underline">
-    {{ $t('auth.student-onboarding.privacy_link') }}
-  </NuxtLink>
-</p>
-      
+      </div>
+
+      <div v-else-if="step === 4" key="s4" class="py-1">
+        <div class="flex items-center gap-3 mb-6">
+          <div>
+            <h2 class="text-[17px] font-bold text-slate-900 mb-0.5">{{ $t('academic_record.title') }}</h2>
+            <p class="text-[13px] text-slate-400">{{ $t('academic_record.honor_declaration_text') }}</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <label class="flex items-start gap-3 cursor-pointer group">
+            <div class="relative mt-0.5 flex-shrink-0">
+              <input v-model="form.honor_declaration" type="checkbox" class="sr-only peer" @change="touch('honor_declaration')" />
+              <div class="w-4 h-4 rounded border-2 border-gray-300 peer-checked:bg-blue-600 peer-checked:border-blue-600 group-hover:border-blue-400 transition-colors flex items-center justify-center">
+                <svg v-if="form.honor_declaration" class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="text-sm text-gray-600 leading-snug">{{ $t('academic_record.honor_declaration') }}</span>
+          </label>
+          <p v-if="touched.honor_declaration && !isValid('honor_declaration')" class="text-xs text-red-500">{{ $t('academic_record.honor_declaration_required') }}</p>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-[13px] font-semibold text-slate-600">{{ $t('academic_record.transcript_upload') }}</label>
+            <UiFileUpload
+              v-model="form.transcript"
+              :label="$t('academic_record.transcript')"
+              accept=".pdf"
+              @error="transcriptError = $event"
+            />
+            <p v-if="transcriptError" class="text-xs text-red-500">{{ transcriptError }}</p>
+            <p v-if="touched.transcript && !isValid('transcript')" class="text-xs text-red-500">{{ $t('academic_record.transcript_error') }}</p>
+          </div>
+
+          <label class="flex items-start gap-3 cursor-pointer group">
+            <div class="relative mt-0.5 flex-shrink-0">
+              <input v-model="form.privacyAccepted" type="checkbox" class="sr-only peer" @change="touch('privacyAccepted')" />
+              <div class="w-4 h-4 rounded border-2 border-gray-300 peer-checked:bg-blue-600 peer-checked:border-blue-600 group-hover:border-blue-400 transition-colors flex items-center justify-center">
+                <svg v-if="form.privacyAccepted" class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="text-sm text-gray-600 leading-snug">
+              {{ $t('privacy.consent') }}
+              <NuxtLink to="/privacy-policy" class="text-blue-600 hover:underline">{{ $t('privacy.policy_link') }}</NuxtLink>
+            </span>
+          </label>
+          <p v-if="touched.privacyAccepted && !isValid('privacyAccepted')" class="text-xs text-red-500">{{ $t('academic_record.privacy_required') }}</p>
+        </div>
       </div>
 
     </transition>
@@ -180,7 +225,7 @@
       </button>
 
       <button
-        v-if="step < 3"
+        v-if="step < 4"
         @click="nextStep"
         :disabled="!isStepValid"
         class="ml-auto px-6 py-2.5 rounded-xl text-sm font-semibold border-none cursor-pointer transition-all duration-200"
@@ -214,8 +259,8 @@ const emit = defineEmits<{
 const step = ref(1)
 const loading = ref(false)
 const fileError = ref('')
-const { t } = useI18n()
-const progress = computed(() => ((step.value - 1) / 2) * 100)
+const { t, locale } = useI18n()
+const progress = computed(() => ((step.value - 1) / 3) * 100)
 
 const form = reactive({
   name: '',
@@ -226,6 +271,9 @@ const form = reactive({
   year_of_study: null as number | null,
   portfolio_url: '',
   cv: null as File | null,
+  transcript: null as File | null,
+  honor_declaration: false,
+  privacyAccepted: false,
 })
 
 const touched = reactive<Record<string, boolean>>({})
@@ -237,15 +285,18 @@ const universities = ref<any[]>([])
 const studyPrograms = ref<any[]>([])
 const studyFields = ref<any[]>([])
 const studyYears = ref<any[]>([])
+const transcriptError = ref('')
 
 onMounted(async () => {
-  ;[universities.value, studyPrograms.value, studyFields.value, studyYears.value] =
-    await Promise.all([
-      api.get('/university'),
-      api.get(`/study-programs-public/lang/${useI18n().locale.value}`),
-      api.get(`/study-fields-public/lang/${useI18n().locale.value}`),
-      api.get(`/study-years-public/lang/${useI18n().locale.value}`),
-    ])
+  const universitiesResult: any = await api.get('/university')
+  const studyProgramsResult: any = await api.get(`/study-programs-public/lang/${locale.value}`)
+  const studyFieldsResult: any = await api.get(`/study-fields-public/lang/${locale.value}`)
+  const studyYearsResult: any = await api.get(`/study-years-public/lang/${locale.value}`)
+
+  universities.value = universitiesResult
+  studyPrograms.value = studyProgramsResult
+  studyFields.value = studyFieldsResult
+  studyYears.value = studyYearsResult
 })
 
 const rules: Record<string, (v: any) => boolean> = {
@@ -266,6 +317,11 @@ const rules: Record<string, (v: any) => boolean> = {
     v instanceof File &&
     (v.type === 'application/pdf' ||
       v.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+  transcript: v =>
+    v == null ||
+    (v instanceof File && v.type === 'application/pdf' && v.size <= 5 * 1024 * 1024),
+  honor_declaration: v => v === true,
+  privacyAccepted: v => v === true,
 }
 
 const isValid = (field: string) => {
@@ -302,7 +358,10 @@ const isStepValid = computed(() => {
       isValid('year_of_study')
     )
   }
-  return isValid('cv')
+  if (step.value === 3) {
+    return isValid('cv')
+  }
+  return isValid('honor_declaration') && isValid('privacyAccepted') && isValid('transcript')
 })
 
 function nextStep() {
@@ -312,6 +371,9 @@ function nextStep() {
 
 async function submit() {
   touch('cv')
+  touch('honor_declaration')
+  touch('privacyAccepted')
+  touch('transcript')
   if (!isStepValid.value) return
   loading.value = true
   fileError.value = ''
@@ -321,6 +383,14 @@ async function submit() {
       if (v !== null && v !== '' && v !== undefined) data.append(k, v as any)
     })
     await api.post('/auth/student-onboarding', data)
+
+    const transcriptForm = new FormData()
+    transcriptForm.append('honor_declaration', '1')
+    if (form.transcript) {
+      transcriptForm.append('transcript_file', form.transcript)
+    }
+
+    await api.post('/student/academic-record', transcriptForm)
     emit('completed')
   } catch (e: any) {
     if (e?.response?.status === 422) {

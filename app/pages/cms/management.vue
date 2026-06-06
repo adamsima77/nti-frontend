@@ -92,52 +92,78 @@
     </div>
 
     <!-- Modals -->
+     <ClientOnly>
     <AdminCmsArticleModal
       v-model="showArticleModal"
       :article="editingItem"
       @saved="fetchData"
     />
+    </ClientOnly>
+
+    <ClientOnly>
     <AdminCmsPartnerModal
       v-model="showPartnerModal"
       :partner="editingItem"
       @saved="fetchData"
     />
+    </ClientOnly>
+    
+    <ClientOnly>
     <AdminCmsFaqModal
       v-model="showFaqModal"
       :faq-item="editingItem"
       @saved="fetchData"
     />
+    </ClientOnly>
+
+     <ClientOnly>
     <AdminCmsBannerModal
       v-model="showBannerModal"
       :banner="editingItem"
       @saved="fetchData"
     />
+    </ClientOnly>
+
+    <ClientOnly>
     <AdminCmsNtiMembersModal
       v-model="showSiteMemberModal"
       :member="editingItem"
       @saved="fetchData"
     />
+    </ClientOnly>
+
+    <ClientOnly>
     <AdminConfirmDeleteModal
       v-model="showDeleteModal"
       :item-name="deletingItemName"
       :is-deleting="isDeleting"
       @confirm="handleDelete"
     />
+    </ClientOnly>
+
+    <ClientOnly>
     <AdminCmsMetaTagModal
       v-model="showMetaTagModal"
       :meta-tag="editingItem"
       @saved="fetchData"
     />
+    </ClientOnly>
+
+    <ClientOnly>
     <AdminCmsPartnerReferenceModal
       v-model="showPartnerReferenceModal"
       :reference="editingItem"
       @saved="fetchData"
     />
+    </ClientOnly>
+
+    <ClientOnly>
     <AdminCmsEmailTemplateModal
       v-model="showEmailTemplateModal"
       :template="editingItem"
       @saved="fetchData"
     />
+    </ClientOnly>
   </div>
 </template>
 

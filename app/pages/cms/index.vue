@@ -4,28 +4,51 @@
     <!-- Header -->
     <div class="mb-10">
       <ClientOnly>
-      <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('cmsDashboard.welcome', { name: userDisplayName }) }}</h1>
+        <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('cmsDashboard.welcome', { name: userDisplayName }) }}</h1>
       </ClientOnly>
       <p class="text-gray-500">{{ $t('cmsDashboard.subtitle') }}</p>
     </div>
 
     <!-- Stats row -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-      <div class="bg-white rounded-lg shadow-sm border-l-4 border-blue-600 p-5">
-        <div class="text-3xl font-bold text-blue-600">{{ publicatedArticles }}</div>
-        <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.publishedArticles') }}</p>
+      <div class="bg-white rounded-lg shadow-sm border-l-4 border-blue-600 p-5 relative min-h-[100px]">
+        <div v-if="loadingDashboard" class="absolute inset-0 flex items-center justify-center">
+          <UiLoader class="!min-h-0 scale-75" />
+        </div>
+        <template v-else>
+          <div class="text-3xl font-bold text-blue-600">{{ publicatedArticles }}</div>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.publishedArticles') }}</p>
+        </template>
       </div>
-      <div class="bg-white rounded-lg shadow-sm border-l-4 border-amber-500 p-5">
-        <div class="text-3xl font-bold text-amber-500">{{ draftCount }}</div>
-        <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.drafts') }}</p>
+      
+      <div class="bg-white rounded-lg shadow-sm border-l-4 border-amber-500 p-5 relative min-h-[100px]">
+        <div v-if="loadingDashboard" class="absolute inset-0 flex items-center justify-center">
+          <UiLoader class="!min-h-0 scale-75" />
+        </div>
+        <template v-else>
+          <div class="text-3xl font-bold text-amber-500">{{ draftCount }}</div>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.drafts') }}</p>
+        </template>
       </div>
-      <div class="bg-white rounded-lg shadow-sm border-l-4 border-purple-500 p-5">
-        <div class="text-3xl font-bold text-purple-600">{{ partnerCount }}</div>
-        <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.partners') }}</p>
+      
+      <div class="bg-white rounded-lg shadow-sm border-l-4 border-purple-500 p-5 relative min-h-[100px]">
+        <div v-if="loadingDashboard" class="absolute inset-0 flex items-center justify-center">
+          <UiLoader class="!min-h-0 scale-75" />
+        </div>
+        <template v-else>
+          <div class="text-3xl font-bold text-purple-600">{{ partnerCount }}</div>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.partners') }}</p>
+        </template>
       </div>
-      <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-600 p-5">
-        <div class="text-3xl font-bold text-green-600">{{ faqCount }}</div>
-        <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.faqEntries') }}</p>
+      
+      <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-600 p-5 relative min-h-[100px]">
+        <div v-if="loadingDashboard" class="absolute inset-0 flex items-center justify-center">
+          <UiLoader class="!min-h-0 scale-75" />
+        </div>
+        <template v-else>
+          <div class="text-3xl font-bold text-green-600">{{ faqCount }}</div>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('cmsDashboard.stats.faqEntries') }}</p>
+        </template>
       </div>
     </div>
 
@@ -59,89 +82,111 @@
           <ChevronRight class="w-4 h-4" />
         </NuxtLink>
       </div>
-      <div class="space-y-3">
-        <div
-          v-for="item in recentlyEditedItems"
-          :key="`${item.contentType}-${item.id}`"
-          class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center gap-4"
-        >
-          <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" :class="contentTypeStyle(item.type).bg">
-            <component :is="contentTypeStyle(item.type).icon" class="w-4 h-4" :class="contentTypeStyle(item.type).color" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="font-medium text-navy text-sm truncate">{{ item.title }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">{{ $t(`cmsDashboard.contentTypes.${item.contentType}`) }} · {{ $t('cmsDashboard.recentlyEdited.edited') }} {{ item.editedAt }}</p>
-          </div>
-          <NuxtLink
-            :to="item.editLink"
-            class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5 shrink-0"
-          >
-            {{ $t('cmsDashboard.recentlyEdited.edit') }}
-            <ChevronRight class="w-3.5 h-3.5" />
-          </NuxtLink>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 relative min-h-[150px]">
+        <div v-if="loadingDashboard" class="py-8 flex justify-center items-center">
+          <UiLoader class="!min-h-0" />
         </div>
-        <p
-          v-if="!recentlyEditedItems.length"
-          class="text-sm text-gray-400 text-center py-6"
-        >
-          {{ $t('cmsDashboard.recentlyEdited.empty') }}
-        </p>
+
+        <template v-else>
+          <div v-if="recentlyEditedItems && recentlyEditedItems.length" class="space-y-3">
+            <div
+              v-for="item in recentlyEditedItems"
+              :key="`${item.contentType}-${item.id}`"
+              class="bg-gray-50/40 rounded-lg border border-gray-100 p-4 flex items-center gap-4"
+            >
+              <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" :class="contentTypeStyle(item.contentType).bg">
+                <component :is="contentTypeStyle(item.contentType).icon" class="w-4 h-4" :class="contentTypeStyle(item.contentType).color" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-navy text-sm truncate">{{ item.title }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">
+                  {{ $t(`cmsDashboard.contentTypes.${item.contentType}`) }} · {{ $t('cmsDashboard.recentlyEdited.edited') }} {{ item.editedAt }}
+                </p>
+              </div>
+              <NuxtLink
+                :to="item.editLink"
+                class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5 shrink-0"
+              >
+                {{ $t('cmsDashboard.recentlyEdited.edit') }}
+                <ChevronRight class="w-3.5 h-3.5" />
+              </NuxtLink>
+            </div>
+          </div>
+          
+          <div v-else class="text-center py-8 border border-dashed border-gray-200 rounded-md bg-gray-50/20">
+            <p class="text-sm text-gray-400">
+              {{ $t('cmsDashboard.recentlyEdited.empty') }}
+            </p>
+          </div>
+        </template>
       </div>
     </div>
 
     <!-- Content overview table -->
     <div class="mb-8">
       <h2 class="text-xl font-bold text-navy mb-4">{{ $t('cmsDashboard.overview.title') }}</h2>
-      <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-gray-100 bg-gray-50">
-                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.section') }}</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.published') }}</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.drafts') }}</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.lastEdited') }}</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500"></th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-              <tr
-                v-for="section in contentSections"
-                :key="section.id"
-                class="hover:bg-gray-50 transition-colors"
-              >
-                <td class="px-5 py-4">
-                  <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-md flex items-center justify-center" :class="section.iconBg">
-                      <component :is="section.icon" class="w-4 h-4" :class="section.iconColor" />
-                    </div>
-                    <span class="font-medium text-navy">{{ $t(section.nameKey) }}</span>
-                  </div>
-                </td>
-                <td class="px-5 py-4 text-gray-600">{{ section.published }}</td>
-                <td class="px-5 py-4">
-                  <span
-                    v-if="section.drafts > 0"
-                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700"
-                  >
-                    {{ section.drafts }}
-                  </span>
-                  <span v-else class="text-gray-400">—</span>
-                </td>
-                <td class="px-5 py-4 text-gray-500 text-xs">{{ section.lastEdited }}</td>
-                <td class="px-5 py-4">
-                  <NuxtLink
-                    :to="section.link"
-                    class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
-                  >
-                    {{ $t('cmsDashboard.overview.manage') }}
-                    <ChevronRight class="w-3.5 h-3.5" />
-                  </NuxtLink>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden relative min-h-[200px]">
+        
+        <div v-if="loadingDashboard" class="py-12 flex justify-center items-center">
+          <UiLoader class="!min-h-0" />
         </div>
+
+        <template v-else>
+          <div v-if="contentSections && contentSections.length" class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-100 bg-gray-50">
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.section') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.published') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.drafts') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('cmsDashboard.overview.columns.lastEdited') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500"></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                <tr
+                  v-for="section in contentSections"
+                  :key="section.id"
+                  class="hover:bg-gray-50 transition-colors"
+                >
+                  <td class="px-5 py-4">
+                    <div class="flex items-center gap-2">
+                      <div class="w-7 h-7 rounded-md flex items-center justify-center" :class="section.iconBg">
+                        <component :is="section.icon" class="w-4 h-4" :class="section.iconColor" />
+                      </div>
+                      <span class="font-medium text-navy">{{ $t(section.nameKey) }}</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 text-gray-600">{{ section.published }}</td>
+                  <td class="px-5 py-4">
+                    <span
+                      v-if="section.drafts > 0"
+                      class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700"
+                    >
+                      {{ section.drafts }}
+                    </span>
+                    <span v-else class="text-gray-400">—</span>
+                  </td>
+                  <td class="px-5 py-4 text-gray-500 text-xs">{{ section.lastEdited }}</td>
+                  <td class="px-5 py-4">
+                    <NuxtLink
+                      :to="section.link"
+                      class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
+                    >
+                      {{ $t('cmsDashboard.overview.manage') }}
+                      <ChevronRight class="w-3.5 h-3.5" />
+                    </NuxtLink>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div v-else class="text-center py-12 border border-dashed border-gray-200 rounded-md bg-gray-50/20 m-4">
+            <p class="text-sm text-gray-400">Nenašli sa žiadne sekcie obsahu na zobrazenie.</p>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -181,19 +226,20 @@ const userDisplayName = computed(() => {
   return u.name ? `${u.name} ${u.surname ?? ''}`.trim() : u.email ?? t('cmsDashboard.defaultUser')
 })
 
-// ── Stats ──────────────────────────────────────────────────
+// ── Scoped Loading State ───────────────────────────────────
+const loadingDashboard = ref(true)
 
+// ── Stats ──────────────────────────────────────────────────
 const publicatedArticles = ref(0)
 const draftCount         = ref(0)
 const partnerCount       = ref(0)
 const faqCount           = ref(0)
 
 // ── Content overview ───────────────────────────────────────
-
 const contentOverview = ref<Record<string, any>>({})
 
 const sectionMeta: Record<string, { nameKey: string; link: string; icon: any; iconBg: string; iconColor: string }> = {
-  news:               { nameKey: 'cmsDashboard.sections.news',               link: localePath('/cms/management?tab=clanky'),             icon: Newspaper,  iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
+  news:               { nameKey: 'cmsDashboard.sections.news',              link: localePath('/cms/management?tab=clanky'),             icon: Newspaper,  iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
   partners:           { nameKey: 'cmsDashboard.sections.partners',           link: localePath('/cms/management?tab=partneri'),           icon: Users,      iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
   faq:                { nameKey: 'cmsDashboard.sections.faq',                link: localePath('/cms/management?tab=faq'),                icon: HelpCircle, iconBg: 'bg-amber-50',  iconColor: 'text-amber-600' },
   hero_banners:       { nameKey: 'cmsDashboard.sections.heroBanners',        link: localePath('/cms/management?tab=bannery'),            icon: Image,      iconBg: 'bg-pink-50',   iconColor: 'text-pink-600' },
@@ -201,8 +247,10 @@ const sectionMeta: Record<string, { nameKey: string; link: string; icon: any; ic
   partner_references: { nameKey: 'cmsDashboard.sections.partnerReferences',  link: localePath('/cms/management?tab=partner_references'), icon: FileText,   iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
 }
 
-const contentSections = computed(() =>
-  Object.entries(sectionMeta).map(([key, meta], i) => {
+const contentSections = computed(() => {
+  if (!contentOverview.value || Object.keys(contentOverview.value).length === 0) return []
+  
+  return Object.entries(sectionMeta).map(([key, meta], i) => {
     const data = contentOverview.value[key] ?? {}
     return {
       id:         i + 1,
@@ -215,21 +263,21 @@ const contentSections = computed(() =>
       iconBg:     meta.iconBg,
       iconColor:  meta.iconColor,
     }
-  }),
-)
+  })
+})
 
 // ── Translation helper ─────────────────────────────────────
-
 function getTranslation(translations: any[]): any {
   if (!Array.isArray(translations) || !translations.length) return {}
   return translations.find((tr) => tr.language_id === langId.value) ?? translations[0]
 }
 
 // ── Recently edited ────────────────────────────────────────
-
 const recentlyEditedItems = computed(() => {
   const items: any[] = []
   const o = contentOverview.value
+
+  if (!o || Object.keys(o).length === 0) return []
 
   if (o.news?.last_updated) {
     const item = o.news.last_updated
@@ -306,7 +354,6 @@ const recentlyEditedItems = computed(() => {
 })
 
 // ── Fetch ──────────────────────────────────────────────────
-
 onMounted(async () => {
   try {
     const response = await api.get('/content-overview') as Record<string, any>
@@ -320,20 +367,20 @@ onMounted(async () => {
     )
   } catch (error) {
     console.error('Failed to fetch content overview:', error)
+  } finally {
+    loadingDashboard.value = false
   }
 })
 
 // ── Quick actions ──────────────────────────────────────────
-
 const quickActions = [
-  { labelKey: 'cmsDashboard.quickActions.newArticle',  to: { path: localePath('/cms/management'), query: { tab: 'clanky',    create: '1' } }, icon: Plus,   iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
-  { labelKey: 'cmsDashboard.quickActions.newMetadata', to: { path: localePath('/cms/management'), query: { tab: 'meta_tags', create: '1' } }, icon: Layout, iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
-  { labelKey: 'cmsDashboard.quickActions.partners',    to: { path: localePath('/cms/management'), query: { tab: 'partneri',  create: '1' } }, icon: Users,  iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
-  { labelKey: 'cmsDashboard.quickActions.publicWeb',   to: localePath('/'),                                                                   icon: Globe,  iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
+  { labelKey: 'cmsDashboard.quickActions.newArticle',  to: { path: localePath('/cms/management'), query: { tab: 'clanky',    create: '1' } }, icon: Plus,    iconBg: 'bg-blue-50',   iconColor: 'text-blue-600' },
+  { labelKey: 'cmsDashboard.quickActions.newMetadata', to: { path: localePath('/cms/management'), query: { tab: 'meta_tags', create: '1' } }, icon: Layout,  iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
+  { labelKey: 'cmsDashboard.quickActions.partners',    to: { path: localePath('/cms/management'), query: { tab: 'partneri',  create: '1' } }, icon: Users,   iconBg: 'bg-green-50',  iconColor: 'text-green-600' },
+  { labelKey: 'cmsDashboard.quickActions.publicWeb',   to: localePath('/'),                                                                   icon: Globe,   iconBg: 'bg-gray-100',  iconColor: 'text-gray-600' },
 ]
 
 // ── Helpers ────────────────────────────────────────────────
-
 const contentTypeStyle = (contentType: string) => {
   const map: Record<string, { bg: string; color: string; icon: any }> = {
     news:              { bg: 'bg-blue-50',   color: 'text-blue-600',   icon: Newspaper },

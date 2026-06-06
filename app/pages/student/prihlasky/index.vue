@@ -38,6 +38,11 @@
           :options="programOptions"
           :placeholder="t('student_dashboard.applications.filters.program')"
         />
+        <UiSelect
+          v-model="categoryFilter"
+          :options="categoryOptions"
+          :placeholder="t('student_dashboard.applications.filters.category')"
+        />
       </div>
 
       <div
@@ -55,6 +60,12 @@
           </div>
           <p class="text-sm text-gray-500 mb-2">
             {{ app.team }} · {{ app.program }}
+            <span
+              v-if="app.category"
+              class="inline-flex items-center rounded-full bg-gray-100 text-gray-600 px-2 py-0.5 text-xs font-medium ml-2"
+            >
+              {{ app.category }}
+            </span>
             <span v-if="app.submittedAt"> · {{ app.submittedAt }}</span>
           </p>
           <p
@@ -132,6 +143,7 @@ onMounted(async () => {
 const searchQuery = ref('')
 const statusFilter = ref('')
 const programFilter = ref('')
+const categoryFilter = ref('')
 
 function draftToApplication(draft: ApplicationDraft): Application {
   const team = teamsStore.teams.find((x) => x.id === draft.teamId)
@@ -197,13 +209,22 @@ const programOptions = computed(() => {
   return [{ value: '', label: t('student_dashboard.applications.filters.all_programs') }, ...[...programs].sort().map((p) => ({ value: p, label: p }))]
 })
 
+const categoryOptions = computed(() => {
+  const categories = new Set<string>()
+  for (const a of combinedApplications.value) {
+    if (a.category) categories.add(a.category)
+  }
+  return [{ value: '', label: t('student_dashboard.applications.filters.all_categories') }, ...[...categories].sort().map((category) => ({ value: category, label: category }))]
+})
+
 const filteredApplications = computed(() => {
   return combinedApplications.value.filter((app: Application) => {
     const matchesSearch =
       !searchQuery.value || app.title.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesStatus = !statusFilter.value || app.status === statusFilter.value
     const matchesProgram = !programFilter.value || app.program === programFilter.value
-    return matchesSearch && matchesStatus && matchesProgram
+    const matchesCategory = !categoryFilter.value || app.category === categoryFilter.value
+    return matchesSearch && matchesStatus && matchesProgram && matchesCategory
   })
 })
 </script>

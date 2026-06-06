@@ -51,7 +51,6 @@ interface ApiApplication {
     id?: number
     name: string
   }
-  team_id?: number
   status?: string | { id?: number; name?: string }
   submitted_at: string | null
   team_members_count?: number
@@ -59,6 +58,10 @@ interface ApiApplication {
   documents?: ApiDocumentItem[]
   milestones?: ApiMilestoneRaw[]
   status_history?: ApiStatusHistoryItem[]
+  category?: {
+    id?: number
+    name?: string
+  }
   description?: string | null
 }
 
@@ -106,7 +109,7 @@ export function mapStatusFromApi(status: ApiApplication['status']): ApplicationS
   if (n.includes('draft')) return 'draft'
   if (n.includes('podan')) return 'submitted'
   if (n.includes('hodnot')) return 'evaluating'
-  if (n.includes('dopln')) return 'submitted'
+  if (n.includes('dopln')) return 'supplement'
   if (n.includes('schválen')) return 'approved'
   if (n.includes('zamiet')) return 'rejected'
   return 'draft'
@@ -169,6 +172,7 @@ export const mapApplication = (app: ApiApplication): Application => {
     submittedAt: app.submitted_at,
     members: app.team_members_count ?? 0,
     documents: docCount,
+    category: app.category?.name ?? '',
     milestones: mapMilestones(app),
     description: app.description ?? '',
     documentRows,

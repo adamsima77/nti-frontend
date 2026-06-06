@@ -33,6 +33,24 @@
         />
       </div>
 
+      <!-- Supplement banner -->
+      <div v-if="application.status === SUPPLEMENT && supplementEntry" class="mb-6">
+        <div class="rounded-lg border border-amber-100 bg-amber-50 p-4 flex items-start justify-between gap-4">
+          <div>
+            <p class="font-medium text-amber-800">{{ t('student_dashboard.applications.supplement.banner_title') }}</p>
+            <p class="text-sm text-amber-700 mt-1">{{ supplementEntry.note }}</p>
+          </div>
+          <div class="shrink-0">
+            <button
+              @click="editAndResubmit"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
+            >
+              {{ t('student_dashboard.applications.supplement.edit_and_resubmit') }}
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="flex items-start justify-between mb-6">
         <div>
           <div class="flex items-center gap-3 mb-1">
@@ -172,6 +190,10 @@
                 <dd class="text-sm font-medium text-navy">{{ application.program }}</dd>
               </div>
               <div class="flex justify-between">
+                <dt class="text-sm text-gray-500">{{ t('student_dashboard.applications.detail.category') }}</dt>
+                <dd class="text-sm font-medium text-navy">{{ application.category || t('student_dashboard.common.not_available') }}</dd>
+              </div>
+              <div class="flex justify-between">
                 <dt class="text-sm text-gray-500">{{ t('student_dashboard.applications.team') }}</dt>
                 <dd class="text-sm font-medium text-navy">{{ application.team }}</dd>
               </div>
@@ -239,6 +261,8 @@ import { computed } from 'vue'
 import { ArrowLeft, Paperclip, FileText, CheckCircle, Clock, Circle } from 'lucide-vue-next'
 import type { ApplicationStatus } from '../../../composables/modules/student/types'
 import { useApplication } from '../../../composables/modules/student/useApplications'
+import { useApplicationsStore } from '~/stores/applications'
+import { useRouter } from 'vue-router'
 const route = useRoute()
 const localePath = useLocalePath()
 const { t } = useI18n()
@@ -251,12 +275,20 @@ definePageMeta({
 useHead({ title: t('student_dashboard.applications.detail_seo_title') })
 
 const { application, pending } = useApplication(() => route.params.id as string)
+const applicationsStore = useApplicationsStore()
+const router = useRouter()
+const SUPPLEMENT = 'supplement' as any
 
 const documentRows = computed(() => application.value?.documentRows ?? [])
 
 const historyRows = computed(() => {
   const h = application.value?.history ?? []
   return [...h].reverse()
+})
+
+const supplementEntry = computed(() => {
+  const rows = historyRows.value || []
+  return rows.find((r: any) => r.status === 'supplement') ?? null
 })
 
 const docColumns = [
@@ -274,6 +306,37 @@ function historyDotColor(status: ApplicationStatus): string {
     rejected: 'bg-red-500',
   }
   return colors[status] || 'bg-gray-400'
+}
+
+async function editAndResubmit() {
+  if (!application.value) return
+  if (application.value?.status !== 'supplement') return
+
+  try {
+    // Fetch full application details to get form_data and documents
+    await applicationsStore.fetchApplicationById(application.value.id as number)
+    const raw = (applicationsStore.currentApplication as any) || null
+    if (!raw) {
+      // fallback: navigate to new form
+      await router.push(localePath('/student/prihlasky/nova'))
+      return
+    }
+
+    const formData = raw.form_data ?? {}
+    const callId = raw.call_id ?? raw.call?.id
+    const teamId = raw.team_id ?? raw.team?.id
+
+    if (!callId || !teamId) {
+      await router.push(localePath('/student/prihlasky/nova'))
+      return
+    }
+
+    // Save draft and navigate to create page with query params so draft is loaded
+    applicationsStore.saveDraft(teamId, callId, formData)
+    await router.push(localePath(`/student/prihlasky/nova?call=${callId}&team=${teamId}`))
+  } catch (err) {
+    console.error('Failed to prepare resubmit:', err)
+  }
 }
 
 function historyLabel(status: ApplicationStatus): string {

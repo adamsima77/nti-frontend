@@ -100,38 +100,133 @@
         class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6"
       >
         <h2 class="text-lg font-bold text-navy mb-5">{{ t('student_dashboard.profile.student_profile') }}</h2>
-        <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div>
-            <dt class="text-gray-500">{{ t('student_dashboard.profile.university') }}</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.university?.name ?? t('student_dashboard.common.not_available') }}</dd>
+        <div class="grid grid-cols-1 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-semibold text-gray-500">{{ t('student_dashboard.profile.university') }}</label>
+              <select
+                v-model="studentDetails.university_id"
+                class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-500"
+              >
+                <option :value="null">{{ t('student_dashboard.profile.select_university') }}</option>
+                <option v-for="university in universities" :key="university.id" :value="university.id">{{ university.name }}</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-semibold text-gray-500">{{ t('student_dashboard.profile.study_program') }}</label>
+              <select
+                v-model="studentDetails.study_program_id"
+                class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-500"
+              >
+                <option :value="null">{{ t('student_dashboard.profile.select_program') }}</option>
+                <option v-for="program in studyPrograms" :key="program.id" :value="program.id">{{ program.study_program_translations?.[0]?.name ?? program.name }}</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-semibold text-gray-500">{{ t('student_dashboard.profile.study_field') }}</label>
+              <select
+                v-model="studentDetails.study_field_id"
+                class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-500"
+              >
+                <option :value="null">{{ t('student_dashboard.profile.select_field') }}</option>
+                <option v-for="field in studyFields" :key="field.id" :value="field.id">{{ field.study_field_translations?.[0]?.name ?? field.name }}</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-semibold text-gray-500">{{ t('student_dashboard.profile.study_year') }}</label>
+              <select
+                v-model="studentDetails.study_year_id"
+                class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-500"
+              >
+                <option :value="null">{{ t('student_dashboard.profile.select_year') }}</option>
+                <option v-for="year in studyYears" :key="year.id" :value="year.id">{{ year.study_year_translations?.[0]?.name ?? year.name }}</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <dt class="text-gray-500">{{ t('student_dashboard.profile.study_program') }}</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.study_program?.study_program_translations?.[0]?.name ?? t('student_dashboard.common.not_available') }}</dd>
+
+          <div v-if="studentRecord.portfolio_url" class="text-sm text-gray-700">
+            <p class="font-medium text-gray-900">{{ t('student_dashboard.profile.portfolio') }}</p>
+            <a
+              :href="studentRecord.portfolio_url"
+              class="text-blue-600 hover:underline break-all"
+              target="_blank"
+              rel="noopener noreferrer"
+            >{{ studentRecord.portfolio_url }}</a>
           </div>
-          <div>
-            <dt class="text-gray-500">{{ t('student_dashboard.profile.study_field') }}</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.study_field?.study_field_translations?.[0]?.name ?? t('student_dashboard.common.not_available') }}</dd>
+
+          <div class="mt-6 flex items-center gap-3">
+            <UiButton :disabled="studentSaving" @click="saveStudentRecord">
+              {{ studentSaving ? t('student_dashboard.common.saving') : t('student_dashboard.profile.save_student_record') }}
+            </UiButton>
+            <span v-if="studentSaving" class="text-sm text-gray-500">{{ t('student_dashboard.profile.saving_record') }}</span>
           </div>
-          <div>
-            <dt class="text-gray-500">{{ t('student_dashboard.profile.study_year') }}</dt>
-            <dd class="font-medium text-navy">{{ studentRecord.study_year.study_year_translations?.[0]?.name ?? t('student_dashboard.common.not_available') }}</dd>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
+          <h2 class="text-lg font-bold text-navy mb-5">{{ t('student_dashboard.academic_record.title') }}</h2>
+          <div class="space-y-5">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                v-model="academicForm.honor_declaration"
+                class="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span class="text-sm text-gray-700 leading-relaxed">
+                {{ t('student_dashboard.academic_record.honor_declaration_text') }}
+              </span>
+            </label>
+
+            <p v-if="academicRecord?.honor_declaration_signed_at" class="text-sm text-gray-500">
+              {{ t('student_dashboard.academic_record.signed_at') }} {{ formatDate(academicRecord.honor_declaration_signed_at) }}
+            </p>
+
+            <div class="space-y-3">
+              <p class="text-sm font-semibold text-gray-500">{{ t('student_dashboard.academic_record.transcript_label') }}</p>
+              <div v-if="academicRecord?.transcript_file || academicForm.transcript" class="border border-gray-200 rounded-xl bg-slate-50 p-4">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div class="min-w-0">
+                    <p class="text-sm font-medium text-slate-900 truncate">{{ transcriptFileName }}</p>
+                    <p class="text-xs text-gray-500">{{ academicForm.transcript ? t('student_dashboard.academic_record.new_transcript') : t('student_dashboard.academic_record.current_transcript') }}</p>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <a
+                      v-if="academicRecord?.transcript_file && !academicForm.transcript"
+                      :href="academicRecord.transcript_file"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50"
+                    >
+                      {{ t('student_dashboard.academic_record.download') }}
+                    </a>
+                    <UiButton type="button" size="sm" variant="secondary" @click="transcriptInputRef?.click()">
+                      {{ academicRecord?.transcript_file ? t('student_dashboard.academic_record.replace') : t('student_dashboard.academic_record.upload_transcript') }}
+                    </UiButton>
+                  </div>
+                </div>
+              </div>
+              <div v-else>
+                <UiFileUpload
+                  v-model="academicForm.transcript"
+                  :label="t('student_dashboard.academic_record.upload_transcript')"
+                  accept=".pdf"
+                  @error="transcriptError = $event"
+                />
+              </div>
+              <p v-if="transcriptError" class="text-xs text-red-500">{{ transcriptError }}</p>
+              <input ref="transcriptInputRef" type="file" class="sr-only" accept=".pdf" @change="onTranscriptFile" />
+            </div>
+
+            <div class="flex items-center gap-3">
+              <UiButton :disabled="academicSaving" @click="saveAcademicRecord">
+                {{ academicSaving ? t('student_dashboard.common.saving') : t('student_dashboard.academic_record.save_button') }}
+              </UiButton>
+              <span v-if="academicSaving" class="text-sm text-gray-500">{{ t('student_dashboard.academic_record.saving') }}</span>
+            </div>
           </div>
-          <div
-            v-if="studentRecord.portfolio_url"
-            class="md:col-span-2"
-          >
-            <dt class="text-gray-500">{{ t('student_dashboard.profile.portfolio') }}</dt>
-            <dd>
-              <a
-                :href="studentRecord.portfolio_url"
-                class="text-blue-600 hover:underline break-all"
-                target="_blank"
-                rel="noopener noreferrer"
-              >{{ studentRecord.portfolio_url }}</a>
-            </dd>
-          </div>
-        </dl>
+        </div>
       </div>
 
       <div
@@ -182,6 +277,26 @@ const deletingAccount = ref(false)
 const avatarInputRef = ref<HTMLInputElement | null>(null)
 const studentLoaded = ref(false)
 const studentRecord = ref<any | null>(null)
+const academicRecord = ref<any | null>(null)
+const academicSaving = ref(false)
+const academicLoading = ref(false)
+const transcriptError = ref('')
+const transcriptInputRef = ref<HTMLInputElement | null>(null)
+const studentSaving = ref(false)
+const universities = ref<any[]>([])
+const studyPrograms = ref<any[]>([])
+const studyFields = ref<any[]>([])
+const studyYears = ref<any[]>([])
+const studentDetails = reactive({
+  university_id: null as number | null,
+  study_program_id: null as number | null,
+  study_field_id: null as number | null,
+  study_year_id: null as number | null,
+})
+const academicForm = reactive({
+  honor_declaration: false,
+  transcript: null as File | null,
+})
 
 const form = reactive({
   firstName: '',
@@ -235,7 +350,7 @@ onMounted(async () => {
   try {
     await authStore.getCurrentUser()
     syncFormFromUser()
-    await Promise.all([teamsStore.fetchTeams(), refreshApplications(), loadStudentMe()])
+    await Promise.all([teamsStore.fetchTeams(), refreshApplications(), loadStudyOptions(), loadStudentMe(), loadAcademicRecord()])
   } finally {
     pageLoading.value = false
   }
@@ -245,10 +360,134 @@ async function loadStudentMe() {
   try {
     const res = await api.get('/students/me') as { student?: any }
     studentRecord.value = res.student ?? null
+    studentDetails.university_id = studentRecord.value?.university_id ?? null
+    studentDetails.study_program_id = studentRecord.value?.study_program_id ?? null
+    studentDetails.study_field_id = studentRecord.value?.study_field_id ?? null
+    studentDetails.study_year_id = studentRecord.value?.study_year_id ?? null
   } catch {
     studentRecord.value = null
+    studentDetails.university_id = null
+    studentDetails.study_program_id = null
+    studentDetails.study_field_id = null
+    studentDetails.study_year_id = null
   } finally {
     studentLoaded.value = true
+  }
+}
+
+async function loadStudyOptions() {
+  try {
+    const [universityRes, studyProgramRes, studyFieldRes, studyYearRes] = await Promise.all<any>([
+      api.get('/university'),
+      api.get('/study-program'),
+      api.get('/study-field'),
+      api.get('/study-year'),
+    ])
+
+    universities.value = universityRes ?? []
+    studyPrograms.value = studyProgramRes ?? []
+    studyFields.value = studyFieldRes ?? []
+    studyYears.value = studyYearRes ?? []
+  } catch {
+    universities.value = []
+    studyPrograms.value = []
+    studyFields.value = []
+    studyYears.value = []
+  }
+}
+
+async function loadAcademicRecord() {
+  academicLoading.value = true
+  try {
+    const res = await api.get('/student/academic-record') as any
+    const record = res?.academic_record ?? res
+    academicRecord.value = record ?? null
+    academicForm.honor_declaration = Boolean(record?.honor_declaration)
+    academicForm.transcript = null
+  } catch {
+    academicRecord.value = null
+    academicForm.honor_declaration = false
+    academicForm.transcript = null
+  } finally {
+    academicLoading.value = false
+  }
+}
+
+const transcriptFileName = computed(() => {
+  if (academicForm.transcript) return academicForm.transcript.name
+  return academicRecord.value?.transcript_file?.split('/').pop() ?? ''
+})
+
+function onTranscriptFile(ev: Event) {
+  const input = ev.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  transcriptError.value = ''
+  if (!file) return
+
+  if (file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) {
+    transcriptError.value = t('student_dashboard.academic_record.transcript_type_error')
+    return
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    transcriptError.value = t('student_dashboard.academic_record.transcript_size_error')
+    return
+  }
+
+  academicForm.transcript = file
+}
+
+function formatDate(dateString?: string | null): string {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  if (Number.isNaN(date.getTime())) return ''
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
+async function saveAcademicRecord() {
+  academicSaving.value = true
+  transcriptError.value = ''
+
+  try {
+    const formData = new FormData()
+    formData.append('honor_declaration', academicForm.honor_declaration ? '1' : '0')
+    if (academicForm.transcript) {
+      formData.append('transcript_file', academicForm.transcript)
+    }
+
+    await api.post('/student/academic-record', formData)
+    await loadAcademicRecord()
+    addToast({ message: t('student_dashboard.academic_record.save_success'), type: 'success' })
+  } catch (err: any) {
+    const msg = err?.data?.message ?? err?.message ?? t('student_dashboard.academic_record.save_error')
+    addToast({ message: msg, type: 'error' })
+  } finally {
+    academicSaving.value = false
+  }
+}
+
+async function saveStudentRecord() {
+  if (!studentRecord.value) return
+
+  studentSaving.value = true
+  try {
+    await api.put(`/students/${studentRecord.value.id}`, {
+      university_id: studentDetails.university_id,
+      study_program_id: studentDetails.study_program_id,
+      study_field_id: studentDetails.study_field_id,
+      study_year_id: studentDetails.study_year_id,
+    })
+    await loadStudentMe()
+    addToast({ message: t('student_dashboard.profile.toasts.saved'), type: 'success' })
+  } catch (err: any) {
+    const msg = err?.data?.message ?? err?.message ?? t('student_dashboard.profile.toasts.save_failed')
+    addToast({ message: msg, type: 'error' })
+  } finally {
+    studentSaving.value = false
   }
 }
 

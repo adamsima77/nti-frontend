@@ -58,6 +58,125 @@
     "en_title": "English",
     "sk_title": "Slovenčina"
   },
+  "evaluator": {
+    "welcome": "Welcome, {name}!",
+    "subtitle": "Evaluator dashboard",
+    "stats": {
+      "total": "Applications total",
+      "pending": "Pending evaluation",
+      "evaluated": "Evaluated",
+      "decided": "Decided"
+    },
+    "assigned_calls": "Assigned calls",
+    "go_to_list": "Go to list",
+    "deadline_label": "Deadline",
+    "open_applications": "Open applications",
+    "urgent_header": "Waiting for your evaluation",
+    "action": {
+      "evaluate": "Evaluate",
+      "detail": "Detail"
+    },
+    "recent_applications": "Recent applications",
+    "view_all": "View all",
+    "view_application_detail": "View application detail",
+    "application_detail": "Application detail",
+    "view_evaluation": "View evaluation",
+    "application_summary": "Application summary",
+    "category": "Category",
+    "filter_by_category": "Filter by category",
+    "all_categories": "All categories",
+    "student_name": "Student name",
+    "school_program_year": "School / Program / Year",
+    "call": "Call",
+    "current_status": "Current status",
+    "application_description": "Application description",
+    "form_responses": "Form responses",
+    "no_form_responses": "No form responses",
+
+    "team_members": "Team members",
+    "student_profile": "Student profile",
+    "documents": "Documents",
+    "no_documents": "No documents",
+    "overall_evaluation": "Overall evaluation",
+    "final_decision": "Final decision",
+    "submitted_at": "Submitted at",
+    "application_history": "Application history",
+    "no_history": "No history",
+    "back_to_list": "Back to evaluations",
+    "submitted_label": "Submitted",
+    "commission_avg": "commission average / 100",
+    "scoring_form": "Scoring form",
+    "scoring_instructions": "Rate each criterion from 0 to its maximum points",
+    "max_points": "max {n} pts",
+    "comment_placeholder": "Comment on the criterion: {criterion}...",
+    "total_score": "Total score",
+    "points": "points",
+    "scoring_label": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "sufficient": "Sufficient",
+      "insufficient": "Insufficient"
+    },
+    "overall_comment": "Overall comment and recommendation",
+    "internal_note_label": "Internal note for commission",
+    "internal_note_placeholder": "Notes visible only to commission members...",
+    "recommendation_label": "Recommendation",
+    "recommendations": {
+      "approve": "Approve",
+      "supplement": "Request supplement",
+      "reject": "Reject"
+    },
+    "submit_section": "Submit evaluation",
+    "request_supplement": "Request supplement from the team",
+    "supplement_hint": "The team will receive a notification asking for additional materials",
+    "supplement_placeholder": "What specifically should the team provide...",
+    "save_draft": "Save draft",
+    "submit": "Submit evaluation",
+    "submitting": "Submitting...",
+    "error": {
+      "select_recommendation": "Select a recommendation before submitting"
+    },
+    "submitted_title": "Evaluation submitted",
+    "submitted_message": "Your evaluation has been recorded and is visible to other commission members.",
+    "sidebar": {
+      "commission": "Commission",
+      "average": "Average",
+      "team": "Team",
+      "info": "Information",
+      "program": "Program",
+      "submitted": "Submitted",
+      "evaluation_deadline": "Evaluation deadline",
+      "academic_criteria": "Academic criteria",
+      "documents": "Documents"
+    },
+    "academic_record": {
+      "title": "Academic record",
+      "honor_declaration": "Honor declaration",
+      "signed_at": "Signed at",
+      "not_signed": "Not signed",
+      "transcript": "Grade transcript",
+      "download": "Download",
+      "not_uploaded": "Not uploaded",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "waiting": "waiting",
+    "loading_detail": "Loading application detail...",
+    "auto_saved": "💾 Draft was saved",
+    "academic_flag": {
+      "unverified": "Unverified",
+      "meets": "Meets criteria",
+      "not_meet": "Does not meet criteria"
+    },
+    "errors": {
+      "locked": "Evaluation is locked.",
+      "supplement_empty": "Please enter what the team should supplement.",
+      "invalid_score": "Score for criterion {criterion} is out of range or missing."
+    }
+    ,
+    "program_label": "Program",
+    "application_label": "Application"
+  },
 
   "program-a": {
     "title": "What is Program A",
@@ -917,8 +1036,10 @@
         "search_placeholder": "Search by title...",
         "status": "Status",
         "program": "Program",
+        "category": "Category",
         "all_statuses": "All statuses",
-        "all_programs": "All programs"
+        "all_programs": "All programs",
+        "all_categories": "All categories"
       },
       "status": {
         "draft": "Draft",
@@ -940,6 +1061,7 @@
         "in_progress": "In progress",
         "pending": "Pending",
         "information": "Information",
+        "category": "Category",
         "members": "Members",
         "submitted_at": "Submitted at",
         "status_history": "Status history",
@@ -970,6 +1092,12 @@
       "study_field": "Study field",
       "study_year": "Year",
       "portfolio": "Portfolio",
+      "select_university": "Select university",
+      "select_program": "Select program",
+      "select_field": "Select field",
+      "select_year": "Select year",
+      "save_student_record": "Save student record",
+      "saving_record": "Saving student record...",
       "teams_count": "{count} teams",
       "applications_count": "{count} applications",
       "no_student_record": "You don't have a student record in the database yet (it is usually created via onboarding API).",
@@ -983,9 +1111,38 @@
         "invalid_photo_type": "Only JPEG or PNG images are allowed.",
         "photo_too_large": "The file is too large (max. 4 MB).",
         "photo_saved": "Profile photo was saved.",
-        "photo_error": "Photo upload failed."
+        "photo_error": "Photo upload failed.",
+        "save_failed": "Unable to save student record."
       }
+    },
+    "academic_record": {
+      "title": "Academic record",
+      "honor_declaration": "Honor declaration",
+      "honor_declaration_text": "I hereby declare that I have no carried-over subjects and my profile subject average meets program requirements",
+      "honor_declaration_required": "You must confirm the honor declaration to continue.",
+      "transcript_label": "Grade transcript",
+      "transcript_upload": "Upload transcript",
+      "upload_transcript": "Upload grade transcript (PDF)",
+      "save_button": "Save academic record",
+      "signed_at": "Signed at",
+      "not_signed": "Not signed",
+      "transcript_error": "Please upload a PDF transcript.",
+      "download": "Download transcript",
+      "not_uploaded": "Transcript not uploaded",
+      "privacy_required": "You must agree to the privacy policy.",
+      "yes": "Yes",
+      "no": "No",
+      "status_confirmed": "Honor declaration confirmed",
+      "status_not_confirmed": "Honor declaration not confirmed",
+      "status_not_provided": "Honor declaration not provided",
+      "saving": "Saving...",
+      "saved": "Academic record saved."
     }
+  },
+
+  "privacy": {
+    "consent": "I agree with the",
+    "policy_link": "Privacy Policy"
   },
 
   "pending_approval": {
@@ -1413,7 +1570,12 @@
       "tasks": "Tasks assigned"
     },
     "noEntries": "No entries",
-    "tryFilters": "Try changing filters or add a new consultation"
+    "tryFilters": "Try changing filters or add a new consultation",
+    "types": {
+      "online": "Online",
+      "personal": "In person",
+      "written": "Written"
+    }
   },
   "consultationForm": {
     "pageTitle": "New consultation | NTI Mentor",
@@ -1578,7 +1740,12 @@
       "tasks": "Tasks assigned"
     },
     "noEntries": "No entries",
-    "tryFilters": "Try changing filters or add a new consultation"
+    "tryFilters": "Try changing filters or add a new consultation",
+    "types": {
+      "online": "Online",
+      "personal": "In person",
+      "written": "Written"
+    }
   },
   "consultationForm": {
     "pageTitle": "New consultation | NTI Mentor",
@@ -1661,11 +1828,13 @@
     "errors": {
       "notFound": "The project was not found or you do not have access to it.",
       "loadFailed": "Failed to load project detail.",
-      "saveFailed": "An error occurred while saving."
+      "saveFailed": "An error occurred while saving.",
+      "rejectCommentRequired": "A comment is required when rejecting a milestone (min. 20 characters)."
     }
   }
  },
  "portal_sidebar_links": {
+  "roles": "Roles & Permissions",
   "dashboard": "Dashboard",
   "applications": "My applications",
   "teams": "My teams",
@@ -1689,6 +1858,8 @@
   "sectionSystem": "System"
 },
 "user_management": {
+    "export_calls": "Export calls",
+    "export_users": "Export users",
     "title": "Users",
     "subtitle": "Manage registered users and their roles",
     "page_title": "Users — Admin | NTI",
@@ -1698,6 +1869,7 @@
     "all_statuses": "All statuses",
     "clear_filters": "Clear filters",
     "edit": "Edit",
+    "gdpr_download": "GDPR export",
     "gdpr_anonymize": "GDPR anonymization",
     "total_users": "Total: {count} users",
     "col_name": "Name",
@@ -1824,6 +1996,298 @@
   "common": {
     "cancel": "Cancel",
     "close": "Close",
-    "retry": "Retry"
+    "retry": "Retry",
+     "select_export_format": "Select export format",
+      "export_btn": "Export data"
+  },
+
+  "admin_dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of platform activities and statistics",
+    "stats": {
+      "applications": "Applications",
+      "activeCalls": "Active Calls",
+      "users": "Users",
+      "teams": "Teams"
+    },
+    "activeCalls": {
+      "title": "Active Calls",
+      "applicationsCount": "{count} applications",
+      "deadline": "Deadline",
+      "empty": "No active calls are currently available."
+    },
+    "pendingApprovals": {
+      "title": "Organizations Pending Approval",
+      "noOrganization": "No organization",
+      "noPosition": "Position not specified",
+      "registration": "Registration",
+      "empty": "No organizations are pending approval."
+    },
+    "cmsOverview": {
+      "empty": "No content sections found to display."
+    }
+  },
+ "admin_calls": {
+  "title": "Calls",
+  "subtitle": "Manage calls and application periods",
+  "page_title": "Calls — Admin | NTI",
+  "add_call": "New call",
+  "all_statuses": "All statuses",
+  "deadline_from": "Deadline from",
+  "deadline_to": "Deadline to",
+  "clear_filters": "Clear filters",
+  "total_calls": "Total calls: {count}",
+  "col_name": "Name",
+  "col_program": "Program",
+  "col_organization": "Organization",
+  "col_status": "Status",
+  "col_deadline": "Deadline",
+  "col_applications": "Applications",
+  "edit": "Edit",
+  "open": "Open",
+  "closed": "Closed",
+  "load_error": "Failed to load call.",
+  "fetch_error": "Failed to load calls."
+},
+
+"superadmin_dashboard": {
+    "page": "Page {current} of {total}",
+     "empty": "No audit logs found",
+    "title": "Super Admin Dashboard",
+    "subtitle": "Global system control, infrastructure metrics, security auditing, and compliance oversight.",
+    "actions": {
+      "systemSettings": "System Settings"
+    },
+    "stats": {
+      "totalUsers": "Total Users (Platform)",
+      "totalOrganizations": "Total Organizations",
+      "systemErrors": "Active System Errors",
+      "securityAlerts": "Security Alerts (24h)"
+    },
+    "auditLogs": {
+      "title": "System Audit Logs & Security Events (Last 48h)",
+      "viewAll": "View All Logs",
+      "title_1": "System Audit Logs & Security Events",
+      "subtitle": "Critical security events, access logs, and system changes",
+      "empty": "No critical audit logs recorded in the last 48 hours.",
+      "page": "Page {current} of {total}",
+      "columns": {
+        "actor": "Actor",
+        "source": "Source",
+        "type": "Type",
+        "severity": "Severity",
+        "message": "Message",
+        "object": "Object",
+        "ipAddress": "IP Address",
+        "timestamp": "Timestamp"
+      }
+    },
+    "gdprOversight": {
+      "title": "GDPR Compliance & Retention",
+      "retentionPruning": "Automated Retention Pruning",
+      "lastExecution": "Last run",
+      "pendingAnonymization": "Pending Anonymizations",
+      "expiredDataPruned": "Expired Records Cleaned"
+    },
+    "integrations": {
+      "title": "Infrastructure & Services Health",
+      "unavailable": "Unavailable"
+    },
+    "modules": {
+      "title": "System Architecture Core Modules",
+      "configure": "Configure Node",
+      "columns": {
+        "moduleName": "Core Module",
+        "status": "Status",
+        "version": "Version",
+        "totalDbRecords": "Database Records"
+      }
+    },
+    "sections": {
+      "identity": "Identity & Access Control (RBAC)",
+      "organizations": "Partners & Organizations",
+      "reporting": "Reporting & Metrics Generator",
+      "notifications": "Notification Engine & Dispatcher",
+      "audit": "System Audit & Compliance Ledger"
+    },
+    "status": {
+      "active": "Active / Healthy"
+    }
+  },
+  "filters": {
+    "year": "Year",
+    "day": "Day",
+    "time": "Time",
+    "any": "Any",
+    "apply": "Apply Filters",
+    "clear": "Clear"
+  },
+  "callModal": {
+    "titleNew": "New Call",
+    "titleEdit": "Edit Call",
+    "language": "Language",
+    "languageSwitcherHint": "Switch language to edit translations",
+    "program": "Program",
+    "selectProgram": "Select program",
+    "status": "Status",
+    "qualificationStack": "Qualification Stack",
+    "noStackOptional": "No stack (optional)",
+    "contentInLanguage": "Content in language",
+    "callName": "Call Name",
+    "callNamePlaceholder": "E.g. Spring Incubator 2026",
+    "description": "Description",
+    "descriptionPlaceholder": "Brief description of the call and its focus...",
+    "applicationDatesHeading": "Application Deadlines",
+    "projectDatesHeading": "Project Implementation Dates",
+    "dateStart": "Start",
+    "dateDeadline": "Deadline",
+    "projectStart": "Project Start",
+    "projectEnd": "Project End",
+    "forceCloseTitle": "Manually Close Call",
+    "forceCloseActiveHint": "The call is manually closed — applicants cannot apply.",
+    "forceCloseInactiveHint": "The call follows the scheduled deadline. Toggle on to close it immediately.",
+    "formTabHint": {
+      "prefix": "Design fields that applicants will fill out when submitting their application. For ",
+      "highlight": "Program A",
+      "suffix": ", fields for 6 mandatory documents are pre-filled."
+    },
+    "fieldDefaultLabel": "Field {num}",
+    "fieldRequiredBadge": "required",
+    "fieldNameLabel": "Field Label",
+    "fieldNamePlaceholder": "E.g. Project Description",
+    "fieldTypeLabel": "Field Type",
+    "fieldIdentifierLabel": "Identifier",
+    "automatic": "automatic",
+    "fieldSampleTextLabel": "Placeholder Text",
+    "fieldSampleTextPlaceholder": "E.g. Enter name...",
+    "fieldAllowedFormatsLabel": "Allowed Formats",
+    "fieldHelpTextLabel": "Help Text",
+    "fieldHelpTextPlaceholder": "Short description of what the applicant should fill out...",
+    "fieldOptionsLabel": "Selection Options",
+    "fieldOptionPlaceholder": "Option...",
+    "fieldAddOption": "Add Option",
+    "fieldRequiredLabel": "Required Field",
+    "formEmptyTitle": "Form is empty",
+    "formEmptySubtitle": "Add fields using the button below",
+    "fieldAddButton": "Add Field",
+    "criteriaTabHint": {
+      "prefix": "Select the committee's evaluation criteria and set their ",
+      "highlightWeight": "weight (1–10)",
+      "middle": ". Criteria flagged as an ",
+      "highlightSignal": "academic signal",
+      "suffix": " are informative — they do not cause automatic rejection (§7.2)."
+    },
+    "availableCriteriaLabel": "Available Criteria",
+    "selectAtLeastOne": "Select at least one",
+    "noCriteriaAvailable": "No criteria available.",
+    "noTranslationBadge": "No translation",
+    "newCriterionBadge": "New",
+    "weight": "Weight",
+    "removeNewCriterionTooltip": "Remove this new criterion",
+    "criterionWeightLabel": "Criterion Weight",
+    "academicSignal": "Academic Signal",
+    "academicSignalHint": "informative, does not reject application",
+    "createNewCriterionButton": "Create New Criterion",
+    "newCriterionFormTitle": "New Criterion — fill for each language",
+    "required": "required",
+    "optional": "optional",
+    "criterionNameInputLabel": "Criterion Name",
+    "criterionNamePlaceholderSK": "E.g. Inovačný potenciál",
+    "criterionNamePlaceholderEN": "E.g. Innovation potential",
+    "criterionDescriptionInputLabel": "Description",
+    "criterionDescriptionPlaceholderSK": "Short description for evaluators...",
+    "criterionDescriptionPlaceholderEN": "Short description for evaluators...",
+    "addAndSelectButton": "Add and Select",
+    "cancel": "Cancel",
+    "saveButton": "Save",
+    "savingStatus": "Saving…",
+    "selectedLabel": "Selected",
+    "newCriteriaSummarySuffix": "new (will be created upon saving)",
+    "averageWeightLabel": "Average Weight",
+    "primaryLanguageFallback": "primary language",
+    "criterionFallbackPrefix": "Criterion",
+    "tabs": {
+      "basic": "Basic Info",
+      "form": "Application Form",
+      "criteria": "Evaluation Criteria"
+    },
+    "fieldTypes": {
+      "text": "Short Text",
+      "textarea": "Long Text",
+      "number": "Number",
+      "email": "E-mail",
+      "select": "Single Select",
+      "radio": "Radio Button",
+      "checkbox": "Checkboxes",
+      "date": "Date",
+      "file": "Attachment"
+    },
+    "weightLabels": [
+      "Very Low",
+      "Low",
+      "Below Average",
+      "Slightly Low",
+      "Medium",
+      "Slightly High",
+      "Above Average",
+      "High",
+      "Very High",
+      "Critical"
+    ],
+    "criteriaCountSingular": "criterion",
+    "criteriaCountPluralFew": "criteria",
+    "criteriaCountPluralMany": "criteria",
+    "academicSignalCountSingular": "academic signal",
+    "academicSignalCountPluralFew": "academic signals",
+    "academicSignalCountPluralMany": "academic signals",
+    "validation": {
+      "deadlineOrder": "Deadline must be after the start date.",
+      "projectEndOrder": "Project end must be after its start date.",
+      "programRequired": "Please select a program.",
+      "requiredField": "Required.",
+      "nameTranslatableRequired": "Name ({code}) is required.",
+      "descriptionTranslatableRequired": "Description ({code}) is required.",
+      "formFieldNameRequired": "All fields must have a completed label.",
+      "formFieldIdentifierInvalid": "Field \"{label}\" has an invalid identifier.",
+      "formFieldDuplicate": "The form contains duplicate field identifiers.",
+      "newCriteriaPrimaryNameRequired": "New criteria must have a title filled in the primary language.",
+      "atLeastOneCriterion": "You must select at least one evaluation criterion.",
+      "newCriterionPrimaryRequired": "Name in {lang} is required.",
+      "serverFormSchemaValidationFailed": "Form schema validation failed on the server.",
+      "serverCriteriaValidationFailed": "Criteria validation failed on the server."
+    },
+    "toasts": {
+      "metaError": "Failed to load metadata.",
+      "validationBasicError": "Please check the mandatory fields — complete content for all languages.",
+      "formFieldNameError": "Form error: All fields must have a completed label.",
+      "formFieldIdentifierError": "Identifier error: Field \"{label}\" requires lowercase letters without accents.",
+      "formFieldDuplicateError": "Form error: Duplicate field identifiers.",
+      "newCriteriaPrimaryTranslationError": "Criteria error: New criterion lacks a primary translation.",
+      "atLeastOneCriterionError": "Criteria error: Select at least one evaluation criterion.",
+      "saveSuccess": "The call was successfully saved.",
+      "serverValidationError": "Failed to save the call due to validation errors on the server.",
+      "saveGenericError": "Failed to save the call."
+    },
+    "errors": {
+      "criterionIdFetchFailed": "Failed to fetch ID for new criterion \"{fallback}\"."
+    }
+  },
+
+  "superadmin_permissions": {
+    "page_title": "Permission Matrix",
+    "title": "Permission Matrix",
+    "subtitle": "Manage assigned permissions for individual system roles.",
+    "save_changes": "Save Changes",
+    "system_roles": "System Roles",
+    "permissions_count": "{count} permissions",
+    "search_placeholder": "Search permission...",
+    "assign_all": "Assign all visible",
+    "unassign_all": "Unassign all visible",
+    "empty_state": "No permissions found matching the filter.",
+    "module_label": "Module: {name}",
+    "items_count": "{count} items",
+    "load_error": "Error loading the permission matrix.",
+    "save_success": "Changes saved successfully.",
+    "save_error": "Error while saving configuration."
   }
 }
