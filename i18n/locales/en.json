@@ -1009,6 +1009,7 @@
     "applications": {
       "title": "My Applications",
       "application": "Application",
+       "submitted_date": "Submitted at",
       "team": "Team",
       "new_application": "New application",
       "new_description": "Choose a call and fill in the form for your team application",
@@ -1027,6 +1028,13 @@
       "no_form_schema": "This call does not contain a dynamic form schema from API yet.",
       "no_form_schema_continuation": "The application can be completed after backend support is added",
       "no_form_fields": "This call has no form fields (empty schema). Check the call configuration or contact an administrator.",
+      "supplement": {
+        "cancel_edit": "Cancel edit",
+        "banner_title": "The application has been returned for completion. Please provide the required information and resubmit it.",
+        "edit_and_resubmit": "Edit and resubmit",
+        "editing_title": "Edit request",
+        "editing_subtitle": "Correct the required information and resubmit the request."
+      },
       "open_calls": {
         "open": "Open",
         "empty_title": "No open calls",
@@ -1049,6 +1057,7 @@
         "rejected": "Rejected"
       },
       "detail": {
+        "submit_draft": "Edit and submit",
         "not_found_title": "Application not found",
         "project_description": "Project description",
         "documents": "Documents",

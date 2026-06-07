@@ -361,32 +361,40 @@ const handleSubmit = async (data: Record<string, any>) => {
     return
   }
 
-  const formPayload  = serializeFormDataForApi(schema, data as Record<string, unknown>)
-  const documentIds  = collectDocumentIdsFromForm(schema, data as Record<string, unknown>)
+  // 1. Dynamic Schema-Driven Validation (Strict for submission)
+  const errors: string[] = []
+  schema.fields.forEach((field: any) => {
+    if (field.required && (!data[field.name] || (Array.isArray(data[field.name]) && data[field.name].length === 0))) {
+      errors.push(t('student_dashboard.applications.errors.required_field', { field: field.label || field.name }))
+    }
+  })
 
-  if (documentIds.length === 0) {
-    addToast({
-      message: 'Nahrajte aspoň jednu prílohu (pole typu súbor v prihláške).',
-      type: 'error',
-    })
+  if (errors.length > 0) {
+    addToast({ message: errors[0], type: 'error' })
     return
   }
+
+  // 2. Prepare Payload
+  const formPayload = serializeFormDataForApi(schema, data as Record<string, unknown>)
 
   isSubmitting.value = true
 
   try {
-    const application = await applicationsStore.createApplication({
-      callId:      selectedCall.value.id,
-      teamId:      Number(selectedTeamId.value),
-      documentIds,
-      formData:    formPayload,
-    })
+  
+    const response = await api.post('/submit-application', {
+      call_id: selectedCall.value.id,
+      team_id: Number(selectedTeamId.value),
+      form_data: formPayload,
+    }) as any
 
     addToast({ message: t('student_dashboard.applications.toasts.created'), type: 'success' })
 
-    applicationsStore.clearDraft(Number(selectedTeamId.value), selectedCall.value.id)
-
-    await router.push(localePath(`/student/prihlasky/${application.id}`))
+    const appId = response?.data?.id ?? response?.id
+    if (appId) {
+      await router.push(localePath(`/student/prihlasky/${appId}`))
+    } else {
+      await router.push(localePath('/student/prihlasky'))
+    }
   } catch (err: any) {
     const msg = err?.data?.message ?? err?.message ?? t('student_dashboard.applications.toasts.submit_failed')
     addToast({ message: msg, type: 'error' })

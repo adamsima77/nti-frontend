@@ -738,8 +738,16 @@
       }
     },
     "applications": {
+       "supplement": {
+        "banner_title": "Prihláška bola vrátená na doplnenie, doplňte požadované údaje a znova ju odošlite.",
+        "edit_and_resubmit": "Upraviť a znovu odoslať",
+        "cancel_edit": "Zrušiť úpravu",
+        "editing_title": "Upraviť žiadosť",
+         "editing_subtitle": "Opravte požadované údaje a žiadosť znova odošlite."
+       },
       "title": "Moje prihlášky",
       "application": "Prihláška",
+      "submitted_date": "Datum podania",
       "team": "Tím",
       "new_application": "Nová prihláška",
       "new_description": "Vyberte výzvu a vyplňte formulár pre prihlášku vášho tímu",
@@ -780,6 +788,7 @@
         "rejected": "Zamietnuté"
       },
       "detail": {
+        "submit_draft": "Upraviť a odoslať",
         "not_found_title": "Prihláška nenájdená",
         "project_description": "Popis projektu",
         "documents": "Dokumenty",

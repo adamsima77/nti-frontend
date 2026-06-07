@@ -26,6 +26,11 @@ interface ApiStatusHistoryItem {
   status?: { id?: number; name?: string }
   note?: string | null
   created_at?: string
+  changed_by?: {
+    id: number
+    name: string
+  } | null,
+  updated_at?: string
 }
 
 interface ApiDocumentItem {
@@ -35,17 +40,40 @@ interface ApiDocumentItem {
   uploaded_at?: string | null
 }
 
+interface ApiTeamMember {
+  user_id: number
+  name: string
+  surname: string
+  role_id: number
+  role_name: string
+  student?: {
+    id: number
+    academic_flags?: Array<{
+      id: number
+      name: string
+      created_at?: string
+      updated_at?: string
+      pivot?: Record<string, unknown>
+    }>
+  }
+}
+
 interface ApiApplication {
   id: number
+  name?: string 
+  description?: string 
 
   reference?: string
   academic_flag?: boolean
+  last_update?: string
 
-  team_members?: any[]
+  team_members?: ApiTeamMember[]
+  team_members_count?: number
 
-  form_data?: Record<string, unknown>
+  form_data?: Record<string, unknown> | null
 
   documents?: ApiDocumentItem[]
+  documents_count?: number
 
   mentorships?: any[]
   milestones?: ApiMilestoneRaw[]
@@ -64,11 +92,14 @@ interface ApiApplication {
       name: string
     }
   }
+  call_id?: number
 
   team?: {
     id?: number
     name: string
   }
+  team_id?: number
+  created_by?: number
 
   status?: string | {
     id?: number
@@ -105,22 +136,32 @@ function extractSingleApplication(res: unknown): ApiApplication | null {
 
   const r = res as Record<string, unknown>
 
-  // { id: 1, ... }
+  // Direct matching: { id: 1, ... }
   if (typeof r.id === 'number') {
     return r as unknown as ApiApplication
   }
 
-  // { application: { id: 1, ... } }
+  // Wrapped schema matching: { application: { id: 1, ... }, answer: ... }
   if (
     r.application &&
     typeof r.application === 'object' &&
     !Array.isArray(r.application) &&
     typeof (r.application as ApiApplication).id === 'number'
   ) {
-    return r.application as ApiApplication
+    const app = r.application as ApiApplication
+
+    // Inject matching answers block into form_data if original form_data context is null
+    if (!app.form_data && r.answer && typeof r.answer === 'object' && !Array.isArray(r.answer)) {
+      const answerObj = r.answer as Record<string, unknown>
+      if (answerObj.answer && typeof answerObj.answer === 'object') {
+        app.form_data = answerObj.answer as Record<string, unknown>
+      }
+    }
+    
+    return app
   }
 
-  // { data: { id: 1, ... } }
+  // Wrapped data property matching: { data: { id: 1, ... } }
   if (
     r.data &&
     typeof r.data === 'object' &&
@@ -135,7 +176,7 @@ function extractSingleApplication(res: unknown): ApiApplication | null {
 
 function formatApiDate(iso: string | null | undefined): string {
   if (!iso) return ''
-  return String(iso).slice(0, 10)
+  return String(iso) 
 }
 
 export function mapStatusFromApi(status: ApiApplication['status']): ApplicationStatus {
@@ -155,17 +196,42 @@ function mapMilestoneStatus(s: unknown): Milestone['status'] {
   if (v === 'completed' || v === 'in_progress' || v === 'pending') return v
   return 'pending'
 }
-
-function mapHistory(app: ApiApplication): ApplicationHistoryEntry[] {
+function mapHistory(app: ApiApplication): any[] {
   const raw = app.status_history ?? []
   return [...raw]
     .filter((h) => h?.created_at)
     .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)))
-    .map((h) => ({
-      status: mapStatusFromApi(h.status),
-      date: formatApiDate(h.created_at),
-      note: h.note ?? null,
-    }))
+    .map((h) => {
+      // Vytiahneme surový ISO timestamp z changed_by alebo z created_at
+      const rawDateStr = h.changed_by?.updated_at ?? h.created_at
+      let formattedTimestamp = ''
+
+      if (rawDateStr) {
+        const d = new Date(rawDateStr)
+        // Skontrolujeme, či je dátum validný
+        if (!isNaN(d.getTime())) {
+          const day = String(d.getDate()).padStart(2, '0')
+          const month = String(d.getMonth() + 1).padStart(2, '0')
+          const year = d.getFullYear()
+          const hours = String(d.getHours()).padStart(2, '0')
+          const minutes = String(d.getMinutes()).padStart(2, '0')
+          
+          // Vygeneruje formát: "07.06.2026 11:22"
+          formattedTimestamp = `${day}.${month}.${year} ${hours}:${minutes}`
+        }
+      }
+
+      return {
+        status: mapStatusFromApi(h.status),
+        date: formatApiDate(h.created_at), // Ponechané pre pravý panel (iba dátum)
+        note: h.note ?? null,
+        changed_by: h.changed_by ? {
+          id: h.changed_by.id,
+          name: h.changed_by.name,
+          updated_at: formattedTimestamp 
+        } : null
+      }
+    })
 }
 
 function mapDocumentRows(app: ApiApplication): ApplicationDocumentRow[] {
@@ -195,25 +261,26 @@ function mapMilestones(app: ApiApplication): Milestone[] {
 export const mapApplication = (app: ApiApplication): Application => {
   const documentRows = mapDocumentRows(app)
   const docCount = app.documents_count ?? documentRows.length
+  const teamMembers = app.team_members ?? []
 
   return {
     id: app.id,
     title: app.name ?? app.call?.name ?? `Prihláška #${app.id}`,
     program: app.call?.program?.name ?? app.call?.name ?? 'Program',
     team: app.team?.name ?? (app.team_id != null ? `Tím #${app.team_id}` : 'Tím'),
-    teamId: app.team_id,
-    callId: app.call?.id ?? app.call_id,
+    teamId: app.team_id ?? null,
+    callId: app.call?.id ?? app.call_id ?? null,
     status: mapStatusFromApi(app.status),
-     teamMembers: app.team_members ?? [],
-  formData: app.form_data ?? {},
+    teamMembers,
+    formData: app.form_data ?? {},
     submittedAt: app.submitted_at,
-    members: app.team_members_count ?? 0,
+    members: app.team_members_count ?? teamMembers.length,
     documents: docCount,
     category: app.category?.name ?? '',
     milestones: mapMilestones(app),
     description: app.description ?? '',
     documentRows,
-    history: mapHistory(app),
+    history: mapHistory(app), // Tu sa už nachádza pole s changed_by objektom
     comments: [] as ApplicationComment[],
   }
 }

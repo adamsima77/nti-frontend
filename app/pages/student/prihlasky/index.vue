@@ -119,9 +119,7 @@
                   <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">#</th>
                   <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Výzva</th>
                   <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Tím</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Kategória</th>
                   <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Stav</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Dokumenty</th>
                   <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Vytvorené</th>
                   <th class="px-5 py-3" />
                 </tr>
@@ -141,14 +139,9 @@
                   <td class="px-5 py-4 text-gray-600">
                     {{ app.team?.name ?? '—' }}
                   </td>
-                  <td class="px-5 py-4 text-gray-600">
-                    {{ categoryName(app) }}
-                  </td>
+                  
                   <td class="px-5 py-4">
-                    <UiStatusBadge :status="app.status.name" />
-                  </td>
-                  <td class="px-5 py-4 text-gray-500">
-                    {{ app.documents?.length ?? 0 }}
+                    <UiStatusBadge :status="normalizeStatusProp(app.status?.name)" />
                   </td>
                   <td class="px-5 py-4 text-gray-400 text-xs whitespace-nowrap">
   {{ formatDate(app.submitted_at) }}
@@ -345,4 +338,22 @@ onMounted(async () => {
   await fetchLookups()
   await fetchApplications()
 })
+
+const dbStatusMap: Record<string, string> = {
+  'Draft': 'draft',
+  'Podané': 'submitted',
+  'V hodnotení': 'evaluating',
+  'Vyžiadané doplnenie': 'pending', // Reuses pending styles (amber/warning colors)
+  'Schválené': 'approved',
+  'Zamietnuté': 'rejected',
+  'Pozastavené': 'paused',
+  'Onboarding': 'pending_onboarding', // Maps to user onboarding style variations cleanly
+  'Aktívny projekt': 'active',
+  'Ukončené': 'completed',
+}
+
+function normalizeStatusProp(dbStatusName?: string): string {
+  if (!dbStatusName) return 'draft'
+  return dbStatusMap[dbStatusName] ?? dbStatusName.toLowerCase()
+}
 </script>

@@ -17,7 +17,7 @@
         @update:current-page="onPageChange"
       >
         <template #header>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 border-b border-gray-100">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 border-b border-gray-100">
             <UiInput
               v-model="search"
               placeholder="Hľadať podľa tímu alebo ID..."
@@ -27,6 +27,10 @@
               :options="statusOptions"
               placeholder="Vyberte stav"
             />
+            <UiButton @click="handleExport">
+              <Download class="w-4 h-4" />
+              Exportovať
+            </UiButton>
           </div>
         </template>
 
@@ -34,33 +38,41 @@
           <UiStatusBadge :status="value" />
         </template>
 
-       
-
-      <template #row-actions="{ row }">
-  <div class="flex items-center gap-2">
-    <button
-      class="text-blue-600 hover:text-blue-800 transition"
-      title="Zobraziť detail"
-      @click="openDetail(row)"
-    >
-      <Eye class="w-4 h-4" />
-    </button>
-  </div>
-</template>
+        <template #row-actions="{ row }">
+          <div class="flex items-center gap-2">
+            <button
+              class="text-blue-600 hover:text-blue-800 transition"
+              title="Zobraziť detail"
+              @click="openDetail(row)"
+            >
+              <Eye class="w-4 h-4" />
+            </button>
+          </div>
+        </template>
       </UiDataTable>
- 
     </div>
- 
   </div>
-    <AdminApplicationDetailModal
-  v-model="showDetailModal"
-  :application-id="selectedApplicationId"
-  @refreshed="fetchApplications"
-/>
+
+  <AdminApplicationDetailModal
+    v-model="showDetailModal"
+    :application-id="selectedApplicationId"
+    @refreshed="fetchApplications"
+  />
+
+  <AdminExportModal
+    v-model="openExportModal"
+    title="Export prihlášok"
+    subtitle="Exportuje zoznam prihlášok na základe zvolených filtrov"
+    endpoint="applications/export"
+    filename-prefix="applications_export"
+    :allowed-formats="['xlsx', 'csv', 'pdf']"
+    :is-async="true"
+    :filters="exportFilters"
+  />
 </template>
 
 <script setup lang="ts">
-import { Eye, UserPlus } from 'lucide-vue-next'
+import { Download, Eye } from 'lucide-vue-next'
 import type { AdminApplication } from '~/types/admin'
 
 definePageMeta({
@@ -74,14 +86,14 @@ useHead({ title: 'Prihlášky — Admin | NTI' })
 const api = useApi()
 
 // ── Filters ────────────────────────────────────────────────────────────────
-const search = ref('')
+const search       = ref('')
 const statusFilter = ref<number | ''>('')
 
 // ── Table state ────────────────────────────────────────────────────────────
-const isLoading = ref(false)
+const isLoading    = ref(false)
 const applications = ref<any[]>([])
-const currentPage = ref(1)
-const totalPages = ref(1)
+const currentPage  = ref(1)
+const totalPages   = ref(1)
 
 const columns = [
   { key: 'reference',   label: 'ID',      sortable: true },
@@ -92,7 +104,7 @@ const columns = [
   { key: 'submittedAt', label: 'Dátum',   sortable: true },
 ]
 
-// ── Filter options ─────────────────────────────────────────────────────────
+// ── Status filter options ──────────────────────────────────────────────────
 const statusOptions = ref<{ value: number | ''; label: string }[]>([])
 
 // ── Status slug map ────────────────────────────────────────────────────────
@@ -114,33 +126,38 @@ const mappedApplications = computed(() =>
   applications.value.map((a) => {
     const firstMentor = a.mentorships?.[0]?.mentor
     return {
-      id:              a.id,
-      reference:       a.reference ?? '—',
-      team:            a.team?.name ?? '—',
-      call:            a.call?.name ?? '—',
-      status:          STATUS_MAP[a.status?.name] ?? 'draft',
-      mentor:          firstMentor
-                         ? `${firstMentor.name} ${firstMentor.surname}`.trim()
-                         : null,
-      submittedAt:     a.submitted_at
-                         ? new Date(a.submitted_at).toLocaleDateString('sk-SK')
-                         : '—',
-      canAssignMentor: ['Schválené', 'Aktívny projekt'].includes(a.status?.name ?? ''),
-      _raw:            a,
+      id:          a.id,
+      reference:   a.reference ?? '—',
+      team:        a.team?.name ?? '—',
+      call:        a.call?.name ?? '—',
+      status:      STATUS_MAP[a.status?.name] ?? 'draft',
+      mentor:      firstMentor
+                     ? `${firstMentor.name} ${firstMentor.surname}`.trim()
+                     : null,
+      submittedAt: a.submitted_at
+                     ? new Date(a.submitted_at).toLocaleDateString('sk-SK')
+                     : '—',
+      _raw: a,
     }
   }),
 )
 
-// ── Client-side search only (status is server-side) ────────────────────────
+
+
+// ── Client-side search (status filter is server-side) ─────────────────────
 const filteredApplications = computed(() => {
   const q = search.value.toLowerCase().trim()
   if (!q) return mappedApplications.value
-
-  return mappedApplications.value.filter((a) =>
-    a.reference.toLowerCase().includes(q) ||
-    a.team.toLowerCase().includes(q),
+  return mappedApplications.value.filter(
+    (a) => a.reference.toLowerCase().includes(q) || a.team.toLowerCase().includes(q),
   )
 })
+
+// ── Export filters passed to AdminExportModal ──────────────────────────────
+// The modal appends these as query params: ?status_id=X&...
+const exportFilters = computed(() => ({
+  ...(statusFilter.value !== '' && { status_id: statusFilter.value }),
+}))
 
 // ── Data fetching ──────────────────────────────────────────────────────────
 async function fetchApplications() {
@@ -153,19 +170,19 @@ async function fetchApplications() {
           ...(statusFilter.value !== '' && { status_id: statusFilter.value }),
         },
       }),
-      api.get('/status-of-applications'),
+      api.get('/get-status-admin'),
     ])
 
-    const paginator = appsRes.applications
+    const paginator    = appsRes.applications
     applications.value = paginator.data ?? []
     currentPage.value  = paginator.current_page
     totalPages.value   = paginator.last_page
 
-   const rawStatuses: any[] = statusRes.statuses ?? []
-statusOptions.value = [
-  { value: '', label: 'Všetky stavy' },  
-  ...rawStatuses.map((s) => ({ value: s.id, label: s.name })),
-]
+    const rawStatuses: any[] = statusRes.statuses ?? []
+    statusOptions.value = [
+      { value: '', label: 'Všetky stavy' },
+      ...rawStatuses.map((s) => ({ value: s.id, label: s.name })),
+    ]
   } catch {
     useToast().error('Nepodarilo sa načítať prihlášky. Skúste to neskôr.')
   } finally {
@@ -173,8 +190,6 @@ statusOptions.value = [
   }
 }
 
-// search → client-side only, no API call, no debounce needed
-// status → server-side, reset page and refetch
 watch(statusFilter, () => {
   currentPage.value = 1
   fetchApplications()
@@ -187,19 +202,20 @@ async function onPageChange(page: number) {
 
 onMounted(() => fetchApplications())
 
-
-const selectedApplication = ref<AdminApplication | null>(null)
-
-  const showDetailModal = ref(false)
-// selectedApplication is already declared as ref<AdminApplication | null>(null)
- 
+// ── Detail modal ───────────────────────────────────────────────────────────
+const showDetailModal       = ref(false)
 const selectedApplicationId = ref<number | null>(null)
+const selectedApplication   = ref<AdminApplication | null>(null)
 
 function openDetail(row: any) {
   selectedApplicationId.value = row.id
-  showDetailModal.value = true
+  showDetailModal.value       = true
 }
 
+// ── Export modal ───────────────────────────────────────────────────────────
+const openExportModal = ref(false)
 
-
+function handleExport() {
+  openExportModal.value = true
+}
 </script>

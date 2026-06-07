@@ -117,13 +117,13 @@
                 <div>
                   <p class="text-sm font-medium text-navy">{{ row.title }}</p>
                   <p class="text-xs text-gray-400 mt-0.5">
-                    {{ row.program }} · {{ row.submittedAt || t('student_dashboard.applications.draft') }}
+                      <span>{{ formatApplicationDate(row.submitted_at) }}</span>
                   </p>
                 </div>
               </template>
-              <template #cell-status="{ value }">
-                <UiStatusBadge :status="value" />
-              </template>
+              <template #cell-status="{ row }">
+  <UiStatusBadge :status="normalizeStatusProp(row.status?.name)" />
+</template>
             </UiDataTable>
           </div>
         </div>
@@ -230,7 +230,7 @@ const memberColumns = [
 ]
 
 const appColumns = [
-  { key: 'title', label: t('student_dashboard.applications.application') },
+  { key: 'title', label: t('student_dashboard.applications.submitted_date') },
   { key: 'status', label: t('student_dashboard.applications.filters.status') },
 ]
 
@@ -257,6 +257,19 @@ const removeMemberAction = async (memberId: number) => {
   }
 }
 
+function formatApplicationDate(dateString?: string): string {
+  if (!dateString) return t('student_dashboard.applications.draft')
+  
+  // Replace space with T to ensure cross-browser ISO parsing standard compliance
+  const date = new Date(dateString.replace(' ', 'T'))
+  
+  return date.toLocaleDateString('sk-SK', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
+
 const handleMemberInvited = () => {
   showInviteModal.value = false
   addToast({
@@ -275,4 +288,24 @@ function getInitials(name: string): string {
     .toUpperCase()
     .slice(0, 2)
 }
+
+
+const dbStatusMap: Record<string, string> = {
+  'Draft': 'draft',
+  'Podané': 'submitted',
+  'V hodnotení': 'evaluating',
+  'Vyžiadané doplnenie': 'pending', // Reuses pending styles (amber/warning colors)
+  'Schválené': 'approved',
+  'Zamietnuté': 'rejected',
+  'Pozastavené': 'paused',
+  'Onboarding': 'pending_onboarding', // Maps to user onboarding style variations cleanly
+  'Aktívny projekt': 'active',
+  'Ukončené': 'completed',
+}
+
+function normalizeStatusProp(dbStatusName?: string): string {
+  if (!dbStatusName) return 'draft'
+  return dbStatusMap[dbStatusName] ?? dbStatusName.toLowerCase()
+}
+
 </script>

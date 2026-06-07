@@ -2,14 +2,14 @@
   <Teleport to="body">
     <Transition name="modal-fade">
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        
+
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="close" />
 
         <div
           class="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
-          style="min-height: 500px;" 
+          style="min-height: 500px;"
         >
-          <!-- ── Loading skeleton ───────────────────────────────────────────── -->
+          <!-- ── Loading skeleton ─────────────────────────────────────── -->
           <div v-if="isFetching" class="flex-1 flex items-center justify-center py-24">
             <div class="flex flex-col items-center gap-3 text-gray-400">
               <div class="w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
@@ -18,7 +18,7 @@
           </div>
 
           <template v-else-if="application">
-            <!-- ── Header ─────────────────────────────────────────────────── -->
+            <!-- ── Header ─────────────────────────────────────────────── -->
             <div class="flex items-start justify-between px-6 pt-5 pb-4 border-b border-gray-100">
               <div class="flex items-center gap-3 min-w-0">
                 <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
@@ -45,7 +45,7 @@
               </button>
             </div>
 
-            <!-- ── Tabs ───────────────────────────────────────────────────── -->
+            <!-- ── Tabs ───────────────────────────────────────────────── -->
             <div class="flex border-b border-gray-100 px-6 gap-1 overflow-x-auto">
               <button
                 v-for="tab in tabs"
@@ -69,7 +69,7 @@
               </button>
             </div>
 
-            <!-- ── Tab content ─────────────────────────────────────────────── -->
+            <!-- ── Tab content ────────────────────────────────────────── -->
             <div class="flex-1 overflow-y-auto">
 
               <!-- ═══════════ INFO TAB ═══════════ -->
@@ -109,7 +109,6 @@
                           {{ memberFullName(member) }}
                         </p>
                       </div>
-                      <!-- Rola člena tímu -->
                       <span
                         v-if="member.role_name || member.role_id"
                         :class="[
@@ -184,13 +183,14 @@
 
               <!-- ═══════════ ANSWERS TAB ═══════════ -->
               <div v-else-if="activeTab === 'answers'" class="p-6 max-w-4xl mx-auto">
-  
+
                 <div v-if="isFetchingAnswers" class="flex flex-col items-center justify-center py-16 text-slate-400 gap-3">
-                  <div class="w-8 h-8 border-3 border-slate-200 border-t-indigo-600 rounded-full animate-spin" />
+                  <div class="w-8 h-8 border-2 border-slate-200 border-t-indigo-600 rounded-full animate-spin" />
                   <span class="text-sm font-medium">Načítavam odpovede…</span>
                 </div>
 
-                <div v-else-if="!formData || Object.keys(formData).length === 0"
+                <div
+                  v-else-if="!formData || Object.keys(formData).length === 0"
                   class="flex flex-col items-center justify-center py-16 text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50"
                 >
                   <FileText class="w-12 h-12 mb-3 text-slate-300 opacity-80" />
@@ -203,42 +203,113 @@
                     :key="key"
                     :class="[
                       'bg-white rounded-xl border border-slate-100 p-5 shadow-sm transition-all duration-200 hover:shadow-md',
-                      typeof value === 'string' && value.length > 60 ? 'md:col-span-2' : ''
+                      fieldSpansFullWidth(value) ? 'md:col-span-2' : '',
                     ]"
                   >
+                    <!-- Field label -->
                     <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                       {{ key }}
                     </p>
-                    
-                    <div v-if="Array.isArray(value)" class="flex flex-wrap gap-2 mt-1.5">
-                      <span
-                        v-for="item in value"
-                        :key="item"
-                        class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-sm"
-                      >
-                        {{ item }}
-                      </span>
-                    </div>
 
-                    <p 
-                      v-else-if="typeof value === 'string' && value.length > 60" 
-                      class="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed mt-1.5 bg-slate-50 p-4 rounded-xl border border-slate-100"
-                    >
-                      {{ value }}
-                    </p>
+                    <!-- ── FILE ── -->
+                    <template v-if="detectFieldType(value) === 'file'">
+                      <div class="flex flex-col gap-2 mt-1.5">
+                        <div
+                          v-for="docId in parseFileIds(value)"
+                          :key="docId"
+                          class="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-50 group"
+                        >
+                          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                            <Paperclip class="w-4 h-4 text-blue-500" />
+                          </div>
+                          <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-navy truncate">
+                              {{ fileMetaMap[docId]?.file_name ?? `Dokument #${docId}` }}
+                            </p>
+                            <p v-if="fileMetaMap[docId]?.created_at" class="text-xs text-slate-400 mt-0.5">
+                              {{ formatDate(fileMetaMap[docId].created_at) }}
+                            </p>
+                          </div>
+                          <button
+                            class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            :disabled="downloadingIds.has(docId)"
+                            @click="downloadDocument(docId, fileMetaMap[docId]?.file_name)"
+                          >
+                            <span
+                              v-if="downloadingIds.has(docId)"
+                              class="w-3 h-3 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"
+                            />
+                            <Download v-else class="w-3.5 h-3.5" />
+                            {{ downloadingIds.has(docId) ? 'Sťahujem…' : 'Stiahnuť' }}
+                          </button>
+                        </div>
+                      </div>
+                    </template>
 
-                    <p v-else class="text-base font-semibold text-slate-700 mt-1">
-                      {{ value ?? '—' }}
-                    </p>
+                    <!-- ── DATE ── -->
+                    <template v-else-if="detectFieldType(value) === 'date'">
+                      <div class="flex items-center gap-2 mt-1">
+                        <CalendarDays class="w-4 h-4 text-slate-400 flex-shrink-0" />
+                        <p class="text-sm font-semibold text-slate-700">
+                          {{ formatDateOnly(value) }}
+                        </p>
+                      </div>
+                    </template>
+
+                    <!-- ── BOOLEAN ── -->
+                    <template v-else-if="detectFieldType(value) === 'boolean'">
+                      <div class="flex items-center gap-2 mt-1">
+                        <div
+                          :class="[
+                            'w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0',
+                            isTruthy(value) ? 'bg-emerald-100' : 'bg-red-50',
+                          ]"
+                        >
+                          <Check v-if="isTruthy(value)" class="w-3 h-3 text-emerald-600" />
+                          <X v-else class="w-3 h-3 text-red-400" />
+                        </div>
+                        <p class="text-sm font-semibold text-slate-700">
+                          {{ isTruthy(value) ? 'Áno' : 'Nie' }}
+                        </p>
+                      </div>
+                    </template>
+
+                    <!-- ── ARRAY (multi-select / checkbox group) ── -->
+                    <template v-else-if="detectFieldType(value) === 'array'">
+                      <div class="flex flex-wrap gap-2 mt-1.5">
+                        <span
+                          v-for="item in normalizeArray(value)"
+                          :key="item"
+                          class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100"
+                        >
+                          {{ item }}
+                        </span>
+                        <span v-if="!normalizeArray(value).length" class="text-sm text-slate-400">—</span>
+                      </div>
+                    </template>
+
+                    <!-- ── LONG TEXT ── -->
+                    <template v-else-if="detectFieldType(value) === 'longtext'">
+                      <p class="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed mt-1.5 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        {{ value }}
+                      </p>
+                    </template>
+
+                    <!-- ── NUMBER / SHORT TEXT (default) ── -->
+                    <template v-else>
+                      <p class="text-base font-semibold text-slate-700 mt-1">
+                        {{ value ?? '—' }}
+                      </p>
+                    </template>
+
                   </div>
                 </div>
-
               </div>
 
               <!-- ═══════════ MANAGEMENT TAB ═══════════ -->
               <div v-else-if="activeTab === 'manage'" class="p-6 space-y-6">
 
-                <!-- ── Status change ──────────────────────────────────────── -->
+                <!-- ── Status change ────────────────────────────────────── -->
                 <div class="rounded-xl border border-gray-100 overflow-hidden">
                   <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
@@ -288,7 +359,7 @@
                   </div>
                 </div>
 
-                <!-- ── Committee assignment (len v stave Podané) ── -->
+                <!-- ── Committee assignment ──────────────────────────── -->
                 <div
                   v-if="showCommitteeSection"
                   class="rounded-xl border border-amber-100 bg-amber-50/40 overflow-hidden"
@@ -300,8 +371,6 @@
                     </h3>
                   </div>
                   <div class="px-4 py-4 space-y-3">
-
-                    <!-- Komisia už priradená → len info banner, žiadny formulár -->
                     <template v-if="assignedCommittee">
                       <div class="flex items-center gap-3 p-3 rounded-xl bg-amber-100/60 border border-amber-200">
                         <Scale class="w-4 h-4 text-amber-600 flex-shrink-0" />
@@ -323,17 +392,14 @@
                       </p>
                     </template>
 
-                    <!-- Žiadna komisia → zobraziť select + tlačidlo -->
                     <template v-else>
                       <p class="text-xs text-gray-500">
                         Prihláška je v stave hodnotenia. Vyberte komisiu, ktorá prihláška posúdi.
                       </p>
-
                       <div v-if="isFetchingCommittees" class="flex items-center gap-2 text-xs text-gray-400 py-2">
                         <div class="w-4 h-4 border-2 border-gray-200 border-t-amber-500 rounded-full animate-spin" />
                         Načítavam komisie…
                       </div>
-
                       <div v-else class="flex gap-2">
                         <div class="flex-1">
                           <UiSelect
@@ -361,7 +427,7 @@
                   </div>
                 </div>
 
-                <!-- ── Mentor assignment (len v stave Onboarding) ── -->
+                <!-- ── Mentor assignment ──────────────────────────────── -->
                 <div
                   v-if="showMentorSection"
                   class="rounded-xl border border-emerald-100 bg-emerald-50/40 overflow-hidden"
@@ -376,13 +442,10 @@
                     <p class="text-xs text-gray-500">
                       Projekt vstúpil do onboardingu. Priraďte mentora, ktorý bude tím sprevádzať.
                     </p>
-
                     <div v-if="isFetchingMentors" class="flex items-center gap-2 text-xs text-gray-400 py-2">
                       <div class="w-4 h-4 border-2 border-gray-200 border-t-emerald-500 rounded-full animate-spin" />
                       Načítavam mentorov…
                     </div>
-
-                    <!-- Currently assigned mentors -->
                     <div v-if="application.mentorships?.length" class="space-y-1.5">
                       <p class="text-xs font-medium text-gray-500">Priradení mentori:</p>
                       <div class="flex flex-wrap gap-2">
@@ -403,7 +466,6 @@
                         </div>
                       </div>
                     </div>
-
                     <div class="flex gap-2">
                       <div class="flex-1">
                         <UiSelect
@@ -422,7 +484,6 @@
                         Priradiť
                       </button>
                     </div>
-
                     <div v-if="mentorError" class="text-xs text-red-500 flex items-center gap-1">
                       <AlertCircle class="w-3.5 h-3.5" />
                       {{ mentorError }}
@@ -433,7 +494,8 @@
               </div>
 
             </div>
-            <!-- ── Footer ─────────────────────────────────────────────────── -->
+
+            <!-- ── Footer ─────────────────────────────────────────────── -->
             <div class="px-6 py-3 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
               <span class="text-xs text-gray-400">
                 Aktualizované: {{ formatDate(application.last_update) }}
@@ -447,7 +509,7 @@
             </div>
           </template>
 
-          <!-- ── Error state ────────────────────────────────────────────── -->
+          <!-- ── Error state ────────────────────────────────────────── -->
           <div v-else class="flex-1 flex flex-col items-center justify-center py-20 text-gray-400">
             <AlertCircle class="w-10 h-10 mb-3 opacity-40" />
             <p class="text-sm">Prihlášku sa nepodarilo načítať.</p>
@@ -477,12 +539,16 @@ import {
   Info,
   MessageSquare,
   Settings,
+  Paperclip,
+  Download,
+  CalendarDays,
+  Check,
 } from 'lucide-vue-next'
 
 const api = useApi()
 const toast = useToast()
 
-// ── Types ─────────────────────────────────────────────────────────────────
+// ── Types ──────────────────────────────────────────────────────────────────
 
 interface Mentor {
   id: number
@@ -507,11 +573,14 @@ interface TeamMember {
   name?: string
   surname?: string
   role_id?: number
-  role_name?: string   // voliteľné — backend môže poslať priamo textovú hodnotu
-  student?: {
-    id?: number
-    name?: string
-  } | null
+  role_name?: string
+  student?: { id?: number; name?: string } | null
+}
+
+interface FileMeta {
+  file_name: string
+  file_path: string
+  created_at: string | null
 }
 
 interface ApplicationDetail {
@@ -520,38 +589,20 @@ interface ApplicationDetail {
   submitted_at: string | null
   last_update: string | null
   form_data: Record<string, any> | null
-
-  call: {
-    id: number
-    name: string
-  } | null
-
-  status: {
-    id: number
-    name: string
-  } | null
-
-  team: {
-    id: number
-    name: string
-    members: TeamMember[]
-  } | null
-
+  call: { id: number; name: string } | null
+  status: { id: number; name: string } | null
+  team: { id: number; name: string; members: TeamMember[] } | null
   mentorships: Mentorship[]
   committee: Committee | null
-
   statusHistory: Array<{
     id: number
-    status: {
-      id: number
-      name: string
-    } | null
+    status: { id: number; name: string } | null
     note?: string
     created_at: string
   }>
 }
 
-// ── STATUS Konštanty ─────────────────────────────────────────────────────
+// ── STATUS constants ───────────────────────────────────────────────────────
 
 const STATE_DRAFT                = 'Draft'
 const STATE_SUBMITTED            = 'Podané'
@@ -590,11 +641,8 @@ const BACKEND_TRANSITIONS: Record<string, string[]> = {
   [STATE_COMPLETED]: [],
 }
 
-// Komisia: len v stave Podané (odtiaľ vedie prechod na V hodnotení)
 const COMMITTEE_STATUSES = [STATE_SUBMITTED]
-
-// Mentor: len v stave Onboarding (odtiaľ vedie prechod na Aktívny projekt)
-const MENTOR_STATUSES = [STATE_ONBOARDING]
+const MENTOR_STATUSES    = [STATE_ONBOARDING]
 
 // ── Props / emits ──────────────────────────────────────────────────────────
 
@@ -610,22 +658,17 @@ const emit = defineEmits<{
 
 // ── Core state ─────────────────────────────────────────────────────────────
 
-const isFetching = ref(false)
+const isFetching  = ref(false)
 const application = ref<ApplicationDetail | null>(null)
-const activeTab = ref<'info' | 'answers' | 'manage'>('info')
+const activeTab   = ref<'info' | 'answers' | 'manage'>('info')
 
 // ── Derived ────────────────────────────────────────────────────────────────
 
 const currentStatusName = computed(() => application.value?.status?.name ?? STATE_DRAFT)
-const statusSlug = computed(() => STATUS_SLUG[currentStatusName.value] ?? 'draft')
+const statusSlug        = computed(() => STATUS_SLUG[currentStatusName.value] ?? 'draft')
 
-const showCommitteeSection = computed(() =>
-  COMMITTEE_STATUSES.includes(currentStatusName.value),
-)
-
-const showMentorSection = computed(() =>
-  MENTOR_STATUSES.includes(currentStatusName.value),
-)
+const showCommitteeSection = computed(() => COMMITTEE_STATUSES.includes(currentStatusName.value))
+const showMentorSection    = computed(() => MENTOR_STATUSES.includes(currentStatusName.value))
 
 const assignedCommittee = computed((): Committee | null => {
   if (application.value?.committee) return application.value.committee
@@ -648,8 +691,8 @@ const quickStats = computed(() => [
 ])
 
 const tabs = computed(() => [
-  { id: 'info', label: 'Informácie', icon: Info, badge: null },
-  { id: 'answers', label: 'Odpovede', icon: MessageSquare, badge: null },
+  { id: 'info',    label: 'Informácie', icon: Info,        badge: null },
+  { id: 'answers', label: 'Odpovede',   icon: MessageSquare, badge: null },
   {
     id: 'manage',
     label: 'Správa',
@@ -663,9 +706,8 @@ const tabs = computed(() => [
 async function fetchApplication() {
   if (!props.applicationId) return
   isFetching.value = true
-
   try {
-    const res = await api.get(`/applications/${props.applicationId}`)
+    const res  = await api.get(`/applications/${props.applicationId}`)
     const data = res?.application ?? res
     if (!data) throw new Error('No data received')
 
@@ -697,19 +739,91 @@ async function fetchApplication() {
   } catch (error) {
     console.error('Fetch error:', error)
     application.value = null
-    toast.addToast({
-      message: 'Nepodarilo sa načítať detail prihlášky.',
-      type: 'error',
-    })
+    toast.addToast({ message: 'Nepodarilo sa načítať detail prihlášky.', type: 'error' })
   } finally {
     isFetching.value = false
   }
 }
 
-// ── Form answers ───────────────────────────────────────────────────────────
+// ── Form answers & field-type engine ──────────────────────────────────────
 
 const isFetchingAnswers = ref(false)
-const formData = ref<Record<string, any> | null>(null)
+const formData          = ref<Record<string, any> | null>(null)
+
+/**
+ * FILE REFERENCE DETECTION
+ *
+ * The backend stores file answers as a JSON-stringified array of Document IDs,
+ * e.g. "[6]" or "[6,7]". We detect this pattern and resolve the IDs to real
+ * file metadata via GET /documents/{id}.
+ */
+const FILE_REF_RE = /^\[\s*\d+(\s*,\s*\d+)*\s*\]$/
+
+type FieldType = 'file' | 'date' | 'boolean' | 'array' | 'longtext' | 'text'
+
+function detectFieldType(value: any): FieldType {
+  if (value === null || value === undefined) return 'text'
+
+  // Native JS array → multi-select / checkbox group
+  if (Array.isArray(value)) return 'array'
+
+  if (typeof value === 'boolean') return 'boolean'
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+
+    // File reference: "[6]", "[3, 7]"
+    if (FILE_REF_RE.test(trimmed)) return 'file'
+
+    // ISO date only: "2026-06-03"
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return 'date'
+
+    // Boolean strings from checkboxes
+    if (trimmed === 'true' || trimmed === 'false') return 'boolean'
+
+    // Long text
+    if (trimmed.length > 60) return 'longtext'
+  }
+
+  return 'text'
+}
+
+/** Parse "[6]" or "[3, 7]" into [6] / [3, 7] */
+function parseFileIds(value: string): number[] {
+  try {
+    const parsed = JSON.parse(value)
+    if (Array.isArray(parsed)) return parsed.map(Number).filter(n => !isNaN(n) && n > 0)
+  } catch {
+    // fallback: extract numbers manually
+    const nums = value.match(/\d+/g)
+    if (nums) return nums.map(Number)
+  }
+  return []
+}
+
+/** Normalize a value to a string array for rendering multi-select answers */
+function normalizeArray(value: any): string[] {
+  if (Array.isArray(value)) return value.map(String)
+  try {
+    const parsed = JSON.parse(value)
+    if (Array.isArray(parsed)) return parsed.map(String)
+  } catch {}
+  return []
+}
+
+function isTruthy(value: any): boolean {
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'string') return value.toLowerCase() === 'true'
+  return Boolean(value)
+}
+
+/** A field should span full width when it is long text or a file block */
+function fieldSpansFullWidth(value: any): boolean {
+  const t = detectFieldType(value)
+  if (t === 'longtext') return true
+  if (t === 'file' && parseFileIds(value).length > 1) return true
+  return false
+}
 
 async function fetchAnswers() {
   if (!props.applicationId || !application.value) return
@@ -718,18 +832,27 @@ async function fetchAnswers() {
     const res = await api.get(`/application-answer/${props.applicationId}`)
     const raw = res.data ?? res
 
+    let map: Record<string, any> = {}
+
     if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-      formData.value = raw
+      map = raw
     } else if (Array.isArray(raw)) {
-      const map: Record<string, any> = {}
       for (const entry of raw) {
         const label = entry.form_field?.name ?? entry.form_field_id
         map[label] = entry.value
       }
-      formData.value = map
-    } else {
-      formData.value = null
     }
+
+    formData.value = Object.keys(map).length ? map : null
+
+    // Pre-load file metadata for all file references found in the answers
+    const fileIds: number[] = []
+    for (const val of Object.values(map)) {
+      if (typeof val === 'string' && FILE_REF_RE.test(val.trim())) {
+        fileIds.push(...parseFileIds(val))
+      }
+    }
+    if (fileIds.length) await fetchFileMeta(fileIds)
   } catch {
     formData.value = application.value?.form_data ?? null
   } finally {
@@ -737,15 +860,82 @@ async function fetchAnswers() {
   }
 }
 
-// ── Statuses list & Options ──────────────────────────────────────────────────
+// ── File metadata cache & download ────────────────────────────────────────
+
+/**
+ * Map of document_id → { file_name, file_path, created_at }
+ * Populated on demand when answers are fetched.
+ */
+const fileMetaMap   = ref<Record<number, FileMeta>>({})
+const downloadingIds = ref<Set<number>>(new Set())
+
+async function fetchFileMeta(ids: number[]) {
+  const missing = ids.filter(id => !(id in fileMetaMap.value))
+  if (!missing.length) return
+
+  await Promise.allSettled(
+    missing.map(async (id) => {
+      try {
+        const res = await api.get(`/documents/${id}`)
+        const version = res.current_version ?? null
+        if (version) {
+          fileMetaMap.value[id] = {
+            file_name:  version.file_name,
+            file_path:  version.file_path,
+            created_at: version.created_at ?? null,
+          }
+        }
+      } catch {
+        // Leave missing — the download button will still work using the document ID
+      }
+    }),
+  )
+}
+
+/**
+ * Trigger an authenticated file download.
+ *
+ * The /documents/{id}/download endpoint requires auth:sanctum.
+ * We use api.get with responseType 'blob' (same pattern as the GDPR export),
+ * then create a temporary object URL so the browser triggers a Save dialog.
+ */
+async function downloadDocument(docId: number, fileName?: string) {
+  if (downloadingIds.value.has(docId)) return
+
+  // Reactively add: we need to replace the Set reference so Vue tracks it
+  downloadingIds.value = new Set([...downloadingIds.value, docId])
+
+  try {
+    const blob: Blob = await api.get(`/documents/${docId}/download`, {
+      responseType: 'blob',
+    })
+
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href     = url
+    anchor.download = fileName ?? `dokument-${docId}`
+    document.body.appendChild(anchor)
+    anchor.click()
+    document.body.removeChild(anchor)
+    URL.revokeObjectURL(url)
+  } catch {
+    toast.addToast({ message: 'Stiahnutie súboru zlyhalo.', type: 'error' })
+  } finally {
+    const next = new Set(downloadingIds.value)
+    next.delete(docId)
+    downloadingIds.value = next
+  }
+}
+
+// ── Statuses ───────────────────────────────────────────────────────────────
 
 const allStatuses = ref<Array<{ id: number; name: string }>>([])
 
 const statusOptions = computed(() => {
   if (currentStatusName.value === STATE_IN_EVALUATION) return []
-  const allowedTargetStates = BACKEND_TRANSITIONS[currentStatusName.value] ?? []
+  const allowed = BACKEND_TRANSITIONS[currentStatusName.value] ?? []
   return allStatuses.value
-    .filter(s => s.name !== currentStatusName.value && allowedTargetStates.includes(s.name))
+    .filter(s => s.name !== currentStatusName.value && allowed.includes(s.name))
     .map(s => ({ value: s.id, label: s.name }))
 })
 
@@ -753,34 +943,30 @@ async function fetchStatuses() {
   try {
     const res = await api.get('/admin-app-statuses')
     allStatuses.value = res.statuses ?? []
-  } catch {
-    // non-critical
-  }
+  } catch { /* non-critical */ }
 }
 
 // ── Status change ──────────────────────────────────────────────────────────
 
-const statusForm = reactive({ status_id: null as number | null, note: '' })
+const statusForm      = reactive({ status_id: null as number | null, note: '' })
 const isChangingStatus = ref(false)
-const statusError = ref<string | null>(null)
+const statusError      = ref<string | null>(null)
 
 async function changeStatus() {
   if (!statusForm.status_id || !props.applicationId) return
-  statusError.value = null
+  statusError.value    = null
   isChangingStatus.value = true
-
   try {
     const res = await api.post(`/change-app-state/${props.applicationId}/admin`, {
       state_id: statusForm.status_id,
-      note: statusForm.note || undefined,
+      note:     statusForm.note || undefined,
     })
-
-    application.value = res.data ?? res
-    statusForm.status_id = null
-    statusForm.note = ''
+    application.value     = res.data ?? res
+    statusForm.status_id  = null
+    statusForm.note       = ''
     toast.addToast({ message: 'Stav prihlášky bol úspešne zmenený.', type: 'success' })
     emit('refreshed')
-     close()
+    close()
   } catch (err: any) {
     statusError.value = err?.data?.message ?? 'Nepodarilo sa zmeniť stav.'
   } finally {
@@ -790,11 +976,11 @@ async function changeStatus() {
 
 // ── Committees ─────────────────────────────────────────────────────────────
 
-const committees = ref<Committee[]>([])
+const committees           = ref<Committee[]>([])
 const isFetchingCommittees = ref(false)
-const committeeForm = reactive({ committee_id: null as number | null })
+const committeeForm        = reactive({ committee_id: null as number | null })
 const isAssigningCommittee = ref(false)
-const committeeError = ref<string | null>(null)
+const committeeError       = ref<string | null>(null)
 
 const committeeOptions = computed(() => {
   if (assignedCommittee.value) return []
@@ -806,21 +992,16 @@ async function fetchCommittees() {
   try {
     const res = await api.get('/evaluator/fetch-commissions')
     committees.value = res.commissions ?? res.data ?? []
-  } catch {
-    // non-critical
-  } finally {
-    isFetchingCommittees.value = false
-  }
+  } catch { /* non-critical */ }
+  finally { isFetchingCommittees.value = false }
 }
 
 async function assignCommittee() {
   if (!committeeForm.committee_id || !props.applicationId) return
-  committeeError.value = null
+  committeeError.value       = null
   isAssigningCommittee.value = true
   try {
-    await api.post(
-      `/add-committee/${props.applicationId}/committee/${committeeForm.committee_id}`,
-    )
+    await api.post(`/add-committee/${props.applicationId}/committee/${committeeForm.committee_id}`)
     await fetchApplication()
     committeeForm.committee_id = null
     toast.addToast({ message: 'Komisia bola priradená.', type: 'success' })
@@ -836,30 +1017,27 @@ async function removeCommittee(committeeId: number) {
   if (!props.applicationId) return
   try {
     await api.delete(`/remove-committee/${props.applicationId}`)
-
     if (application.value) {
-      application.value.committee = null
+      application.value.committee  = null
       application.value.mentorships = application.value.mentorships.map(ms => ({
         ...ms,
         commission: ms.commission?.id === committeeId ? null : ms.commission,
       }))
     }
-
     toast.addToast({ message: 'Komisia bola odstránená.', type: 'success' })
     emit('refreshed')
-  } catch (err) {
-    console.error(err)
+  } catch {
     toast.addToast({ message: 'Nepodarilo sa odstrániť komisiu.', type: 'error' })
   }
 }
 
 // ── Mentors ────────────────────────────────────────────────────────────────
 
-const mentors = ref<Mentor[]>([])
+const mentors           = ref<Mentor[]>([])
 const isFetchingMentors = ref(false)
-const mentorForm = reactive({ mentor_id: null as number | null })
+const mentorForm        = reactive({ mentor_id: null as number | null })
 const isAssigningMentor = ref(false)
-const mentorError = ref<string | null>(null)
+const mentorError       = ref<string | null>(null)
 
 const mentorOptions = computed(() =>
   mentors.value
@@ -872,25 +1050,20 @@ async function fetchMentors() {
   try {
     const res = await api.get('/mentors')
     mentors.value = res.mentors ?? res.data ?? []
-  } catch {
-    // non-critical
-  } finally {
-    isFetchingMentors.value = false
-  }
+  } catch { /* non-critical */ }
+  finally { isFetchingMentors.value = false }
 }
 
 async function assignMentor() {
   if (!mentorForm.mentor_id || !props.applicationId) return
-  mentorError.value = null
+  mentorError.value    = null
   isAssigningMentor.value = true
   try {
     const res = await api.post(
       `/mentor/admin/applications/${props.applicationId}/mentors/${mentorForm.mentor_id}`,
     )
-
     if (res.data) application.value = res.data
     else await fetchApplication()
-
     mentorForm.mentor_id = null
     toast.addToast({ message: 'Mentor bol priradený.', type: 'success' })
     emit('refreshed')
@@ -924,8 +1097,9 @@ watch(
   async ([open, id]) => {
     if (!open || !id) return
 
-    activeTab.value = 'info'
-    formData.value = null
+    activeTab.value    = 'info'
+    formData.value     = null
+    fileMetaMap.value  = {}
 
     await fetchApplication()
     await fetchStatuses()
@@ -941,10 +1115,10 @@ watch(
 
 watch(
   () => application.value?.status?.name,
-  async (name) => {
+  (name) => {
     if (!name) return
     if (COMMITTEE_STATUSES.includes(name)) fetchCommittees()
-    if (MENTOR_STATUSES.includes(name)) fetchMentors()
+    if (MENTOR_STATUSES.includes(name))    fetchMentors()
   },
 )
 
@@ -954,10 +1128,6 @@ function close() {
   emit('update:modelValue', false)
 }
 
-/**
- * Textový label roly podľa role_id.
- * Fallback ak backend neposiela role_name priamo.
- */
 function memberRoleLabel(roleId?: number): string {
   if (roleId === 1) return 'Vedúci tímu'
   if (roleId === 2) return 'Člen'
@@ -971,23 +1141,19 @@ function memberFullName(member: TeamMember): string {
 }
 
 function initials(name: string): string {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
+  return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('').toUpperCase()
 }
 
 function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '—'
   return new Date(dateStr).toLocaleString('sk-SK', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
   })
+}
+
+function formatDateOnly(dateStr: string): string {
+  const [year, month, day] = dateStr.split('-')
+  return `${day}. ${month}. ${year}`
 }
 </script>
