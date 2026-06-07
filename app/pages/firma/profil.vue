@@ -12,6 +12,14 @@
     </div>
 
     <template v-else>
+      <div
+        v-if="isPo"
+        class="mb-6 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2"
+      >
+        <AlertCircle class="w-4 h-4 shrink-0" />
+        Profil organizácie môže upravovať iba administrátor organizácie.
+      </div>
+
       <form @submit.prevent="handleSave" class="space-y-6">
         <div class="bg-white rounded-lg border border-gray-100 p-6">
           <h2 class="text-base font-semibold text-navy mb-4">Základné informácie</h2>
@@ -21,12 +29,14 @@
               label="Názov organizácie"
               placeholder="TechFirma s.r.o."
               required
+              :disabled="isPo"
               :error="errors.organization_name"
             />
             <UiInput
               v-model="form.ico"
               label="IČO"
               placeholder="12345678"
+              :disabled="isPo"
               :error="errors.ico"
             />
             <UiInput
@@ -34,12 +44,14 @@
               label="Telefón"
               type="tel"
               placeholder="+421 900 000 000"
+              :disabled="isPo"
             />
             <UiInput
               v-model="form.website"
               label="Webová stránka"
               type="url"
               placeholder="https://vasafirma.sk"
+              :disabled="isPo"
               :error="errors.website"
             />
             <div>
@@ -48,7 +60,8 @@
                 v-model="form.description"
                 rows="4"
                 placeholder="Stručný popis vašej firmy, oblasti pôsobenia a hodnôt..."
-                class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
+                :disabled="isPo"
+                class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -62,12 +75,13 @@
             <label
               v-for="s in allSectors"
               :key="s.id"
-              class="cursor-pointer"
+              :class="isPo ? 'cursor-not-allowed' : 'cursor-pointer'"
             >
               <input
                 type="checkbox"
                 :value="s.id"
                 v-model="form.sectors"
+                :disabled="isPo"
                 class="sr-only"
               />
               <span
@@ -90,22 +104,26 @@
               v-model="form.address.city"
               label="Mesto"
               placeholder="Nitra"
+              :disabled="isPo"
             />
             <UiInput
               v-model="form.address.postalCode"
               label="PSČ"
               placeholder="949 01"
+              :disabled="isPo"
             />
             <UiInput
               v-model="form.address.street"
               label="Ulica"
               placeholder="Štefánikova 12"
               class="md:col-span-2"
+              :disabled="isPo"
             />
             <UiInput
               v-model="form.address.country"
               label="Krajina"
               placeholder="Slovensko"
+              :disabled="isPo"
             />
           </div>
         </div>
@@ -126,7 +144,7 @@
           {{ saveError }}
         </div>
 
-        <div class="flex flex-col sm:flex-row justify-between gap-3">
+        <div v-if="!isPo" class="flex flex-col sm:flex-row justify-between gap-3">
           <UiButton
             variant="danger"
             :disabled="isDeletingAccount"
@@ -179,6 +197,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { CheckCircle, AlertCircle } from 'lucide-vue-next'
+import { useOrgDashboard } from '~/composables/useOrgDashboard'
 
 definePageMeta({
   layout: 'portal',
@@ -192,6 +211,8 @@ const authStore = useAuthStore()
 const api = useApi()
 const { addToast } = useToast()
 const { locale } = useI18n()
+const orgDashboard = useOrgDashboard()
+const isPo = orgDashboard.isPo
 
 const isLoading = ref(true)
 const isSaving = ref(false)
@@ -350,6 +371,7 @@ onMounted(async () => {
   isLoading.value = true
   try {
     await authStore.getCurrentUser()
+    await orgDashboard.load()
     await loadSectors()
     await loadOrganization()
   } catch (err: any) {

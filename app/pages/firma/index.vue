@@ -1,6 +1,97 @@
 <!-- pages/firma/index.vue -->
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
+
+    <!-- MEMBER VIEW -->
+    <template v-if="orgDashboard.isMember.value">
+      <div class="mb-10">
+        <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
+        <p class="text-gray-500">Prehľad zadaní a priradených tímov vašej organizácie</p>
+      </div>
+
+      <div v-if="orgDashboard.isLoading.value" class="flex justify-center py-20">
+        <UiLoader />
+      </div>
+
+      <template v-else>
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div class="bg-white rounded-lg shadow-sm border-l-4 border-blue-600 p-5">
+            <div class="text-3xl font-bold text-blue-600">{{ orgDashboard.stats.value.total_calls }}</div>
+            <p class="text-sm text-gray-500 mt-1">Zadania celkom</p>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-600 p-5">
+            <div class="text-3xl font-bold text-green-600">{{ orgDashboard.stats.value.active_calls }}</div>
+            <p class="text-sm text-gray-500 mt-1">Aktívne</p>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm border-l-4 border-purple-500 p-5">
+            <div class="text-3xl font-bold text-purple-600">{{ orgDashboard.stats.value.in_progress }}</div>
+            <p class="text-sm text-gray-500 mt-1">V realizácii</p>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm border-l-4 border-gray-400 p-5">
+            <div class="text-3xl font-bold text-gray-600">{{ orgDashboard.stats.value.completed }}</div>
+            <p class="text-sm text-gray-500 mt-1">Uzavreté</p>
+          </div>
+        </div>
+
+        <!-- Calls table -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100">
+            <h2 class="text-lg font-semibold text-navy">Zadania organizácie</h2>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-100 bg-gray-50">
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">Zadanie</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">Typ / Program</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">Deadline</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">Prihlášky</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">Priradený tím</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">Stav</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                <tr
+                  v-for="call in orgDashboard.calls.value"
+                  :key="call.id"
+                  class="hover:bg-gray-50 transition-colors"
+                >
+                  <td class="px-5 py-4">
+                    <p class="font-medium text-navy">{{ call.name }}</p>
+                    <p v-if="call.description" class="text-xs text-gray-400 mt-0.5 line-clamp-1">{{ call.description }}</p>
+                  </td>
+                  <td class="px-5 py-4 text-gray-600">
+                    <span>{{ call.call_type ?? '—' }}</span>
+                    <span v-if="call.program" class="text-xs text-gray-400 block">{{ call.program }}</span>
+                  </td>
+                  <td class="px-5 py-4 text-gray-600">{{ call.application_deadline ?? '—' }}</td>
+                  <td class="px-5 py-4 text-center font-medium text-navy">{{ call.applications_count }}</td>
+                  <td class="px-5 py-4">
+                    <span v-if="call.assigned_team" class="inline-flex items-center gap-1 text-green-700 font-medium">
+                      <Users class="w-3.5 h-3.5" />
+                      {{ call.assigned_team.name }}
+                    </span>
+                    <span v-else class="text-gray-400 text-xs">Nepriradený</span>
+                  </td>
+                  <td class="px-5 py-4">
+                    <UiStatusBadge :status="call.status ?? ''" />
+                  </td>
+                </tr>
+                <tr v-if="!orgDashboard.calls.value.length">
+                  <td colspan="6" class="px-5 py-10 text-center text-gray-400">
+                    Organizácia zatiaľ nemá žiadne zadania
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </template>
+    </template>
+
+    <!-- ADMIN VIEW (pôvodný obsah) -->
+    <template v-else>
     <!-- Header -->
     <div class="mb-10">
       <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
@@ -56,7 +147,7 @@
 
     <!-- Budget overview -->
     <div class="mb-8">
-      <h2 class="text-xl font-bold text-navy mb-4">Rozpočty zadaní</h2>
+      <h2 class="text-xl font-bold text-navy mb-4">Zadania</h2>
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
@@ -71,7 +162,7 @@
             </thead>
             <tbody class="divide-y divide-gray-50">
               <tr
-                v-for="task in tasks"
+                v-for="task in budgetTasks"
                 :key="task.id"
                 class="hover:bg-gray-50 transition-colors"
               >
@@ -102,14 +193,16 @@
                   <UiStatusBadge :status="task.status" />
                 </td>
               </tr>
+              <tr v-if="!budgetTasks.length">
+                <td colspan="5" class="px-5 py-10 text-center text-gray-400">
+                  Nemáte žiadne zadania
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
-        <div class="px-5 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
-          <span class="text-sm text-gray-500">
-            Celkový rozpočet: <span class="font-semibold text-navy">{{ formatCurrency(totalBudget) }}</span> · Čerpanie:
-            <span class="font-semibold text-navy">{{ formatCurrency(totalSpent) }}</span>
-          </span>
+        <div class="px-5 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-end">
+
           <NuxtLink
             to="/firma/zadania"
             class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
@@ -227,6 +320,8 @@
         </div>
       </div>
     </div>
+    </template><!-- end ADMIN VIEW -->
+
   </div>
 </template>
 
@@ -234,6 +329,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { Users, Calendar, AlertTriangle, ChevronRight } from 'lucide-vue-next'
 import { normalizeTaskStatus } from '~/composables/useTaskStatus'
+import { useOrgDashboard } from '~/composables/useOrgDashboard'
 
 definePageMeta({
   layout: 'portal',
@@ -247,6 +343,8 @@ useHead({
 
 const authStore = useAuthStore()
 const api = useApi()
+
+const orgDashboard = useOrgDashboard()
 
 const userDisplayName = computed(() => {
   const u = authStore.user
@@ -356,7 +454,18 @@ const loadTasks = async () => {
   }
 }
 
-onMounted(loadTasks)
+const router = useRouter()
+
+onMounted(async () => {
+  await orgDashboard.load()
+  if (orgDashboard.isPo.value) {
+    router.replace('/firma/po')
+    return
+  }
+  if (orgDashboard.isAdmin.value) {
+    await loadTasks()
+  }
+})
 
 const filters = computed(() => [
   { label: 'Všetky', value: 'all', count: tasks.value.length },

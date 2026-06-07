@@ -24,7 +24,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useOrgDashboard } from '~/composables/useOrgDashboard'
 import {
   LayoutDashboard,
   FileText,
@@ -37,18 +38,18 @@ import {
   ClipboardCheck,
   FileCode,
   Megaphone,
-  Mail,
-  Download,
   Shield,
-  ShieldCheck
+  ShieldCheck,
+  ListTodo,
 } from 'lucide-vue-next'
 
 const mobileSidebarOpen = ref(false)
 const sidebarCollapsed  = ref(false)
 
-const authStore  = useAuthStore()
-const { t }      = useI18n()
-const localePath = useLocalePath()
+const authStore    = useAuthStore()
+const orgDashboard = useOrgDashboard()
+const { t }        = useI18n()
+const localePath   = useLocalePath()
 
 const handleStorageChange = async (e: StorageEvent) => {
   if (e.key === '_t' && e.newValue) {
@@ -62,8 +63,11 @@ const handleStorageChange = async (e: StorageEvent) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('storage', handleStorageChange)
+  if (authStore.userRole === 'company') {
+    await orgDashboard.load()
+  }
 })
 
 onUnmounted(() => {
@@ -114,6 +118,22 @@ const navItems = computed(() => {
   }
 
   if (role === 'company') {
+    const orgRole = orgDashboard.myRole.value
+
+    if (orgRole === 'po') {
+      return [
+        { label: t('portal_sidebar_links.dashboard'),      to: localePath('/firma/po'),      icon: LayoutDashboard },
+        { label: t('portal_sidebar_links.companyProfile'), to: localePath('/firma/profil'),  icon: Building2 },
+      ]
+    }
+
+    if (orgRole === 'member') {
+      return [
+        { label: t('portal_sidebar_links.dashboard'),      to: localePath('/firma'),         icon: LayoutDashboard },
+        { label: t('portal_sidebar_links.companyProfile'), to: localePath('/firma/profil'),  icon: Building2 },
+      ]
+    }
+
     return [
       { label: t('portal_sidebar_links.dashboard'),       to: localePath('/firma'),          icon: LayoutDashboard },
       { label: t('portal_sidebar_links.companyProfile'),  to: localePath('/firma/profil'),   icon: Building2 },
