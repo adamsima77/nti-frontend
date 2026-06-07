@@ -76,48 +76,65 @@
             <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ task.description }}</p>
           </div>
  
-          <!-- Technická špecifikácia -->
-          <div v-if="task.tech_spec" class="bg-white rounded-lg border border-gray-100 p-6">
-            <h2 class="text-base font-semibold text-navy mb-3 flex items-center gap-2">
-              <Code class="w-4 h-4 text-blue-600" />
-              Technická špecifikácia
-            </h2>
-            <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ task.tech_spec }}</p>
-          </div>
- 
-          <!-- Tech tagy -->
-          <div v-if="task.tech_tags.length" class="bg-white rounded-lg border border-gray-100 p-6">
-            <h2 class="text-base font-semibold text-navy mb-3 flex items-center gap-2">
-              <Tag class="w-4 h-4 text-blue-600" />
-              Preferované technológie
-            </h2>
-            <div class="flex flex-wrap gap-2">
-              <span
-                v-for="tag in task.tech_tags"
-                :key="tag"
-                class="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
-              >
-                {{ tag }}
-              </span>
+          <!-- Technické detaily -->
+          <div v-if="task.tech_spec || task.tech_tags.length || task.documents.length" class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-50 bg-gray-50/50">
+              <h2 class="text-base font-semibold text-navy flex items-center gap-2">
+                <Code class="w-4 h-4 text-blue-600" />
+                Technické detaily a podklady
+              </h2>
             </div>
-          </div>
- 
-          <!-- Požiadavky -->
-          <div v-if="task.requirements.length" class="bg-white rounded-lg border border-gray-100 p-6">
-            <h2 class="text-base font-semibold text-navy mb-3 flex items-center gap-2">
-              <CheckCircle class="w-4 h-4 text-blue-600" />
-              Požiadavky na tím
-            </h2>
-            <ul class="space-y-2">
-              <li
-                v-for="req in task.requirements"
-                :key="req"
-                class="flex items-start gap-2 text-sm text-gray-600"
-              >
-                <CheckCircle class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                {{ req }}
-              </li>
-            </ul>
+            
+            <div class="p-6 space-y-8">
+              <!-- Popis riešenia -->
+              <div v-if="task.tech_spec">
+                <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                  {{ task.tech_spec }}
+                </p>
+              </div>
+
+              <!-- Tech tagy -->
+              <div v-if="task.tech_tags.length">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Tag class="w-3.5 h-3.5" />
+                  Preferované technológie
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    v-for="tag in task.tech_tags"
+                    :key="tag"
+                    class="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium border border-blue-100"
+                  >
+                    {{ tag }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Prílohy -->
+              <div v-if="task.documents.length" class="pt-4 border-t border-gray-50">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <FileText class="w-3.5 h-3.5" />
+                  Prílohy
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <a
+                    v-for="doc in task.documents"
+                    :key="doc.id"
+                    type="button"
+                    @click="downloadFile(doc)"
+                    class="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all group"
+                  >
+                    <div class="w-8 h-8 rounded bg-gray-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                      <FileText class="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-navy truncate">{{ doc.name }}</p>
+                      <p class="text-[10px] text-gray-400 uppercase">Kliknite pre stiahnutie</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
  
           <!-- Product Owner -->
@@ -248,6 +265,10 @@
               <span class="font-medium text-navy">{{ task.callType || '—' }}</span>
             </div>
             <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Začiatok prihlasovania</span>
+              <span class="font-medium text-navy">{{ task.applicationStart || '—' }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
               <span class="text-gray-500">Deadline prihlášok</span>
               <span class="font-medium text-navy">{{ task.deadline || '—' }}</span>
             </div>
@@ -372,6 +393,8 @@ const loadTask = async () => {
       status: normalizeTaskStatus(data.status?.name ?? 'Draft'),
       rawStatus: data.status?.name ?? 'Draft',
       createdAt: formatDate(data.created_at),
+      documents: data.documents ?? [],
+      applicationStart: formatDate(data.application_start),
       deadline: formatDate(data.application_deadline),
       projectStart: formatDate(data.project_start),
       projectEnd: formatDate(data.project_end),
@@ -425,6 +448,7 @@ const handlePublish = async () => {
     })
 
     task.value.status = 'pending'
+    task.value.rawStatus = 'Čaká na schválenie'
     
     addToast({ 
       message: 'Zadanie bolo úspešne odoslané na schválenie.', 
@@ -437,6 +461,25 @@ const handlePublish = async () => {
     })
   } finally {
     isActionLoading.value = false
+  }
+}
+
+const downloadFile = async (doc: any) => {
+  try {
+    const response = await api.get(`/documents/${doc.id}/download`, {
+      responseType: 'blob'
+    }) as any
+
+    const url = window.URL.createObjectURL(new Blob([response]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', doc.name)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+  } catch {
+    addToast({ message: 'Stiahnutie zlyhalo', type: 'error' })
   }
 }
 </script>

@@ -84,13 +84,36 @@
             }
           "
         />
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-50">
+
+        <div class="space-y-4">
+          <h3 class="text-sm font-semibold text-gray-400 uppercase">Fáza prihlasovania</h3>
           <FormField
-            :field="{ name: 'deadline', type: 'date', label: 'Deadline realizácie', required: true }"
-            v-model="form.deadline"
-            :error="errors.deadline ?? undefined"
+            :field="{ name: 'application_start', type: 'date', label: 'Začiatok prihlasovania', required: true }"
+            v-model="form.application_start"
+            :error="errors.application_start ?? undefined"
+          />
+          <FormField
+            :field="{ name: 'application_deadline', type: 'date', label: 'Deadline prihlášok', required: true }"
+            v-model="form.application_deadline"
+            :error="errors.application_deadline ?? undefined"
           />
         </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm font-semibold text-gray-400 uppercase">Fáza realizácie</h3>
+          <FormField
+            :field="{ name: 'project_start', type: 'date', label: 'Začiatok projektu', required: true }"
+            v-model="form.project_start"
+            :error="errors.project_start ?? undefined"
+          />
+          <FormField
+            :field="{ name: 'project_end', type: 'date', label: 'Ukončenie projektu (odovzdanie)', required: true }"
+            v-model="form.project_end"
+            :error="errors.project_end ?? undefined"
+          />
+        </div>
+      </div>
       </div>
     </div>
 
@@ -107,62 +130,56 @@
             type: 'textarea',
             label: 'Popis technického riešenia',
             placeholder:
-              'Popíšte technický kontext, existujúce systémy, preferované technológie, obmedzenia a cieľovú architektúru...',
+              'Popíšte technický kontext, existujúce systémy, požiadavky na tím, obmedzenia a cieľovú architektúru...',
             required: true,
           }"
           v-model="form.tech_spec"
         />
-        <div class="pt-4 border-t border-gray-50">
-          <FormField
-            :field="{
-              name: 'attachments',
-              type: 'file',
-              label: 'Prílohy a dokumentácia',
-              description: 'Nahrajte detailnú špecifikáciu, diagramy alebo iné podklady pre študentov.',
-              allowMultiple: true,
-              required: true,
-              maxFileSize: 10 * 1024 * 1024,
-              accept: '.pdf,.doc,.docx,.zip,.jpg,.png',
-            }"
-            v-model="form.attachments"
-            :error="errors.attachments ?? undefined"
-          />
-        </div>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+              Prílohy a dokumentácia
+            </label>
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx"
+              multiple
+              class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              @change="handleNewFileUpload"
+            />
+          </div>
 
-        <!-- Requirements -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Požiadavky na tím</label>
-          <div class="space-y-2">
-            <div
-              v-for="(_, i) in form.requirements"
-              :key="i"
-              class="flex items-center gap-2"
+          <div v-if="form.existing_attachments.length" class="mt-2 space-y-2">
+            <p class="text-xs font-medium text-gray-400 uppercase">Aktuálne nahraté súbory:</p>
+            <div 
+              v-for="file in form.existing_attachments" 
+              :key="file.id"
+              class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100"
             >
-              <input
-                v-model="form.requirements[i]"
-                type="text"
-                placeholder="Napr. Skúsenosti s React a Node.js"
-                class="flex-1 px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="button"
-                @click="removeRequirement(Number(i))"
-                class="text-gray-400 hover:text-danger-500 transition-colors p-1"
-              >
-                <X class="w-4 h-4" />
-              </button>
+              <div class="flex items-center gap-2">
+                <FileText class="w-4 h-4 text-blue-500" />
+                <span class="text-sm text-navy font-medium">{{ file.name }}</span>
+              </div>
+              <div class="flex gap-2">
+                <button 
+                  type="button" 
+                  @click="downloadFile(file)" 
+                  class="text-xs text-blue-600 hover:underline"
+                >
+                  Stiahnuť
+                </button>
+                <button 
+                  type="button" 
+                  @click="removeExistingFile(file.id)" 
+                  class="text-xs text-red-500"
+                >
+                  Zmazať
+                </button>
+              </div>
             </div>
-            <button
-              type="button"
-              @click="addRequirement"
-              class="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800"
-            >
-              <Plus class="w-4 h-4" />
-              Pridať požiadavku
-            </button>
           </div>
         </div>
-
+        
         <!-- Tech tags -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Preferované technológie</label>
@@ -413,6 +430,10 @@ const emit = defineEmits<{
   (e: 'delete'): void
 }>()
 
+const { addToast } = useToast()
+const newFiles = ref(null)
+const authStore = useAuthStore()
+
 const api = useApi()
 
 const getProgramLabel = (program: any) => {
@@ -467,12 +488,20 @@ const statusStepClass = (stepValue: string) => {
 
 const availableActions = computed(() => statusTransitions[form.status] ?? [])
 
+const formatDateForInput = (val: any): string => {
+  if (!val) return ''
+  return String(val).slice(0, 10)
+}
+
 // ── Form ─────────────────────────────────────────────────────
 const form = reactive({
   title: props.initialData?.title ?? '',
   description: props.initialData?.description ?? '',
   program: props.initialData?.program ? String(props.initialData.program) : '',
-  deadline: props.initialData?.deadline ?? '',
+  application_start: props.initialData?.application_start ?? '',
+  application_deadline: props.initialData?.application_deadline ?? '',
+  project_start: props.initialData?.project_start ?? '',
+  project_end: props.initialData?.project_end ?? '',
   tech_spec: props.initialData?.tech_spec ?? '',
   requirements: props.initialData?.requirements ?? ([''] as string[]),
   tech_tags: props.initialData?.tech_tags ?? ([] as string[]),
@@ -483,6 +512,8 @@ const form = reactive({
   budget_type: props.initialData?.budget_type ?? 'milestone',
   max_teams: props.initialData?.max_teams ?? 1,
   status: props.initialData?.status ?? ('draft' as string),
+  existing_attachments: props.initialData?.attachments ?? [],
+  new_attachment_ids: [] as number[]
 })
 
 const errors = reactive<Record<string, string | null>>({})
@@ -515,7 +546,12 @@ const validate = () => {
   errors.title = form.title ? null : 'Názov je povinný'
   errors.description = form.description ? null : 'Popis je povinný'
   errors.budget = form.budget && form.budget > 0 ? null : 'Zadajte rozpočet'
-  errors.deadline = form.deadline ? null : 'Deadline je povinný'
+  if (form.application_deadline < form.application_start) {
+     errors.application_deadline = 'Deadline nemôže byť skôr ako začiatok'
+  }
+  if (form.project_end < form.project_start) {
+     errors.project_end = 'Koniec projektu musí byť po jeho začiatku'
+  }
   validatePoEmail()
   return !Object.values(errors).some(Boolean)
 }
@@ -546,10 +582,11 @@ const save = async (asDraft = false) => {
       name: form.title,
       description: form.description,
       program_id: programId,
-      application_start: form.deadline ? new Date().toISOString() : null,
-      application_deadline: form.deadline || null,
-      project_start: form.deadline ? new Date().toISOString() : null,
-      project_end: form.deadline ? new Date(form.deadline).toISOString() : null,
+      organization_id: authStore.userOrganizationId,
+      application_start: form.application_start || null,
+      application_deadline: form.application_deadline || null,
+      project_start: form.project_start || null,
+      project_end: form.project_end || null,
       budget: form.budget,
       budget_type: form.budget_type,
       max_teams: form.max_teams,
@@ -557,6 +594,7 @@ const save = async (asDraft = false) => {
       tech_tags: form.tech_tags,
       po_email: form.po_email || null,
       language_id: langId.value,
+      document_ids: form.existing_attachments.map((f: any) => f.id),
     }
 
     const response = props.isNew
@@ -594,7 +632,80 @@ const handleStatusChange = async (newStatus: string) => {
   }
 }
 
+watch(() => props.initialData, (newData) => {
+  if (newData) {
+    form.title = newData.title ?? ''
+    form.description = newData.description ?? ''
+    form.tech_spec = newData.tech_spec ?? ''
+    form.application_start = formatDateForInput(newData.application_start)
+    form.application_deadline = formatDateForInput(newData.application_deadline)
+    form.project_start = formatDateForInput(newData.project_start)
+    form.project_end = formatDateForInput(newData.project_end)
+    form.requirements = newData.requirements ?? ['']
+    form.tech_tags = newData.tech_tags ?? []
+    form.po_name = newData.po_name ?? ''
+    form.po_email = newData.po_email ?? ''
+    form.budget = newData.budget ?? null
+    form.budget_type = newData.budget_type ?? 'milestone'
+    form.max_teams = newData.max_teams ?? 1
+    form.status = newData.status ?? 'draft'
+    form.existing_attachments = newData.attachments ?? []
+  }
+}, { immediate: true, deep: true })
+
 // ── Helpers ──────────────────────────────────────────────────
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('sk-SK', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val)
+
+const handleNewFileUpload = async (event: any) => {
+  console.log('files:', event.target.files)
+  const files = event.target.files
+  if (!files.length) return
+
+  for (const file of files) {
+    const fd = new FormData()
+    fd.append('file', file)
+
+    try {
+      const res = await api.post('/documents', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }) as any
+      
+      form.new_attachment_ids.push(res.document_id)
+      form.existing_attachments.push({
+        id: res.document_id,
+        name: file.name,
+        url: '#'
+      })
+      
+      addToast({ message: `Súbor ${file.name} bol nahratý`, type: 'success' })
+    } catch (err) {
+      addToast({ message: 'Nahrávanie súboru zlyhalo', type: 'error' })
+    }
+  }
+}
+
+const removeExistingFile = (id: number) => {
+  form.existing_attachments = form.existing_attachments.filter((f: any) => f.id !== id)
+  form.new_attachment_ids = form.new_attachment_ids.filter(fid => fid !== id)
+}
+
+const downloadFile = async (file: any) => {
+  try {
+    const response = await api.get(`/documents/${file.id}/download`, {
+      responseType: 'blob'
+    }) as any
+    
+    const url = window.URL.createObjectURL(new Blob([response]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', file.name)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+  } catch {
+    addToast({ message: 'Stiahnutie zlyhalo', type: 'error' })
+  }
+}
 </script>
