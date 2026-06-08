@@ -159,6 +159,7 @@
             <div class="space-y-3">
               <button
                 @click="showInviteModal = true"
+                v-if="teamsStore.currentTeam.myRole === 'Team Lead'"
                 class="w-full px-4 py-2.5 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition flex items-center justify-center gap-2"
               >
                 <UserPlus class="w-4 h-4" />

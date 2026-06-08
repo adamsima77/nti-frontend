@@ -41,7 +41,7 @@
             <p class="font-medium text-amber-800">{{ t('student_dashboard.applications.supplement.banner_title') }}</p>
             <p class="text-sm text-amber-700 mt-1">{{ supplementEntry.note }}</p>
           </div>
-          <div class="shrink-0">
+          <div v-if="isTeamLeader" class="shrink-0">
             <button
               v-if="!isEditing"
               @click="startEditing"
@@ -73,8 +73,8 @@
           </p>
         </div>
 
-        <!-- Draft: primary CTA to open form inline -->
-        <div v-if="application.status === 'draft' && !isEditing" class="shrink-0">
+        <!-- Draft: primary CTA — only for team leader -->
+        <div v-if="isTeamLeader && application.status === 'draft' && !isEditing" class="shrink-0">
           <button
             @click="startEditing"
             class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition"
@@ -82,6 +82,14 @@
             {{ t('student_dashboard.applications.detail.submit_draft') }}
           </button>
         </div>
+      </div>
+
+      <!-- Read-only notice for člen tímu when application is editable -->
+      <div
+        v-if="!isTeamLeader && ['draft', 'supplement'].includes(application.status)"
+        class="mb-6 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-500"
+      >
+        {{ t('student_dashboard.applications.detail.readonly_member') }}
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -375,6 +383,7 @@ import {
 } from 'lucide-vue-next'
 import { useApplication } from '../../../composables/modules/student/useApplications'
 import { useApplicationsStore } from '~/stores/applications'
+import { useAuthStore } from '~/stores/auth'
 import { useRouter, useRoute } from 'vue-router'
 import type { FormSchema } from '~/stores/applications'
 
@@ -435,6 +444,7 @@ const { t } = useI18n()
 const router = useRouter()
 const api = useApi()
 
+const authStore = useAuthStore()
 const applicationsStore = useApplicationsStore()
 const callsStore = useCallsStore()
 const { addToast } = useToast()
@@ -445,6 +455,14 @@ useHead({ title: t('student_dashboard.applications.detail_seo_title') })
 
 const { application: applicationModel, pending } = useApplication(() => route.params.id as string)
 const application = computed(() => applicationModel.value)
+
+// ── Role check ─────────────────────────────────────────────────────────────
+
+const isTeamLeader = computed(() => {
+  const members = (applicationModel.value as any)?.teamMembers ?? []
+  const me = members.find((m: any) => m.user_id === authStore.user?.id)
+  return me?.role_id === 1
+})
 
 // ── Schema state ───────────────────────────────────────────────────────────
 
@@ -459,13 +477,11 @@ watch(
 
     schemaLoading.value = true
     try {
-      // Ensure raw application is in store (call_id lives on the raw model)
       const raw = applicationsStore.currentApplication as any
       let callId: number | null =
         raw?.call_id ?? (app as any).call_id ?? (app as any).callId ?? null
 
       if (!callId) {
-        // Last resort: refetch to get raw fields
         await applicationsStore.fetchApplicationById((app as any).id)
         const fetched = applicationsStore.currentApplication as any
         callId = fetched?.call_id ?? null
@@ -530,7 +546,6 @@ async function loadDocumentMeta(ids: number[]) {
   )
 }
 
-// Load metadata whenever schema items resolve
 watch(
   schemaFormItems,
   (items) => {
@@ -542,8 +557,6 @@ watch(
 
 // ── File download ──────────────────────────────────────────────────────────
 
-// ref<Set> + full Set replacement on each mutation — same pattern as
-// ApplicationDetailModal so Vue correctly tracks reactivity
 const downloadingIds = ref<Set<number>>(new Set())
 
 async function downloadDocument(docId: number) {
@@ -573,17 +586,16 @@ async function downloadDocument(docId: number) {
   }
 }
 
-// ── Inline edit (supplement) ───────────────────────────────────────────────
+// ── Inline edit ────────────────────────────────────────────────────────────
 
 const isEditing = ref(false)
 const editingData = ref<Record<string, any>>({})
 const isSubmitting = ref(false)
 
 function startEditing() {
-  // Pre-populate with current answers so the form is not blank
+  if (!isTeamLeader.value) return
   editingData.value = { ...(application.value?.formData ?? {}) }
   isEditing.value = true
-  // Scroll form into view
   nextTick(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   })
@@ -595,7 +607,6 @@ function cancelEditing() {
 }
 
 function handleEditSaveDraft(data: Record<string, any>) {
-  // Local persist only — no network call needed mid-edit
   editingData.value = { ...data }
 }
 
@@ -608,7 +619,6 @@ async function handleEditSubmit(data: Record<string, any>) {
     return
   }
 
-  // Validate required fields
   const errors: string[] = []
   schema.fields.forEach((field: any) => {
     const val = data[field.name]
@@ -622,7 +632,6 @@ async function handleEditSubmit(data: Record<string, any>) {
     return
   }
 
-  // Resolve call_id and team_id from raw store model
   const raw = applicationsStore.currentApplication as any
   const callId = raw?.call_id ?? (application.value as any).callId ?? null
   const teamId = raw?.team_id ?? (application.value as any).teamId ?? null
@@ -652,10 +661,8 @@ async function handleEditSubmit(data: Record<string, any>) {
     const newId = response?.data?.id ?? response?.id
 
     if (newId && newId !== currentId) {
-      // Backend created a new application record (e.g. supplement resubmit) — navigate
       await router.push(localePath(`/student/prihlasky/${newId}`))
     } else {
-      // Same record updated — refetch in place so status badge & history refresh
       await applicationsStore.fetchApplicationById(currentId)
     }
   } catch (err: any) {
@@ -667,7 +674,7 @@ async function handleEditSubmit(data: Record<string, any>) {
   }
 }
 
-// ── Existing view helpers ──────────────────────────────────────────────────
+// ── View helpers ───────────────────────────────────────────────────────────
 
 const historyRows = computed(() => {
   const h = application.value?.history ?? []

@@ -152,11 +152,11 @@ const navItems = computed(() => {
     ]
   }
 
-  if (role === 'evaluator' || role === 'predseda_komisie') {
+  if (role === 'evaluator') {
     return [
       { label: t('portal_sidebar_links.dashboard'),   to: localePath('/hodnotenie'),        icon: LayoutDashboard },
-      { label: t('portal_sidebar_links.profile'),     to: localePath('/profil'),            icon: UserCircle },
       { label: t('portal_sidebar_links.evaluations'), to: localePath('/hodnotenie/zoznam'), icon: ClipboardCheck },
+      { label: t('portal_sidebar_links.profile'),     to: localePath('/profil'),            icon: UserCircle }
     ]
   }
 

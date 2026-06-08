@@ -1,6 +1,5 @@
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
-    <!-- Breadcrumbs -->
     <div class="mb-8">
       <UiBreadcrumbs
         :items="[
@@ -10,18 +9,15 @@
       />
     </div>
 
-    <!-- Header -->
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-navy mb-2">{{ t('student_dashboard.applications.new_application') }}</h1>
       <p class="text-gray-600">{{ t('student_dashboard.applications.new_description') }}</p>
     </div>
 
-    <!-- Step 1: Select Call -->
     <div
       v-if="!selectedCall"
       class="space-y-6"
     >
-      <!-- Loading -->
       <div
         v-if="callsStore.isLoading"
         class="grid gap-4"
@@ -33,7 +29,6 @@
         />
       </div>
 
-      <!-- Available Calls -->
       <div
         v-else-if="callsStore.openCalls.length"
         class="grid gap-4"
@@ -71,7 +66,6 @@
         </div>
       </div>
 
-      <!-- Empty state -->
       <div
         v-else
         class="bg-white rounded-lg shadow-sm border border-gray-100"
@@ -88,12 +82,10 @@
       </div>
     </div>
 
-    <!-- Step 2: Fill Form -->
     <div
       v-else
       class="bg-white rounded-lg shadow-sm border border-gray-100 p-8"
     >
-      <!-- Call Header -->
       <div class="mb-8 pb-8 border-b">
         <div class="flex items-start justify-between mb-4">
           <div>
@@ -108,13 +100,13 @@
           </button>
         </div>
 
-        <!-- Team selection -->
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">{{ t('student_dashboard.applications.team') }}</label>
           <p class="text-xs text-gray-500">{{ t('student_dashboard.applications.team_min_members_help') }}</p>
           <select
             v-model.number="selectedTeamId"
-            class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            :disabled="isFormDisabled"
+            class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
           >
             <option
               value=""
@@ -139,13 +131,20 @@
         </div>
       </div>
 
-      <!-- Form -->
+      <div 
+        v-if="isFormDisabled" 
+        class="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900"
+      >
+        Prihláška už bola odoslaná alebo je uzamknutá na úpravu.
+      </div>
+
       <DynamicForm
         v-if="selectedCall.formSchema?.fields?.length"
         :key="selectedCall.id"
         :form-schema="selectedCall.formSchema"
         :initial-data="draftData"
-        :draft-persist-enabled="Boolean(selectedTeamId)"
+        :draft-persist-enabled="Boolean(selectedTeamId) && !isFormDisabled"
+        :disabled="isFormDisabled"
         @cancel="handleCancel"
         @save-draft="handleSaveDraft"
         @submit="handleSubmit"
@@ -191,19 +190,6 @@ function parseUploadedDocumentIds(val: unknown): number[] {
   return []
 }
 
-function collectDocumentIdsFromForm(schema: FormSchema, data: Record<string, unknown>): number[] {
-  const set = new Set<number>()
-  for (const f of schema.fields) {
-    if (f.type !== 'file') continue
-    for (const id of parseUploadedDocumentIds(data[f.name])) set.add(id)
-  }
-  return [...set].sort((a, b) => a - b)
-}
-
-/**
- * Serialise formData to Record<string, string> for the backend.
- * File fields become JSON-stringified arrays of document IDs.
- */
 function serializeFormDataForApi(schema: FormSchema, data: Record<string, unknown>): Record<string, string> {
   const out: Record<string, string> = {}
   for (const field of schema.fields) {
@@ -244,7 +230,6 @@ const api = useApi()
 
 const callsStore = useCallsStore()
 const teamsStore = useTeamsStore()
-const applicationsStore = useApplicationsStore()
 const { addToast } = useToast()
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -252,6 +237,7 @@ const { addToast } = useToast()
 const selectedCall   = ref<Call | null>(null)
 const selectedTeamId = ref<number | null>(null)
 const draftData      = ref<Record<string, any>>({})
+const applicationStatus = ref<string | null>(null)
 const isSubmitting   = ref(false)
 const isSavingDraft  = ref(false)
 
@@ -260,6 +246,11 @@ const isSavingDraft  = ref(false)
 const eligibleTeams = computed(() =>
   teamsStore.teams.filter((team) => Array.isArray(team.members) && team.members.length >= 3),
 )
+
+// Kontrola, či sa majú polia zakázať (ak je prihláška podaná alebo zamknutá)
+const isFormDisabled = computed(() => {
+  return applicationStatus.value === 'submitted' || applicationStatus.value === 'approved' || applicationStatus.value === 'rejected'
+})
 
 // ── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -275,14 +266,16 @@ onMounted(async () => {
     await callsStore.fetchCallById(callId)
     if (callsStore.currentCall) {
       selectedCall.value = callsStore.currentCall
+      
+      // Nastavenie stavu prihlášky z backendu ak existuje
+      applicationStatus.value = (callsStore.currentCall as any).applicationStatus ?? null
+
+      if ((callsStore.currentCall as any).formData) {
+        draftData.value = (callsStore.currentCall as any).formData
+      }
     }
     if (Number.isFinite(teamId) && teamId > 0) {
       selectedTeamId.value = teamId
-      const draft = applicationsStore.getDraft(teamId, callId)
-      if (draft) {
-        draftData.value = draft.data
-        addToast({ message: t('student_dashboard.applications.toasts.loading_draft'), type: 'info' })
-      }
     }
   }
 })
@@ -293,23 +286,19 @@ const selectCall = async (call: Call) => {
   await callsStore.fetchCallById(call.id)
   selectedCall.value = callsStore.currentCall ?? call
   selectedTeamId.value = null
+  draftData.value = {}
+  applicationStatus.value = (callsStore.currentCall as any).applicationStatus ?? null
 
-  // Restore any locally-persisted draft for this call
-  for (const team of teamsStore.teams) {
-    const draft = applicationsStore.getDraft(team.id, selectedCall.value.id)
-    if (draft) {
-      draftData.value = draft.data
-      if (team.members.length >= 3) selectedTeamId.value = team.id
-      addToast({ message: t('student_dashboard.applications.toasts.loading_draft'), type: 'info' })
-      break
-    }
+  if (selectedCall.value && (selectedCall.value as any).formData) {
+    draftData.value = (selectedCall.value as any).formData
+    addToast({ message: t('student_dashboard.applications.toasts.loading_draft'), type: 'info' })
   }
 }
 
 // ── Draft save ─────────────────────────────────────────────────────────────
 
 const handleSaveDraft = async (data: Record<string, any>) => {
-  if (!selectedCall.value) return
+  if (!selectedCall.value || isFormDisabled.value) return
 
   if (!selectedTeamId.value) {
     addToast({
@@ -328,12 +317,8 @@ const handleSaveDraft = async (data: Record<string, any>) => {
     await api.post('/applications/draft', {
       call_id:   selectedCall.value.id,
       team_id:   Number(selectedTeamId.value),
-      // Serialise: file fields → JSON array of document IDs, rest → strings
       form_data: serializeFormDataForApi(schema, data as Record<string, unknown>),
     })
-
-    // Mirror into local store so navigating away and back restores the form
-    applicationsStore.saveDraft(Number(selectedTeamId.value), selectedCall.value.id, data)
 
     addToast({
       message: t('student_dashboard.applications.toasts.draft_saved'),
@@ -350,6 +335,7 @@ const handleSaveDraft = async (data: Record<string, any>) => {
 // ── Submit ─────────────────────────────────────────────────────────────────
 
 const handleSubmit = async (data: Record<string, any>) => {
+  if (isFormDisabled.value) return
   if (!selectedTeamId.value || !selectedCall.value) {
     addToast({ message: t('student_dashboard.applications.toasts.select_team'), type: 'error' })
     return
@@ -361,7 +347,7 @@ const handleSubmit = async (data: Record<string, any>) => {
     return
   }
 
-  // 1. Dynamic Schema-Driven Validation (Strict for submission)
+  // Schema Validation
   const errors: string[] = []
   schema.fields.forEach((field: any) => {
     if (field.required && (!data[field.name] || (Array.isArray(data[field.name]) && data[field.name].length === 0))) {
@@ -374,13 +360,10 @@ const handleSubmit = async (data: Record<string, any>) => {
     return
   }
 
-  // 2. Prepare Payload
   const formPayload = serializeFormDataForApi(schema, data as Record<string, unknown>)
-
   isSubmitting.value = true
 
   try {
-  
     const response = await api.post('/submit-application', {
       call_id: selectedCall.value.id,
       team_id: Number(selectedTeamId.value),
@@ -410,6 +393,7 @@ const handleCancel = () => {
     selectedCall.value   = null
     selectedTeamId.value = null
     draftData.value      = {}
+    applicationStatus.value = null
     router.push(localePath('/student/prihlasky'))
   }
 }

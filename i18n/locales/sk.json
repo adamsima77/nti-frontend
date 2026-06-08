@@ -788,6 +788,8 @@
         "rejected": "Zamietnuté"
       },
       "detail": {
+        "readonly_submitted": "Prihláška bola úspešne odoslaná a je uzamknutá.",
+        "view_application": "Zobraziť prihlášku",
         "submit_draft": "Upraviť a odoslať",
         "not_found_title": "Prihláška nenájdená",
         "project_description": "Popis projektu",
@@ -1543,6 +1545,7 @@
   "error_message": "Nepodarilo sa anonymizovať používateľa"
 },
   "evaluator": {
+    "apps": "Pridelené prihlášky",
     "welcome": "Vitajte, {name}!",
     "subtitle": "Prehľad hodnotení",
     "stats": {
@@ -1582,7 +1585,7 @@
     "documents": "Dokumenty",
     "no_documents": "Žiadne dokumenty",
     "overall_evaluation": "Celkové hodnotenie",
-    "final_decision": "Finálne rozhodnutie",
+    "final_decision": "Vaše rozhodnutie",
     "submitted_at": "Odoslané dňa",
     "application_history": "História prihlášky",
     "no_history": "Žiadna história",
@@ -1628,6 +1631,7 @@
     },
     "sidebar": {
       "commission": "Komisia",
+      "students": "Študenti",
       "average": "Priemerné skóre",
       "team": "Tím",
       "info": "Informácie",

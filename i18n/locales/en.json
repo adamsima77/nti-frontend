@@ -59,6 +59,7 @@
     "sk_title": "Slovenčina"
   },
   "evaluator": {
+    "apps": "Assigned Applications",
     "welcome": "Welcome, {name}!",
     "subtitle": "Evaluator dashboard",
     "stats": {
@@ -98,7 +99,7 @@
     "documents": "Documents",
     "no_documents": "No documents",
     "overall_evaluation": "Overall evaluation",
-    "final_decision": "Final decision",
+    "final_decision": "Your Final decision",
     "submitted_at": "Submitted at",
     "application_history": "Application history",
     "no_history": "No history",
@@ -140,6 +141,7 @@
     "submitted_message": "Your evaluation has been recorded and is visible to other commission members.",
     "sidebar": {
       "commission": "Commission",
+      "students": "Students",
       "average": "Average",
       "team": "Team",
       "info": "Information",
@@ -1057,6 +1059,8 @@
         "rejected": "Rejected"
       },
       "detail": {
+        "readonly_submitted": "The application was submitted successfully and is locked.",
+        "view_application": "View application",
         "submit_draft": "Edit and submit",
         "not_found_title": "Application not found",
         "project_description": "Project description",

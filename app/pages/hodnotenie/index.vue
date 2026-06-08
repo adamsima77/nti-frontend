@@ -1,14 +1,11 @@
-<!-- pages/hodnotenie/index.vue -->
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
-    <!-- Header -->
     <div class="mb-10 flex items-start justify-between">
       <div>
         <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('evaluator.welcome', { name: userDisplayName }) }}</h1>
         <p class="text-gray-500">{{ $t('evaluator.subtitle') }}</p>
       </div>
 
-      <!-- Locale Switcher (copied pattern) -->
       <div class="hidden md:flex items-center gap-1 ml-4">
         <button
           :class="[
@@ -33,7 +30,6 @@
       </div>
     </div>
 
-    <!-- Stats -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="bg-white rounded-lg shadow-sm border-l-4 border-blue-600 p-5">
         <div class="text-3xl font-bold text-blue-600">{{ stats.total }}</div>
@@ -53,13 +49,12 @@
       </div>
     </div>
 
-    <!-- Assigned calls -->
     <div
-      v-if="calls.length"
+      v-if="assignedCalls.length"
       class="mb-8"
     >
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-navy">{{ $t('evaluator.assigned_calls') }}</h2>
+        <h2 class="text-xl font-bold text-navy">{{ $t('evaluator.apps') }}</h2>
         <NuxtLink
           :to="localePath('/hodnotenie/zoznam')"
           class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
@@ -70,7 +65,7 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div
-          v-for="call in calls"
+          v-for="call in assignedCalls"
           :key="call.id"
           class="bg-white rounded-lg border border-gray-100 p-5 hover:shadow-md transition-shadow"
         >
@@ -87,7 +82,7 @@
               </div>
               <p class="text-sm text-gray-500">{{ $t('evaluator.deadline_label') }}: {{ call.deadline }}</p>
             </div>
-            <span class="text-xs text-gray-400">{{ call.applications_pending }} nehodnotených</span>
+            <span class="text-xs text-gray-400">{{ call.applications_pending ?? 0 }} nehodnotených</span>
           </div>
 
           <div class="bg-gray-100 rounded-full h-2 mb-2">
@@ -112,7 +107,6 @@
       </div>
     </div>
 
-    <!-- Required actions -->
     <div
       v-if="urgentApplications.length"
       class="mb-8 bg-amber-50 border border-amber-200 rounded-lg p-5"
@@ -138,7 +132,6 @@
       </ul>
     </div>
 
-    <!-- Recent applications -->
     <div>
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-navy">{{ $t('evaluator.recent_applications') }}</h2>
@@ -177,45 +170,43 @@
                   · Deadline: {{ app.deadline }}
                 </span>
               </p>
+              
               <div
                 v-if="app.my_score !== null"
                 class="flex items-center gap-3"
               >
                 <div class="flex items-center gap-1.5">
                   <Star class="w-4 h-4 text-warning-500" />
-                  <span class="text-sm font-semibold text-navy">{{ app.my_score }}/100</span>
+                  <span class="text-sm font-semibold text-navy">{{ app.my_score }}/{{ app.max_score }}</span>
                   <span class="text-xs text-gray-400">váš skór</span>
                 </div>
                 <div
                   v-if="app.avgScore !== null"
                   class="flex items-center gap-1.5"
                 >
-                  <span class="text-xs text-gray-400">·</span>
-                  <span class="text-sm text-gray-500"
-                    >priemer komisie: <strong class="text-navy">{{ app.avgScore }}/100</strong></span
-                  >
-                </div>
+                  </div>
               </div>
             </div>
+            
             <div class="shrink-0">
               <NuxtLink
                 :to="`/hodnotenie/${app.id}`"
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 :class="
-                  app.my_score === null && app.status === 'evaluating'
+                  app.my_score === null && ['evaluating', 'submitted', 'under_review'].includes(app.status)
                     ? 'bg-blue-600 text-white hover:bg-blue-700'
                     : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
                 "
               >
                 <ClipboardCheck
-                  v-if="app.my_score === null && app.status === 'evaluating'"
+                  v-if="app.my_score === null && ['evaluating', 'submitted', 'under_review'].includes(app.status)"
                   class="w-4 h-4"
                 />
                 <Eye
                   v-else
                   class="w-4 h-4"
                 />
-                {{ app.my_score === null && app.status === 'evaluating' ? 'Hodnotiť' : 'Detail' }}
+                {{ app.my_score === null && ['evaluating', 'submitted', 'under_review'].includes(app.status) ? 'Hodnotiť' : 'Detail' }}
               </NuxtLink>
             </div>
           </div>
@@ -226,14 +217,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { ChevronRight, AlertTriangle, Star, ClipboardCheck, Eye } from 'lucide-vue-next'
 import { useEvaluatorDashboard } from '~/composables/useEvaluatorDashboard'
+import { useAuthStore } from '~/stores/auth'
 
 const localePath = useLocalePath()
 const { setLocale, locale } = useI18n()
 const authStore = useAuthStore()
-const { dashboard, calls, fetchDashboard, fetchCalls } = useEvaluatorDashboard()
+const { dashboard, fetchDashboard } = useEvaluatorDashboard()
 
 definePageMeta({
   layout: 'portal',
@@ -250,29 +242,68 @@ const userDisplayName = computed(() => {
   return fullName || u.email
 })
 
+const assignedCalls = computed(() => {
+  return dashboard.value?.calls ?? []
+})
+
+// Centralizovaná transformácia dát, ktorá spočíta max_score na základe priradenej výzvy a jej kritérií
+const transformedApplications = computed(() => {
+  const rawApps = dashboard.value?.applications ?? []
+  const callsList = assignedCalls.value
+
+  return rawApps.map((app: any) => {
+    // Nájdeme prislúchajúcu výzvu pre túto aplikáciu, aby sme získali zoznam kritérií
+    const matchingCall = callsList.find((c: any) => c.id === app.call_id)
+    
+    let maxScore = 40 // Východzí fallback
+    if (matchingCall && matchingCall.criteria && matchingCall.criteria.length > 0) {
+      maxScore = matchingCall.criteria.length * 20
+    }
+
+    return {
+      ...app,
+      max_score: maxScore
+    }
+  })
+})
+
 const recentApplications = computed(() => {
+  // Ak backend vracia špecifické pole recentApplications, namapujeme ho rovnako
   const fromDashboard = dashboard.value?.recentApplications ?? dashboard.value?.applications ?? []
-  return fromDashboard.slice(0, 3)
+  const callsList = assignedCalls.value
+
+  return fromDashboard.slice(0, 3).map((app: any) => {
+    const matchingCall = callsList.find((c: any) => c.id === app.call_id)
+    let maxScore = 40
+    if (matchingCall && matchingCall.criteria && matchingCall.criteria.length > 0) {
+      maxScore = matchingCall.criteria.length * 20
+    }
+    return { ...app, max_score: maxScore }
+  })
 })
 
 const urgentApplications = computed(() => {
   const direct = dashboard.value?.urgentApplications ?? []
   if (direct.length) return direct
-  return (dashboard.value?.applications ?? []).filter(app => app.status === 'evaluating' && app.my_score === null)
+  
+  return transformedApplications.value.filter(app => 
+    ['evaluating', 'submitted', 'under_review'].includes(app.status) && app.my_score === null
+  )
 })
 
 const stats = computed(() => {
   const s = dashboard.value?.stats ?? {}
-  const applications = dashboard.value?.applications ?? []
+  const applications = transformedApplications.value
+  
   return {
     total: s.total ?? applications.length,
-    pending: s.pending ?? applications.filter(app => app.status === 'evaluating' && app.my_score === null).length,
+    pending: s.pending ?? applications.filter(app => app.my_score === null).length,
     evaluated: s.evaluated ?? applications.filter(app => app.my_score !== null).length,
-    decided: s.decided ?? applications.filter(app => ['approved', 'rejected'].includes(app.status)).length,
+    decided: s.decided ?? 0, 
   }
 })
 
 onMounted(async () => {
-  await Promise.all([fetchDashboard(), fetchCalls()])
+  await fetchDashboard()
 })
 </script>
