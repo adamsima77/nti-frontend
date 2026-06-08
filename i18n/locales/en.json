@@ -1864,7 +1864,9 @@
   "auditLog": "Audit log",
   "sectionManagement": "Management",
   "sectionContent": "Content",
-  "sectionSystem": "System"
+  "sectionSystem": "System",
+  "poTask": "Assignment",
+  "poMilestones": "Milestones"
 },
 "user_management": {
     "export_calls": "Export calls",

@@ -90,7 +90,7 @@
       </template>
     </template>
 
-    <!-- ADMIN VIEW (pôvodný obsah) -->
+    <!-- ADMIN VIEW -->
     <template v-else>
     <!-- Header -->
     <div class="mb-10">

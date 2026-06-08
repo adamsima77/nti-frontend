@@ -137,6 +137,45 @@
             </div>
           </div>
  
+          <!-- Míľniky -->
+          <div v-if="milestones.length" class="bg-white rounded-lg border border-gray-100 p-6">
+            <h2 class="text-base font-semibold text-navy mb-4 flex items-center gap-2">
+              <Flag class="w-4 h-4 text-blue-600" />
+              Míľniky zadania
+            </h2>
+            <div class="space-y-2">
+              <div
+                v-for="m in milestones"
+                :key="m.id"
+                class="flex items-start gap-3 p-3 rounded-lg border border-gray-100"
+              >
+                <div class="mt-0.5">
+                  <div :class="[
+                    'w-5 h-5 rounded-full flex items-center justify-center',
+                    m.status === 'done' ? 'bg-green-100' : 'bg-gray-100'
+                  ]">
+                    <CheckCircle v-if="m.status === 'done'" class="w-3.5 h-3.5 text-green-600" />
+                    <div v-else class="w-2 h-2 rounded-full bg-gray-400" />
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-navy">{{ m.name }}</p>
+                  <p v-if="m.description" class="text-xs text-gray-400 mt-0.5">{{ m.description }}</p>
+                  <p class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                    <Calendar class="w-3 h-3" />
+                    {{ m.due_date ?? '—' }}
+                  </p>
+                </div>
+                <span :class="[
+                  'text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0',
+                  m.status === 'done' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                ]">
+                  {{ m.status === 'done' ? 'Hotovo' : 'Otvorené' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <!-- Product Owner -->
           <div v-if="task.po_name || task.po_email" class="bg-white rounded-lg border border-gray-100 p-6">
             <h2 class="text-base font-semibold text-navy mb-4 flex items-center gap-2">
@@ -339,7 +378,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { ChevronLeft, ChevronRight, Pencil, Send, CheckCircle, Users, FileText, Code, Tag, UserCircle } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, Pencil, Send, CheckCircle, Users, FileText, Code, Tag, UserCircle, Flag, Calendar } from 'lucide-vue-next'
 import { normalizeTaskStatus, apiTaskStatusState } from '~/composables/useTaskStatus'
 
 definePageMeta({
@@ -360,6 +399,7 @@ const authStore = useAuthStore()
 const { addToast } = useToast()
 
 const task = ref<any>(null)
+const milestones = ref<any[]>([])
 const isLoading = ref(true)
 const isActionLoading = ref(false)
 
@@ -420,7 +460,19 @@ const loadTask = async () => {
   }
 }
 
-onMounted(loadTask)
+const loadMilestones = async (callId: number) => {
+  try {
+    const res = await api.get(`/calls/${callId}/milestones`) as any
+    milestones.value = res.milestones ?? []
+  } catch {}
+}
+
+onMounted(async () => {
+  await loadTask()
+  if (task.value?.id) {
+    await loadMilestones(task.value.id)
+  }
+})
 
 const canEditTask = computed(() => authStore.hasPermission('organizations.edit_own'))
 

@@ -28,7 +28,7 @@
         </template>
       </div>
       <div
-        v-if="availableActions.length"
+        v-if="availableActions.length && !hideWorkflow"
         class="flex gap-2 mt-3 pt-3 border-t border-gray-100"
       >
         <button
@@ -219,7 +219,7 @@
     </div>
 
     <!-- 3. Product Owner -->
-    <div class="bg-white rounded-lg border border-gray-100 p-6">
+    <div v-if="!hidePo" class="bg-white rounded-lg border border-gray-100 p-6">
       <h2 class="text-base font-semibold text-navy mb-1 flex items-center gap-2">
         <UserCircle class="w-4 h-4 text-blue-600" />
         Product Owner
@@ -251,7 +251,63 @@
       </div>
     </div>
 
-    <!-- 4. Rozpočet -->
+    <!-- 4. Míľniky -->
+    <div class="bg-white rounded-lg border border-gray-100 p-6">
+      <h2 class="text-base font-semibold text-navy mb-1 flex items-center gap-2">
+        <Flag class="w-4 h-4 text-blue-600" />
+        Míľniky zadania
+      </h2>
+      <p class="text-xs text-gray-400 mb-4">Definujte kontrolné body projektu — čo musí tím splniť a kedy</p>
+
+      <div class="space-y-2 mb-3">
+        <div
+          v-for="(m, i) in form.milestones"
+          :key="i"
+          class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100"
+        >
+          <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input
+              v-model="m.name"
+              type="text"
+              placeholder="Názov míľniku *"
+              class="sm:col-span-2 px-3 py-2 text-sm rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+            <input
+              v-model="m.due_date"
+              type="date"
+              class="px-3 py-2 text-sm rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+            <input
+              v-model="m.description"
+              type="text"
+              placeholder="Popis"
+              class="sm:col-span-3 px-3 py-2 text-sm rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+          </div>
+          <button
+            type="button"
+            @click="removeMilestone(i)"
+            class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition mt-0.5"
+          >
+            <X class="w-4 h-4" />
+          </button>
+        </div>
+        <p v-if="!form.milestones.length" class="text-sm text-gray-400 text-center py-4 border border-dashed border-gray-200 rounded-lg">
+          Zatiaľ žiadne míľniky
+        </p>
+      </div>
+
+      <button
+        type="button"
+        @click="addMilestone"
+        class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition"
+      >
+        <Plus class="w-4 h-4" />
+        Pridať míľnik
+      </button>
+    </div>
+
+    <!-- 5. Rozpočet -->
     <div class="bg-white rounded-lg border border-gray-100 p-6">
       <h2 class="text-base font-semibold text-navy mb-1 flex items-center gap-2">
         <Wallet class="w-4 h-4 text-blue-600" />
@@ -405,6 +461,7 @@ import {
   Code,
   UserCircle,
   Wallet,
+  Flag,
   Plus,
   X,
   CheckCircle,
@@ -421,8 +478,14 @@ const props = withDefaults(defineProps<{
   isNew: boolean
   initialData?: Record<string, any>
   canDelete?: boolean
+  hidePo?: boolean
+  hideWorkflow?: boolean
+  updateEndpoint?: string
 }>(), {
   canDelete: true,
+  hidePo: false,
+  hideWorkflow: false,
+  updateEndpoint: undefined,
 })
 
 const emit = defineEmits<{
@@ -513,7 +576,8 @@ const form = reactive({
   max_teams: props.initialData?.max_teams ?? 1,
   status: props.initialData?.status ?? ('draft' as string),
   existing_attachments: props.initialData?.attachments ?? [],
-  new_attachment_ids: [] as number[]
+  new_attachment_ids: [] as number[],
+  milestones: [] as { id?: number; name: string; description: string; due_date: string }[],
 })
 
 const errors = reactive<Record<string, string | null>>({})
@@ -522,6 +586,46 @@ const isActionLoading = ref(false)
 const saveSuccess = ref(false)
 const saveError = ref<string | null>(null)
 const newTag = ref('')
+
+// ── Milestones ────────────────────────────────────────────────
+const addMilestone = () => form.milestones.push({ name: '', description: '', due_date: '' })
+const removeMilestone = (i: number) => form.milestones.splice(i, 1)
+
+const loadMilestones = async (callId: number) => {
+  try {
+    const res = await api.get(`/calls/${callId}/milestones`) as any
+    form.milestones = (res.milestones ?? []).map((m: any) => ({
+      id: m.id,
+      name: m.name,
+      description: m.description ?? '',
+      due_date: m.due_date ?? '',
+    }))
+  } catch {}
+}
+
+const saveMilestones = async (callId: number) => {
+  
+  const existingIds = form.milestones.filter(m => m.id).map(m => m.id as number)
+  try {
+    const res = await api.get(`/calls/${callId}/milestones`) as any
+    const serverIds = (res.milestones ?? []).map((m: any) => m.id)
+    for (const sid of serverIds) {
+      if (!existingIds.includes(sid)) {
+        await api.delete(`/calls/${callId}/milestones/${sid}`)
+      }
+    }
+  } catch {}
+
+  for (const m of form.milestones) {
+    if (!m.name || !m.due_date) continue
+    const payload = { name: m.name, description: m.description || undefined, due_date: m.due_date }
+    if (m.id) {
+      await api.patch(`/calls/${callId}/milestones/${m.id}`, payload)
+    } else {
+      await api.post(`/calls/${callId}/milestones`, payload)
+    }
+  }
+}
 
 // ── Requirements ─────────────────────────────────────────────
 const addRequirement = () => form.requirements.push('')
@@ -597,15 +701,24 @@ const save = async (asDraft = false) => {
       document_ids: form.existing_attachments.map((f: any) => f.id),
     }
 
+    const putEndpoint = props.updateEndpoint
+      ? props.updateEndpoint
+      : `/v1/admin/calls/${props.initialData?.id}`
+
     const response = props.isNew
       ? await api.post('/v1/admin/calls', payload)
-      : await api.put(`/v1/admin/calls/${props.initialData?.id}`, payload)
+      : await api.put(putEndpoint, payload)
+
+    const callId = (response as any)?.id ?? props.initialData?.id ?? null
+    if (callId) {
+      await saveMilestones(callId)
+    }
 
     saveSuccess.value = true
     setTimeout(() => {
       saveSuccess.value = false
     }, 4000)
-    emit('saved', (response as any)?.id ?? props.initialData?.id ?? null)
+    emit('saved', callId)
   } catch (error) {
     saveError.value = 'Nastala chyba pri ukladaní.'
   } finally {
@@ -650,6 +763,9 @@ watch(() => props.initialData, (newData) => {
     form.max_teams = newData.max_teams ?? 1
     form.status = newData.status ?? 'draft'
     form.existing_attachments = newData.attachments ?? []
+    if (newData.id) {
+      loadMilestones(newData.id)
+    }
   }
 }, { immediate: true, deep: true })
 

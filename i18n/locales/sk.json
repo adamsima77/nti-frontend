@@ -1256,7 +1256,9 @@
   "auditLog": "Audit log",
   "sectionManagement": "Správa",
   "sectionContent": "Obsah",
-  "sectionSystem": "Systém"
+  "sectionSystem": "Systém",
+  "poTask": "Zadanie",
+  "poMilestones": "Míľniky"
   },
   "mentor": {
     "dashboard": {

@@ -41,6 +41,7 @@ import {
   Shield,
   ShieldCheck,
   ListTodo,
+  Flag,
 } from 'lucide-vue-next'
 
 const mobileSidebarOpen = ref(false)
@@ -122,8 +123,9 @@ const navItems = computed(() => {
 
     if (orgRole === 'po') {
       return [
-        { label: t('portal_sidebar_links.dashboard'),      to: localePath('/firma/po'),      icon: LayoutDashboard },
-        { label: t('portal_sidebar_links.companyProfile'), to: localePath('/firma/profil'),  icon: Building2 },
+        { label: t('portal_sidebar_links.dashboard'),   to: localePath('/firma/po'),           icon: LayoutDashboard },
+        { label: t('portal_sidebar_links.poTask'),      to: localePath('/firma/po/zadanie'),   icon: FileText },
+        { label: t('portal_sidebar_links.poMilestones'),to: localePath('/firma/po/milniky'),   icon: Flag },
       ]
     }
 
