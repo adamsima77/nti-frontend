@@ -66,6 +66,22 @@ const statusConfig: Record<string, { labelKey: string; color: string; bgClass: s
     bgClass:  'bg-orange-50 text-orange-700',
   },
 
+  onboarding: {
+    labelKey: 'status_labels.onboarding',
+    color:    '#2563EB',
+    bgClass:  'bg-blue-50 text-blue-700 border border-blue-200',
+  },
+  active_project: {
+    labelKey: 'status_labels.active_project',
+    color:    '#16A34A', 
+    bgClass:  'bg-green-50 text-green-700 border border-green-200',
+  },
+  ended_project: {
+    labelKey: 'status_labels.ended_project',
+    color:    '#475569', 
+    bgClass:  'bg-slate-100 text-slate-700 border border-slate-200',
+  },
+
   // ── CMS / partners ─────────────────────────────────────
   published: {
     labelKey: 'status_labels.published',
@@ -95,9 +111,9 @@ const statusConfig: Record<string, { labelKey: string; color: string; bgClass: s
     bgClass:  'bg-warning-50 text-warning-700',
   },
   completed: {
-    labelKey: 'status_labels.completed',
-    color:    '#16803C',
-    bgClass:  'bg-success-50 text-success-700',
+   labelKey: 'status_labels.closed',
+    color:    '#64748B',
+    bgClass:  'bg-gray-100 text-gray-500',
   },
   closed: {
     labelKey: 'status_labels.closed',
@@ -137,6 +153,7 @@ const statusConfig: Record<string, { labelKey: string; color: string; bgClass: s
     bgClass:  'bg-gray-100 text-gray-400 border border-gray-200',
   },
 
+  // Fallback slovenské stringy z API mapovania
   'Draft':                 { labelKey: 'status_labels.draft',            color: '#64748B', bgClass: 'bg-gray-50 text-gray-500 border border-gray-200' },
   'Publikované':           { labelKey: 'status_labels.published',        color: '#16A34A', bgClass: 'bg-green-50 text-green-700' },
   'V párovaní':            { labelKey: 'status_labels.matching',         color: '#7C3AED', bgClass: 'bg-purple-50 text-purple-700' },
@@ -157,16 +174,22 @@ const statusConfig: Record<string, { labelKey: string; color: string; bgClass: s
   'Ukončené':              { labelKey: 'status_labels.closed',           color: '#64748B', bgClass: 'bg-gray-100 text-gray-500' },
 }
 
-const cfg = computed(() => statusConfig[props.status])
+// Bezpečný fallback, ak kľúč v objekte neexistuje
+const cfg = computed(() => {
+  return statusConfig[props.status] || {
+    labelKey: `status_labels.${props.status}`,
+    color: '#94A3B8',
+    bgClass: 'bg-gray-50 text-gray-500 border border-gray-200'
+  }
+})
 
-const statusColor   = computed(() => cfg.value?.color   ?? '#94A3B8')
-const statusClasses = computed(() => cfg.value?.bgClass ?? 'bg-gray-50 text-gray-500')
+const statusColor   = computed(() => cfg.value.color)
+const statusClasses = computed(() => cfg.value.bgClass)
 
 const statusLabel = computed(() => {
-  if (cfg.value?.labelKey && te(cfg.value.labelKey)) {
+  if (cfg.value.labelKey && te(cfg.value.labelKey)) {
     return t(cfg.value.labelKey)
   }
-  // Fallback if key doesn't exist, check if general status key exists, else raw prop string
   return te(`status_labels.${props.status}`) ? t(`status_labels.${props.status}`) : (props.status || t('status_labels.unknown'))
 })
 </script>

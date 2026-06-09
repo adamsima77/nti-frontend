@@ -1666,7 +1666,7 @@
     "application_label": "Prihláška",
     "program_label": "Program"
   },
-  "status_labels": {
+ "status_labels": {
     "unknown": "Neznámy stav",
     "approved": "Schválené",
     "pending": "Čaká na doplnenie",
@@ -1688,7 +1688,10 @@
     "pending_onboarding": "Čaká na onboarding",
     "pending_approval": "Čaká na schválenie",
     "banned": "Zablokovaný",
-    "anonymized": "Anonymizovaný"
+    "anonymized": "Anonymizovaný",
+    "onboarding": "Onboarding",
+    "active_project": "Aktívny projekt",
+    "ended_project": "Ukončené"
   },
   "cmsOverview": {
     "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."

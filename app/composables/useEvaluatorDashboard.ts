@@ -130,6 +130,7 @@ function mapApplicationDetail(row: Record<string, unknown>): ApplicationDetail {
   const documentsSource: unknown[] = Array.isArray(row.documents) ? row.documents : []
   const historySource: unknown[] = Array.isArray(row.status_history) ? row.status_history : (Array.isArray(row.history) ? row.history : [])
   const teamRecord = row.team && typeof row.team === 'object' ? row.team as Record<string, unknown> : undefined
+  
   const teamMembersSource: Record<string, unknown>[] = Array.isArray(row.teamMembers)
     ? row.teamMembers as Record<string, unknown>[]
     : Array.isArray(row.team_members)
@@ -137,17 +138,27 @@ function mapApplicationDetail(row: Record<string, unknown>): ApplicationDetail {
       : Array.isArray(teamRecord?.members)
         ? teamRecord!.members as Record<string, unknown>[]
         : []
+
   const commissionMembersSource: Record<string, unknown>[] = Array.isArray(row.commissionMembers)
     ? row.commissionMembers as Record<string, unknown>[]
     : Array.isArray(row.commission_members)
       ? row.commission_members as Record<string, unknown>[]
       : []
 
+  // Safe fallback processing to make sure answers object is cleanly captured
+  const rawAnswers = row.answers ?? (row.data as any)?.answers
+
   return {
     ...summary,
     school: row.school == null ? undefined : toString(row.school),
     study_program: row.study_program == null ? undefined : toString(row.study_program),
     study_year: row.study_year == null ? undefined : toString(row.study_year),
+    
+    // ── FIXED: Mapping the actual answer responses ──
+    answers: rawAnswers && typeof rawAnswers === 'object' && !Array.isArray(rawAnswers)
+      ? (rawAnswers as Record<string, unknown>)
+      : {},
+
     form_data: row.form_data && typeof row.form_data === 'object' && !Array.isArray(row.form_data)
       ? row.form_data as Record<string, unknown>
       : {},

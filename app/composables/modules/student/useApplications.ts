@@ -181,14 +181,22 @@ function formatApiDate(iso: string | null | undefined): string {
 
 export function mapStatusFromApi(status: ApiApplication['status']): ApplicationStatus {
   const name = typeof status === 'string' ? status : (status?.name ?? '')
-  const n = name.toLowerCase()
-  if (n.includes('draft')) return 'draft'
+  const n = name.toLowerCase().trim()
+  
+  if (n.includes('draft') || n.includes('plánovan')) return 'draft'
   if (n.includes('podan')) return 'submitted'
   if (n.includes('hodnot')) return 'evaluating'
   if (n.includes('dopln')) return 'supplement'
   if (n.includes('schválen')) return 'approved'
   if (n.includes('zamiet')) return 'rejected'
-  return 'draft'
+  
+
+  if (n.includes('onboarding')) return 'onboarding'
+  if (n.includes('aktiv') || n.includes('active')) return 'active_project'
+  if (n.includes('ukončen') || n.includes('ended')) return 'ended_project'
+  
+ 
+  return name as ApplicationStatus
 }
 
 function mapMilestoneStatus(s: unknown): Milestone['status'] {

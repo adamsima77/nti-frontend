@@ -73,6 +73,7 @@
 
 <script setup lang="ts">
 import { Download, Eye } from 'lucide-vue-next'
+import { watch } from 'vue'
 import type { AdminApplication } from '~/types/admin'
 
 definePageMeta({
@@ -82,7 +83,7 @@ definePageMeta({
 })
 
 useHead({ title: 'Prihlášky — Admin | NTI' })
-
+const { addToast } = useToast()
 const api = useApi()
 
 // ── Filters ────────────────────────────────────────────────────────────────
@@ -153,11 +154,29 @@ const filteredApplications = computed(() => {
   )
 })
 
-// ── Export filters passed to AdminExportModal ──────────────────────────────
-// The modal appends these as query params: ?status_id=X&...
-const exportFilters = computed(() => ({
-  ...(statusFilter.value !== '' && { status_id: statusFilter.value }),
-}))
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+watch(() => search, (newValue) =>{
+    if(searchTimeout) clearTimeout(searchTimeout);
+    const q = search.value.toLowerCase().trim()
+
+    if(!q || q.length < 2){
+        return
+    }
+
+    searchTimeout = setTimeout(() => {
+        currentPage.value = 1
+        fetchApplications()
+        return
+    }, 300)
+     
+})
+
+const exportFilters = computed(() => {
+  return {
+    ...(statusFilter.value !== '' && { status_id: statusFilter.value }),
+    ...(search.value !== '' && { search: search.value }),
+  };
+});
 
 // ── Data fetching ──────────────────────────────────────────────────────────
 async function fetchApplications() {
@@ -168,6 +187,7 @@ async function fetchApplications() {
         params: {
           page: currentPage.value,
           ...(statusFilter.value !== '' && { status_id: statusFilter.value }),
+          search: search.value
         },
       }),
       api.get('/get-status-admin'),
@@ -184,7 +204,7 @@ async function fetchApplications() {
       ...rawStatuses.map((s) => ({ value: s.id, label: s.name })),
     ]
   } catch {
-    useToast().error('Nepodarilo sa načítať prihlášky. Skúste to neskôr.')
+    addToast('Nepodarilo sa načítať prihlášky. Skúste to neskôr.', 'error')
   } finally {
     isLoading.value = false
   }
