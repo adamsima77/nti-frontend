@@ -3,11 +3,11 @@
     <div class="flex items-center justify-between gap-4 mb-8">
       <div>
         <NuxtLink
-          :to="localePath('/hodnotenie/zoznam')"
+          :to="localePath('/admin/prihlasky')"
           class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-navy transition-colors"
         >
           <ChevronLeft class="w-4 h-4" />
-          {{ t('evaluator.back_to_list') }}
+          {{ t('evaluator.back_to_apps') }}
         </NuxtLink>
         <h1 class="text-2xl font-bold text-navy mt-4">{{ t('evaluator.student_profile') }}</h1>
       </div>
@@ -110,7 +110,7 @@ import { ChevronLeft, Download } from 'lucide-vue-next'
 definePageMeta({
   layout: 'portal',
   middleware: 'auth',
-  roles: ['evaluator'],
+  roles: ['nti_admin', 'nti_superadmin'],
 })
 
 const api = useApi()

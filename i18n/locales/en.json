@@ -59,6 +59,7 @@
     "sk_title": "Slovenčina"
   },
   "evaluator": {
+    "back_to_apps": "Back To Applications",
     "apps": "Assigned Applications",
     "welcome": "Welcome, {name}!",
     "subtitle": "Evaluator dashboard",

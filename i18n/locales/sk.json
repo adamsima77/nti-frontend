@@ -1545,6 +1545,7 @@
   "error_message": "Nepodarilo sa anonymizovať používateľa"
 },
   "evaluator": {
+    "back_to_apps": "Naspäť na prihlášky",
     "apps": "Pridelené prihlášky",
     "welcome": "Vitajte, {name}!",
     "subtitle": "Prehľad hodnotení",

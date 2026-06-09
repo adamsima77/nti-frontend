@@ -116,7 +116,7 @@
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-gray-100 bg-gray-50/60">
-                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">#</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Application ID</th>
                   <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Výzva</th>
                   <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Tím</th>
                   <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Stav</th>
@@ -131,7 +131,7 @@
                   class="hover:bg-gray-50/70 transition-colors group"
                 >
                   <td class="px-5 py-4 text-gray-400 font-mono text-xs">
-                    {{ app.id }}
+                    {{ app.reference }}
                   </td>
                   <td class="px-5 py-4">
                     <span class="font-medium text-gray-900">{{ app.call?.name ?? '—' }}</span>

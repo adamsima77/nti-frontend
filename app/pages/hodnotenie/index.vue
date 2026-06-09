@@ -6,28 +6,7 @@
         <p class="text-gray-500">{{ $t('evaluator.subtitle') }}</p>
       </div>
 
-      <div class="hidden md:flex items-center gap-1 ml-4">
-        <button
-          :class="[
-            'px-2 py-1 text-xs font-medium rounded transition-colors duration-200',
-            locale === 'en' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
-          ]"
-          :title="$t('locale.en_title')"
-          @click="setLocale('en')"
-        >
-          EN
-        </button>
-        <button
-          :class="[
-            'px-2 py-1 text-xs font-medium rounded transition-colors duration-200',
-            locale === 'sk' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
-          ]"
-          :title="$t('locale.sk_title')"
-          @click="setLocale('sk')"
-        >
-          SK
-        </button>
-      </div>
+   
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -80,7 +59,6 @@
                   Program {{ call.program }}
                 </span>
               </div>
-              <p class="text-sm text-gray-500">{{ $t('evaluator.deadline_label') }}: {{ call.deadline }}</p>
             </div>
             <span class="text-xs text-gray-400">{{ call.applications_pending ?? 0 }} nehodnotených</span>
           </div>
@@ -163,12 +141,6 @@
               </div>
               <p class="text-sm text-gray-500 mb-3">
                 {{ app.teamName }} · Podané {{ app.submitted_at }}
-                <span
-                  v-if="app.deadline"
-                  class="ml-2 text-warning-500 font-medium"
-                >
-                  · Deadline: {{ app.deadline }}
-                </span>
               </p>
               
               <div
