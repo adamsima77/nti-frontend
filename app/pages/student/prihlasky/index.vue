@@ -27,7 +27,7 @@
             <input
               v-model="filters.search"
               type="text"
-              placeholder="Hľadať podľa názvu výzvy…"
+              placeholder="Hľadať podľa ID aplikácie alebo výzvy..."
               class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
           </div>
@@ -328,7 +328,30 @@ watch([() => filters.program_type_id, () => filters.status_id], () => {
   currentPage.value = 1
   fetchApplications()
 })
- 
+
+
+
+let searchDebounceTimeout = null
+
+watch(() => filters.search, (newSearch) => {
+  
+  if (searchDebounceTimeout) clearTimeout(searchDebounceTimeout)
+
+
+  if (!newSearch || newSearch.length < 2) {
+    currentPage.value = 1
+    fetchApplications()
+    return
+  }
+
+
+  searchDebounceTimeout = setTimeout(() => {
+    currentPage.value = 1 
+    fetchApplications()
+  }, 300)
+})
+
+
 // Page change
 watch(currentPage, fetchApplications)
  

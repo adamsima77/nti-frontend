@@ -1992,7 +1992,10 @@
     "pending_onboarding": "Pending onboarding",
     "pending_approval": "Pending approval",
     "banned": "Banned",
-    "anonymized": "Anonymized"
+    "anonymized": "Anonymized",
+    "onboarding": "Onboarding",
+    "active_project": "Active Project",
+    "ended_project": "Completed Project"
   },
   "gdpr_download": {
     "modal_title": "Export GDPR personal data",

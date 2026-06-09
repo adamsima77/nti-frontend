@@ -71,7 +71,9 @@
             {{ application.team }} · {{ application.program }}
             <span v-if="application.submittedAt"> · {{ formatDate(application.submittedAt) }}</span>
           </p>
+          
         </div>
+    
 
         <!-- Draft: primary CTA — only for team leader -->
         <div v-if="isTeamLeader && application.status === 'draft' && !isEditing" class="shrink-0">
@@ -344,6 +346,7 @@
                 :key="i"
                 class="flex gap-3"
               >
+            
                 <div class="flex flex-col items-center">
                   <div
                     class="w-3 h-3 rounded-full flex-shrink-0"
@@ -484,6 +487,7 @@ watch(
       if (!callId) {
         await applicationsStore.fetchApplicationById((app as any).id)
         const fetched = applicationsStore.currentApplication as any
+       
         callId = fetched?.call_id ?? null
       }
 
@@ -698,48 +702,120 @@ function formatDate(iso?: string): string {
   }).format(parsedDate)
 }
 
-function historyDotColor(status: string): string {
-  switch (status) {
-    case 'approved':   return 'bg-green-500'
-    case 'evaluating': return 'bg-blue-500'
-    case 'submitted':  return 'bg-emerald-500'
-    case 'supplement': return 'bg-amber-500'
-    case 'rejected':   return 'bg-red-500'
-    default:           return 'bg-gray-400'
-  }
-}
-
 function historyLabel(status: unknown): string {
+  
   if (!status) return '—'
   
-  // Ak by náhodou prišiel objekt, vytiahneme z neho name
   const statusStr = typeof status === 'object' && status !== null && 'name' in status
     ? String((status as any).name)
     : String(status)
 
-  const normalizedStatus = statusStr.toLowerCase().trim()
-
   const labels: Record<string, string> = {
-    'draft':            'Draft',
-    'podané':           'Podané',
-    'submitted':        'Podané',
-    'v hodnotení':      'V hodnotení',
-    'evaluating':       'V hodnotení',
-    'vyžiadané doplnenie': 'Vyžiadané doplnenie',
-    'supplement':       'Vyžiadané doplnenie',
-    'schválené':        'Schválené',
-    'approved':         'Schválené',
-    'zamietnuté':       'Zamietnuté',
-    'rejected':         'Zamietnuté',
-    
-    // 🔴 PRIDANÉ NOVÉ STAVY Z API:
-    'onboarding':       'Onboarding',
-    'aktívny projekt':  'Aktívny projekt',
-    'pozastavené':      'Pozastavené',
-    'ukončené':         'Ukončené'
+    // EN/Kódové stavy
+    'draft':                'Draft',
+    'approved':             'Schválené',
+    'pending':              'Vyžiadané doplnenie',
+    'rejected':             'Zamietnuté',
+    'evaluating':           'V hodnotení',
+    'submitted':            'Podané',
+    'active':               'Aktívny projekt',
+    'active_project':       'Aktívny projekt', // Pridané
+    'paused':               'Pozastavené',
+    'published':            'Publikované',
+    'concept':              'Koncept',
+    'matching':             'V párovaní',
+    'assigned':             'Pridelené',
+    'in_progress':          'V realizácii',
+    'completed':            'Dokončené',
+    'closed':               'Uzavreté',
+    'inactive':             'Neaktívne',
+    'pending_approval':     'Čaká na schválenie',
+    'vyziadane_doplnenie':  'Vyžiadané doplnenie',
+    'onboarding':           'Onboarding',      // Pridané
+    'ended_project':        'Ukončené',         // Pridané
+
+    // SK stavy z API
+    'Draft':                'Draft',
+    'Publikované':          'Publikované',
+    'V párovaní':           'V párovaní',
+    'Pridelené':            'Pridelené',
+    'V realizácii':         'V realizácii',
+    'Uzavreté':             'Uzavreté',
+    'Čaká na schválenie':   'Čaká na schválenie',
+    'Podané':               'Podané',
+    'V hodnotení':          'V hodnotení',
+    'Vyžiadané doplnenie':  'Vyžiadané doplnenie',
+    'Schválené':            'Schválené',
+    'Zamietnuté':           'Zamietnuté',
+    'Dokončené':            'Dokončené',
+    'V riešení':            'V realizácii',
+    'Plánované':            'Draft',
+    'Onboarding':           'Onboarding',
+    'Aktívny projekt':      'Aktívny projekt',
+    'Ukončené':             'Ukončené'
   }
 
-  return labels[normalizedStatus] ?? statusStr
+  return labels[statusStr] ?? labels[statusStr.toLowerCase().trim()] ?? statusStr
+}
+
+function historyDotColor(status: unknown): string {
+  if (!status) return 'bg-gray-400'
+
+  // FIX: Ak je status objekt z API, vytiahneme z neho 'name', inak ho prevedieme na string
+  const statusStr = typeof status === 'object' && status !== null && 'name' in status
+    ? String((status as any).name)
+    : String(status)
+
+  const colorMap: Record<string, string> = {
+    // Podľa EN kľúčov (Svetlejšia zelená)
+    'approved':            'bg-green-500', 
+    'submitted':           'bg-emerald-500',
+    'active':              'bg-green-500', 
+    'active_project':      'bg-green-500', // Pridané
+    'published':           'bg-green-500', 
+    'completed':           'bg-green-500', 
+    
+    // Ostatné farby podľa UiStatus
+    'pending':             'bg-amber-800', 
+    'rejected':            'bg-red-600',   
+    'evaluating':          'bg-blue-600',  
+    'draft':               'bg-slate-500', 
+    'paused':              'bg-orange-700', 
+    'concept':             'bg-amber-500', 
+    'matching':            'bg-purple-600',
+    'assigned':            'bg-sky-700',   
+    'in_progress':         'bg-amber-600', 
+    'closed':              'bg-slate-500', 
+    'inactive':            'bg-slate-400', 
+    'pending_approval':    'bg-amber-800', 
+    'vyziadane_doplnenie': 'bg-amber-600', 
+    'onboarding':          'bg-blue-600',  // Pridané
+    'ended_project':       'bg-slate-500', // Pridané
+
+    // Podľa SK textov (Svetlejšia zelená)
+    'Publikované':          'bg-green-500', 
+    'Schválené':            'bg-green-500', 
+    'Dokončené':            'bg-green-500', 
+    'Aktívny projekt':      'bg-green-500', 
+    
+    // Ostatné SK stavy
+    'Draft':                'bg-slate-500', 
+    'V párovaní':           'bg-purple-600',
+    'Pridelené':            'bg-sky-700',   
+    'V realizácii':         'bg-amber-600', 
+    'Uzavreté':             'bg-slate-500', 
+    'Čaká na schválenie':   'bg-amber-800', 
+    'Podané':               'bg-blue-600',  
+    'V hodnotení':          'bg-blue-600',  
+    'Vyžiadané doplnenie':  'bg-amber-600', 
+    'Zamietnuté':           'bg-red-600',   
+    'V riešení':            'bg-amber-600', 
+    'Plánované':            'bg-slate-500', 
+    'Onboarding':           'bg-blue-600',  
+    'Ukončené':             'bg-slate-500'  
+  }
+
+  return colorMap[statusStr] ?? colorMap[statusStr.toLowerCase().trim()] ?? 'bg-gray-400'
 }
 
 function milestoneStatus(status: string): string {

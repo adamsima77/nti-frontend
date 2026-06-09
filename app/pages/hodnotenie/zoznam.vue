@@ -254,7 +254,7 @@ const selectedCallApplicationsRaw = computed(() => {
       return {
         id: app.id,
         projectName: call_project_name_fallback(app, evalItem),
-        status: translate_status(app.active_status),
+        status: app.status.name,
         category: app.category ?? null,
         program: programLabel, 
         teamName: app.team?.name ?? '—',
@@ -274,10 +274,7 @@ const call_project_name_fallback = (app: any, evalItem: any) => {
   return `${app?.reference ?? 'Prihláška'} #${app?.id ?? evalItem.id}`
 }
 
-const translate_status = (statusId: number) => {
-  const statuses: Record<number, string> = { 1: 'draft', 2: 'submitted', 3: 'under_review', 4: 'accepted' }
-  return statuses[statusId] || 'pending'
-}
+
 
 // ── Kategórie pre filter ─────────────────────────────────────────────────────
 const selectedCallCategories = computed(() => {

@@ -37,7 +37,7 @@ export interface Application {
   callId: number
   title: string
   description: string
-  status: 'draft' | 'submitted' | 'evaluating' | 'approved' | 'rejected'
+  status: 'draft' | 'submitted' | 'evaluating' | 'approved' | 'rejected' | 'onboarding' | 'active_project' | 'ended_project'
   data: Record<string, any>
   submittedAt?: string
   createdAt?: string

@@ -264,17 +264,7 @@ definePageMeta({
 
 const isLoading    = ref(false)
 const errorMessage = ref<string | null>(null)
-
-// Answers come directly from the evaluator detail response under `answers: {}`
-// No separate API call needed — everything is in GET /evaluator/applications/{id}
-const fetchedAnswers = computed<Record<string, unknown>>(() => {
-  if (!applicationDetail.value) return {}
-  
-  // Skontroluje klasickú štruktúru, alebo obalenú cez Laravel resource "data"
-  return (applicationDetail.value.answers as Record<string, unknown>) ?? 
-         (applicationDetail.value.data?.answers as Record<string, unknown>) ?? 
-         {}
-})
+const localAnswers = ref<Record<string, unknown>>({})
 
 // FILE_REF_RE: "[2]", "[3,7]" — same regex as the modal
 const FILE_REF_RE = /^\[\s*\d+(\s*,\s*\d+)*\s*\]$/
@@ -286,8 +276,9 @@ const downloadingIds = ref<Set<number>>(new Set())
 // ── Computed ───────────────────────────────────────────────────────────────
 
 const answersReady = computed(() => {
-  const fields = applicationDetail.value?.form_fields ?? applicationDetail.value?.data?.form_fields
-  return !!(fields?.length && Object.keys(fetchedAnswers.value).length > 0)
+ 
+  const fields = applicationDetail.value?.form_fields ?? (applicationDetail.value as any)?.data?.form_fields
+  return !!(fields?.length)
 })
 
 const applicationTitle = computed(() => {
@@ -312,16 +303,16 @@ const maxScore = computed(() =>
   ),
 )
 
-// ── Answer helpers (mirrors AdminApplicationDetailModal) ───────────────────
+// ── Answer helpers ─────────────────────────────────────────────────────────
 
-/** Get the raw answer value for a field from fetchedAnswers */
+/** Get the raw answer value for a field from localAnswers */
 function getAnswerRaw(fieldName: string): unknown {
-  return fetchedAnswers.value[fieldName] ?? null
+  
+  return localAnswers.value[fieldName] ?? null
 }
 
 /**
  * Parse file IDs from a "[2]" or "[3,7]" string.
- * Same logic as the modal's parseFileIds.
  */
 function parseFileIds(value: unknown): number[] {
   if (value == null) return []
@@ -367,11 +358,6 @@ function extractIdFromStoragePath(path: string | null | undefined): number | nul
 
 // ── File download ──────────────────────────────────────────────────────────
 
-/**
- * Download a document by ID via GET /documents/{id}/download → blob.
- * Resolves the filename from GET /documents/{id} (cached), then saves.
- * Same pattern as AdminApplicationDetailModal.downloadDocument.
- */
 async function downloadDocument(docId: number) {
   if (downloadingIds.value.has(docId)) return
 
@@ -424,6 +410,16 @@ async function loadApplication() {
 
   try {
     await fetchApplicationDetail(applicationId)
+    
+
+    // Capture answers directly after fetch — bypasses any composable
+    // caching/reactivity quirks by reading the value once while it's hot
+    const raw = applicationDetail.value as any
+    localAnswers.value =
+      (raw?.answers as Record<string, unknown>) ??
+      (raw?.data?.answers as Record<string, unknown>) ??
+      {}
+     
   } catch (err) {
     errorMessage.value = err instanceof Error ? err.message : t('evaluator.loading_detail_error')
   } finally {
