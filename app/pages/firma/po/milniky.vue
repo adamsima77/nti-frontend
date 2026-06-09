@@ -57,7 +57,7 @@
               <!-- Komentáre (dôvody zamietnutia) -->
               <div v-if="item.comments?.length" class="mt-2 space-y-1">
                 <div v-for="c in item.comments" :key="c.id"
-                  class="text-xs bg-red-50 text-red-700 rounded px-2 py-1 border border-red-100">
+                  class="text-xs bg-gray-50 text-gray-600 rounded px-2 py-1 border border-gray-200">
                   <span class="font-medium">{{ c.author }}:</span> {{ c.text }}
                 </div>
               </div>
@@ -84,7 +84,7 @@
 
       <!-- ═══ TAB: SCHVAĽOVANIE ═══ -->
       <div v-if="activeTab === 'approvals'" class="space-y-4">
-        <p class="text-sm text-gray-500">Míľniky označené ako dokončené. Otvorte detail a skontrolujte výstupy pred schválením.</p>
+        <p class="text-sm text-gray-500">Míľniky označené ako dokončené. Skontrolujte výstupy pred schválením.</p>
 
         <div v-if="deliverablesLoading" class="text-center py-10 text-gray-400 text-sm">Načítavam...</div>
         <div v-else-if="!deliverables.length" class="text-center py-10 text-gray-400 border border-dashed border-gray-200 rounded-lg">
@@ -128,7 +128,7 @@
           <input v-model="form.name" type="text" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
         </div>
         <div class="space-y-1">
-          <label class="text-xs font-medium text-gray-500">Popis</label>
+          <label class="text-xs font-medium text-gray-500">Popis *</label>
           <textarea v-model="form.description" rows="3" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
         </div>
         <div class="space-y-1">
@@ -197,7 +197,7 @@
           </div>
 
           <div v-if="detailMilestone?.status === 'Dokončené'" class="space-y-1">
-            <label class="text-sm font-semibold text-gray-600">Komentár <span class="text-gray-400 font-normal">(voliteľný)</span></label>
+            <label class="text-sm font-semibold text-gray-600">Komentár *</label>
             <textarea v-model="comment" rows="3"
               placeholder="Pridajte poznámku pre tím..."
               class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
@@ -258,16 +258,20 @@ async function loadDashboard() {
 
 onMounted(async () => {
   await loadDashboard()
-  if (call.value) loadMilestones()
+  if (call.value) {
+    loadMilestones()
+    if (activeTab.value === 'approvals') loadDeliverables()
+  }
 })
 
 // ── Tabs ──────────────────────────────────────────────────────────────────
 
 type TabId = 'list' | 'approvals'
-const activeTab = ref<TabId>('list')
+const route = useRoute()
+const activeTab = ref<TabId>(route.query.tab === 'approvals' ? 'approvals' : 'list')
 const tabs = [
-  { id: 'list' as TabId,     label: 'Zoznam míľnikov',    icon: ListTodo },
-  { id: 'approvals' as TabId, label: 'Schvaľovanie',      icon: ClipboardCheck },
+  { id: 'list' as TabId,      label: 'Zoznam míľnikov', icon: ListTodo },
+  { id: 'approvals' as TabId, label: 'Schvaľovanie',    icon: ClipboardCheck },
 ]
 
 function onTabChange(id: TabId) {
@@ -384,6 +388,7 @@ async function approve(item: any) {
     })
     detailOpen.value = false
     deliverables.value = deliverables.value.filter(d => d.id !== item.id)
+    loadMilestones()
     toast.addToast({ message: 'Míľnik bol schválený.', type: 'success' })
   } catch {
     toast.addToast({ message: 'Schválenie zlyhalo.', type: 'error' })
@@ -397,6 +402,7 @@ async function reject(item: any) {
     })
     detailOpen.value = false
     deliverables.value = deliverables.value.filter(d => d.id !== item.id)
+    loadMilestones()
     toast.addToast({ message: 'Míľnik bol zamietnutý.', type: 'success' })
   } catch {
     toast.addToast({ message: 'Zamietnutie zlyhalo.', type: 'error' })

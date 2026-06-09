@@ -103,7 +103,7 @@ const navItems = computed(() => {
 
   if (role === 'student') {
     return [
-      { label: t('portal_sidebar_links.dashboard'),    to: localePath('/student'),           icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.dashboard'),    to: localePath('/student'),           icon: LayoutDashboard, exact: true },
       { label: t('portal_sidebar_links.applications'), to: localePath('/student/prihlasky'), icon: FileText },
       { label: t('portal_sidebar_links.teams'),        to: localePath('/student/timy'),      icon: Users },
       { label: t('portal_sidebar_links.profile'),      to: localePath('/student/profil'),    icon: UserCircle },
@@ -112,7 +112,7 @@ const navItems = computed(() => {
 
   if (role === 'cms_editor') {
     return [
-      { label: t('portal_sidebar_links.dashboard'),  to: localePath('/cms'),            icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.dashboard'),  to: localePath('/cms'),            icon: LayoutDashboard, exact: true },
       { label: t('portal_sidebar_links.cms'),        to: localePath('/cms/management'), icon: FileCode },
       { label: t('portal_sidebar_links.cmsProfile'), to: localePath('/cms/profil'),     icon: UserCircle },
     ]
@@ -123,21 +123,22 @@ const navItems = computed(() => {
 
     if (orgRole === 'po') {
       return [
-        { label: t('portal_sidebar_links.dashboard'),   to: localePath('/firma/po'),           icon: LayoutDashboard },
-        { label: t('portal_sidebar_links.poTask'),      to: localePath('/firma/po/zadanie'),   icon: FileText },
-        { label: t('portal_sidebar_links.poMilestones'),to: localePath('/firma/po/milniky'),   icon: Flag },
+        { label: t('portal_sidebar_links.dashboard'),    to: localePath('/firma/po'),          icon: LayoutDashboard, exact: true },
+        { label: t('portal_sidebar_links.poTask'),       to: localePath('/firma/po/zadanie'),  icon: FileText },
+        { label: t('portal_sidebar_links.poMilestones'), to: localePath('/firma/po/milniky'),  icon: Flag },
+        { label: 'Môj profil',                           to: localePath('/firma/moj-profil'),  icon: UserCircle },
       ]
     }
 
     if (orgRole === 'member') {
       return [
-        { label: t('portal_sidebar_links.dashboard'),      to: localePath('/firma'),         icon: LayoutDashboard },
-        { label: t('portal_sidebar_links.companyProfile'), to: localePath('/firma/profil'),  icon: Building2 },
+        { label: t('portal_sidebar_links.dashboard'), to: localePath('/firma'),            icon: LayoutDashboard, exact: true },
+        { label: 'Môj profil',                        to: localePath('/firma/moj-profil'), icon: UserCircle },
       ]
     }
 
     return [
-      { label: t('portal_sidebar_links.dashboard'),       to: localePath('/firma'),          icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.dashboard'),       to: localePath('/firma'),          icon: LayoutDashboard, exact: true },
       { label: t('portal_sidebar_links.companyProfile'),  to: localePath('/firma/profil'),   icon: Building2 },
       { label: t('portal_sidebar_links.tasks'),           to: localePath('/firma/zadania'),  icon: ClipboardList },
       { label: t('portal_sidebar_links.members'),         to: localePath('/firma/clenovia'), icon: Users },
@@ -146,7 +147,7 @@ const navItems = computed(() => {
 
   if (role === 'mentor') {
     return [
-      { label: t('portal_sidebar_links.dashboard'),     to: localePath('/mentor'),             icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.dashboard'),     to: localePath('/mentor'),             icon: LayoutDashboard, exact: true },
       { label: t('portal_sidebar_links.projects'),      to: localePath('/mentor/projekty'),    icon: FolderKanban },
       { label: t('portal_sidebar_links.consultations'), to: localePath('/mentor/konzultacie'), icon: MessageSquare },
     ]
@@ -154,14 +155,14 @@ const navItems = computed(() => {
 
   if (role === 'evaluator') {
     return [
-      { label: t('portal_sidebar_links.dashboard'),   to: localePath('/hodnotenie'),        icon: LayoutDashboard },
+      { label: t('portal_sidebar_links.dashboard'),   to: localePath('/hodnotenie'),        icon: LayoutDashboard, exact: true },
       { label: t('portal_sidebar_links.evaluations'), to: localePath('/hodnotenie/zoznam'), icon: ClipboardCheck },
       { label: t('portal_sidebar_links.profile'),     to: localePath('/profil'),            icon: UserCircle }
     ]
   }
 
   return [
-    { label: t('portal_sidebar_links.dashboard'), to: localePath('/'), icon: LayoutDashboard },
+    { label: t('portal_sidebar_links.dashboard'), to: localePath('/'), icon: LayoutDashboard, exact: true },
   ]
 })
 </script>

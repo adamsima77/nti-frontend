@@ -29,6 +29,8 @@ export function useOrgDashboard() {
   const myRole = ref<'organization_admin' | 'member' | 'po' | null>(null)
   const stats = ref<OrgDashboardStats>({ total_calls: 0, active_calls: 0, in_progress: 0, completed: 0 })
   const calls = ref<OrgCall[]>([])
+  const teams = ref<any[]>([])
+  const applications = ref<any[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
@@ -47,6 +49,8 @@ export function useOrgDashboard() {
     const res = await api.get(`/organizations/${orgId.value}/member-dashboard`) as any
     stats.value = res?.stats ?? { total_calls: 0, active_calls: 0, in_progress: 0, completed: 0 }
     calls.value = res?.calls ?? []
+    teams.value = res?.teams ?? []
+    applications.value = res?.applications ?? []
   }
 
   const load = async () => {
@@ -65,5 +69,5 @@ export function useOrgDashboard() {
     }
   }
 
-  return { orgId, myRole, isMember, isAdmin, isPo, stats, calls, isLoading, error, load }
+  return { orgId, myRole, isMember, isAdmin, isPo, stats, calls, teams, applications, isLoading, error, load }
 }

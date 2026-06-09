@@ -16,7 +16,7 @@
       </div>
       <UiStatusBadge
         v-if="taskData"
-        :status="taskData.status"
+        :status="taskData.rawStatus"
       />
     </div>
 
@@ -125,7 +125,7 @@ const mapCallToFormData = (call: any) => ({
   requirements: call.call_criteria?.map((c: any) => c.name).filter(Boolean) ?? [''],
   tech_tags: call.tech_tags ?? [],
   attachments: call.documents ?? [],
-  po_name: call.product_owner?.name ?? '',
+  po_name: [call.product_owner?.name, call.product_owner?.surname].filter(Boolean).join(' ') || '',
   po_email: call.product_owner?.email ?? '',
   budget: call.budget ? Number(call.budget) : null,
   budget_type: call.budget_type ?? 'milestone',

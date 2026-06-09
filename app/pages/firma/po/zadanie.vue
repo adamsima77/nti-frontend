@@ -45,7 +45,7 @@
         <div>
           <div class="flex items-center gap-3 mb-1">
             <h1 class="text-2xl font-bold text-navy">{{ task.title }}</h1>
-            <UiStatusBadge :status="task.status" :label="task.rawStatus" />
+            <UiStatusBadge :status="task.rawStatus" />
           </div>
           <p class="text-gray-500 text-sm">{{ task.program }} · Vytvorené {{ task.createdAt }}</p>
         </div>
@@ -249,7 +249,7 @@ const mapCallToTask = (call: any) => ({
   assignedTeam: call.applications?.find((a: any) =>
     ['Onboarding', 'Aktívny projekt', 'Ukončené'].includes(a.status?.name)
   )?.team?.name ?? null,
-  po_name: call.product_owner?.name ?? '',
+  po_name: [call.product_owner?.name, call.product_owner?.surname].filter(Boolean).join(' ') || '',
   po_email: call.product_owner?.email ?? '',
   po_phone: call.product_owner?.phone ?? '',
   po_position: call.product_owner?.position ?? '',

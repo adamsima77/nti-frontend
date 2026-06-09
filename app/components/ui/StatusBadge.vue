@@ -136,6 +136,25 @@ const statusConfig: Record<string, { labelKey: string; color: string; bgClass: s
     color:    '#94A3B8',
     bgClass:  'bg-gray-100 text-gray-400 border border-gray-200',
   },
+
+  'Draft':                 { labelKey: 'status_labels.draft',            color: '#64748B', bgClass: 'bg-gray-50 text-gray-500 border border-gray-200' },
+  'Publikované':           { labelKey: 'status_labels.published',        color: '#16A34A', bgClass: 'bg-green-50 text-green-700' },
+  'V párovaní':            { labelKey: 'status_labels.matching',         color: '#7C3AED', bgClass: 'bg-purple-50 text-purple-700' },
+  'Pridelené':             { labelKey: 'status_labels.assigned',         color: '#0369A1', bgClass: 'bg-sky-50 text-sky-700' },
+  'V realizácii':          { labelKey: 'status_labels.in_progress',      color: '#D97706', bgClass: 'bg-warning-50 text-warning-700' },
+  'Uzavreté':              { labelKey: 'status_labels.closed',           color: '#64748B', bgClass: 'bg-gray-100 text-gray-500' },
+  'Čaká na schválenie':    { labelKey: 'status_labels.pending_approval', color: '#92400E', bgClass: 'bg-warning-50 text-warning-700' },
+  'Podané':                { labelKey: 'status_labels.submitted',        color: '#0D5FBF', bgClass: 'bg-blue-50 text-blue-700' },
+  'V hodnotení':           { labelKey: 'status_labels.evaluating',       color: '#0D5FBF', bgClass: 'bg-blue-50 text-blue-600' },
+  'Vyžiadané doplnenie':   { labelKey: 'status_labels.pending',          color: '#D97706', bgClass: 'bg-amber-50 text-amber-700' },
+  'Schválené':             { labelKey: 'status_labels.approved',         color: '#16803C', bgClass: 'bg-success-50 text-success-700' },
+  'Zamietnuté':            { labelKey: 'status_labels.rejected',         color: '#DC2626', bgClass: 'bg-danger-50 text-danger-700' },
+  'Dokončené':             { labelKey: 'status_labels.completed',        color: '#16803C', bgClass: 'bg-success-50 text-success-700' },
+  'V riešení':             { labelKey: 'status_labels.in_progress',      color: '#D97706', bgClass: 'bg-warning-50 text-warning-700' },
+  'Plánované':             { labelKey: 'status_labels.draft',            color: '#64748B', bgClass: 'bg-gray-50 text-gray-500 border border-gray-200' },
+  'Onboarding':            { labelKey: 'status_labels.evaluating',       color: '#0D5FBF', bgClass: 'bg-blue-50 text-blue-600' },
+  'Aktívny projekt':       { labelKey: 'status_labels.active',           color: '#16A34A', bgClass: 'bg-green-50 text-green-700' },
+  'Ukončené':              { labelKey: 'status_labels.closed',           color: '#64748B', bgClass: 'bg-gray-100 text-gray-500' },
 }
 
 const cfg = computed(() => statusConfig[props.status])

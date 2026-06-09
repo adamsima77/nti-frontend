@@ -12,11 +12,17 @@
     </div>
 
     <template v-else>
+      <!-- Vitajte -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
+        <p class="text-gray-500 text-sm">Prehľad vášho zadania a míľnikov</p>
+      </div>
+
       <!-- Header -->
       <div class="bg-white rounded-xl border border-gray-100 p-6 mb-8">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-xs font-medium text-gray-300 uppercase tracking-widest mb-2">Product Owner</p>
+            <p class="text-xs font-medium text-gray-300 uppercase tracking-widest mb-2">Zadanie</p>
             <h1 class="text-2xl font-bold text-navy leading-snug mb-1">{{ call.name }}</h1>
             <p class="text-sm text-gray-400">{{ call.organization }} · {{ call.program }}</p>
           </div>
@@ -28,7 +34,7 @@
       </div>
 
       <!-- Štatistiky -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-600 p-5">
           <div class="text-3xl font-bold text-green-600">{{ stats.open_milestones }}</div>
           <p class="text-sm text-gray-500 mt-1">Otvorené míľniky</p>
@@ -41,8 +47,30 @@
           <div class="text-3xl font-bold text-amber-600">{{ stats.pending_approvals }}</div>
           <p class="text-sm text-gray-500 mt-1">Čakajú na schválenie</p>
         </div>
+        <div class="bg-white rounded-lg shadow-sm border-l-4 border-blue-400 p-5">
+          <div class="text-3xl font-bold text-blue-500">{{ stats.documents_count }}</div>
+          <p class="text-sm text-gray-500 mt-1">Dokumenty</p>
+        </div>
       </div>
 
+      <!-- Vyžadovaná akcia: čakajúce schválenia míľnikov -->
+      <NuxtLink
+        v-if="stats.pending_approvals > 0"
+        :to="localePath('/firma/po/milniky') + '?tab=approvals'"
+        class="mt-8 flex items-start gap-4 bg-amber-50 border border-amber-300 rounded-xl p-5 hover:bg-amber-100 transition-colors group"
+      >
+        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+          <AlertTriangle class="w-5 h-5 text-amber-600" />
+        </div>
+        <div class="flex-1">
+          <p class="font-semibold text-amber-900 group-hover:underline">Vyžadovaná akcia</p>
+          <p class="text-sm text-amber-700 mt-0.5">
+            {{ stats.pending_approvals }} {{ stats.pending_approvals === 1 ? 'míľnik čaká' : 'míľniky čakajú' }} na vaše schválenie.
+            Kliknite pre prechod na schvaľovanie.
+          </p>
+        </div>
+        <ChevronRight class="w-5 h-5 text-amber-500 self-center flex-shrink-0" />
+      </NuxtLink>
 
       <!-- Priradený tím -->
       <div v-if="team" class="mt-6 bg-green-50 border border-green-100 rounded-lg p-5 flex items-center gap-4">
@@ -65,13 +93,37 @@
         </div>
       </div>
 
+      <!-- Blížiace sa termíny -->
+      <div v-if="upcomingDeadlines.length" class="mt-8">
+        <h2 class="text-lg font-bold text-navy mb-4">Blížiace sa termíny</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div
+            v-for="d in upcomingDeadlines"
+            :key="d.label"
+            class="bg-white rounded-lg border border-gray-100 shadow-sm p-5 flex items-center gap-4"
+          >
+            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
+              <Calendar class="w-6 h-6 text-blue-600" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-navy truncate">{{ d.label }}</p>
+              <p class="text-sm text-gray-500">{{ d.date }}</p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <span class="text-2xl font-bold text-blue-600">{{ d.daysLeft }}</span>
+              <p class="text-xs text-gray-500">dní zostáva</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { Briefcase, Users } from 'lucide-vue-next'
+import { ref, computed, onMounted } from 'vue'
+import { Briefcase, Users, Calendar, AlertTriangle, ChevronRight } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
@@ -79,13 +131,21 @@ definePageMeta({
   roles: ['partner'],
 })
 
-useHead({ title: 'Dashboard | NTI PO' })
+useHead({ title: 'Product Owner Dashboard | NTI' })
 
 const api = useApi()
+const localePath = useLocalePath()
+const authStore = useAuthStore()
+
+const userDisplayName = computed(() => {
+  const u = authStore.user
+  if (!u) return ''
+  return [u.name, u.surname].filter(Boolean).join(' ') || u.email || ''
+})
 
 const call = ref<any>(null)
 const team = ref<any>(null)
-const stats = ref({ open_milestones: 0, done_milestones: 0, pending_approvals: 0 })
+const stats = ref({ open_milestones: 0, done_milestones: 0, pending_approvals: 0, documents_count: 0 })
 const isLoading = ref(true)
 
 async function loadDashboard() {
@@ -101,6 +161,23 @@ async function loadDashboard() {
     isLoading.value = false
   }
 }
+
+const upcomingDeadlines = computed(() => {
+  if (!call.value) return []
+  const today = new Date().toISOString().slice(0, 10)
+  const entries = [
+    { label: 'Uzávierka prihlášok', date: call.value.application_deadline },
+    { label: 'Začiatok projektu',   date: call.value.project_start },
+    { label: 'Koniec projektu',     date: call.value.project_end },
+  ]
+  return entries
+    .filter(e => e.date && e.date >= today)
+    .sort((a, b) => (a.date! > b.date! ? 1 : -1))
+    .map(e => {
+      const diff = Math.ceil((new Date(e.date!).getTime() - new Date(today).getTime()) / 86_400_000)
+      return { label: e.label, date: e.date, daysLeft: diff }
+    })
+})
 
 onMounted(loadDashboard)
 </script>

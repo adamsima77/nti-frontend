@@ -1666,7 +1666,28 @@
     "program_label": "Program"
   },
   "status_labels": {
-    "unknown": "Neznámy"
+    "unknown": "Neznámy stav",
+    "approved": "Schválené",
+    "pending": "Čaká na doplnenie",
+    "rejected": "Zamietnuté",
+    "evaluating": "V hodnotení",
+    "active": "Aktívny",
+    "draft": "Draft",
+    "submitted": "Podané",
+    "paused": "Pozastavené",
+    "published": "Publikované",
+    "concept": "Koncept",
+    "matching": "V párovaní",
+    "assigned": "Pridelené",
+    "in_progress": "V realizácii",
+    "completed": "Dokončené",
+    "closed": "Uzavreté",
+    "inactive": "Neaktívny",
+    "pending_email": "Čaká na overenie emailu",
+    "pending_onboarding": "Čaká na onboarding",
+    "pending_approval": "Čaká na schválenie",
+    "banned": "Zablokovaný",
+    "anonymized": "Anonymizovaný"
   },
   "cmsOverview": {
     "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."

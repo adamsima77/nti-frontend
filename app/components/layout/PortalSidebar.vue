@@ -49,7 +49,7 @@
               :class="[
                 'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-200',
                 isCollapsed ? 'justify-center' : '',
-                isActive(item.to)
+                isActive(item.to, item.exact)
                   ? 'bg-white/10 text-white border-l-3 border-blue-500'
                   : 'text-white/70 hover:bg-white/5 hover:text-white',
               ]"
@@ -124,8 +124,9 @@ const emit = defineEmits(['close', 'toggle-collapse'])
 
 const route = useRoute()
 
-const isActive = (to) => {
+const isActive = (to, exact = false) => {
   const localized = localePath(to)
+  if (exact) return route.path === localized
   return route.path === localized || route.path.startsWith(localized + '/')
 }
 

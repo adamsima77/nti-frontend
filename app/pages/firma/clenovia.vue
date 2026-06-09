@@ -12,8 +12,7 @@
     <!-- Info box -->
     <div class="bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 mb-6 flex gap-2 text-sm text-blue-700">
       <Info class="w-4 h-4 mt-0.5 shrink-0" />
-      Každý člen dostane prístup do firemného portálu podľa svojej roly. Administrátor môže spravovať zadania a profil,
-      člen má iba prístup na čítanie.
+      Každý člen dostane prístup do firemného portálu podľa svojej roly.
     </div>
 
     <div class="flex items-center justify-end mb-4">
@@ -74,7 +73,6 @@
                   @change="handleRoleChange(member)"
                   class="px-2 py-1 rounded border border-gray-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="admin">Administrátor</option>
                   <option value="member">Člen</option>
                   <option value="po">Product Owner</option>
                 </select>
@@ -167,7 +165,6 @@
               class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-none"
             >
               <option value="member">Člen</option>
-              <option value="admin">Administrátor</option>
               <option value="po">Product Owner</option>
             </select>
           </div>
@@ -260,7 +257,7 @@ const members = ref<Member[]>([])
 const pendingInvites = computed(() => members.value.filter((m) => m.status === 'pending'))
 const showInviteModal = ref(false)
 const inviteEmail = ref('')
-const inviteRole = ref<'admin' | 'member' | 'po'>('member')
+const inviteRole = ref<'member' | 'po'>('member')
 const inviteError = ref<string | null>(null)
 
 const inviteMember = async () => {

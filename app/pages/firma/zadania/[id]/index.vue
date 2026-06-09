@@ -39,7 +39,7 @@
         <div>
           <div class="flex items-center gap-3 mb-1">
             <h1 class="text-2xl font-bold text-navy">{{ task.title }}</h1>
-            <UiStatusBadge :status="task.status" :label="task.rawStatus" />
+            <UiStatusBadge :status="task.rawStatus" />
           </div>
           <p class="text-gray-500 text-sm">{{ task.program }} · Vytvorené {{ task.createdAt }}</p>
         </div>
@@ -152,10 +152,17 @@
                 <div class="mt-0.5">
                   <div :class="[
                     'w-5 h-5 rounded-full flex items-center justify-center',
-                    m.status === 'done' ? 'bg-green-100' : 'bg-gray-100'
+                    m.status === 'Schválené' ? 'bg-green-100' :
+                    m.status === 'Dokončené' ? 'bg-amber-100' :
+                    m.status === 'Zamietnuté' ? 'bg-red-100' :
+                    m.status === 'V riešení'  ? 'bg-blue-100' : 'bg-gray-100'
                   ]">
-                    <CheckCircle v-if="m.status === 'done'" class="w-3.5 h-3.5 text-green-600" />
-                    <div v-else class="w-2 h-2 rounded-full bg-gray-400" />
+                    <CheckCircle v-if="m.status === 'Schválené'" class="w-3.5 h-3.5 text-green-600" />
+                    <CheckCircle v-else-if="m.status === 'Dokončené'" class="w-3.5 h-3.5 text-amber-500" />
+                    <div v-else class="w-2 h-2 rounded-full" :class="
+                      m.status === 'Zamietnuté' ? 'bg-red-400' :
+                      m.status === 'V riešení'  ? 'bg-blue-400' : 'bg-gray-400'
+                    " />
                   </div>
                 </div>
                 <div class="flex-1 min-w-0">
@@ -168,9 +175,13 @@
                 </div>
                 <span :class="[
                   'text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0',
-                  m.status === 'done' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                  m.status === 'Schválené'  ? 'bg-green-100 text-green-700' :
+                  m.status === 'Dokončené'  ? 'bg-amber-100 text-amber-700' :
+                  m.status === 'Zamietnuté' ? 'bg-red-100 text-red-700' :
+                  m.status === 'V riešení'  ? 'bg-blue-100 text-blue-700' :
+                  'bg-gray-100 text-gray-500'
                 ]">
-                  {{ m.status === 'done' ? 'Hotovo' : 'Otvorené' }}
+                  {{ m.status ?? 'Plánované' }}
                 </span>
               </div>
             </div>
@@ -184,7 +195,7 @@
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div v-if="task.po_name">
-                <p class="text-xs text-gray-400 mb-0.5">Meno</p>
+                <p class="text-xs text-gray-400 mb-0.5">Meno a priezvisko</p>
                 <p class="text-sm font-medium text-navy">{{ task.po_name }}</p>
               </div>
               <div v-if="task.po_position">
@@ -446,7 +457,7 @@ const loadTask = async () => {
       tech_spec: data.tech_spec ?? '',
       tech_tags: data.tech_tags ?? [],
       requirements: data.call_criteria?.map((c: any) => c.name) ?? [],
-      po_name: data.product_owner?.name ?? '',
+      po_name: [data.product_owner?.name, data.product_owner?.surname].filter(Boolean).join(' ') || '',
       po_email: data.product_owner?.email ?? '',
       applications: data.applications ?? [],
       assignedTeam: null,

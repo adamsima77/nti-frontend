@@ -2,8 +2,13 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
 
+    <!-- Loading -->
+    <div v-if="orgDashboard.myRole.value === null" class="flex justify-center py-20">
+      <UiLoader />
+    </div>
+
     <!-- MEMBER VIEW -->
-    <template v-if="orgDashboard.isMember.value">
+    <template v-else-if="orgDashboard.isMember.value">
       <div class="mb-10">
         <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
         <p class="text-gray-500">Prehľad zadaní a priradených tímov vašej organizácie</p>
@@ -87,6 +92,59 @@
             </table>
           </div>
         </div>
+
+        <!-- Priradené tímy -->
+        <div class="mt-8">
+          <h2 class="text-lg font-bold text-navy mb-4">Priradené tímy</h2>
+          <div v-if="orgDashboard.teams.value.length" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div
+              v-for="(t, i) in orgDashboard.teams.value"
+              :key="i"
+              class="bg-white rounded-lg border border-gray-100 p-4 flex items-center gap-3"
+            >
+              <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                <Users class="w-4 h-4 text-green-600" />
+              </div>
+              <div class="min-w-0">
+                <p class="font-medium text-navy truncate">{{ t.team_name }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ t.call_name }}</p>
+              </div>
+              <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700 shrink-0">{{ t.status }}</span>
+            </div>
+          </div>
+          <div v-else class="bg-gray-50 border border-dashed border-gray-200 rounded-lg p-5 text-center text-sm text-gray-400">
+            Zatiaľ nebol priradený žiadny tím
+          </div>
+        </div>
+
+        <!-- Prihlášky -->
+        <div class="mt-8">
+          <h2 class="text-lg font-bold text-navy mb-4">Posledné prihlášky</h2>
+          <div v-if="orgDashboard.applications.value.length" class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-100 bg-gray-50">
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">Tím</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">Zadanie</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">Stav</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                <tr v-for="(app, i) in orgDashboard.applications.value" :key="i" class="hover:bg-gray-50 transition-colors">
+                  <td class="px-5 py-3 font-medium text-navy">{{ app.team_name }}</td>
+                  <td class="px-5 py-3 text-gray-500 text-xs">{{ app.call_name }}</td>
+                  <td class="px-5 py-3">
+                    <UiStatusBadge :status="app.status ?? ''" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-else class="bg-gray-50 border border-dashed border-gray-200 rounded-lg p-5 text-center text-sm text-gray-400">
+            Zatiaľ neboli podané žiadne prihlášky
+          </div>
+        </div>
+
       </template>
     </template>
 
@@ -114,7 +172,7 @@
       </div>
       <div class="bg-white rounded-lg shadow-sm border-l-4 border-amber-500 p-5">
         <div class="text-3xl font-bold text-warning-500">{{ stats.pendingApplications }}</div>
-        <p class="text-sm text-gray-500 mt-1">Čakajúce prihlášky</p>
+        <p class="text-sm text-gray-500 mt-1">Prihlášky</p>
       </div>
     </div>
 
@@ -190,7 +248,7 @@
                   </p>
                 </td>
                 <td class="px-5 py-4">
-                  <UiStatusBadge :status="task.status" />
+                  <UiStatusBadge :status="task.statusLabel" />
                 </td>
               </tr>
               <tr v-if="!budgetTasks.length">
@@ -214,87 +272,51 @@
       </div>
     </div>
 
-    <!-- Assigned teams & applications -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-      <!-- Assigned teams -->
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-navy">Priradené tímy</h2>
-        </div>
-        <div class="space-y-3">
-          <div
-            v-for="team in assignedTeams"
-            :key="team.id"
-            class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center gap-4"
-          >
-            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-              <Users class="w-5 h-5 text-blue-600" />
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-medium text-navy truncate">{{ team.name }}</p>
-              <p class="text-xs text-gray-500 mt-0.5">{{ team.task }} · {{ team.members }} členov</p>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                :class="teamProgressClass(team.progress)"
-              >
-                {{ team.progress }}%
-              </span>
-            </div>
+    <!-- Assigned teams -->
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-navy mb-4">Priradené tímy</h2>
+      <div v-if="assignedTeams.length" :class="['grid gap-4', gridClass(assignedTeams.length)]">
+        <div
+          v-for="team in assignedTeams"
+          :key="team.id"
+          class="bg-white rounded-lg shadow-sm border border-gray-100 px-5 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+        >
+          <div class="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+            <Users class="w-4 h-4 text-blue-600" />
           </div>
-          <p
-            v-if="!assignedTeams.length"
-            class="text-sm text-gray-400 text-center py-6"
-          >
-            Zatiaľ žiadne priradené tímy
-          </p>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-navy text-sm">{{ team.name }}</p>
+            <p class="text-xs text-gray-500 mt-0.5">{{ team.task }} · {{ team.members }} členov</p>
+          </div>
         </div>
       </div>
+      <p v-else class="text-sm text-gray-400 text-center py-6 bg-white rounded-lg border border-gray-100">
+        Zatiaľ žiadne priradené tímy
+      </p>
+    </div>
 
-      <!-- Pending applications -->
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-navy">Prihlášky tímov</h2>
-          <NuxtLink
-            to=""
-            class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
-          >
-            Zobraziť všetky
-            <ChevronRight class="w-4 h-4" />
-          </NuxtLink>
-        </div>
-        <div class="space-y-3">
-          <div
-            v-for="app in pendingApplications"
-            :key="app.id"
-            class="bg-white rounded-lg shadow-sm border border-gray-100 p-4"
-          >
-            <div class="flex items-start justify-between mb-2">
-              <div>
-                <p class="font-medium text-navy text-sm">{{ app.teamName }}</p>
-                <p class="text-xs text-gray-500 mt-0.5">{{ app.task }} · Podané {{ app.submittedAt }}</p>
-              </div>
-              <UiStatusBadge :status="app.status" />
-            </div>
-            <div class="flex gap-2 mt-3">
-              <NuxtLink
-                to=""
-                class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
-              >
-                Detail
-                <ChevronRight class="w-3.5 h-3.5" />
-              </NuxtLink>
-            </div>
+    <!-- Recent applications -->
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-navy mb-4">Posledné prihlášky</h2>
+      <div v-if="pendingApplications.length" :class="['grid gap-4', gridClass(pendingApplications.length)]">
+        <div
+          v-for="app in pendingApplications"
+          :key="app.id"
+          class="bg-white rounded-lg shadow-sm border border-gray-100 px-5 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+        >
+          <div class="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+            <Users class="w-4 h-4 text-blue-600" />
           </div>
-          <p
-            v-if="!pendingApplications.length"
-            class="text-sm text-gray-400 text-center py-6"
-          >
-            Žiadne čakajúce prihlášky
-          </p>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-navy text-sm">{{ app.teamName }}</p>
+            <p class="text-xs text-gray-500 mt-0.5">{{ app.task }} · Podané {{ app.submittedAt }}</p>
+          </div>
+          <UiStatusBadge :status="app.status" />
         </div>
       </div>
+      <p v-else class="text-sm text-gray-400 text-center py-6 bg-white rounded-lg border border-gray-100">
+        Zatiaľ žiadne prihlášky
+      </p>
     </div>
 
     <!-- Upcoming deadlines -->
@@ -338,7 +360,7 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Dashboard | NTI Firma',
+  title: 'Firemný Dashboard | NTI',
 })
 
 const authStore = useAuthStore()
@@ -348,8 +370,12 @@ const orgDashboard = useOrgDashboard()
 
 const userDisplayName = computed(() => {
   const u = authStore.user
-  if (!u) return 'Organizácia'
-  return u.organization_name || u.email || 'Organizácia'
+  if (!u) return ''
+  // člen vidí svoje meno, admin vidí názov firmy
+  if (orgDashboard.isMember.value) {
+    return [u.name, u.surname].filter(Boolean).join(' ') || u.email || ''
+  }
+  return u.organization_name || u.email || ''
 })
 
 const tasks = ref<any[]>([])
@@ -374,6 +400,12 @@ const assignedTeams = computed(() =>
       progress: Math.min(100, (task.applicationsCount ?? 0) * 20),
     }))
 )
+
+const gridClass = (count: number) => {
+  if (count === 1) return 'grid-cols-1'
+  if (count === 2 || count === 4) return 'grid-cols-2'
+  return 'grid-cols-3'
+}
 
 const pendingApplications = computed(() =>
   tasks.value
@@ -403,12 +435,17 @@ const actions = computed(() => {
 })
 
 const budgetTasks = computed(() => tasks.value.slice(0, 3))
-const upcomingDeadlines = computed(() =>
-  tasks.value
-    .filter((task) => task.deadline)
+const upcomingDeadlines = computed(() => {
+  const today = new Date().toISOString().slice(0, 10)
+  return tasks.value
+    .filter((task) => task.deadline && task.deadline >= today)
     .sort((a, b) => (a.deadline > b.deadline ? 1 : -1))
     .slice(0, 4)
-)
+    .map((task) => ({
+      ...task,
+      daysLeft: Math.ceil((new Date(task.deadline).getTime() - new Date(today).getTime()) / 86_400_000),
+    }))
+})
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('sk-SK', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val)

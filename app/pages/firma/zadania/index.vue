@@ -45,7 +45,7 @@
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-1">
               <h3 class="font-semibold text-navy text-base">{{ task.title }}</h3>
-              <UiStatusBadge :status="task.status" />
+              <UiStatusBadge :status="task.rawStatus" />
             </div>
             <p class="text-sm text-gray-500">{{ task.program }} · Pridané {{ task.createdAt }}</p>
           </div>
