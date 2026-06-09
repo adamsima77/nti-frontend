@@ -413,14 +413,6 @@
       </button>
       <div class="flex gap-3 sm:ml-auto">
         <button
-          type="button"
-          @click="handleSaveDraft"
-          :disabled="isSaving"
-          class="px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
-        >
-          Uložiť ako draft
-        </button>
-        <button
           type="submit"
           :disabled="isSaving"
           class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
@@ -727,7 +719,6 @@ const save = async (asDraft = false) => {
 }
 
 const handleSave = () => save(false)
-const handleSaveDraft = () => save(true)
 
 // ── Status change ─────────────────────────────────────────────
 const handleStatusChange = async (newStatus: string) => {
