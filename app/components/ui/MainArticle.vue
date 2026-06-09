@@ -2,12 +2,17 @@
   <div
     class="grid md:grid-cols-2 gap-8 mb-20 bg-gray-50 rounded-2xl overflow-hidden shadow-[0_-10px_30px_rgba(0,0,0,0.08),0_10px_30px_rgba(0,0,0,0.08)]"
   >
-    <NuxtLink :to="link">
-      <img
-        :src="image"
-        :alt="alt"
-        class="w-full h-64 md:h-full object-cover cursor-pointer hover:opacity-95 transition-all duration-300 ease-in-out"
-      />
+    <NuxtLink :to="link" class="block overflow-hidden rounded-2xl">
+      <template v-if="image">
+        <img
+          :src="image"
+          :alt="alt"
+          class="w-full aspect-[16/9] md:aspect-[4/3] object-cover cursor-pointer hover:opacity-95 transition-all duration-300 ease-in-out"
+        />
+      </template>
+      <div v-else class="w-full aspect-[16/9] md:aspect-[4/3] bg-slate-100 flex items-center justify-center text-sm text-slate-500">
+        {{ $t ? $t('news.image_not_available') : 'Image not available' }}
+      </div>
     </NuxtLink>
 
     <div class="flex flex-col justify-center p-6 sm:p-8">
@@ -42,7 +47,7 @@
 
 <script setup>
 const props = defineProps({
-  image: { type: String, required: true },
+  image: { type: String, default: null },
   alt: { type: String, default: 'Featured article' },
   title: { type: String, required: true },
   main_description: { type: String, default: '' },

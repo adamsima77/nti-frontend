@@ -62,12 +62,15 @@
           {{ $t('news.publicated') }}: {{ new Date(newsDetail?.created_at).toLocaleDateString('sk-SK') }}
         </p>
 
-        <div class="w-full max-h-125 lg:max-h-225 overflow-hidden rounded-lg">
+        <div v-if="newsDetail?.image_url" class="w-full max-h-[450px] overflow-hidden rounded-lg">
           <img
             :src="newsDetail?.image_url"
             class="w-full h-full object-cover rounded-lg"
             :alt="newsDetail?.news_translations?.[0]?.title"
           />
+        </div>
+        <div v-else class="w-full h-64 rounded-lg bg-slate-100 flex items-center justify-center text-sm text-slate-500">
+          {{ $t ? $t('news.image_not_available') : 'Image not available' }}
         </div>
 
         <div class="w-full h-1 bg-gray-300 my-6" />

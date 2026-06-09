@@ -2,11 +2,18 @@
   <div
     class="bg-gray-50 rounded-2xl shadow-[0_-8px_20px_rgba(0,0,0,0.06),0_8px_20px_rgba(0,0,0,0.06)] p-6 sm:p-8 flex flex-col h-full"
   >
-    <img
-      :src="image"
-      :alt="alt"
-      class="rounded-lg mb-4 sm:mb-5 hover:opacity-90 shadow-lg transition-opacity duration-300 ease-in-out cursor-pointer"
-    />
+    <div class="rounded-lg mb-4 sm:mb-5 overflow-hidden bg-slate-100">
+      <template v-if="image">
+        <img
+          :src="image"
+          :alt="alt"
+          class="w-full h-52 sm:h-56 object-cover hover:opacity-90 shadow-lg transition-opacity duration-300 ease-in-out cursor-pointer"
+        />
+      </template>
+      <div v-else class="w-full h-52 sm:h-56 flex items-center justify-center text-sm text-slate-500">
+        {{ $t ? $t('news.image_not_available') : 'Image not available' }}
+      </div>
+    </div>
 
     <div class="flex-1 flex flex-col justify-between">
       <NuxtLink :to="link">
