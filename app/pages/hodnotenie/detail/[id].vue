@@ -174,7 +174,7 @@
                       <button
                         :disabled="downloadingIds.has(extractIdFromStoragePath(member.transcript_file)!)"
                         @click="downloadDocument(extractIdFromStoragePath(member.transcript_file)!)"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-blue-200 bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 disabled:opacity-60 disabled:cursor-not-allowed transition"
+                        class="inline-flex mt-2 items-center gap-1.5 px-3 py-1.5 rounded-md border border-blue-200 bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 disabled:opacity-60 disabled:cursor-not-allowed transition"
                       >
                         <span
                           v-if="downloadingIds.has(extractIdFromStoragePath(member.transcript_file)!)"
@@ -257,7 +257,7 @@ const { applicationDetail, fetchApplicationDetail } = useEvaluatorDashboard()
 definePageMeta({
   layout: 'portal',
   middleware: 'auth',
-  roles: ['evaluator', 'predseda_komisie'],
+  roles: ['evaluator'],
 })
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -267,9 +267,14 @@ const errorMessage = ref<string | null>(null)
 
 // Answers come directly from the evaluator detail response under `answers: {}`
 // No separate API call needed — everything is in GET /evaluator/applications/{id}
-const fetchedAnswers = computed<Record<string, unknown>>(
-  () => (applicationDetail.value?.answers as Record<string, unknown>) ?? {},
-)
+const fetchedAnswers = computed<Record<string, unknown>>(() => {
+  if (!applicationDetail.value) return {}
+  
+  // Skontroluje klasickú štruktúru, alebo obalenú cez Laravel resource "data"
+  return (applicationDetail.value.answers as Record<string, unknown>) ?? 
+         (applicationDetail.value.data?.answers as Record<string, unknown>) ?? 
+         {}
+})
 
 // FILE_REF_RE: "[2]", "[3,7]" — same regex as the modal
 const FILE_REF_RE = /^\[\s*\d+(\s*,\s*\d+)*\s*\]$/
@@ -280,10 +285,10 @@ const downloadingIds = ref<Set<number>>(new Set())
 
 // ── Computed ───────────────────────────────────────────────────────────────
 
-const answersReady = computed(() =>
-  !!(applicationDetail.value?.form_fields?.length &&
-  Object.keys(fetchedAnswers.value).length > 0),
-)
+const answersReady = computed(() => {
+  const fields = applicationDetail.value?.form_fields ?? applicationDetail.value?.data?.form_fields
+  return !!(fields?.length && Object.keys(fetchedAnswers.value).length > 0)
+})
 
 const applicationTitle = computed(() => {
   if (!applicationDetail.value) return t('evaluator.application_detail')

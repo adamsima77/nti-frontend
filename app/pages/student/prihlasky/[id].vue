@@ -709,16 +709,37 @@ function historyDotColor(status: string): string {
   }
 }
 
-function historyLabel(status: string): string {
+function historyLabel(status: unknown): string {
+  if (!status) return '—'
+  
+  // Ak by náhodou prišiel objekt, vytiahneme z neho name
+  const statusStr = typeof status === 'object' && status !== null && 'name' in status
+    ? String((status as any).name)
+    : String(status)
+
+  const normalizedStatus = statusStr.toLowerCase().trim()
+
   const labels: Record<string, string> = {
-    draft:      'Draft',
-    submitted:  'Podané',
-    evaluating: 'V hodnotení',
-    supplement: 'Vyžiadané doplnenie',
-    approved:   'Schválené',
-    rejected:   'Zamietnuté',
+    'draft':            'Draft',
+    'podané':           'Podané',
+    'submitted':        'Podané',
+    'v hodnotení':      'V hodnotení',
+    'evaluating':       'V hodnotení',
+    'vyžiadané doplnenie': 'Vyžiadané doplnenie',
+    'supplement':       'Vyžiadané doplnenie',
+    'schválené':        'Schválené',
+    'approved':         'Schválené',
+    'zamietnuté':       'Zamietnuté',
+    'rejected':         'Zamietnuté',
+    
+    // 🔴 PRIDANÉ NOVÉ STAVY Z API:
+    'onboarding':       'Onboarding',
+    'aktívny projekt':  'Aktívny projekt',
+    'pozastavené':      'Pozastavené',
+    'ukončené':         'Ukončené'
   }
-  return labels[status] ?? status
+
+  return labels[normalizedStatus] ?? statusStr
 }
 
 function milestoneStatus(status: string): string {

@@ -475,7 +475,7 @@ const MetaRow = defineComponent({
 definePageMeta({
   layout: 'portal',
   middleware: 'auth',
-  roles: ['evaluator', 'predseda_komisie'],
+  roles: ['evaluator'],
 })
 
 // ── Composables ────────────────────────────────────────────────

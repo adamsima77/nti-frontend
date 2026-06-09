@@ -46,7 +46,7 @@
             </div>
 
             <!-- ── Tabs ───────────────────────────────────────────────── -->
-            <div class="flex border-b border-gray-100 px-6 gap-1 overflow-x-auto">
+            <div class="flex border-b border-gray-100 px-6 py-5 gap-1 overflow-x-auto">
               <button
                 v-for="tab in tabs"
                 :key="tab.id"
@@ -105,9 +105,11 @@
                         </span>
                       </div>
                       <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium text-navy truncate">
+                        <NuxtLink :to = "localePath(`/admin/prihlasky/student-detail/${member.student.id}`)">
+                        <p class="text-sm font-medium text-navy hover:text-blue-500 transition-colors duration-300 truncate">
                           {{ memberFullName(member) }}
                         </p>
+                        </NuxtLink>
                       </div>
                       <span
                         v-if="member.role_name || member.role_id"
@@ -146,6 +148,113 @@
                       <p class="text-sm font-medium text-navy truncate">
                         {{ ms.mentor?.name }} {{ ms.mentor?.surname }}
                       </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ── Evaluations (commission scores) ─────────────────
+                     Shown when the application is in evaluation or later.
+                     Displays each commission member, their score total,
+                     and whether they have submitted their evaluation.
+                ──────────────────────────────────────────────────────── -->
+                <div
+                  v-if="application.evaluations?.length"
+                  class="rounded-xl border border-amber-100 overflow-hidden"
+                >
+                  <div class="px-4 py-3 bg-amber-50 border-b border-amber-100">
+                    <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
+                      <Scale class="w-4 h-4 text-amber-500" />
+                      Hodnotenie komisie
+                    </h3>
+                  </div>
+
+                  <div
+                    v-for="evaluation in application.evaluations"
+                    :key="evaluation.commission.id"
+                    class="divide-y divide-amber-50"
+                  >
+                    <!-- Commission name subheader -->
+                    <div class="px-4 py-2 bg-amber-50/50 flex items-center gap-2">
+                      <span class="text-xs font-semibold text-amber-700 uppercase tracking-wide">
+                        {{ evaluation.commission.name }}
+                      </span>
+                      <span class="text-xs text-amber-500">
+                        ({{ submittedCount(evaluation) }}/{{ evaluation.members.length }} odovzdaných)
+                      </span>
+                    </div>
+
+                    <!-- Each evaluator row -->
+                    <div
+                      v-for="member in evaluation.members"
+                      :key="member.id"
+                      class="flex items-center gap-3 px-4 py-3"
+                    >
+                      <!-- Avatar -->
+                      <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                        <span class="text-xs font-semibold text-amber-700">
+                          {{ initials(`${member.name} ${member.surname}`) }}
+                        
+                        </span>
+                      </div>
+
+                      <!-- Name -->
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-navy truncate">
+                          {{ member.name }} {{ member.surname }}
+                        </p>
+                        <p v-if="member.submitted_at" class="text-xs text-gray-400 mt-0.5">
+                          Odovzdané: {{ formatDate(member.submitted_at) }}
+                        </p>
+                        <p 
+      v-if="member.internal_note" 
+      class="text-xs text-amber-800 bg-amber-50/70 rounded px-2 py-1 mt-1.5 border border-amber-100/50 inline-block text-balance"
+    >
+      <span class="font-semibold text-amber-950">Poznámka:</span> {{ member.internal_note }}
+    </p>
+                      </div>
+
+                      <!-- Score pill or pending badge -->
+                      <template v-if="member.submitted_at && member.scores.length">
+                        <div class="flex-shrink-0 flex items-center gap-1.5">
+                          <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-sm font-bold">
+                            {{ memberTotalScore(member) }} b.
+                          </span>
+                          <!-- Per-criterion breakdown tooltip-style list (shown inline, compact) -->
+                          <div
+                            v-if="member.scores.length > 1"
+                            class="text-xs text-gray-400 flex flex-col items-end gap-0.5"
+                          >
+                            <span
+                              v-for="score in member.scores"
+                              :key="score.criterion_id"
+                            >
+                              {{ score.criterion_name ?? `K${score.criterion_id}` }}: {{ score.score }}
+                            </span>
+                          </div>
+                        </div>
+                      </template>
+                      <template v-else-if="member.submitted_at">
+                        <span class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-green-50 text-green-700 text-xs font-medium">
+                          Odovzdané
+                        </span>
+                        
+                      </template>
+                      <template v-else>
+                        <span class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-400 text-xs font-medium">
+                          Čaká na hodnotenie
+                        </span>
+                      </template>
+                    </div>
+
+                    <!-- Commission total row -->
+                    <div
+                      v-if="commissionHasAnyScores(evaluation)"
+                      class="px-4 py-2.5 bg-amber-50/70 flex items-center justify-between"
+                    >
+                      <span class="text-xs font-medium text-amber-700">Priemer komisie</span>
+                      <span class="text-sm font-bold text-amber-900">
+                        {{ commissionAverageScore(evaluation) }} b.
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -328,9 +437,14 @@
                       <UiSelect
                         v-model="statusForm.status_id"
                         :options="statusOptions"
-                        :disabled="currentStatusName === STATE_IN_EVALUATION || isChangingStatus"
+                        :disabled="isChangingStatus"
                         placeholder="Vyberte nový stav..."
                       />
+                      <!-- Inform admin when no transitions are available -->
+                      <p v-if="statusOptions.length === 0" class="text-xs text-gray-400 flex items-center gap-1 mt-1">
+                        <Info class="w-3.5 h-3.5" />
+                        Z tohto stavu nie sú dostupné žiadne prechody.
+                      </p>
                     </div>
 
                     <div class="space-y-1">
@@ -544,6 +658,7 @@ import {
   CalendarDays,
   Check,
 } from 'lucide-vue-next'
+import { useLocale } from 'vuetify'
 
 const api = useApi()
 const toast = useToast()
@@ -577,6 +692,27 @@ interface TeamMember {
   student?: { id?: number; name?: string } | null
 }
 
+interface EvaluationScore {
+  criterion_id: number
+  criterion_name: string | null
+  score: string
+  comment: string
+}
+
+interface EvaluationMember {
+  id: number
+  user_id: number
+  name: string
+  surname: string
+  submitted_at: string | null
+  scores: EvaluationScore[]
+}
+
+interface Evaluation {
+  commission: Committee
+  members: EvaluationMember[]
+}
+
 interface FileMeta {
   file_name: string
   file_path: string
@@ -593,6 +729,7 @@ interface ApplicationDetail {
   status: { id: number; name: string } | null
   team: { id: number; name: string; members: TeamMember[] } | null
   mentorships: Mentorship[]
+  evaluations: Evaluation[]
   committee: Committee | null
   statusHistory: Array<{
     id: number
@@ -602,6 +739,8 @@ interface ApplicationDetail {
   }>
 }
 
+
+const localePath = useLocalePath()
 // ── STATUS constants ───────────────────────────────────────────────────────
 
 const STATE_DRAFT                = 'Draft'
@@ -628,19 +767,27 @@ const STATUS_SLUG: Record<string, string> = {
   [STATE_COMPLETED]: 'completed',
 }
 
-const BACKEND_TRANSITIONS: Record<string, string[]> = {
-  [STATE_DRAFT]: [STATE_SUBMITTED],
-  [STATE_SUBMITTED]: [STATE_IN_EVALUATION, STATE_SUPPLEMENT_REQUESTED],
-  [STATE_SUPPLEMENT_REQUESTED]: [STATE_SUBMITTED],
-  [STATE_IN_EVALUATION]: [STATE_APPROVED, STATE_REJECTED, STATE_SUPPLEMENT_REQUESTED],
-  [STATE_APPROVED]: [STATE_ONBOARDING],
-  [STATE_ONBOARDING]: [STATE_ACTIVE_PROJECT],
-  [STATE_ACTIVE_PROJECT]: [STATE_PAUSED, STATE_COMPLETED],
-  [STATE_PAUSED]: [STATE_ACTIVE_PROJECT, STATE_COMPLETED],
-  [STATE_REJECTED]: [],
-  [STATE_COMPLETED]: [],
+// Transitions keyed by status ID to avoid any unicode/encoding mismatch with
+// Slovak diacritics when comparing name strings at runtime.
+// IDs match the StatusOfApplicationSeeder insertion order:
+//  1 Draft  2 Podané  3 V hodnotení  4 Vyžiadané doplnenie
+//  5 Schválené  6 Zamietnuté  7 Pozastavené  8 Onboarding
+//  9 Aktívny projekt  10 Ukončené
+const BACKEND_TRANSITIONS: Record<number, number[]> = {
+  1:  [2],        // Draft            → Podané
+  2:  [3, 4],     // Podané           → V hodnotení | Vyžiadané doplnenie
+  3:  [5, 6, 4],  // V hodnotení      → Schválené | Zamietnuté | Vyžiadané doplnenie
+  4:  [2],        // Vyžiadané dopl.  → Podané
+  5:  [8],        // Schválené        → Onboarding
+  6:  [],         // Zamietnuté       → (terminal)
+  7:  [9, 10],    // Pozastavené      → Aktívny projekt | Ukončené
+  8:  [9],        // Onboarding       → Aktívny projekt
+  9:  [7, 10],    // Aktívny projekt  → Pozastavené | Ukončené
+  10: [],         // Ukončené         → (terminal)
 }
 
+// Committee assignment is only available when the application is submitted (pre-evaluation).
+// Once in evaluation the committee is already locked and visible in the Info tab.
 const COMMITTEE_STATUSES = [STATE_SUBMITTED]
 const MENTOR_STATUSES    = [STATE_ONBOARDING]
 
@@ -670,10 +817,19 @@ const statusSlug        = computed(() => STATUS_SLUG[currentStatusName.value] ??
 const showCommitteeSection = computed(() => COMMITTEE_STATUSES.includes(currentStatusName.value))
 const showMentorSection    = computed(() => MENTOR_STATUSES.includes(currentStatusName.value))
 
+/**
+ * Resolve the assigned committee from multiple possible locations in the response:
+ * 1. application.committee  (top-level committees[] array, first entry)
+ * 2. mentorships[].commission
+ * 3. evaluations[].commission  ← the API returns it here when in evaluation
+ */
 const assignedCommittee = computed((): Committee | null => {
   if (application.value?.committee) return application.value.committee
   for (const ms of application.value?.mentorships ?? []) {
     if (ms.commission) return ms.commission
+  }
+  for (const ev of application.value?.evaluations ?? []) {
+    if (ev.commission) return ev.commission
   }
   return null
 })
@@ -691,7 +847,7 @@ const quickStats = computed(() => [
 ])
 
 const tabs = computed(() => [
-  { id: 'info',    label: 'Informácie', icon: Info,        badge: null },
+  { id: 'info',    label: 'Informácie', icon: Info,          badge: null },
   { id: 'answers', label: 'Odpovede',   icon: MessageSquare, badge: null },
   {
     id: 'manage',
@@ -700,6 +856,27 @@ const tabs = computed(() => [
     badge: showCommitteeSection.value || showMentorSection.value ? '!' : null,
   },
 ])
+
+// ── Evaluation score helpers ───────────────────────────────────────────────
+
+function memberTotalScore(member: EvaluationMember): number {
+  return member.scores.reduce((sum, s) => sum + (parseFloat(s.score) || 0), 0)
+}
+
+function submittedCount(evaluation: Evaluation): number {
+  return evaluation.members.filter(m => m.submitted_at !== null).length
+}
+
+function commissionHasAnyScores(evaluation: Evaluation): boolean {
+  return evaluation.members.some(m => m.submitted_at && m.scores.length > 0)
+}
+
+function commissionAverageScore(evaluation: Evaluation): string {
+  const submitted = evaluation.members.filter(m => m.submitted_at && m.scores.length > 0)
+  if (!submitted.length) return '—'
+  const avg = submitted.reduce((sum, m) => sum + memberTotalScore(m), 0) / submitted.length
+  return avg % 1 === 0 ? String(avg) : avg.toFixed(1)
+}
 
 // ── Fetch application ──────────────────────────────────────────────────────
 
@@ -711,6 +888,8 @@ async function fetchApplication() {
     const data = res?.application ?? res
     if (!data) throw new Error('No data received')
 
+    // Committee can live in data.committees[], mentorships[].commission,
+    // or evaluations[].commission — check all three.
     const topLevelCommittee: Committee | null =
       Array.isArray(data.committees) && data.committees.length > 0
         ? data.committees[0]
@@ -719,6 +898,11 @@ async function fetchApplication() {
     const mentorshipCommittee: Committee | null =
       !topLevelCommittee && Array.isArray(data.mentorships)
         ? (data.mentorships.find((ms: any) => ms.commission)?.commission ?? null)
+        : null
+
+    const evaluationCommittee: Committee | null =
+      !topLevelCommittee && !mentorshipCommittee && Array.isArray(data.evaluations)
+        ? (data.evaluations.find((ev: any) => ev.commission)?.commission ?? null)
         : null
 
     application.value = {
@@ -733,8 +917,9 @@ async function fetchApplication() {
           }
         : null,
       statusHistory: data.status_history ?? [],
-      committee: topLevelCommittee ?? mentorshipCommittee,
+      committee: topLevelCommittee ?? mentorshipCommittee ?? evaluationCommittee,
       mentorships: data.mentorships ?? [],
+      evaluations: data.evaluations ?? [],
     }
   } catch (error) {
     console.error('Fetch error:', error)
@@ -835,7 +1020,13 @@ async function fetchAnswers() {
     let map: Record<string, any> = {}
 
     if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-      map = raw
+      // Handle { id, application_id, answer: { key: val }, ... } shape:
+      // the answers live in raw.answer, not the envelope itself.
+      if (raw.answer && typeof raw.answer === 'object' && !Array.isArray(raw.answer)) {
+        map = raw.answer
+      } else {
+        map = raw
+      }
     } else if (Array.isArray(raw)) {
       for (const entry of raw) {
         const label = entry.form_field?.name ?? entry.form_field_id
@@ -932,10 +1123,11 @@ async function downloadDocument(docId: number, fileName?: string) {
 const allStatuses = ref<Array<{ id: number; name: string }>>([])
 
 const statusOptions = computed(() => {
-  if (currentStatusName.value === STATE_IN_EVALUATION) return []
-  const allowed = BACKEND_TRANSITIONS[currentStatusName.value] ?? []
+  const currentId = application.value?.status?.id
+  if (!currentId) return []
+  const allowed = BACKEND_TRANSITIONS[currentId] ?? []
   return allStatuses.value
-    .filter(s => s.name !== currentStatusName.value && allowed.includes(s.name))
+    .filter(s => allowed.includes(s.id))
     .map(s => ({ value: s.id, label: s.name }))
 })
 
