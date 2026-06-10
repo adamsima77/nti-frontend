@@ -40,7 +40,6 @@
           {{ project.teamName }} · {{ t('mentor.dashboard.assignedAt', { date: project.assignedAt }) }}
         </p>
       </div>
-     
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -52,9 +51,9 @@
             <h2 class="text-base font-semibold text-navy flex items-center gap-2">
               <Flag class="w-4 h-4 text-purple-500" /> {{ t('mentor.detail.milestones') }}
             </h2>
-            <span class="text-xs text-gray-400"
-              >{{ completedMilestones }}/{{ project.milestones.length }} {{ t('mentor.detail.completed') }}</span
-            >
+            <span class="text-xs text-gray-400">
+              {{ completedMilestones }}/{{ project.milestones.length }} {{ t('mentor.detail.completed') }}
+            </span>
           </div>
 
           <div class="space-y-3">
@@ -152,7 +151,7 @@
                 </div>
               </div>
 
-              <!-- Add comment inline (review / reject only) -->
+              <!-- Add comment inline (pending_approval only) -->
               <div
                 v-if="canReviewMilestone(milestone, milestoneIndex)"
                 class="ml-8 mt-2 flex gap-2"
@@ -191,7 +190,9 @@
               <div class="flex items-start justify-between gap-3 mb-2">
                 <div>
                   <p class="font-medium text-navy text-sm">{{ c.title }}</p>
-                  <p class="text-xs text-gray-400 mt-0.5">{{ c.date }} · {{ c.duration }} min · {{ c.type }}</p>
+                  <p class="text-xs text-gray-400 mt-0.5">
+                    {{ c.date }} · {{ c.duration }} min · {{ consultationTypeLabel(c.type) }}
+                  </p>
                 </div>
                 <button
                   v-if="canManageConsultations"
@@ -219,13 +220,22 @@
               </div>
             </div>
 
-              <div
-                v-if="!project.consultations.length"
+            <div
+              v-if="!project.consultations.length"
               class="text-center py-8 text-sm text-gray-400"
             >
-                {{ t('mentor.detail.noConsultations') }}
+              {{ t('mentor.detail.noConsultations') }}
             </div>
           </div>
+
+          <!-- Add consultation button -->
+          <button
+            v-if="canManageConsultations"
+            @click="showConsultationModal = true"
+            class="mt-4 inline-flex items-center gap-1.5 text-sm text-purple-600 hover:text-purple-800 font-medium"
+          >
+            <Plus class="w-4 h-4" /> {{ t('mentor.detail.newConsultationTitle') }}
+          </button>
         </div>
       </div>
 
@@ -243,12 +253,7 @@
               <div
                 class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 shrink-0"
               >
-                {{
-                  member.name
-                    .split(' ')
-                    .map((n: string) => n[0])
-                    .join('')
-                }}
+                {{ member.name.split(' ').map((n: string) => n[0]).join('') }}
               </div>
               <div>
                 <p class="text-sm font-medium text-navy">{{ member.name }}</p>
@@ -262,21 +267,16 @@
         <div class="bg-white rounded-lg border border-gray-100 p-5">
           <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('mentor.detail.progress') }}</h3>
           <div class="text-3xl font-bold text-navy mb-1">
-            {{ Math.round((completedMilestones / project.milestones.length) * 100) }}%
+            {{ milestoneProgressPct }}%
           </div>
           <div class="bg-gray-100 rounded-full h-2 mb-2">
             <div
-              class="h-2 rounded-full bg-purple-500"
-              :style="{ width: `${(completedMilestones / project.milestones.length) * 100}%` }"
+              class="h-2 rounded-full bg-purple-500 transition-all"
+              :style="{ width: `${milestoneProgressPct}%` }"
             />
           </div>
           <p class="text-xs text-gray-400">
-            {{
-              t('mentor.detail.milestonesOf', {
-                completed: completedMilestones,
-                total: project.milestones.length,
-              })
-            }}
+            {{ t('mentor.detail.milestonesOf', { completed: completedMilestones, total: project.milestones.length }) }}
           </p>
         </div>
 
@@ -313,7 +313,7 @@
       </div>
     </div>
 
-    <!-- ── New consultation modal ── -->
+    <!-- ── Consultation modal ── -->
     <div
       v-if="showConsultationModal"
       class="fixed inset-0 z-50 flex items-center justify-center px-4"
@@ -449,19 +449,8 @@
               fill="none"
               viewBox="0 0 24 24"
             >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
-              />
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
             </svg>
             {{ isSavingConsultation ? t('mentor.detail.saving') : t('mentor.detail.save') }}
           </button>
@@ -486,14 +475,11 @@ import {
   Pencil,
   ArrowRight,
   AlertCircle,
-  Users,
 } from 'lucide-vue-next'
 import type { Consultation, MentorProject, Milestone, MilestoneComment } from '../../../types/mentor'
 import { useMentorDashboard } from '../../../composables/useMentorDashboard'
 
-definePageMeta({
-  layout: 'portal',
-})
+definePageMeta({ layout: 'portal' })
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -502,14 +488,46 @@ const api = useApi()
 const { addToast } = useToast()
 const authStore = useAuthStore()
 
+// Only keep what we actually need from the dashboard composable — milestone
+// updates and cache invalidation after approve/reject.
+const { updateMilestoneStatus, fetchProjects, fetchDashboard } = useMentorDashboard()
+
+// ── Types ─────────────────────────────────────────────────────
 type MentorProjectDetail = MentorProject & {
   productOwner?: { name: string; email?: string | null } | null
-  teamMembers?: Array<{ id: number; name: string; role: string }>
+  teamMembers: Array<{ id: number; name: string; role: string }>
   consultations: Consultation[]
   milestones: Array<Milestone & { comments: MilestoneComment[] }>
 }
 
+// Map form-level types (online / personal / written) → API-level types (online / offline)
+const FORM_TYPE_TO_API: Record<string, string> = {
+  online: 'online',
+  personal: 'offline',
+  written: 'offline',
+}
+
+// Map API-level types back to form-level options
+const API_TYPE_TO_FORM: Record<string, string> = {
+  online: 'online',
+  offline: 'personal',
+  personal: 'personal',
+  written: 'written',
+}
+
+// Human-readable label shown in the consultation log
+const CONSULTATION_TYPE_LABELS: Record<string, string> = {
+  online: 'Online (videohovor)',
+  offline: 'Osobne',
+  personal: 'Osobne',
+  written: 'Písomná / e-mail',
+}
+
 useHead({ title: t('mentor.detail.pageTitle') })
+
+// ── State ─────────────────────────────────────────────────────
+const loading = ref(false)
+const pageError = ref<string | null>(null)
 
 const project = reactive<MentorProjectDetail>({
   id: Number(route.params.id),
@@ -524,47 +542,13 @@ const project = reactive<MentorProjectDetail>({
   consultations: [],
 })
 
-const loading = ref(false)
-const pageError = ref<string | null>(null)
-const {
-  projects: mentorProjects,
-  fetchProjects,
-  fetchDashboard,
-  fetchMilestones,
-  fetchConsultations,
-  updateMilestoneStatus,
-} = useMentorDashboard()
-
+// ── Data loading — single endpoint ────────────────────────────
 const loadProject = async () => {
   loading.value = true
   pageError.value = null
-
   try {
-    if (!mentorProjects.value.length) {
-      await fetchProjects()
-    }
-
-    const found = mentorProjects.value.find((item: MentorProject) => item.id === project.id)
-    if (!found) {
-      pageError.value = t('mentor.detail.errors.notFound')
-      return
-    }
-
-    Object.assign(project, {
-      ...found,
-      productOwner: found.productOwner ?? null,
-      teamMembers: found.teamMembers ?? [],
-      milestones: found.milestones ?? [],
-      consultations: [],
-    })
-
-    const [milestones, consultations] = await Promise.all([
-      fetchMilestones(project.id),
-      fetchConsultations(project.id),
-    ])
-
-    if (milestones) project.milestones = milestones as MentorProjectDetail['milestones']
-    if (consultations) project.consultations = consultations
+    const data = await api.get<MentorProjectDetail>(`/mentor/projects/${project.id}`)
+    Object.assign(project, data)
   } catch {
     pageError.value = t('mentor.detail.errors.loadFailed')
   } finally {
@@ -574,10 +558,26 @@ const loadProject = async () => {
 
 onMounted(loadProject)
 
-// ── Computed ─────────────────────────────────────────────────
-const completedMilestones = computed(() => project.milestones.filter((m) => m.status === 'completed').length)
-const totalConsultationTime = computed(() => project.consultations.reduce((sum, consultation) => sum + consultation.duration, 0))
-const canManageConsultations = computed(() => authStore.hasPermission('mentorship.edit_any') || authStore.hasPermission('mentorship.edit_own'))
+// ── Computed ──────────────────────────────────────────────────
+const completedMilestones = computed(
+  () => project.milestones.filter((m) => m.status === 'completed').length,
+)
+
+const milestoneProgressPct = computed(() =>
+  project.milestones.length
+    ? Math.round((completedMilestones.value / project.milestones.length) * 100)
+    : 0,
+)
+
+const totalConsultationTime = computed(() =>
+  project.consultations.reduce((sum, c) => sum + c.duration, 0),
+)
+
+const canManageConsultations = computed(
+  () =>
+    authStore.hasPermission('mentorship.edit_any') ||
+    authStore.hasPermission('mentorship.edit_own'),
+)
 
 // ── Milestone helpers ─────────────────────────────────────────
 const milestoneLoading = ref<number | null>(null)
@@ -638,7 +638,7 @@ const handleMilestoneAction = async (milestoneId: number, action: 'approve' | 'r
       action === 'reject' ? newComment[milestoneId]?.trim() : undefined,
     )
     if (action === 'reject') newComment[milestoneId] = ''
-    // Keep dashboard + project list in sync (pending actions, pendingMilestone flag, stats).
+    // Sync dashboard stats and project list, then refresh this page
     await Promise.all([fetchProjects(), fetchDashboard()])
     await loadProject()
   } finally {
@@ -649,9 +649,9 @@ const handleMilestoneAction = async (milestoneId: number, action: 'approve' | 'r
 const addComment = async (milestoneId: number) => {
   const text = newComment[milestoneId]?.trim()
   if (!text) return
-  const m = project.milestones.find((m) => m.id === milestoneId)
-  if (m) {
-    m.comments.push({
+  const milestone = project.milestones.find((m) => m.id === milestoneId)
+  if (milestone) {
+    milestone.comments.push({
       id: Date.now(),
       author: 'Mentor',
       date: new Date().toLocaleDateString('sk-SK'),
@@ -661,11 +661,15 @@ const addComment = async (milestoneId: number) => {
   newComment[milestoneId] = ''
 }
 
+// ── Consultation helpers ──────────────────────────────────────
+const consultationTypeLabel = (type: string) =>
+  CONSULTATION_TYPE_LABELS[type] ?? type
+
 // ── Consultation modal ────────────────────────────────────────
 const showConsultationModal = ref(false)
 const isSavingConsultation = ref(false)
 const consultationError = ref<string | null>(null)
-const editingConsultation = ref<any>(null)
+const editingConsultation = ref<Consultation | null>(null)
 
 const today = new Date().toISOString().split('T')[0] ?? ''
 
@@ -673,20 +677,25 @@ const consultationForm = reactive({
   title: '',
   date: today,
   duration: 60 as number,
-  type: 'online',
+  type: 'online' as string,
   summary: '',
   actionItems: [''] as string[],
 })
 
-const consultationErrors = reactive<Record<string, string | null>>({})
+const consultationErrors = reactive<Record<string, string | null>>({
+  title: null,
+  date: null,
+  summary: null,
+})
 
-const editConsultation = (c: any) => {
+const editConsultation = (c: Consultation) => {
   editingConsultation.value = c
   Object.assign(consultationForm, {
     title: c.title,
     date: c.date,
     duration: c.duration,
-    type: normalizeConsultationType(c.type),
+    // Map API type back to form option (offline → personal)
+    type: API_TYPE_TO_FORM[c.type] ?? 'personal',
     summary: c.summary,
     actionItems: [...c.actionItems, ''],
   })
@@ -705,48 +714,47 @@ const closeConsultationModal = () => {
     summary: '',
     actionItems: [''],
   })
+  Object.assign(consultationErrors, { title: null, date: null, summary: null })
 }
 
-const validateConsultation = () => {
-  consultationErrors.title = consultationForm.title ? null : 'Názov je povinný'
+const validateConsultation = (): boolean => {
+  consultationErrors.title = consultationForm.title.trim() ? null : 'Názov je povinný'
   consultationErrors.date = consultationForm.date ? null : 'Dátum je povinný'
-  consultationErrors.summary = consultationForm.summary ? null : 'Záznam je povinný'
+  consultationErrors.summary = consultationForm.summary.trim() ? null : 'Záznam je povinný'
   return !Object.values(consultationErrors).some(Boolean)
 }
 
-const typeLabel = (type: string) =>
-  ({ online: 'Online (videohovor)', personal: 'Osobne', written: 'Písomná / e-mail' })[type] ?? type
-
-const normalizeConsultationType = (type: string) =>
-  ({
-    online: 'online',
-    personal: 'personal',
-    written: 'written',
-    'Online (videohovor)': 'online',
-    Osobne: 'personal',
-    'Písomná / e-mail': 'written',
-  })[type] ?? 'written'
-
 const saveConsultation = async () => {
   if (!validateConsultation()) return
+
   isSavingConsultation.value = true
   consultationError.value = null
+
   try {
     const items = consultationForm.actionItems.filter((i) => i.trim())
+
+    // Build agenda — summary + optional action items appended
+    const agenda = [
+      consultationForm.summary.trim(),
+      items.length ? `Úlohy: ${items.join('; ')}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n')
+
+    // Backend validates type as `in:online,offline` — map form value accordingly
+    const apiType = FORM_TYPE_TO_API[consultationForm.type] ?? 'offline'
+
     await api.post(`/mentor/projects/${project.id}/consultations`, {
-      note: [
-        consultationForm.title.trim(),
-        `Dátum: ${consultationForm.date}`,
-        `Typ: ${typeLabel(consultationForm.type)}`,
-        `Trvanie: ${consultationForm.duration} min`,
-        consultationForm.summary.trim(),
-        items.length ? `Úlohy: ${items.join('; ')}` : '',
-      ]
-        .filter(Boolean)
-        .join('\n'),
+      title: consultationForm.title.trim(),
+      type: apiType,
+      scheduled_at: consultationForm.date,
+      duration: consultationForm.duration,
+      agenda,
     })
+
     await loadProject()
     closeConsultationModal()
+    addToast({ message: t('mentor.detail.consultationSaved'), type: 'success' })
   } catch {
     consultationError.value = t('mentor.detail.errors.saveFailed')
   } finally {
