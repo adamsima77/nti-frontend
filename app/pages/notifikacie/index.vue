@@ -587,7 +587,10 @@ function onKeydown(e: KeyboardEvent) {
 
 onMounted(() => {
   fetchNotifications()
-  fetchOptions()
+ if (authStore.userRole === 'admin' || authStore.userRole === 'superadmin') {
+       fetchOptions()
+  }
+
   window.addEventListener('keydown', onKeydown)
 })
 onUnmounted(() => window.removeEventListener('keydown', onKeydown))

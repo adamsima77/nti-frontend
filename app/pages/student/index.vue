@@ -117,10 +117,7 @@
                 <Users class="w-4 h-4" />
                 {{ app.members }}
               </span>
-              <span class="flex items-center gap-1">
-                <Paperclip class="w-4 h-4" />
-                {{ app.documents }}
-              </span>
+             
             </div>
             <NuxtLink
               :to="localePath(`/student/prihlasky/${app.id}`)"

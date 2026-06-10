@@ -40,13 +40,7 @@
           {{ project.teamName }} · {{ t('mentor.dashboard.assignedAt', { date: project.assignedAt }) }}
         </p>
       </div>
-      <button
-        v-if="canManageConsultations"
-        @click="showConsultationModal = true"
-        class="shrink-0 inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
-      >
-        <Plus class="w-4 h-4" /> {{ t('mentor.detail.newConsultation') }}
-      </button>
+     
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
