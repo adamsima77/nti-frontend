@@ -256,7 +256,7 @@ const selectedCallApplicationsRaw = computed(() => {
       return {
         id: app.id,
         projectName: call_project_name_fallback(app, evalItem),
-        status: app.status.name,
+        status: normalizeAppStatus(app.status?.name),
         category: app.category ?? null,
         program: programLabel, 
         teamName: app.team?.name ?? '—',
@@ -270,6 +270,18 @@ const selectedCallApplicationsRaw = computed(() => {
       }
     })
 })
+
+const normalizeAppStatus = (name?: string): string => {
+  const map: Record<string, string> = {
+    'Draft': 'draft',
+    'Podané': 'submitted',
+    'V hodnotení': 'evaluating',
+    'Vyžiadané doplnenie': 'supplement_requested',
+    'Schválené': 'approved',
+    'Zamietnuté': 'rejected',
+  }
+  return map[name ?? ''] ?? name ?? ''
+}
 
 const call_project_name_fallback = (app: any, evalItem: any) => {
   if (app?.form_data?.project_name) return app.form_data.project_name

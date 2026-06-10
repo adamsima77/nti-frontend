@@ -28,6 +28,18 @@
       </div>
     </div>
 
+    <!-- Empty state -->
+    <div
+      v-if="!loading.dashboard && !assignedCalls.length && !recentApplications.length"
+      class="bg-white rounded-xl border border-gray-100 py-16 text-center"
+    >
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+        <ClipboardCheck class="w-8 h-8 text-gray-400" />
+      </div>
+      <p class="font-semibold text-navy mb-1">Zatiaľ žiadne pridelené prihlášky</p>
+      <p class="text-sm text-gray-400">Administrátor vám pridelí prihlášky na hodnotenie.</p>
+    </div>
+
     <div
       v-if="assignedCalls.length"
       class="mb-8"
@@ -197,7 +209,7 @@ import { useAuthStore } from '~/stores/auth'
 const localePath = useLocalePath()
 const { setLocale, locale } = useI18n()
 const authStore = useAuthStore()
-const { dashboard, fetchDashboard } = useEvaluatorDashboard()
+const { dashboard, loading, fetchDashboard } = useEvaluatorDashboard()
 
 definePageMeta({
   layout: 'portal',

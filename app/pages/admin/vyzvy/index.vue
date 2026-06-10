@@ -111,7 +111,16 @@
 
         <template #row-actions="{ row }">
           <div class="flex items-center gap-2">
-            <!-- Program B + V párovaní: team selection button -->
+
+            <button
+              v-if="!isDraftCall(row)"
+              class="text-gray-400 hover:text-indigo-600 transition-colors"
+              title="Nastaviť komisiu"
+              @click.stop="openCommissionSetupModal(row)"
+            >
+              <Settings class="w-4 h-4" />
+            </button>
+
             <button
               v-if="isProgramBMatching(row)"
               class="text-indigo-500 hover:text-indigo-700 transition-colors"
@@ -176,11 +185,19 @@
         @team-selected="fetchCalls"
       />
     </ClientOnly>
+
+    <ClientOnly>
+      <AdminCallCommissionSetupModal
+        v-model="commissionSetupModalOpen"
+        :call="commissionSetupCall"
+        @saved="fetchCalls"
+      />
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Plus, Pencil, FileText, X, Users, Download } from 'lucide-vue-next'
+import { Plus, Pencil, FileText, X, Users, Settings, Download } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
@@ -385,17 +402,22 @@ function resolveStatusKey(row: CallRow): string {
 
 // ── Program B helpers ──────────────────────────────────────────────────────────
 
+function isDraftCall(row: CallRow): boolean {
+  const status = row.status?.name || row.currentStatusHistory?.status?.name || row.currentStatus?.name
+  return status === 'Draft'
+}
+
+function isProgramBCall(row: CallRow): boolean {
+  return (row.program?.name ?? '').toLowerCase().includes('b')
+}
+
 function isProgramBMatching(row: CallRow): boolean {
-  const programName = row.program?.name ?? ''
-  const statusName  =
+  const statusName =
     row.status?.name ||
     row.currentStatusHistory?.status?.name ||
     row.currentStatus?.name
 
-  return (
-    programName.toLowerCase().includes('b') &&
-    statusName === 'V párovaní'
-  )
+  return isProgramBCall(row) && statusName === 'V párovaní'
 }
 
 const programBModalOpen = ref(false)
@@ -404,6 +426,15 @@ const programBCall      = ref<{ id: number; name: string } | null>(null)
 function openProgramBModal(row: CallRow) {
   programBCall.value      = { id: row.id, name: row.name }
   programBModalOpen.value = true
+}
+
+const commissionSetupModalOpen = ref(false)
+const commissionSetupCall      = ref<{ id: number; name: string; isB: boolean } | null>(null)
+
+function openCommissionSetupModal(row: CallRow) {
+  const programName = row.program?.name ?? ''
+  commissionSetupCall.value      = { id: row.id, name: row.name, isB: programName.includes('B') }
+  commissionSetupModalOpen.value = true
 }
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
