@@ -111,6 +111,16 @@
 
         <template #row-actions="{ row }">
           <div class="flex items-center gap-2">
+            <!-- Program B + V párovaní: team selection button -->
+            <button
+              v-if="isProgramBMatching(row)"
+              class="text-indigo-500 hover:text-indigo-700 transition-colors"
+              title="Vybrať tím"
+              @click.stop="openProgramBModal(row)"
+            >
+              <Users class="w-4 h-4" />
+            </button>
+
             <button
               v-if="canEditCalls"
               class="text-gray-400 hover:text-navy transition-colors"
@@ -158,11 +168,19 @@
   :filters="exportFilters"
 />
     </ClientOnly>
+
+    <ClientOnly>
+      <AdminProgramBTeamSelectionModal
+        v-model="programBModalOpen"
+        :call="programBCall"
+        @team-selected="fetchCalls"
+      />
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Plus, Pencil, FileText, X } from 'lucide-vue-next'
+import { Plus, Pencil, FileText, X, Users, Download } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
@@ -363,6 +381,29 @@ function resolveStatusKey(row: CallRow): string {
   }
 
   return lookup[statusName ?? ''] ?? 'draft'
+}
+
+// ── Program B helpers ──────────────────────────────────────────────────────────
+
+function isProgramBMatching(row: CallRow): boolean {
+  const programName = row.program?.name ?? ''
+  const statusName  =
+    row.status?.name ||
+    row.currentStatusHistory?.status?.name ||
+    row.currentStatus?.name
+
+  return (
+    programName.toLowerCase().includes('b') &&
+    statusName === 'V párovaní'
+  )
+}
+
+const programBModalOpen = ref(false)
+const programBCall      = ref<{ id: number; name: string } | null>(null)
+
+function openProgramBModal(row: CallRow) {
+  programBCall.value      = { id: row.id, name: row.name }
+  programBModalOpen.value = true
 }
 
 // ── Modal ─────────────────────────────────────────────────────────────────────

@@ -134,9 +134,11 @@
                 :to="`/hodnotenie/${app.id}`"
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 :class="
-                  app.my_score !== null
-                    ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                  app.status !== 'evaluating'
+                    ? 'bg-gray-100 text-gray-400 pointer-events-none opacity-50 cursor-not-allowed'
+                    : app.my_score !== null
+                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
                 "
               >
                 <ClipboardCheck class="w-4 h-4" />

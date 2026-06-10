@@ -52,13 +52,20 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
+  const isCommissionMemberOnHodnotenie =
+    auth.isCommissionMember && to.path.startsWith('/hodnotenie')
+
   // Role-based access check
-  if (requiredRoles?.length && !auth.hasRole(requiredRoles)) {
+  if (requiredRoles?.length && !auth.hasRole(requiredRoles) && !isCommissionMemberOnHodnotenie) {
     throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
   }
 
   // Permission-based access check
-  if (requiredPermissionSet?.length && !requiredPermissionSet.some(permission => auth.hasPermission(permission))) {
+  if (
+    requiredPermissionSet?.length &&
+    !requiredPermissionSet.some(permission => auth.hasPermission(permission)) &&
+    !isCommissionMemberOnHodnotenie
+  ) {
     throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
   }
 })

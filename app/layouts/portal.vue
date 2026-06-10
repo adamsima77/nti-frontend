@@ -120,6 +120,9 @@ const navItems = computed(() => {
 
   if (role === 'company') {
     const orgRole = orgDashboard.myRole.value
+    const commissionItems = authStore.isCommissionMember
+      ? [{ label: t('portal_sidebar_links.evaluations'), to: localePath('/hodnotenie/zoznam'), icon: ClipboardCheck }]
+      : []
 
     if (orgRole === 'po') {
       return [
@@ -127,6 +130,7 @@ const navItems = computed(() => {
         { label: t('portal_sidebar_links.poTask'),       to: localePath('/firma/po/zadanie'),  icon: FileText },
         { label: t('portal_sidebar_links.poMilestones'), to: localePath('/firma/po/milniky'),  icon: Flag },
         { label: 'Môj profil',                           to: localePath('/firma/moj-profil'),  icon: UserCircle },
+        ...commissionItems,
       ]
     }
 
@@ -134,6 +138,7 @@ const navItems = computed(() => {
       return [
         { label: t('portal_sidebar_links.dashboard'), to: localePath('/firma'),            icon: LayoutDashboard, exact: true },
         { label: 'Môj profil',                        to: localePath('/firma/moj-profil'), icon: UserCircle },
+        ...commissionItems,
       ]
     }
 
@@ -142,6 +147,7 @@ const navItems = computed(() => {
       { label: t('portal_sidebar_links.companyProfile'),  to: localePath('/firma/profil'),   icon: Building2 },
       { label: t('portal_sidebar_links.tasks'),           to: localePath('/firma/zadania'),  icon: ClipboardList },
       { label: t('portal_sidebar_links.members'),         to: localePath('/firma/clenovia'), icon: Users },
+      ...commissionItems,
     ]
   }
 

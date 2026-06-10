@@ -9,9 +9,13 @@
 
     <!-- MEMBER VIEW -->
     <template v-else-if="orgDashboard.isMember.value">
-      <div class="mb-10">
+      <div class="mb-10 bg-white rounded-xl border-l-4 border-gray-500 px-6 py-5 shadow-sm">
+        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full mb-3">
+          <span class="w-1.5 h-1.5 rounded-full bg-gray-400" />
+          Člen organizácie
+        </span>
         <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
-        <p class="text-gray-500">Prehľad zadaní a priradených tímov vašej organizácie</p>
+        <p class="text-gray-500 text-sm">Aktuálny prehľad projektov.</p>
       </div>
 
       <div v-if="orgDashboard.isLoading.value" class="flex justify-center py-20">
@@ -151,9 +155,13 @@
     <!-- ADMIN VIEW -->
     <template v-else>
     <!-- Header -->
-    <div class="mb-10">
+    <div class="mb-10 bg-white rounded-xl border-l-4 border-gray-500 px-6 py-5 shadow-sm">
+      <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full mb-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-gray-400" />
+        Administrátor organizácie
+      </span>
       <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
-      <p class="text-gray-500">Prehľad vašich zadaní, tímov a rozpočtov</p>
+      <p class="text-gray-500 text-sm">Centrálny manažment firemného portfólia, zadaní a rozpočtov.</p>
     </div>
 
     <!-- Stats row -->
@@ -425,7 +433,7 @@ const actions = computed(() => {
     return [
       {
         id: 'create-task',
-        message: 'Nemáte ešte žiadne zverejnené zadania. Vytvorte prvé zadanie pre váš tím.',
+        message: 'Nemáte ešte žiadne zverejnené zadania. Vytvorte vaše prvé zadanie.',
         link: '/firma/zadania/nove',
       },
     ]

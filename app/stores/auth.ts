@@ -30,6 +30,7 @@ interface User {
   avatar?: string | null
   organization_name: string | null
   organizations?: OrganizationReference[]
+  is_commission_member?: boolean
 }
 
 const enum UserStatus {
@@ -103,6 +104,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const userOrganizationId = computed(() =>
     user.value?.organizations?.[0]?.id ?? null
+  )
+
+  const isCommissionMember = computed(() =>
+    user.value?.is_commission_member === true
   )
 
   const userPermissions = computed(() =>
@@ -283,6 +288,7 @@ export const useAuthStore = defineStore('auth', () => {
     userRole,
     userPermissions,
     userOrganizationId,
+    isCommissionMember,
 
     hasRole,
     hasPermission,

@@ -460,7 +460,9 @@ const loadTask = async () => {
       po_name: [data.product_owner?.name, data.product_owner?.surname].filter(Boolean).join(' ') || '',
       po_email: data.product_owner?.email ?? '',
       applications: data.applications ?? [],
-      assignedTeam: null,
+      assignedTeam: (data.applications ?? []).find((a: any) =>
+        ['Onboarding', 'Aktívny projekt', 'Ukončené'].includes(a.status?.name)
+      )?.team?.name ?? null,
       assignedTeamMembers: 0,
     }
   } catch (err) {
