@@ -1770,7 +1770,22 @@
     "open": "Otvorená",
     "closed": "Uzavretá",
     "load_error": "Nepodarilo sa načítať výzvu.",
-    "fetch_error": "Nepodarilo sa načítať výzvy."
+    "fetch_error": "Nepodarilo sa načítať výzvy.",
+    "show_applications": "Prihlášky",
+    "program_b_applications_modal_title": "Prihlášky — výber tímu",
+    "program_b_applications_modal_subtitle": "Vyberte tím pre túto výzvu. Po výbere sa ostatné prihlášky zamietnu a výzva sa presunie do stavu \"Pridelené\".",
+    "program_b_col_team": "Tím",
+    "program_b_col_status": "Stav",
+    "program_b_col_evaluations": "Hodnotenia",
+    "program_b_col_avg_score": "Priemerné skóre",
+    "program_b_select_team": "Vybrať tento tím",
+    "program_b_not_all_evaluated": "Čaká sa na odovzdanie všetkých hodnotení",
+    "program_b_select_confirm": "Naozaj chcete vybrať tím \"{team}\"? Táto akcia je nevratná.",
+    "program_b_select_success": "Tím bol úspešne vybraný. Výzva je teraz v stave \"Pridelené\".",
+    "program_b_select_error": "Nepodarilo sa vybrať tím.",
+    "program_b_fetch_error": "Nepodarilo sa načítať prihlášky.",
+    "program_b_no_applications": "Žiadne prihlášky pre túto výzvu.",
+    "program_b_evaluations_progress": "{submitted}/{total} odovzdaných"
   },
 
     "common": {

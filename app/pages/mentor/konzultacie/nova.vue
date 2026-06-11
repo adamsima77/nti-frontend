@@ -1,4 +1,3 @@
-<!-- pages/mentor/konzultacie/nova.vue -->
 <template>
   <div class="max-w-2xl mx-auto px-6 py-10">
     <NuxtLink
@@ -22,7 +21,6 @@
           <MessageSquare class="w-4 h-4 text-purple-500" /> {{ t('mentor.consultationForm.basicInfo') }}
         </h2>
 
-        <!-- Project select -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">
             {{ t('mentor.consultationForm.project') }} <span class="text-danger-500">*</span>
@@ -44,8 +42,7 @@
           <span
             v-if="errors.projectId"
             class="text-xs text-danger-600"
-            >{{ errors.projectId }}</span
-          >
+          >{{ errors.projectId }}</span>
         </div>
 
         <FormField
@@ -67,100 +64,109 @@
 
         <div class="grid grid-cols-2 gap-4">
           <FormField
-            :field="{ name: 'date', type: 'date', label: t('mentor.consultationForm.date'), required: true }"
-            v-model="form.date"
-            :error="errors.date ?? undefined"
+            :field="{ name: 'scheduled_at', type: 'date', label: t('mentor.consultationForm.date'), required: true }"
+            v-model="form.scheduled_at"
+            :error="errors.scheduled_at ?? undefined"
             @blur="
               () => {
-                if (!form.date) errors.date = t('mentor.consultationForm.errors.date')
+                if (!form.scheduled_at) errors.scheduled_at = t('mentor.consultationForm.errors.date')
               }
             "
           />
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor.consultationForm.duration') }}</label>
-            <input
-              v-model.number="form.duration"
-              type="number"
-              min="1"
-              placeholder="60"
-              class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
-            />
-          </div>
+
+        <div>
+  <label class="block text-xs font-semibold text-slate-500 mb-1.5">
+    Čas stretnutia <span class="text-red-500">*</span>
+  </label>
+  <div 
+    class="flex items-center border rounded-xl bg-white transition-all duration-200"
+    :class="errors.scheduled_time ? 'border-red-400 bg-red-50 ring-2 ring-red-100' : 'border-slate-200'"
+  >
+    <input
+      type="time"
+      v-model="form.scheduled_time"
+      class="w-full px-3.5 py-2.5 text-sm text-slate-800 bg-transparent rounded-xl focus:outline-none"
+      @blur="() => { if (!form.scheduled_time) errors.scheduled_time = 'Zadajte čas stretnutia.' }"
+    />
+  </div>
+  <p v-if="errors.scheduled_time" class="text-xs text-red-500 mt-1">
+    {{ errors.scheduled_time }}
+  </p>
+</div>
+          <FormField
+  :field="{
+    name: 'duration',
+    type: 'number',
+    label: 'Trvanie (min)',
+    placeholder: '60',
+    required: true,
+  }"
+  v-model="form.duration"
+  :error="errors.duration ?? undefined"
+  @blur="
+    () => {
+      if (!form.duration || form.duration < 1) {
+        errors.duration = 'Zadajte platnú dĺžku stretnutia.'
+      } else {
+        errors.duration = null
+      }
+    }
+  "
+/>
+          
+          <FormField
+            :field="{
+              name: 'type',
+              type: 'select',
+              label: t('mentor.consultationForm.type'),
+              options: [
+                { value: 'online', label: t('mentor.consultationForm.typeOnline') },
+                { value: 'offline', label: t('mentor.consultationForm.typePersonal') },
+              ],
+              required: true,
+            }"
+            v-model="form.type"
+          />
         </div>
 
-        <FormField
-          :field="{
-            name: 'type',
-            type: 'select',
-            label: t('mentor.consultationForm.type'),
-            options: [
-              { value: 'online', label: t('mentor.consultationForm.typeOnline') },
-              { value: 'personal', label: t('mentor.consultationForm.typePersonal') },
-              { value: 'written', label: t('mentor.consultationForm.typeWritten') },
-            ],
-            required: true,
-          }"
-          v-model="form.type"
-        />
+        <div v-if="form.type === 'online'">
+          <FormField
+            :field="{
+              name: 'meeting_url',
+              type: 'text',
+              label: 'Odkaz na stretnutie (Meeting URL)',
+              placeholder: 'https://teams.microsoft.com/... alebo https://meet.google.com/...',
+              required: true,
+            }"
+            v-model="form.meeting_url"
+            :error="errors.meeting_url ?? undefined"
+            @blur="
+              () => {
+                if (form.type === 'online' && !form.meeting_url) errors.meeting_url = 'Pre online stretnutie je potrebné zadať odkaz.'
+              }
+            "
+          />
+        </div>
       </div>
 
       <div class="bg-white rounded-lg border border-gray-100 p-6 space-y-4">
         <h2 class="text-base font-semibold text-navy flex items-center gap-2">
-          <FileText class="w-4 h-4 text-purple-500" /> {{ t('mentor.consultationForm.record') }}
+          <FileText class="w-4 h-4 text-purple-500" /> Doplňujúce údaje
         </h2>
 
         <FormField
           :field="{
-            name: 'summary',
+            name: 'agenda',
             type: 'textarea',
-            label: t('mentor.consultationForm.summary'),
-            placeholder: t('mentor.consultationForm.summaryPlaceholder'),
-            required: true,
+            label: 'Agenda',
+            placeholder: 'Zadajte agendu...',
+            required: false,
           }"
-          v-model="form.summary"
-          :error="errors.summary ?? undefined"
-          @blur="
-            () => {
-              if (!form.summary) errors.summary = t('mentor.consultationForm.errors.summary')
-            }
-          "
+          v-model="form.agenda"
+          :error="errors.agenda ?? undefined"
         />
-
-        <!-- Action items -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor.consultationForm.tasks') }}</label>
-          <div class="space-y-2">
-            <div
-              v-for="(_, i) in form.actionItems"
-              :key="i"
-              class="flex gap-2"
-            >
-              <input
-                v-model="form.actionItems[i]"
-                type="text"
-                :placeholder="t('mentor.consultationForm.taskPlaceholder')"
-                class="flex-1 px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
-              />
-              <button
-                type="button"
-                @click="form.actionItems.splice(i, 1)"
-                class="text-gray-400 hover:text-danger-500 transition-colors p-1"
-              >
-                <X class="w-4 h-4" />
-              </button>
-            </div>
-            <button
-              type="button"
-              @click="form.actionItems.push('')"
-              class="inline-flex items-center gap-1.5 text-sm text-purple-600 hover:text-purple-800"
-            >
-              <Plus class="w-4 h-4" /> {{ t('mentor.consultationForm.addTask') }}
-            </button>
-          </div>
-        </div>
       </div>
 
-      <!-- Feedback -->
       <div
         v-if="saveError"
         class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2"
@@ -168,7 +174,6 @@
         <AlertCircle class="w-4 h-4 shrink-0" /> {{ saveError }}
       </div>
 
-      <!-- Actions -->
       <div class="flex justify-end gap-3">
         <NuxtLink
           to="/mentor/konzultacie"
@@ -209,14 +214,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { ChevronLeft, MessageSquare, FileText, Plus, X, AlertCircle } from 'lucide-vue-next'
+import { ref, reactive, onMounted, watch } from 'vue'
+import { ChevronLeft, MessageSquare, FileText, AlertCircle } from 'lucide-vue-next'
 
 const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth',
   roles: ['mentor'],
 })
 
@@ -242,7 +246,7 @@ const fetchProjects = async () => {
   loadingProjects.value = true
   try {
     const res = await api.get('/mentor/projects')
-    projects.value = Array.isArray(res) ? (res as MentorProjectOption[]) : []
+    projects.value = Array.isArray(res.data) ? (res.data as MentorProjectOption[]) : []
   } catch {
     projects.value = []
   } finally {
@@ -257,20 +261,41 @@ const today = new Date().toISOString().split('T')[0] ?? ''
 const form = reactive({
   projectId: route.query.project ? Number(route.query.project) : ('' as number | ''),
   title: '',
-  date: today,
-  duration: 60,
+  scheduled_at: today,
+  scheduled_time: '10:00',
   type: 'online',
-  summary: '',
-  actionItems: [''] as string[],
+  meeting_url: '',
+  agenda: '',
+  duration: 60,
 })
 
 const errors = reactive<Record<string, string | null>>({})
 
+// Ak sa zmení typ na offline, vymažeme chybovú hlášku a hodnotu pre meeting_url
+watch(() => form.type, (newType) => {
+  if (newType === 'offline') {
+    form.meeting_url = ''
+    errors.meeting_url = null
+  }
+})
+
 const validate = () => {
   errors.projectId = form.projectId ? null : t('mentor.consultationForm.errors.chooseProject')
   errors.title = form.title ? null : t('mentor.consultationForm.errors.title')
-  errors.date = form.date ? null : t('mentor.consultationForm.errors.date')
-  errors.summary = form.summary ? null : t('mentor.consultationForm.errors.summary')
+  errors.scheduled_at = form.scheduled_at ? null : t('mentor.consultationForm.errors.date')
+  errors.scheduled_time = null
+  
+  if (form.type === 'online') {
+    errors.meeting_url = form.meeting_url.trim() ? null : 'Pre online stretnutie je potrebné zadať odkaz.'
+  } else {
+    errors.meeting_url = null
+  }
+
+  errors.duration =
+  form.duration && form.duration >= 1
+    ? null
+    : 'Zadajte platnú dĺžku stretnutia.'
+
   return !Object.values(errors).some(Boolean)
 }
 
@@ -278,22 +303,28 @@ const handleSave = async () => {
   if (!validate()) return
   isSaving.value = true
   saveError.value = null
+  
   try {
-    const noteParts = [
-      form.title.trim(),
-      `Dátum: ${form.date}`,
-      `Typ: ${form.type}`,
-      `Trvanie: ${form.duration} min`,
-      form.summary.trim(),
-      form.actionItems.filter(Boolean).length ? `Úlohy: ${form.actionItems.filter(Boolean).join('; ')}` : '',
-    ].filter(Boolean)
+    // Spojíme dátum z kalendára a čas z time-pickeru do jedného stringu
+    // Výsledok bude napríklad: "2026-06-10 14:30:00"
+    const fullTimestamp = `${form.scheduled_at} ${form.scheduled_time}:00`
 
     await api.post(`/mentor/projects/${form.projectId}/consultations`, {
-      note: noteParts.join('\n'),
+      title: form.title.trim(),
+      type: form.type,
+      duration: Number(form.duration),
+      scheduled_at: fullTimestamp, // <-- Sem pošleme spojený timestamp
+      meeting_url: form.type === 'online' ? form.meeting_url.trim() : null,
+      agenda: form.agenda.trim() || null,
     })
+    
     router.push('/mentor/konzultacie')
-  } catch {
-    saveError.value = t('mentor.consultationForm.errors.saveFailed')
+  } catch (err: any) {
+    if (err?.response?._data?.message) {
+      saveError.value = err.response._data.message
+    } else {
+      saveError.value = t('mentor.consultationForm.errors.saveFailed')
+    }
   } finally {
     isSaving.value = false
   }

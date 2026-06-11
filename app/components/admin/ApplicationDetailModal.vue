@@ -105,7 +105,9 @@
                         </span>
                       </div>
                       <div class="min-w-0 flex-1">
-                        <NuxtLink :to = "localePath(`/admin/prihlasky/student-detail/${member.student.id}`)">
+                        <NuxtLink 
+                        v-if="member.student?.id"
+                        :to = "localePath(`/admin/prihlasky/student-detail/${member.student.id}`)">
                         <p class="text-sm font-medium text-navy hover:text-blue-500 transition-colors duration-300 truncate">
                           {{ memberFullName(member) }}
                         </p>
@@ -153,12 +155,12 @@
                 </div>
 
                 <!-- ── Evaluations (commission scores) ─────────────────
-                     Shown when the application is in evaluation or later.
-                     Displays each commission member, their score total,
-                     and whether they have submitted their evaluation.
+                     Shown when the application has a commission assigned.
+                     Uses evaluation records when available, otherwise falls
+                     back to the call-level commission setup members.
                 ──────────────────────────────────────────────────────── -->
                 <div
-                  v-if="application.evaluations?.length"
+                  v-if="application.evaluations?.length || application.callCommission"
                   class="rounded-xl border border-amber-100 overflow-hidden"
                 >
                   <div class="px-4 py-3 bg-amber-50 border-b border-amber-100">
@@ -168,95 +170,119 @@
                     </h3>
                   </div>
 
-                  <div
-                    v-for="evaluation in application.evaluations"
-                    :key="evaluation.commission.id"
-                    class="divide-y divide-amber-50"
-                  >
-                    <!-- Commission name subheader -->
-                    <div class="px-4 py-2 bg-amber-50/50 flex items-center gap-2">
-                      <span class="text-xs font-semibold text-amber-700 uppercase tracking-wide">
-                        {{ evaluation.commission.name }}
-                      </span>
-                      <span class="text-xs text-amber-500">
-                        ({{ submittedCount(evaluation) }}/{{ evaluation.members.length }} odovzdaných)
-                      </span>
-                    </div>
-
-                    <!-- Each evaluator row -->
+                  <!-- Case 1: evaluation records exist — show scores per commission group -->
+                  <template v-if="application.evaluations?.length">
                     <div
-                      v-for="member in evaluation.members"
-                      :key="member.id"
-                      class="flex items-center gap-3 px-4 py-3"
+                      v-for="evaluation in application.evaluations"
+                      :key="evaluation.commission?.id ?? 'no-commission'"
+                      class="divide-y divide-amber-50"
                     >
-                      <!-- Avatar -->
-                      <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                        <span class="text-xs font-semibold text-amber-700">
-                          {{ initials(`${member.name} ${member.surname}`) }}
-                        
+                      <div class="px-4 py-2 bg-amber-50/50 flex items-center gap-2">
+                        <span class="text-xs font-semibold text-amber-700 uppercase tracking-wide">
+                          {{ evaluation.commission?.name ?? '—' }}
+                        </span>
+                        <span class="text-xs text-amber-500">
+                          ({{ submittedCount(evaluation) }}/{{ evaluation.members.length }} odovzdaných)
                         </span>
                       </div>
 
-                      <!-- Name -->
-                      <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-navy truncate">
-                          {{ member.name }} {{ member.surname }}
-                        </p>
-                        <p v-if="member.submitted_at" class="text-xs text-gray-400 mt-0.5">
-                          Odovzdané: {{ formatDate(member.submitted_at) }}
-                        </p>
-                        <p 
-      v-if="member.internal_note" 
-      class="text-xs text-amber-800 bg-amber-50/70 rounded px-2 py-1 mt-1.5 border border-amber-100/50 inline-block text-balance"
-    >
-      <span class="font-semibold text-amber-950">Poznámka:</span> {{ member.internal_note }}
-    </p>
-                      </div>
-
-                      <!-- Score pill or pending badge -->
-                      <template v-if="member.submitted_at && member.scores.length">
-                        <div class="flex-shrink-0 flex items-center gap-1.5">
-                          <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-sm font-bold">
-                            {{ memberTotalScore(member) }} b.
+                      <div
+                        v-for="member in evaluation.members"
+                        :key="member.id"
+                        class="flex items-center gap-3 px-4 py-3"
+                      >
+                        <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                          <span class="text-xs font-semibold text-amber-700">
+                            {{ initials(`${member.name} ${member.surname}`) }}
                           </span>
-                          <!-- Per-criterion breakdown tooltip-style list (shown inline, compact) -->
-                          <div
-                            v-if="member.scores.length > 1"
-                            class="text-xs text-gray-400 flex flex-col items-end gap-0.5"
-                          >
-                            <span
-                              v-for="score in member.scores"
-                              :key="score.criterion_id"
-                            >
-                              {{ score.criterion_name ?? `K${score.criterion_id}` }}: {{ score.score }}
-                            </span>
-                          </div>
                         </div>
-                      </template>
-                      <template v-else-if="member.submitted_at">
-                        <span class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-green-50 text-green-700 text-xs font-medium">
-                          Odovzdané
+
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-medium text-navy truncate">
+                            {{ member.name }} {{ member.surname }}
+                          </p>
+                          <p v-if="member.submitted_at" class="text-xs text-gray-400 mt-0.5">
+                            Odovzdané: {{ formatDate(member.submitted_at) }}
+                          </p>
+                          <p
+                            v-if="member.internal_note"
+                            class="text-xs text-amber-800 bg-amber-50/70 rounded px-2 py-1 mt-1.5 border border-amber-100/50 inline-block text-balance"
+                          >
+                            <span class="font-semibold text-amber-950">Poznámka:</span> {{ member.internal_note }}
+                          </p>
+                        </div>
+
+                        <template v-if="member.submitted_at && member.scores.length">
+                          <div class="flex-shrink-0 flex items-center gap-1.5">
+                            <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-sm font-bold">
+                              {{ memberTotalScore(member) }} b.
+                            </span>
+                            <div
+                              v-if="member.scores.length > 1"
+                              class="text-xs text-gray-400 flex flex-col items-end gap-0.5"
+                            >
+                              <span v-for="score in member.scores" :key="score.criterion_id">
+                                {{ score.criterion_name ?? `K${score.criterion_id}` }}: {{ score.score }}
+                              </span>
+                            </div>
+                          </div>
+                        </template>
+                        <template v-else-if="member.submitted_at">
+                          <span class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-green-50 text-green-700 text-xs font-medium">
+                            Odovzdané
+                          </span>
+                        </template>
+                        <template v-else>
+                          <span class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-400 text-xs font-medium">
+                            Čaká na hodnotenie
+                          </span>
+                        </template>
+                      </div>
+
+                      <div
+                        v-if="commissionHasAnyScores(evaluation)"
+                        class="px-4 py-2.5 bg-amber-50/70 flex items-center justify-between"
+                      >
+                        <span class="text-xs font-medium text-amber-700">Priemer komisie</span>
+                        <span class="text-sm font-bold text-amber-900">
+                          {{ commissionAverageScore(evaluation) }} b.
                         </span>
-                        
-                      </template>
-                      <template v-else>
+                      </div>
+                    </div>
+                  </template>
+
+                  <!-- Case 2: no evaluation records yet — show call-level commission members as pending -->
+                  <template v-else-if="application.callCommission">
+                    <div class="divide-y divide-amber-50">
+                      <div class="px-4 py-2 bg-amber-50/50 flex items-center gap-2">
+                        <span class="text-xs font-semibold text-amber-700 uppercase tracking-wide">
+                          {{ application.callCommission.name }}
+                        </span>
+                        <span class="text-xs text-amber-500">
+                          (0/{{ application.callCommission.members.length }} odovzdaných)
+                        </span>
+                      </div>
+                      <div
+                        v-for="member in application.callCommission.members"
+                        :key="member.id"
+                        class="flex items-center gap-3 px-4 py-3"
+                      >
+                        <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                          <span class="text-xs font-semibold text-amber-700">
+                            {{ initials(`${member.name} ${member.surname}`) }}
+                          </span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-medium text-navy truncate">
+                            {{ member.name }} {{ member.surname }}
+                          </p>
+                        </div>
                         <span class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-400 text-xs font-medium">
                           Čaká na hodnotenie
                         </span>
-                      </template>
+                      </div>
                     </div>
-
-                    <!-- Commission total row -->
-                    <div
-                      v-if="commissionHasAnyScores(evaluation)"
-                      class="px-4 py-2.5 bg-amber-50/70 flex items-center justify-between"
-                    >
-                      <span class="text-xs font-medium text-amber-700">Priemer komisie</span>
-                      <span class="text-sm font-bold text-amber-900">
-                        {{ commissionAverageScore(evaluation) }} b.
-                      </span>
-                    </div>
-                  </div>
+                  </template>
                 </div>
 
                 <!-- Status history timeline -->
@@ -719,6 +745,19 @@ interface FileMeta {
   created_at: string | null
 }
 
+interface CallCommissionMember {
+  id: number
+  user_id: number
+  name: string | null
+  surname: string | null
+}
+
+interface CallCommission {
+  id: number
+  name: string
+  members: CallCommissionMember[]
+}
+
 interface ApplicationDetail {
   id: number
   reference: string | null
@@ -731,6 +770,7 @@ interface ApplicationDetail {
   mentorships: Mentorship[]
   evaluations: Evaluation[]
   committee: Committee | null
+  callCommission: CallCommission | null
   statusHistory: Array<{
     id: number
     status: { id: number; name: string } | null
@@ -885,6 +925,7 @@ async function fetchApplication() {
   isFetching.value = true
   try {
     const res  = await api.get(`/applications/${props.applicationId}`)
+const callCommissionRaw: CallCommission | null = res?.call_commission ?? null
     const data = res?.application ?? res
     if (!data) throw new Error('No data received')
 
@@ -920,6 +961,7 @@ async function fetchApplication() {
       committee: topLevelCommittee ?? mentorshipCommittee ?? evaluationCommittee,
       mentorships: data.mentorships ?? [],
       evaluations: data.evaluations ?? [],
+      callCommission: callCommissionRaw,
     }
   } catch (error) {
     console.error('Fetch error:', error)

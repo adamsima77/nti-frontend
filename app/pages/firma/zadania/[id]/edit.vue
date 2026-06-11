@@ -91,6 +91,12 @@ definePageMeta({
 
 useHead({ title: 'Upraviť zadanie | NTI Firma' })
 
+const orgDashboard = useOrgDashboard()
+await orgDashboard.load()
+if (orgDashboard.myRole.value !== 'organization_admin') {
+  await navigateTo(useLocalePath()('/firma'))
+}
+
 const authStore = useAuthStore()
 const api = useApi()
 const route = useRoute()

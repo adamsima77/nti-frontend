@@ -134,9 +134,11 @@
                 :to="`/hodnotenie/${app.id}`"
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 :class="
-                  app.my_score !== null
-                    ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                  app.status !== 'evaluating'
+                    ? 'bg-gray-100 text-gray-400 pointer-events-none opacity-50 cursor-not-allowed'
+                    : app.my_score !== null
+                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
                 "
               >
                 <ClipboardCheck class="w-4 h-4" />
@@ -254,7 +256,7 @@ const selectedCallApplicationsRaw = computed(() => {
       return {
         id: app.id,
         projectName: call_project_name_fallback(app, evalItem),
-        status: app.status.name,
+        status: normalizeAppStatus(app.status?.name),
         category: app.category ?? null,
         program: programLabel, 
         teamName: app.team?.name ?? '—',
@@ -268,6 +270,18 @@ const selectedCallApplicationsRaw = computed(() => {
       }
     })
 })
+
+const normalizeAppStatus = (name?: string): string => {
+  const map: Record<string, string> = {
+    'Draft': 'draft',
+    'Podané': 'submitted',
+    'V hodnotení': 'evaluating',
+    'Vyžiadané doplnenie': 'supplement_requested',
+    'Schválené': 'approved',
+    'Zamietnuté': 'rejected',
+  }
+  return map[name ?? ''] ?? name ?? ''
+}
 
 const call_project_name_fallback = (app: any, evalItem: any) => {
   if (app?.form_data?.project_name) return app.form_data.project_name

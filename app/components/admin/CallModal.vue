@@ -529,6 +529,93 @@
           </span>
         </div>
       </div>
+      <div v-show="activeTab === 'commission'" class="space-y-5">
+        <div v-if="commissionLoading" class="flex items-center gap-2 text-sm text-gray-400 py-6">
+          <div class="w-4 h-4 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+          Načítavam…
+        </div>
+
+        <template v-else>
+          <!-- Locked — aspoň jedna prihláška je v hodnotení -->
+          <div v-if="commissionLocked" class="space-y-4">
+            <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+              <span class="text-amber-500 mt-0.5">🔒</span>
+              <div>
+                <p class="text-sm font-medium text-amber-800">Komisia je uzamknutá</p>
+                <p class="text-xs text-amber-600 mt-0.5">Aspoň jedna prihláška je v stave hodnotenia — komisiu nie je možné zmeniť.</p>
+              </div>
+            </div>
+            <div v-if="commissionSetup?.commission" class="rounded-xl border border-gray-200 divide-y divide-gray-100 text-sm">
+              <div class="flex items-center justify-between px-4 py-3">
+                <span class="text-gray-500">Komisia</span>
+                <span class="font-medium text-navy">{{ commissionSetup.commission.name }}</span>
+              </div>
+              <div v-if="commissionSetup.company_rep" class="flex items-center justify-between px-4 py-3">
+                <span class="text-gray-500">Zástupca firmy</span>
+                <div class="text-right">
+                  <p class="font-medium text-navy">{{ commissionSetup.company_rep.name }}</p>
+                  <p class="text-xs text-gray-400">{{ commissionSetup.company_rep.email }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Editovateľné — žiadna prihláška ešte nie je v hodnotení -->
+          <template v-else>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">
+                Hodnotiaca komisia
+              </label>
+              <select
+                v-model="commissionForm.commission_id"
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <option :value="null">— Vybrať komisiu —</option>
+                <option v-for="c in commissions" :key="c.id" :value="c.id">
+                  {{ c.name }} ({{ c.members.length }} {{ c.members.length === 1 ? 'hodnotiteľ' : c.members.length < 5 ? 'hodnotitelia' : 'hodnotiteľov' }})
+                </option>
+              </select>
+
+              <div v-if="selectedCommission" class="mt-2 rounded-lg bg-gray-50 px-3 py-2 space-y-1">
+                <p v-if="!selectedCommission.members.length" class="text-xs text-gray-400 italic">Komisia nemá žiadnych hodnotiteľov.</p>
+                <div
+                  v-for="m in selectedCommission.members"
+                  :key="m.id"
+                  class="flex items-center gap-2 text-xs text-gray-600"
+                >
+                  <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold shrink-0">
+                    {{ memberInitials(m.name) }}
+                  </div>
+                  <span>{{ m.name }}</span>
+                  <span class="text-gray-400">{{ m.email }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="isProgramB">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">Zástupca firmy</label>
+              <p class="text-xs text-gray-400 mb-2">Musí byť členom organizácie, ktorá vytvorila túto výzvu.</p>
+              <div v-if="!orgMembers.length" class="text-sm text-orange-500 bg-orange-50 rounded-lg px-3 py-2">
+                Táto výzva nemá priradenú organizáciu alebo organizácia nemá žiadnych členov.
+              </div>
+              <select
+                v-else
+                v-model="commissionForm.company_rep_user_id"
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <option :value="null">— Vybrať zástupcu —</option>
+                <option v-for="m in orgMembers" :key="m.id" :value="m.id">
+                  {{ m.name }} ({{ m.email }})
+                </option>
+              </select>
+            </div>
+
+            <div class="text-xs text-gray-400 bg-gray-50 rounded-lg px-3 py-2 leading-relaxed">
+              Po uložení sa pre všetky prihlášky tejto výzvy automaticky vytvoria hodnotiace hárky pre všetkých členov komisie{{ isProgramB ? ' a zástupcu firmy' : '' }}.
+            </div>
+          </template>
+        </template>
+      </div>
     </template>
 
     <template #actions>
@@ -670,12 +757,13 @@ const PROGRAM_A_DEFAULTS: FormField[] = [
 
 // ── Tabs ───────────────────────────────────────────────────────────────────
 
-const activeTab = ref<'basic' | 'form' | 'criteria'>('basic')
+const activeTab = ref<'basic' | 'form' | 'criteria' | 'commission'>('basic')
 
 const TABS = computed(() => [
-  { key: 'basic',    label: t('callModal.tabs.basic'),    badge: undefined },
-  { key: 'form',     label: t('callModal.tabs.form'),     badge: formFields.value.length },
-  { key: 'criteria', label: t('callModal.tabs.criteria'), badge: form.value.criteria.length },
+  { key: 'basic',      label: t('callModal.tabs.basic'),    badge: undefined },
+  { key: 'form',       label: t('callModal.tabs.form'),     badge: formFields.value.length },
+  { key: 'criteria',   label: t('callModal.tabs.criteria'), badge: form.value.criteria.length },
+  { key: 'commission', label: 'Komisia',                    badge: undefined },
 ])
 
 // ── API / toasts ───────────────────────────────────────────────────────────
@@ -694,6 +782,69 @@ const availableCriteria        = ref<Criterion[]>([])
 const metaLoading     = ref(false)
 const criteriaLoading = ref(false)
 const isSaving        = ref(false)
+
+// ── Commission tab state ───────────────────────────────────────────────────
+
+interface CommissionMember { id: number; user_id: number; name: string; email: string }
+interface CommissionOption { id: number; name: string; members: CommissionMember[] }
+interface OrgMember { id: number; name: string; email: string }
+interface CommissionSetupResult {
+  commission: { id: number; name: string } | null
+  company_rep: { id: number; name: string; email: string } | null
+}
+
+const commissionLoading  = ref(false)
+const commissions        = ref<CommissionOption[]>([])
+const orgMembers         = ref<OrgMember[]>([])
+const commissionSetup    = ref<CommissionSetupResult | null>(null)
+const commissionLocked   = ref(false)
+const commissionForm     = ref<{ commission_id: number | null; company_rep_user_id: number | null }>({
+  commission_id: null, company_rep_user_id: null,
+})
+
+const isProgramB = computed(() => {
+  const prog = programOptions.value.find(p => p.value === form.value.program_id)
+  return (prog?.label ?? '').toLowerCase().includes('b')
+})
+
+const selectedCommission = computed(() =>
+  commissionForm.value.commission_id
+    ? commissions.value.find(c => c.id === commissionForm.value.commission_id) ?? null
+    : null,
+)
+
+function memberInitials(name: string | null): string {
+  if (!name) return '?'
+  return name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase()
+}
+
+async function fetchCommissionData(callId?: number) {
+  commissionLoading.value = true
+  try {
+    const requests: Promise<any>[] = [api.get('/v1/admin/commissions') as Promise<any>]
+    if (callId) {
+      requests.push(api.get(`/v1/admin/calls/${callId}/commission-setup`) as Promise<any>)
+      if (isProgramB.value) {
+        requests.push(api.get(`/v1/admin/calls/${callId}/org-members`) as Promise<any>)
+      }
+    }
+    const [comRes, setupRes, orgRes] = await Promise.all(requests)
+    commissions.value     = comRes?.data ?? comRes ?? []
+    commissionSetup.value = setupRes?.commission_setup ?? null
+    commissionLocked.value = setupRes?.locked ?? false
+    orgMembers.value      = orgRes?.data ?? []
+    if (commissionSetup.value?.commission?.id) {
+      commissionForm.value.commission_id = commissionSetup.value.commission.id
+    }
+    if (commissionSetup.value?.company_rep?.id) {
+      commissionForm.value.company_rep_user_id = commissionSetup.value.company_rep.id
+    }
+  } catch (e: any) {
+    addToast({ message: e?.message ?? 'Nepodarilo sa načítať komisie.', type: 'error' })
+  } finally {
+    commissionLoading.value = false
+  }
+}
 
 /** Currently active language tab (language_id) */
 const activeLang = ref<number | null>(null)
@@ -1093,8 +1244,13 @@ watch(() => props.modelValue, async (open) => {
   localNewCriteria.value    = []
   showNewCriterionForm.value = false
   newCriterionError.value    = ''
+  commissions.value          = []
+  orgMembers.value           = []
+  commissionSetup.value      = null
+  commissionLocked.value     = false
+  commissionForm.value       = { commission_id: null, company_rep_user_id: null }
 
- await Promise.all([fetchMeta(), fetchCriteria()])
+  await Promise.all([fetchMeta(), fetchCriteria()])
 
   // ── Derive default status & initialize translation slots ──────────────
   const defaultStatusId =
@@ -1152,6 +1308,8 @@ watch(() => props.modelValue, async (open) => {
 
     const rawFields = c.application_form_schema?.fields ?? c.form_schema?.fields ?? []
     formFields.value = rawFields.length > 0 ? JSON.parse(JSON.stringify(rawFields)) : []
+
+    fetchCommissionData(props.call.id)
   } else {
     // ── CREATE MODE ────────────────────────────────────────────────────
     form.value = {
@@ -1164,6 +1322,8 @@ watch(() => props.modelValue, async (open) => {
     if (visibleProgramOptions.value.length === 1) {
       form.value.program_id = visibleProgramOptions.value[0].value
     }
+
+    fetchCommissionData()
   }
 })
 
@@ -1370,10 +1530,27 @@ async function handleSubmit() {
         : null,
     }
 
-    if (props.call?.id) {
-      await api.put(`/v1/admin/calls/${props.call.id}`, payload)
+    let callId: number | undefined = props.call?.id
+    if (callId) {
+      await api.put(`/v1/admin/calls/${callId}`, payload)
     } else {
-      await api.post('/v1/admin/calls', payload)
+      const created: any = await api.post('/v1/admin/calls', payload)
+      callId = created?.id ?? created?.data?.id
+    }
+
+    const commissionChanged = commissionForm.value.commission_id !== null
+      && commissionForm.value.commission_id !== (commissionSetup.value?.commission?.id ?? null)
+
+    if (callId && commissionChanged && !commissionLocked.value) {
+      const commPayload: Record<string, any> = { commission_id: commissionForm.value.commission_id }
+      if (isProgramB.value && commissionForm.value.company_rep_user_id) {
+        commPayload.company_rep_user_id = commissionForm.value.company_rep_user_id
+      }
+      try {
+        await api.post(`/v1/admin/calls/${callId}/setup-commission`, commPayload)
+      } catch (e: any) {
+        addToast({ message: e?.data?.message ?? 'Komisia sa nedala priradiť.', type: 'error' })
+      }
     }
 
     addToast({ message: t('callModal.toasts.saveSuccess'), type: 'success' })

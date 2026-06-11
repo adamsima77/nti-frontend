@@ -13,9 +13,13 @@
 
     <template v-else>
       <!-- Vitajte -->
-      <div class="mb-8">
+      <div class="mb-8 bg-white rounded-xl border-l-4 border-gray-500 px-6 py-5 shadow-sm">
+        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full mb-3">
+          <span class="w-1.5 h-1.5 rounded-full bg-gray-400" />
+          Product Owner
+        </span>
         <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
-        <p class="text-gray-500 text-sm">Prehľad vášho zadania a míľnikov</p>
+        <p class="text-gray-500 text-sm">Správa projektového cyklu a schvaľovanie kľúčových fáz.</p>
       </div>
 
       <!-- Header -->
@@ -136,6 +140,12 @@ useHead({ title: 'Product Owner Dashboard | NTI' })
 const api = useApi()
 const localePath = useLocalePath()
 const authStore = useAuthStore()
+const orgDashboard = useOrgDashboard()
+
+await orgDashboard.load()
+if (orgDashboard.myRole.value !== 'po') {
+  await navigateTo(localePath('/firma'))
+}
 
 const userDisplayName = computed(() => {
   const u = authStore.user

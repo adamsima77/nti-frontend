@@ -2075,7 +2075,22 @@
   "open": "Open",
   "closed": "Closed",
   "load_error": "Failed to load call.",
-  "fetch_error": "Failed to load calls."
+  "fetch_error": "Failed to load calls.",
+  "show_applications": "Applications",
+  "program_b_applications_modal_title": "Applications — team selection",
+  "program_b_applications_modal_subtitle": "Select a team for this call. After selection, other applications will be rejected and the call will move to \"Assigned\" status.",
+  "program_b_col_team": "Team",
+  "program_b_col_status": "Status",
+  "program_b_col_evaluations": "Evaluations",
+  "program_b_col_avg_score": "Average score",
+  "program_b_select_team": "Select this team",
+  "program_b_not_all_evaluated": "Waiting for all evaluations to be submitted",
+  "program_b_select_confirm": "Are you sure you want to select team \"{team}\"? This action is irreversible.",
+  "program_b_select_success": "Team selected successfully. Call is now in \"Assigned\" status.",
+  "program_b_select_error": "Failed to select team.",
+  "program_b_fetch_error": "Failed to load applications.",
+  "program_b_no_applications": "No applications for this call.",
+  "program_b_evaluations_progress": "{submitted}/{total} submitted"
 },
 
 "superadmin_dashboard": {

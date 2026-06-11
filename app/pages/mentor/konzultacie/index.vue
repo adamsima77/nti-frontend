@@ -1,7 +1,5 @@
-<!-- pages/mentor/konzultacie/index.vue -->
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
-    <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
         <h1 class="text-3xl font-bold text-navy mb-1">{{ t('mentor.consultations.title') }}</h1>
@@ -15,11 +13,10 @@
       </NuxtLink>
     </div>
 
-    <!-- Filters -->
     <div class="flex flex-wrap gap-3 mb-6">
-      <!-- Project filter -->
       <select
         v-model="filterProject"
+        @change="handleFilterChange"
         class="px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-400"
       >
         <option value="">{{ t('mentor.consultations.filters.allProjects') }}</option>
@@ -31,25 +28,30 @@
           {{ p.label }}
         </option>
       </select>
-      <!-- Type filter -->
+
       <select
         v-model="filterType"
+        @change="handleFilterChange"
         class="px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-400"
       >
         <option value="">{{ t('mentor.consultations.filters.allTypes') }}</option>
         <option value="online">{{ t('mentor.consultations.filters.online') }}</option>
-        <option value="personal">{{ t('mentor.consultations.filters.personal') }}</option>
-        <option value="written">{{ t('mentor.consultations.filters.written') }}</option>
+        <option value="offline">{{ t('mentor.consultations.filters.personal') }}</option>
       </select>
-      <!-- Month filter -->
+
       <select
         v-model="filterMonth"
+        @change="handleFilterChange"
         class="px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-400"
       >
         <option value="">{{ t('mentor.consultations.filters.allMonths') }}</option>
-        <option value="2026-04">{{ t('mentor.consultations.months.april2026') }}</option>
-        <option value="2026-03">{{ t('mentor.consultations.months.march2026') }}</option>
-        <option value="2026-02">{{ t('mentor.consultations.months.february2026') }}</option>
+        <option
+          v-for="m in monthOptions"
+          :key="m.value"
+          :value="m.value"
+        >
+          {{ m.label }}
+        </option>
       </select>
     </div>
 
@@ -67,26 +69,20 @@
       {{ error }}
     </div>
 
-    <!-- Summary bar -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="grid grid-cols-2 gap-4 mb-6">
       <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
-        <p class="text-2xl font-bold text-purple-600">{{ filteredConsultations.length }}</p>
+        <p class="text-2xl font-bold text-purple-600">{{ totalItems }}</p>
         <p class="text-xs text-gray-500 mt-0.5">{{ t('mentor.consultations.stats.consultations') }}</p>
       </div>
       <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
-        <p class="text-2xl font-bold text-navy">{{ totalTime }}</p>
+        <p class="text-2xl font-bold text-navy">{{ totalTime }} min</p>
         <p class="text-xs text-gray-500 mt-0.5">{{ t('mentor.consultations.stats.minutesTotal') }}</p>
-      </div>
-      <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
-        <p class="text-2xl font-bold text-navy">{{ totalActionItems }}</p>
-        <p class="text-xs text-gray-500 mt-0.5">{{ t('mentor.consultations.stats.tasks') }}</p>
       </div>
     </div>
 
-    <!-- Consultations list -->
-    <div class="space-y-3">
+    <div class="space-y-3 mb-6">
       <div
-        v-for="c in filteredConsultations"
+        v-for="c in consultations"
         :key="c.id"
         class="bg-white rounded-lg border border-gray-100 p-5 hover:shadow-sm transition-shadow"
       >
@@ -97,15 +93,17 @@
               <span
                 class="text-xs px-2 py-0.5 rounded-full font-medium"
                 :class="typeClass(c.type)"
-                >{{ typeLabel(c.type) }}</span
               >
+                {{ typeLabel(c.type) }}
+              </span>
             </div>
             <p class="text-xs text-gray-400">
               <NuxtLink
                 :to="`/mentor/projekty/${c.projectId}`"
                 class="text-purple-600 hover:underline"
-                >{{ c.projectName }}</NuxtLink
               >
+                {{ c.projectName }}
+              </NuxtLink>
               · {{ c.date }} · {{ c.duration }} min
             </p>
           </div>
@@ -116,23 +114,11 @@
             <ExternalLink class="w-4 h-4" />
           </NuxtLink>
         </div>
-        <p class="text-sm text-gray-600 leading-relaxed mb-3 line-clamp-2">{{ c.summary }}</p>
-        <div
-          v-if="c.actionItems.length"
-          class="flex flex-wrap gap-1.5"
-        >
-          <span
-            v-for="item in c.actionItems"
-            :key="item"
-            class="inline-flex items-center gap-1 text-xs bg-gray-50 border border-gray-200 text-gray-600 px-2 py-0.5 rounded"
-          >
-            <ArrowRight class="w-3 h-3 text-purple-400" /> {{ item }}
-          </span>
-        </div>
+        <p class="text-sm text-gray-600 leading-relaxed mb-1 line-clamp-2">{{ c.summary }}</p>
       </div>
 
       <div
-        v-if="!filteredConsultations.length"
+        v-if="!consultations.length && !loading"
         class="text-center py-16 bg-white rounded-lg border border-gray-100"
       >
         <MessageSquare class="w-12 h-12 text-gray-300 mx-auto mb-3" />
@@ -140,57 +126,96 @@
         <p class="text-sm text-gray-400 mt-1">{{ t('mentor.consultations.tryFilters') }}</p>
       </div>
     </div>
+
+    <div v-if="totalPages > 1" class="flex  mt-8">
+      <UiPagination
+        v-model:current-page="currentPage"
+        :total-pages="totalPages"
+        :max-visible="5"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { Plus, ExternalLink, ArrowRight, MessageSquare } from 'lucide-vue-next'
-import type { Consultation as BaseConsultation } from '../../../types/mentor'
+import { ref, computed, onMounted, watch } from 'vue'
+import { Plus, ExternalLink, MessageSquare } from 'lucide-vue-next'
+
 
 const { t } = useI18n()
 
-type Consultation = BaseConsultation & {
+type Consultation = {
+  id: number
   projectId: number
   projectName: string
+  title: string
+  type: 'online' | 'offline'
+  date: string
+  duration: number
+  summary: string
+  actionItems: string[]
+}
+
+// Laravel Paginator interface
+type PaginationResponse = {
+  current_page: number
+  data: Consultation[]
+  last_page: number
+  per_page: number
+  total: number
 }
 
 definePageMeta({
   layout: 'portal',
-  //middleware: 'auth',
   roles: ['mentor'],
 })
 
 useHead({ title: t('mentor.consultations.pageTitle') })
 const api = useApi()
 
+// Filtre & Stav
 const filterProject = ref('')
 const filterType = ref('')
 const filterMonth = ref('')
+
 const consultations = ref<Consultation[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
 
-const projectOptions = computed(() => {
-  const options = new Map<string, { value: string; label: string }>()
+// Stránkovanie State (riadené backendom)
+const currentPage = ref(1)
+const totalPages = ref(1)
+const totalItems = ref(0)
 
-  for (const consultation of consultations.value) {
-    options.set(String(consultation.projectId), {
-      value: String(consultation.projectId),
-      label: consultation.projectName,
-    })
-  }
-
-  return Array.from(options.values())
-})
+// Zoznamy pre filtre napĺňame z prvej sady dát (aby mentor videl len relevantné možnosti)
+const allKnownConsultations = ref<Consultation[]>([])
 
 const fetchConsultations = async () => {
   loading.value = true
   error.value = null
 
   try {
-    const res = await api.get('/mentor/consultations')
-    consultations.value = Array.isArray(res) ? (res as Consultation[]) : []
+    // Posielame filtre a aktuálnu stránku na backend
+    const res = await api.get<PaginationResponse>('/mentor/consultations', {
+      params: {
+        page: currentPage.value,
+        project_id: filterProject.value || undefined,
+        type: filterType.value || undefined,
+        month: filterMonth.value || undefined,
+      },
+    })
+
+    if (res && 'data' in res) {
+      consultations.value = res.data
+      currentPage.value = res.current_page
+      totalPages.value = res.last_page
+      totalItems.value = res.total
+
+      // Ak ešte nemáme zoznam pre lokálne filtre, uložíme si úvodné dáta
+      if (allKnownConsultations.value.length === 0 && res.data.length > 0) {
+        allKnownConsultations.value = [...res.data]
+      }
+    }
   } catch (err) {
     error.value = (err as { data?: { message?: string }; message?: string } | null)?.data?.message
       ?? (err as { message?: string } | null)?.message
@@ -200,45 +225,75 @@ const fetchConsultations = async () => {
   }
 }
 
+// Spustenie pri mounte
 onMounted(fetchConsultations)
 
-const toMonthKey = (date: string) => {
-  const match = date.match(/^(\d{2})\.(\d{2})\.(\d{4})$/)
-  if (!match) return ''
-  return `${match[3]}-${match[2]}`
+// Sledujeme zmenu stránky - pri zmene okamžite ťaháme dáta
+watch(currentPage, () => {
+  fetchConsultations()
+})
+
+// Pri zmene akéhokoľvek filtra skočíme na stranu 1 a načítame dáta
+const handleFilterChange = () => {
+  currentPage.value = 1
+  fetchConsultations()
 }
 
-const normalizeConsultationType = (type: string) => {
-  if (type === 'online' || type === 'Online (videohovor)') return 'online'
-  if (type === 'personal' || type === 'Osobne') return 'personal'
-  return 'written'
+// Pomocná funkcia na získanie YYYY-MM z formátu d.m.Y
+const toMonthKey = (dateStr: string) => {
+  const parts = dateStr.split('.')
+  if (parts.length !== 3) return ''
+  return `${parts[2]}-${parts[1].padStart(2, '0')}`
 }
 
-const filteredConsultations = computed(() =>
-  consultations.value.filter((c: Consultation) => {
-    if (filterProject.value && String(c.projectId) !== filterProject.value) return false
-    if (filterMonth.value && toMonthKey(String(c.date)) !== filterMonth.value) return false
-    if (filterType.value) {
-      if (normalizeConsultationType(c.type) !== filterType.value) return false
+// Možnosti pre výber projektu vo filtri
+const projectOptions = computed(() => {
+  const options = new Map<string, { value: string; label: string }>()
+  const source = allKnownConsultations.value.length ? allKnownConsultations.value : consultations.value
+  
+  for (const c of source) {
+    options.set(String(c.projectId), {
+      value: String(c.projectId),
+      label: c.projectName,
+    })
+  }
+  return Array.from(options.values())
+})
+
+// Možnosti pre výber mesiaca vo filtri
+const monthOptions = computed(() => {
+  const options = new Map<string, string>()
+  const source = allKnownConsultations.value.length ? allKnownConsultations.value : consultations.value
+
+  for (const c of source) {
+    const key = toMonthKey(c.date)
+    if (key) {
+      const [year, month] = key.split('-')
+      options.set(key, `${month}/${year}`)
     }
-    return true
-  }),
-)
+  }
 
-const totalTime = computed(() => filteredConsultations.value.reduce((sum: number, c: Consultation) => sum + c.duration, 0))
-const totalActionItems = computed(() => filteredConsultations.value.reduce((sum: number, c: Consultation) => sum + c.actionItems.length, 0))
+  return Array.from(options.entries())
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([value, label]) => ({ value, label }))
+})
 
+// Vypočítaný celkový čas (suma trvaní na aktuálne vybranej stránke alebo globálne)
+const totalTime = computed(() => {
+  return consultations.value.reduce((sum: number, c: Consultation) => sum + (c.duration || 0), 0)
+})
+
+// Tailwind triedy pre odznaky typov
 const typeClass = (type: string) => {
-  const normalizedType = normalizeConsultationType(type)
-  if (normalizedType === 'online') return 'bg-blue-50 text-blue-600'
-  if (normalizedType === 'personal') return 'bg-purple-50 text-purple-600'
-  return 'bg-gray-100 text-gray-500'
+  return type === 'online' 
+    ? 'bg-blue-50 text-blue-600' 
+    : 'bg-purple-50 text-purple-600'
 }
 
+// Label pre typy
 const typeLabel = (type: string) => {
-  const normalizedType = normalizeConsultationType(type)
-  if (normalizedType === 'online') return t('mentor.consultations.types.online')
-  if (normalizedType === 'personal') return t('mentor.consultations.types.personal')
-  return t('mentor.consultations.types.written')
+  return type === 'online' 
+    ? t('mentor.consultations.filters.online') 
+    : t('mentor.consultations.filters.personal')
 }
 </script>

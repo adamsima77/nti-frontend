@@ -237,6 +237,12 @@ definePageMeta({
 
 useHead({ title: 'Správa členov | NTI Firma' })
 
+const orgDashboard = useOrgDashboard()
+await orgDashboard.load()
+if (orgDashboard.myRole.value !== 'organization_admin') {
+  await navigateTo(useLocalePath()('/firma'))
+}
+
 const authStore = useAuthStore()
 const { get, post, patch, delete: apiDelete } = useApi()
 

@@ -206,6 +206,11 @@ const api = useApi()
 const { addToast } = useToast()
 const { locale } = useI18n()
 const orgDashboard = useOrgDashboard()
+
+await orgDashboard.load()
+if (orgDashboard.myRole.value !== 'organization_admin') {
+  await navigateTo(useLocalePath()('/firma'))
+}
 const isPo = orgDashboard.isPo
 
 const isLoading = ref(true)

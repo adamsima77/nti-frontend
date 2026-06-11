@@ -67,7 +67,10 @@ const handleStorageChange = async (e: StorageEvent) => {
 onMounted(async () => {
   window.addEventListener('storage', handleStorageChange)
   if (authStore.userRole === 'company') {
-    await orgDashboard.load()
+    await Promise.all([
+      orgDashboard.load(),
+      authStore.getCurrentUser(), // refresh is_commission_member in case user was just assigned as company rep
+    ])
   }
 })
 
@@ -84,7 +87,8 @@ const navItems = computed(() => {
       { label: t('portal_sidebar_links.users'),            to: localePath('/admin/pouzivatelia'),      icon: Users,           section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.challenges'),       to: localePath('/admin/vyzvy'),             icon: Megaphone,       section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.adminApplications'),to: localePath('/admin/prihlasky'),         icon: FileText,        section: t('portal_sidebar_links.sectionManagement') },
-      { label: t('portal_sidebar_links.cms'),              to: localePath('/cms/management'),          icon: FileCode,        section: t('portal_sidebar_links.sectionContent') }, 
+      { label: 'Komisie',                                  to: localePath('/admin/komisie'),           icon: ClipboardCheck,  section: t('portal_sidebar_links.sectionManagement') },
+      { label: t('portal_sidebar_links.cms'),              to: localePath('/cms/management'),          icon: FileCode,        section: t('portal_sidebar_links.sectionContent') },
     ]
   }
 
@@ -94,6 +98,7 @@ const navItems = computed(() => {
       { label: t('portal_sidebar_links.users'),            to: localePath('/admin/pouzivatelia'),      icon: Users,           section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.challenges'),       to: localePath('/admin/vyzvy'),             icon: Megaphone,       section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.adminApplications'),to: localePath('/admin/prihlasky'),         icon: FileText,        section: t('portal_sidebar_links.sectionManagement') },
+      { label: 'Komisie',                                  to: localePath('/admin/komisie'),           icon: ClipboardCheck,  section: t('portal_sidebar_links.sectionManagement') },
       { label: t('portal_sidebar_links.cms'),              to: localePath('/cms/management'),          icon: FileCode,        section: t('portal_sidebar_links.sectionContent') },
       { label: t('portal_sidebar_links.roles'),            to: localePath('/super-admin/role'),         icon: ShieldCheck,     section: t('portal_sidebar_links.sectionSystem') },
       { label: t('portal_sidebar_links.auditLog'),         to: localePath('/super-admin/audit-logs'),   icon: Shield,          section: t('portal_sidebar_links.sectionSystem') },
@@ -120,6 +125,9 @@ const navItems = computed(() => {
 
   if (role === 'company') {
     const orgRole = orgDashboard.myRole.value
+    const commissionItems = authStore.isCommissionMember
+      ? [{ label: t('portal_sidebar_links.evaluations'), to: localePath('/hodnotenie/zoznam'), icon: ClipboardCheck }]
+      : []
 
     if (orgRole === 'po') {
       return [
@@ -127,6 +135,7 @@ const navItems = computed(() => {
         { label: t('portal_sidebar_links.poTask'),       to: localePath('/firma/po/zadanie'),  icon: FileText },
         { label: t('portal_sidebar_links.poMilestones'), to: localePath('/firma/po/milniky'),  icon: Flag },
         { label: 'Môj profil',                           to: localePath('/firma/moj-profil'),  icon: UserCircle },
+        ...commissionItems,
       ]
     }
 
@@ -134,6 +143,7 @@ const navItems = computed(() => {
       return [
         { label: t('portal_sidebar_links.dashboard'), to: localePath('/firma'),            icon: LayoutDashboard, exact: true },
         { label: 'Môj profil',                        to: localePath('/firma/moj-profil'), icon: UserCircle },
+        ...commissionItems,
       ]
     }
 
@@ -142,6 +152,7 @@ const navItems = computed(() => {
       { label: t('portal_sidebar_links.companyProfile'),  to: localePath('/firma/profil'),   icon: Building2 },
       { label: t('portal_sidebar_links.tasks'),           to: localePath('/firma/zadania'),  icon: ClipboardList },
       { label: t('portal_sidebar_links.members'),         to: localePath('/firma/clenovia'), icon: Users },
+      ...commissionItems,
     ]
   }
 

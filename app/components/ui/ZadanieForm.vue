@@ -270,11 +270,13 @@
               v-model="m.name"
               type="text"
               placeholder="Názov míľniku *"
+              required
               class="sm:col-span-2 px-3 py-2 text-sm rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
             <input
               v-model="m.due_date"
               type="date"
+              required
               class="px-3 py-2 text-sm rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
             <input

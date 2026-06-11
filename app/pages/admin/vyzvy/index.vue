@@ -111,6 +111,26 @@
 
         <template #row-actions="{ row }">
           <div class="flex items-center gap-2">
+
+            <button
+              v-if="isProgramBMatching(row)"
+              class="text-indigo-500 hover:text-indigo-700 transition-colors"
+              title="Vybrať tím"
+              @click.stop="openProgramBModal(row)"
+            >
+              <Users class="w-4 h-4" />
+            </button>
+
+            <button
+              v-if="isClosedCall(row)"
+              class="text-gray-400 hover:text-blue-600 transition-colors"
+              title="Stiahnuť záverečný report"
+              @click.stop="downloadClosureReport(row)"
+            >
+              <FileDown class="w-4 h-4" />
+            </button>
+
+
             <button
               v-if="canEditCalls"
               class="text-gray-400 hover:text-navy transition-colors"
@@ -158,15 +178,39 @@
   :filters="exportFilters"
 />
     </ClientOnly>
+
+    <ClientOnly>
+      <AdminProgramBTeamSelectionModal
+        v-model="programBModalOpen"
+        :call="programBCall"
+        @team-selected="fetchCalls"
+      />
+    </ClientOnly>
+
+
+    <ClientOnly>
+      <AdminExportModal
+        v-if="reportCall"
+        v-model="reportModalOpen"
+        title="Záverečný report výzvy"
+        :subtitle="reportCall?.name"
+        :endpoint="`/v1/admin/calls/${reportCall?.id}/report`"
+        filename-prefix="project-report"
+        :allowed-formats="['pdf']"
+        :is-async="true"
+      />
+    </ClientOnly>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { Plus, Pencil, FileText, X } from 'lucide-vue-next'
+import { Plus, Pencil, FileText, X, Users, Download, FileDown } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
+  roles: ['nti_admin', 'nti_superadmin'],
 })
 
 const { t } = useI18n()
@@ -363,6 +407,52 @@ function resolveStatusKey(row: CallRow): string {
   }
 
   return lookup[statusName ?? ''] ?? 'draft'
+}
+
+// ── Program B helpers ──────────────────────────────────────────────────────────
+
+function isDraftCall(row: CallRow): boolean {
+  const status = row.status?.name || row.currentStatusHistory?.status?.name || row.currentStatus?.name
+  return status === 'Draft'
+}
+
+function isProgramBCall(row: CallRow): boolean {
+  return (row.program?.name ?? '').toLowerCase().includes('b')
+}
+
+function isClosedCall(row: CallRow): boolean {
+  const statusName =
+    row.status?.name ||
+    row.currentStatusHistory?.status?.name ||
+    row.currentStatus?.name
+
+  return statusName === 'Uzavreté'
+}
+
+const reportModalOpen = ref(false)
+const reportCall      = ref<CallRow | null>(null)
+
+function downloadClosureReport(row: CallRow) {
+  reportCall.value      = row
+  reportModalOpen.value = true
+}
+
+function isProgramBMatching(row: CallRow): boolean {
+  const statusName =
+    row.status?.name ||
+    row.currentStatusHistory?.status?.name ||
+    row.currentStatus?.name
+
+  return isProgramBCall(row) && statusName === 'V párovaní'
+}
+
+
+const programBModalOpen = ref(false)
+const programBCall      = ref<{ id: number; name: string } | null>(null)
+
+function openProgramBModal(row: CallRow) {
+  programBCall.value      = { id: row.id, name: row.name }
+  programBModalOpen.value = true
 }
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
