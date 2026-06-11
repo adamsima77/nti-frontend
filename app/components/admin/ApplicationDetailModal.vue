@@ -105,7 +105,9 @@
                         </span>
                       </div>
                       <div class="min-w-0 flex-1">
-                        <NuxtLink :to="member.student ? localePath(`/admin/prihlasky/student-detail/${member.student.id}`) : '#'">
+                        <NuxtLink 
+                        v-if="member.student?.id"
+                        :to = "localePath(`/admin/prihlasky/student-detail/${member.student.id}`)">
                         <p class="text-sm font-medium text-navy hover:text-blue-500 transition-colors duration-300 truncate">
                           {{ memberFullName(member) }}
                         </p>

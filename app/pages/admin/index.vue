@@ -189,7 +189,7 @@ import {
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
-  roles: ['nti_admin', 'nti_superadmin'] 
+  roles: ['nti_admin'] 
 })
 
 useHead({ title: 'Dashboard — Admin | NTI' })

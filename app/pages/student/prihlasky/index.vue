@@ -5,15 +5,15 @@
       <!-- Header -->
       <div class="mb-8 flex items-center justify-between gap-4">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900">Moje žiadosti</h1>
-          <p class="mt-1 text-sm text-gray-500">Prehľad všetkých vašich žiadostí o program</p>
+          <h1 class="text-2xl font-semibold text-gray-900">{{ t('student_dashboard.applications.title') }}</h1>
+          <p class="mt-1 text-sm text-gray-500">{{ t('student_dashboard.applications.new_description') }}</p>
         </div>
         <NuxtLink
           :to="localePath('/student/prihlasky/nova')"
           class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap shadow-sm"
         >
           <Plus class="w-4 h-4" />
-          Nová žiadosť
+          {{ t('student_dashboard.applications.new_application') }}
         </NuxtLink>
       </div>
  
@@ -27,7 +27,7 @@
             <input
               v-model="filters.search"
               type="text"
-              placeholder="Hľadať podľa ID aplikácie alebo výzvy..."
+              :placeholder="t('student_dashboard.applications.filters.search_placeholder')"
               class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
           </div>
@@ -39,7 +39,7 @@
               v-model="filters.program_type_id"
               class="w-full appearance-none pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
-              <option value="">Všetky programy</option>
+              <option value="">{{ t('student_dashboard.applications.filters.all_programs') }}</option>
               <option
                 v-for="pt in programTypes"
                 :key="pt.id"
@@ -58,7 +58,7 @@
               v-model="filters.status_id"
               class="w-full appearance-none pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
-              <option value="">Všetky stavy</option>
+              <option value="">{{ t('student_dashboard.applications.filters.all_statuses') }}</option>
               <option
                 v-for="s in statuses"
                 :key="s.id"
@@ -77,7 +77,7 @@
             @click="clearFilters"
           >
             <X class="w-4 h-4" />
-            Zrušiť filtre
+            {{ t('student_dashboard.common.clear_filters') }}
           </button>
         </div>
       </div>
@@ -92,7 +92,7 @@
         >
           <div class="flex flex-col items-center gap-3">
             <Loader2 class="w-7 h-7 text-blue-500 animate-spin" />
-            <span class="text-sm text-gray-400">Načítavam žiadosti…</span>
+            <span class="text-sm text-gray-400">{{ t('student_dashboard.applications.loading') }}</span>
           </div>
         </div>
  
@@ -104,9 +104,9 @@
           <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
             <FileX class="w-6 h-6 text-gray-400" />
           </div>
-          <p class="text-sm font-medium text-gray-700">Žiadne žiadosti nenájdené</p>
+          <p class="text-sm font-medium text-gray-700">{{ t('student_dashboard.applications.empty_title') }}</p>
           <p class="text-xs text-gray-400 mt-1">
-            {{ hasActiveFilters ? 'Skúste upraviť filtre' : 'Zatiaľ ste nepodali žiadnu žiadosť' }}
+            {{ hasActiveFilters ? t('student_dashboard.applications.empty_description') : t('student_dashboard.applications.no_applications_yet') }}
           </p>
         </div>
  
@@ -116,11 +116,11 @@
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-gray-100 bg-gray-50/60">
-                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Application ID</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Výzva</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Tím</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Stav</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">Vytvorené</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">{{ t('student_dashboard.applications.column_application_id') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">{{ t('student_dashboard.applications.column_call') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">{{ t('student_dashboard.applications.column_team') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">{{ t('student_dashboard.applications.column_status') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500 text-xs uppercase tracking-wide">{{ t('student_dashboard.applications.column_created') }}</th>
                   <th class="px-5 py-3" />
                 </tr>
               </thead>
@@ -151,7 +151,7 @@
   :to="localePath(`/student/prihlasky/${app.id}`)"
   class="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-opacity"
 >
-  Detail
+  {{ t('student_dashboard.common.view_detail') }}
   <ArrowRight class="w-3 h-3" />
 </NuxtLink>
                   </td>
@@ -163,7 +163,7 @@
           <!-- Footer: count + pagination -->
           <div class="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50/40">
             <p class="text-xs text-gray-400">
-              {{ paginationMeta.from }}–{{ paginationMeta.to }} z {{ paginationMeta.total }} žiadostí
+              {{ t('student_dashboard.applications.pagination_meta', { from: paginationMeta.from, to: paginationMeta.to, total: paginationMeta.total }) }}
             </p>
             <UiPagination
               :current-page="currentPage"
@@ -194,6 +194,7 @@ import {
 import { useApi } from '~/composables/useApi'
 
 const localePath = useLocalePath()
+const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',

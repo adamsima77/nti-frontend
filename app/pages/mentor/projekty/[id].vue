@@ -106,7 +106,7 @@
                   </div>
 
                   <!-- Action buttons -->
-                  <div class="flex items-center gap-1.5 shrink-0">
+                  <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
 
                     <!-- PENDING: unlock button -->
                     <template v-if="milestone.status === 'pending'">
@@ -122,7 +122,7 @@
                       </span>
                     </template>
 
-                    <!-- PENDING_APPROVAL: approve / reject / return -->
+                    <!-- PENDING_APPROVAL: approve / reject / return + deadline edit -->
                     <template v-if="milestone.status === 'pending_approval'">
                       <button
                         @click="handleMilestoneAction(milestone.id, 'approve')"
@@ -145,26 +145,51 @@
                       >
                         <X class="w-3.5 h-3.5" /> {{ t('mentor.detail.reject') }}
                       </button>
+                      <!-- Deadline edit button -->
+                      <button
+                        @click="toggleDeadlinePanel(milestone.id)"
+                        :disabled="milestoneLoading === milestone.id"
+                        class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-50 text-gray-500 hover:bg-gray-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
+                        :title="t('mentor.detail.editDeadline')"
+                      >
+                        <CalendarDays class="w-3.5 h-3.5" />
+                      </button>
                     </template>
 
-                    <!-- IN_PROGRESS: waiting indicator -->
+                    <!-- IN_PROGRESS: waiting indicator + deadline edit -->
                     <template v-if="milestone.status === 'in_progress'">
                       <span class="text-xs text-blue-500 italic flex items-center gap-1">
                         <Clock class="w-3 h-3" /> {{ t('mentor.detail.waitingForStudent') }}
                       </span>
+                      <button
+                        @click="toggleDeadlinePanel(milestone.id)"
+                        :disabled="milestoneLoading === milestone.id"
+                        class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-50 text-gray-500 hover:bg-gray-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
+                        :title="t('mentor.detail.editDeadline')"
+                      >
+                        <CalendarDays class="w-3.5 h-3.5" />
+                      </button>
                     </template>
 
-                    <!-- RETURNED: waiting for resubmit -->
+                    <!-- RETURNED: waiting for resubmit + deadline edit -->
                     <template v-if="milestone.status === 'returned'">
                       <span class="text-xs text-orange-500 italic flex items-center gap-1">
                         <Clock class="w-3 h-3" /> {{ t('mentor.detail.waitingForResubmit') }}
                       </span>
+                      <button
+                        @click="toggleDeadlinePanel(milestone.id)"
+                        :disabled="milestoneLoading === milestone.id"
+                        class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-50 text-gray-500 hover:bg-gray-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
+                        :title="t('mentor.detail.editDeadline')"
+                      >
+                        <CalendarDays class="w-3.5 h-3.5" />
+                      </button>
                     </template>
 
                   </div>
                 </div>
 
-                <!-- Comments thread (rejection / return feedback) -->
+                <!-- Comments thread -->
                 <div
                   v-if="milestone.comments.length"
                   class="ml-8 space-y-2 mt-3"
@@ -188,17 +213,33 @@
                 </div>
               </div>
 
-              <!-- ── Unlock panel (inline expand) ── -->
+              <!-- ── Unlock panel (pending → in_progress) ── -->
               <div
                 v-if="unlockPanelId === milestone.id"
                 class="border-t border-blue-100 bg-blue-50/60 px-4 py-3"
               >
-                <p class="text-xs font-medium text-blue-700 mb-2 flex items-center gap-1.5">
+                <p class="text-xs font-medium text-blue-700 mb-3 flex items-center gap-1.5">
                   <Unlock class="w-3.5 h-3.5" /> {{ t('mentor.detail.setDeadlineToUnlock') }}
                 </p>
-                <div class="flex items-end gap-2">
-                  <div class="flex-1">
-                    <label class="block text-xs text-gray-600 mb-1">{{ t('mentor.detail.deadline') }}</label>
+                <div class="grid grid-cols-2 gap-3 mb-2">
+                  <!-- start_date: only in pending state -->
+                  <div>
+                    <label class="block text-xs text-gray-600 mb-1">
+                      {{ t('mentor.detail.startDate') }}
+                      <span class="text-gray-400 font-normal ml-1">({{ t('mentor.detail.optional') }})</span>
+                    </label>
+                    <input
+                      v-model="unlockStartDate[milestone.id]"
+                      type="date"
+                      class="w-full px-3 py-2 rounded border border-blue-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+                    />
+                  </div>
+                  <!-- deadline: required to unlock -->
+                  <div>
+                    <label class="block text-xs text-gray-600 mb-1">
+                      {{ t('mentor.detail.deadline') }}
+                      <span class="text-red-400 ml-0.5">*</span>
+                    </label>
                     <input
                       v-model="unlockDeadline[milestone.id]"
                       type="date"
@@ -206,6 +247,8 @@
                       class="w-full px-3 py-2 rounded border border-blue-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
                     />
                   </div>
+                </div>
+                <div class="flex items-center gap-2 mt-2">
                   <button
                     @click="confirmUnlock(milestone.id)"
                     :disabled="milestoneLoading === milestone.id || !unlockDeadline[milestone.id]"
@@ -227,7 +270,46 @@
                 </div>
               </div>
 
-              <!-- ── Return / Reject panel (inline expand) ── -->
+              <!-- ── Deadline-only edit panel (in_progress / pending_approval / returned) ── -->
+              <div
+                v-if="deadlinePanelId === milestone.id"
+                class="border-t border-gray-200 bg-gray-50/60 px-4 py-3"
+              >
+                <p class="text-xs font-medium text-gray-700 mb-3 flex items-center gap-1.5">
+                  <CalendarDays class="w-3.5 h-3.5" /> {{ t('mentor.detail.editDeadline') }}
+                </p>
+                <div class="flex items-end gap-3">
+                  <div class="flex-1">
+                    <label class="block text-xs text-gray-600 mb-1">{{ t('mentor.detail.deadline') }}</label>
+                    <input
+                      v-model="editDeadline[milestone.id]"
+                      type="date"
+                      :min="todayIso"
+                      class="w-full px-3 py-2 rounded border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+                    />
+                  </div>
+                  <button
+                    @click="confirmDeadlineEdit(milestone.id)"
+                    :disabled="milestoneLoading === milestone.id || !editDeadline[milestone.id]"
+                    class="px-3 py-2 bg-purple-600 text-white rounded text-xs font-medium hover:bg-purple-700 transition-colors disabled:opacity-40 flex items-center gap-1"
+                  >
+                    <svg v-if="milestoneLoading === milestone.id" class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    <CalendarDays v-else class="w-3 h-3" />
+                    {{ t('mentor.detail.saveDeadline') }}
+                  </button>
+                  <button
+                    @click="deadlinePanelId = null"
+                    class="px-3 py-2 border border-gray-200 text-gray-500 rounded text-xs hover:bg-gray-50"
+                  >
+                    {{ t('mentor.detail.cancel') }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- ── Return / Reject panel ── -->
               <div
                 v-if="returnPanelId === milestone.id"
                 class="border-t px-4 py-3"
@@ -306,7 +388,6 @@
                         {{ consultationTypeLabel(c.type) }}
                       </span>
                     </div>
-                    <!-- Meeting URL for online consultations -->
                     <a
                       v-if="c.type === 'online' && c.meetingUrl"
                       :href="c.meetingUrl"
@@ -419,7 +500,6 @@
             {{ t('mentor.detail.milestonesOf', { completed: completedMilestones, total: project.milestones.length }) }}
           </p>
 
-          <!-- Milestone status breakdown -->
           <div class="mt-3 space-y-1">
             <div
               v-for="(def, slug) in MILESTONE_STATUS_DEFS"
@@ -533,7 +613,6 @@
             v-model="consultationForm.type"
           />
 
-          <!-- Meeting URL — shown only for online consultations -->
           <div v-if="consultationForm.type === 'online'">
             <label class="block text-sm font-medium text-gray-700 mb-1.5">
               {{ t('mentor.detail.meetingUrl') }}
@@ -603,7 +682,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import {
   ChevronLeft, Flag, MessageSquare, CheckCircle, Clock, X,
   Pencil, Trash2, ArrowRight, AlertCircle, Lock, Unlock,
-  PlayCircle, XCircle, RotateCcw, ExternalLink, Video,
+  PlayCircle, XCircle, RotateCcw, ExternalLink, Video, CalendarDays,
 } from 'lucide-vue-next'
 import type { Consultation, MentorProject, Milestone, MilestoneComment } from '../../../types/mentor'
 import { useMentorDashboard } from '../../../composables/useMentorDashboard'
@@ -746,39 +825,51 @@ const canManageConsultations = computed(
 
 const milestoneLoading = ref<number | null>(null)
 
-/** Unlock panel */
+// ── Unlock panel (pending state) ─────────────────────────────
 const unlockPanelId  = ref<number | null>(null)
-const unlockDeadline = reactive<Record<number, string>>({})
+const unlockStartDate = reactive<Record<number, string>>({})   // optional, pending-only
+const unlockDeadline  = reactive<Record<number, string>>({})   // required to unlock
 
-/** Return / Reject panel */
+// ── Deadline-only edit panel (in_progress / pending_approval / returned) ──
+const deadlinePanelId = ref<number | null>(null)
+const editDeadline    = reactive<Record<number, string>>({})
+
+// ── Return / Reject panel ────────────────────────────────────
 const returnPanelId     = ref<number | null>(null)
 const returnPanelAction = ref<'return' | 'reject'>('return')
 const returnComment     = reactive<Record<number, string>>({})
 
+// Helpers to close all panels before opening another
+const closeAllPanels = () => {
+  unlockPanelId.value  = null
+  deadlinePanelId.value = null
+  returnPanelId.value  = null
+}
+
 const toggleUnlockPanel = (milestoneId: number) => {
-  unlockPanelId.value = unlockPanelId.value === milestoneId ? null : milestoneId
-  returnPanelId.value = null
+  if (unlockPanelId.value === milestoneId) { closeAllPanels(); return }
+  closeAllPanels()
+  unlockPanelId.value = milestoneId
+}
+
+const toggleDeadlinePanel = (milestoneId: number) => {
+  if (deadlinePanelId.value === milestoneId) { closeAllPanels(); return }
+  closeAllPanels()
+  deadlinePanelId.value = milestoneId
 }
 
 const toggleReturnPanel = (milestoneId: number, action: 'return' | 'reject') => {
   if (returnPanelId.value === milestoneId && returnPanelAction.value === action) {
-    returnPanelId.value = null
-    return
+    closeAllPanels(); return
   }
+  closeAllPanels()
   returnPanelId.value     = milestoneId
   returnPanelAction.value = action
-  unlockPanelId.value     = null
 }
 
-/**
- * A milestone can be unlocked only when all preceding milestones are completed.
- * Milestones are ordered as they appear in the array (backend sorts by deadline/id).
- */
 const canUnlockMilestone = (index: number): boolean => {
   if (index === 0) return true
-  return project.milestones
-    .slice(0, index)
-    .every((m) => m.status === 'completed')
+  return project.milestones.slice(0, index).every((m) => m.status === 'completed' || m.status === "rejected")
 }
 
 const milestoneCardClass = (status: MilestoneStatus): string =>
@@ -801,9 +892,11 @@ const formatDate = (iso: string | null | undefined): string => {
 // Milestone actions
 // ──────────────────────────────────────────────────────────────
 
-/** Unlock: pending → in_progress (mentor sets deadline) */
+/** Unlock: pending → in_progress (sets start_date optionally + deadline required) */
 const confirmUnlock = async (milestoneId: number) => {
-  const deadline = unlockDeadline[milestoneId]
+  const deadline  = unlockDeadline[milestoneId]
+  const startDate = unlockStartDate[milestoneId]
+
   if (!deadline) {
     addToast({ message: t('mentor.detail.errors.deadlineRequired'), type: 'error' })
     return
@@ -812,10 +905,11 @@ const confirmUnlock = async (milestoneId: number) => {
   milestoneLoading.value = milestoneId
   try {
     await api.patch(`/mentor/projects/${project.id}/milestones/${milestoneId}`, {
-      status:   'in_progress',
+      status:     'in_progress',
       deadline,
+      ...(startDate ? { start_date: startDate } : {}),
     })
-    unlockPanelId.value = null
+    closeAllPanels()
     await Promise.all([fetchProjects(), fetchDashboard()])
     await loadProject()
     addToast({ message: t('mentor.detail.milestoneUnlocked'), type: 'success' })
@@ -826,8 +920,33 @@ const confirmUnlock = async (milestoneId: number) => {
   }
 }
 
+/** Deadline-only edit for non-terminal milestones via dedicated endpoint */
+const confirmDeadlineEdit = async (milestoneId: number) => {
+  const deadline = editDeadline[milestoneId]
+  if (!deadline) {
+    addToast({ message: t('mentor.detail.errors.deadlineRequired'), type: 'error' })
+    return
+  }
+
+  milestoneLoading.value = milestoneId
+  try {
+    await api.patch(
+      `/mentor/projects/${project.id}/milestones/${milestoneId}/dates`,
+      { deadline },
+    )
+    closeAllPanels()
+    delete editDeadline[milestoneId]
+    await loadProject()
+    addToast({ message: t('mentor.detail.deadlineUpdated'), type: 'success' })
+  } catch {
+    addToast({ message: t('mentor.detail.errors.actionFailed'), type: 'error' })
+  } finally {
+    milestoneLoading.value = null
+  }
+}
+
 /** Approve: pending_approval → completed */
-const handleMilestoneAction = async (milestoneId: number, action: 'approve') => {
+const handleMilestoneAction = async (milestoneId: number, _action: 'approve') => {
   milestoneLoading.value = milestoneId
   try {
     await api.patch(`/mentor/projects/${project.id}/milestones/${milestoneId}`, {
@@ -843,7 +962,7 @@ const handleMilestoneAction = async (milestoneId: number, action: 'approve') => 
   }
 }
 
-/** Return (→ in_progress for rework) or Reject (→ rejected) with required comment */
+/** Return or Reject with required comment */
 const confirmReturnOrReject = async (milestoneId: number) => {
   const comment = (returnComment[milestoneId] ?? '').trim()
   if (comment.length < 20) {
@@ -860,7 +979,7 @@ const confirmReturnOrReject = async (milestoneId: number) => {
       comment,
     })
     returnComment[milestoneId] = ''
-    returnPanelId.value        = null
+    closeAllPanels()
     await Promise.all([fetchProjects(), fetchDashboard()])
     await loadProject()
     addToast({
@@ -882,8 +1001,6 @@ const confirmReturnOrReject = async (milestoneId: number) => {
 
 const consultationTypeLabel = (type: string) => CONSULTATION_TYPE_LABELS[type] ?? type
 
-// ── Delete ─────────────────────────────────────────────────────
-
 const confirmDeleteId        = ref<number | null>(null)
 const deletingConsultationId = ref<number | null>(null)
 
@@ -900,8 +1017,6 @@ const deleteConsultation = async (consultationId: number) => {
     deletingConsultationId.value = null
   }
 }
-
-// ── Edit modal ─────────────────────────────────────────────────
 
 const showConsultationModal = ref(false)
 const isSavingConsultation  = ref(false)
@@ -970,7 +1085,6 @@ const validateConsultation = (): boolean => {
   consultationErrors.date    = consultationForm.date           ? null : 'Dátum je povinný'
   consultationErrors.summary = consultationForm.summary.trim() ? null : 'Záznam je povinný'
 
-  // meeting_url: required for online, basic URL format check
   if (consultationForm.type === 'online') {
     const url = consultationForm.meeting_url.trim()
     if (url && !/^https?:\/\/.+/.test(url)) {

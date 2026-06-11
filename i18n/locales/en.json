@@ -903,6 +903,7 @@
       "sending": "Sending...",
       "saving": "Saving...",
       "save_changes": "Save changes",
+      "clear_filters": "Clear filters",
       "note": "Note",
       "email": "Email",
       "not_available": "—",
@@ -1052,6 +1053,14 @@
         "all_programs": "All programs",
         "all_categories": "All categories"
       },
+      "loading": "Loading applications...",
+      "no_applications_yet": "You have not submitted any applications yet",
+      "column_application_id": "Application ID",
+      "column_call": "Call",
+      "column_team": "Team",
+      "column_status": "Status",
+      "column_created": "Created",
+      "pagination_meta": "Showing {from}–{to} of {total} applications",
       "status": {
         "draft": "Draft",
         "submitted": "Submitted",
@@ -2305,6 +2314,52 @@
     "errors": {
       "criterionIdFetchFailed": "Failed to fetch ID for new criterion \"{fallback}\"."
     }
+  },
+
+  "privacy_policy": {
+    "title": "Privacy Policy",
+    "subtitle": "Information about how we process your personal data",
+    "last_updated": "Last updated",
+    "last_updated_date": "June 11, 2026",
+    "introduction": {
+      "title": "Introduction",
+      "content": "NTI (Nitriansky Technical Incubator) values the protection of your personal data. This page explains how we collect, use, and protect your information."
+    },
+    "collection": {
+      "title": "What data do we collect?",
+      "intro": "We collect data necessary for the operation of our program:",
+      "personal_info": "Personal information (name, age, contact information)",
+      "contact_info": "Contact information (email, phone)",
+      "usage_data": "Data about your use of our website",
+      "device_info": "Information about your device and browser"
+    },
+    "usage": {
+      "title": "How do we use your data?",
+      "intro": "We use your data for the following purposes:",
+      "provide_service": "Providing our programs and services",
+      "improve_service": "Improving our services",
+      "communication": "Communication with you regarding the program",
+      "support": "Technical support and issue resolution"
+    },
+    "protection": {
+      "title": "Protection of your data",
+      "content": "Your data is protected by modern encryption and security protocols. Only authorized NTI employees who are bound by confidentiality obligations can access them."
+    },
+    "rights": {
+      "title": "Your rights",
+      "intro": "You have the following rights:",
+      "access": "Right to access your data",
+      "correction": "Right to correct inaccurate data",
+      "deletion": "Right to delete your data",
+      "objection": "Right to object to the processing of your data"
+    },
+    "contact": {
+      "title": "Contact us",
+      "content": "If you have questions about how we process your data or wish to exercise your rights, please contact us through",
+      "link_text": "contact form"
+    },
+    "footer": "© 2026 Nitriansky Technical Incubator. All rights reserved.",
+    "back_home": "Back to homepage"
   },
 
   "superadmin_permissions": {

@@ -317,6 +317,51 @@
       }
     }
   },
+  "privacy_policy": {
+    "title": "Zásady ochrany osobných údajov",
+    "subtitle": "Informácie o tom, ako spracúvame vaše osobné údaje",
+    "last_updated": "Posledná aktualizácia",
+    "last_updated_date": "11. júna 2026",
+    "introduction": {
+      "title": "Úvod",
+      "content": "NTI (Nitriansky Technický Inkubátor) kladie dôraz na ochranu vašich osobných údajov. Táto stránka vysvetľuje, ako zhromažďujeme, používame a chránime vaše informácie."
+    },
+    "collection": {
+      "title": "Aké údaje zhromažďujeme?",
+      "intro": "Zhromažďujeme údaje potrebné na prevádzku nášho programu:",
+      "personal_info": "Osobné údaje (meno, vek, kontaktné údaje)",
+      "contact_info": "Kontaktné údaje (email, telefón)",
+      "usage_data": "Údaje o používaní našej webovej stránky",
+      "device_info": "Informácie o vašom zariadení a prehliadači"
+    },
+    "usage": {
+      "title": "Ako používame vaše údaje?",
+      "intro": "Vaše údaje používame na nasledujúce účely:",
+      "provide_service": "Poskytovanie našich programov a služieb",
+      "improve_service": "Zlepšovanie našich služieb",
+      "communication": "Komunikácia s vami v súvislosti s programom",
+      "support": "Technická podpora a vyriešenie problémov"
+    },
+    "protection": {
+      "title": "Ochrana vašich údajov",
+      "content": "Vaše údaje sú chránené moderným šifrovaním a bezpečnostnými protokolmi. Prístup k nim majú len oprávnení zamestnanci NTI viazaní mlčanlivosťou."
+    },
+    "rights": {
+      "title": "Vaše práva",
+      "intro": "Máte nasledujúce práva:",
+      "access": "Právo na prístup k vašim údajom",
+      "correction": "Právo na opravu nepresných údajov",
+      "deletion": "Právo na vymazanie údajov",
+      "objection": "Právo namietať proti spracúvaniu údajov"
+    },
+    "contact": {
+      "title": "Kontaktujte nás",
+      "content": "Ak máte otázky o tom, ako spracúvame vaše údaje, alebo si chcete uplatniť svoje práva, kontaktujte nás prostredníctvom",
+      "link_text": "kontaktného formulára"
+    },
+    "footer": "© 2026 Nitriansky Technický Inkubátor. Všetky práva vyhradené.",
+    "back_home": "Späť na úvodnú stránku"
+  },
   "about_nti": {
     "title": "O NTI",
     "description": "Nitriansky Technický Inkubátor je spoľahlivá inštitúcia podporujúca inovácie a technologický rozvoj. Budujeme ekosystém spolupráce medzi fakultami, firmami a startupmi.",
@@ -631,6 +676,7 @@
       "sending": "Posielam...",
       "saving": "Ukladám...",
       "save_changes": "Uložiť zmeny",
+      "clear_filters": "Zrušiť filtre",
       "note": "Poznámka",
       "email": "Email",
       "not_available": "—",
@@ -780,6 +826,14 @@
         "all_programs": "Všetky programy",
         "all_categories": "Všetky kategórie"
       },
+      "loading": "Načítavam žiadosti…",
+      "no_applications_yet": "Zatiaľ ste nepodali žiadnu žiadosť",
+      "column_application_id": "ID žiadosti",
+      "column_call": "Výzva",
+      "column_team": "Tím",
+      "column_status": "Stav",
+      "column_created": "Vytvorené",
+      "pagination_meta": "Zobrazené {from}–{to} z {total} žiadostí",
       "status": {
         "draft": "Rozpracovaná",
         "submitted": "Podané",
