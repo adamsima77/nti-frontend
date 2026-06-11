@@ -131,6 +131,16 @@
             </button>
 
             <button
+              v-if="isClosedCall(row)"
+              class="text-gray-400 hover:text-blue-600 transition-colors"
+              title="Stiahnuť záverečný report"
+              @click.stop="downloadClosureReport(row)"
+            >
+              <FileDown class="w-4 h-4" />
+            </button>
+
+
+            <button
               v-if="canEditCalls"
               class="text-gray-400 hover:text-navy transition-colors"
               :title="$t('admin_calls.edit')"
@@ -193,11 +203,25 @@
         @saved="fetchCalls"
       />
     </ClientOnly>
+
+    <ClientOnly>
+      <AdminExportModal
+        v-if="reportCall"
+        v-model="reportModalOpen"
+        title="Záverečný report výzvy"
+        :subtitle="reportCall?.name"
+        :endpoint="`/v1/admin/calls/${reportCall?.id}/report`"
+        filename-prefix="project-report"
+        :allowed-formats="['pdf']"
+        :is-async="true"
+      />
+    </ClientOnly>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { Plus, Pencil, FileText, X, Users, Settings, Download } from 'lucide-vue-next'
+import { Plus, Pencil, FileText, X, Users, Settings, Download, FileDown } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
@@ -411,6 +435,23 @@ function isProgramBCall(row: CallRow): boolean {
   return (row.program?.name ?? '').toLowerCase().includes('b')
 }
 
+function isClosedCall(row: CallRow): boolean {
+  const statusName =
+    row.status?.name ||
+    row.currentStatusHistory?.status?.name ||
+    row.currentStatus?.name
+
+  return statusName === 'Uzavreté'
+}
+
+const reportModalOpen = ref(false)
+const reportCall      = ref<CallRow | null>(null)
+
+function downloadClosureReport(row: CallRow) {
+  reportCall.value      = row
+  reportModalOpen.value = true
+}
+
 function isProgramBMatching(row: CallRow): boolean {
   const statusName =
     row.status?.name ||
@@ -419,6 +460,7 @@ function isProgramBMatching(row: CallRow): boolean {
 
   return isProgramBCall(row) && statusName === 'V párovaní'
 }
+
 
 const programBModalOpen = ref(false)
 const programBCall      = ref<{ id: number; name: string } | null>(null)
