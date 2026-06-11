@@ -123,27 +123,29 @@
       <div class="absolute inset-0 bg-black/40" @click="formOpen = false" />
       <div class="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
         <h3 class="text-lg font-semibold text-navy">{{ form.id ? 'Upraviť míľnik' : 'Nový míľnik' }}</h3>
-        <div class="space-y-1">
-          <label class="text-xs font-medium text-gray-500">Názov *</label>
-          <input v-model="form.name" type="text" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
-        </div>
-        <div class="space-y-1">
-          <label class="text-xs font-medium text-gray-500">Popis *</label>
-          <textarea v-model="form.description" rows="3" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
-        </div>
-        <div class="space-y-1">
-          <label class="text-xs font-medium text-gray-500">Termín *</label>
-          <input v-model="form.due_date" type="date" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
-        </div>
-        <p v-if="formError" class="text-xs text-red-500">{{ formError }}</p>
-        <div class="flex justify-end gap-2 pt-2">
-          <button class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition" @click="formOpen = false">Zrušiť</button>
-          <button :disabled="formSaving"
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-40 transition"
-            @click="saveMilestone">
-            {{ formSaving ? 'Ukladám...' : 'Uložiť' }}
-          </button>
-        </div>
+        <form @submit.prevent="saveMilestone" class="space-y-4">
+          <div class="space-y-1">
+            <label class="text-xs font-medium text-gray-500">Názov <span class="text-red-500">*</span></label>
+            <input v-model="form.name" type="text" required
+              class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+          </div>
+          <div class="space-y-1">
+            <label class="text-xs font-medium text-gray-500">Popis</label>
+            <textarea v-model="form.description" rows="3" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
+          </div>
+          <div class="space-y-1">
+            <label class="text-xs font-medium text-gray-500">Termín <span class="text-red-500">*</span></label>
+            <input v-model="form.due_date" type="date" required
+              class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition" @click="formOpen = false">Zrušiť</button>
+            <button type="submit" :disabled="formSaving"
+              class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-40 transition">
+              {{ formSaving ? 'Ukladám...' : 'Uložiť' }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
