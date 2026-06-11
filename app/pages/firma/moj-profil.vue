@@ -1,68 +1,79 @@
 <template>
-  <div class="max-w-lg mx-auto px-6 py-10">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-navy mb-1">Môj profil</h1>
-      <p class="text-gray-500 text-sm">Upravte svoje osobné údaje</p>
+  <div class="max-w-4xl mx-auto px-6 py-10">
+    <h1 class="text-2xl font-bold text-navy mb-8">{{ t('profile.title') }}</h1>
+
+    <div v-if="pageLoading" class="space-y-4">
+      <div class="h-32 bg-white rounded-lg border border-gray-100 animate-pulse" />
+      <div class="h-48 bg-white rounded-lg border border-gray-100 animate-pulse" />
     </div>
 
-    <div v-if="isLoading" class="space-y-4">
-      <div class="h-12 bg-gray-100 rounded-lg animate-pulse" />
-      <div class="h-12 bg-gray-100 rounded-lg animate-pulse" />
-    </div>
-
-    <form v-else @submit.prevent="handleSave" class="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
-      <h2 class="text-base font-semibold text-navy">Osobné údaje</h2>
-
-      <div class="grid grid-cols-2 gap-4">
-        <UiInput
-          v-model="form.name"
-          label="Meno"
-          placeholder="Ján"
-          required
-          :error="errors.name"
-        />
-        <UiInput
-          v-model="form.surname"
-          label="Priezvisko"
-          placeholder="Novák"
-          required
-          :error="errors.surname"
-        />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">E-mail</label>
-        <input
-          :value="authStore.user?.email"
-          disabled
-          type="email"
-          class="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-400 text-sm cursor-not-allowed"
-        />
-        <p class="text-xs text-gray-400 mt-1">E-mail nie je možné zmeniť</p>
-      </div>
-
-      <div v-if="saveSuccess" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
-        Profil bol úspešne uložený.
-      </div>
-      <div v-if="saveError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-        {{ saveError }}
-      </div>
-
-      <div class="flex flex-col sm:flex-row justify-between gap-3 pt-2">
-        <UiButton type="button" variant="danger" :disabled="isDeletingAccount" @click="deleteAccount">
-          {{ isDeletingAccount ? 'Mažem účet...' : 'Vymazať účet' }}
-        </UiButton>
-        <div class="flex gap-3">
-          <UiButton type="button" variant="secondary" @click="resetForm">Zrušiť</UiButton>
-          <UiButton type="submit" :loading="isSaving">Uložiť zmeny</UiButton>
+    <template v-else>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
+        <div class="flex items-center gap-6">
+          <div class="flex flex-col items-center gap-2 flex-shrink-0">
+            <div class="relative w-16 h-16 rounded-full overflow-hidden border border-gray-100 bg-gray-50">
+              <img v-if="avatarDisplayUrl" :src="avatarDisplayUrl" alt="" class="w-full h-full object-cover" />
+              <div v-else class="w-full h-full bg-navy text-white text-xl font-bold flex items-center justify-center">
+                {{ userInitials }}
+              </div>
+            </div>
+            <input ref="avatarInputRef" type="file" class="sr-only" accept="image/jpeg,image/jpg,image/png" @change="onAvatarFile" />
+            <UiButton type="button" variant="ghost" size="sm" :disabled="avatarUploading" @click="avatarInputRef?.click()">
+              {{ avatarUploading ? t('profile.avatar.uploading') : (avatarDisplayUrl ? t('profile.avatar.change') : t('profile.avatar.upload')) }}
+            </UiButton>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h2 class="font-semibold text-navy text-lg">{{ form.firstName }} {{ form.lastName }}</h2>
+            <p class="text-sm text-gray-500">{{ form.email }}</p>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-600 flex-shrink-0">
+            {{ roleNames || t('profile.access.role') }}
+          </span>
         </div>
       </div>
-    </form>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
+        <h2 class="text-lg font-bold text-navy mb-5">{{ t('profile.personalData.title') }}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+          <UiInput v-model="form.firstName" :label="t('profile.personalData.firstName')" required />
+          <UiInput v-model="form.lastName" :label="t('profile.personalData.lastName')" required />
+          <UiInput v-model="form.email" :label="t('profile.personalData.email')" type="email" disabled />
+        </div>
+        <div class="mt-6">
+          <UiButton :disabled="saving" @click="saveProfile">
+            {{ saving ? t('profile.personalData.saving') : t('profile.personalData.save') }}
+          </UiButton>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+        <h2 class="text-lg font-bold text-navy mb-4">{{ t('profile.access.title') }}</h2>
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <dt class="text-gray-500">{{ t('profile.access.role') }}</dt>
+            <dd class="font-medium text-navy">{{ roleNames || '-' }}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">{{ t('profile.access.email') }}</dt>
+            <dd class="font-medium text-navy">{{ form.email }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-red-100 p-6 mt-6">
+        <h2 class="text-lg font-bold text-red-700 mb-2">Vymazať účet</h2>
+        <p class="text-sm text-gray-600 mb-4">Táto akcia anonymizuje váš účet a nie je možné ju vrátiť späť.</p>
+        <UiButton variant="danger" :disabled="deletingAccount" @click="deleteAccount">
+          {{ deletingAccount ? 'Mažem účet...' : 'Vymazať účet' }}
+        </UiButton>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, computed, reactive, watch, onMounted } from 'vue'
+import { useOrgDashboard } from '~/composables/useOrgDashboard'
 
 definePageMeta({
   layout: 'portal',
@@ -70,81 +81,140 @@ definePageMeta({
   roles: ['partner'],
 })
 
-useHead({ title: 'Môj profil | NTI Firma' })
+useHead({ title: 'Môj profil | NTI' })
 
-const authStore = useAuthStore()
 const api = useApi()
+const config = useRuntimeConfig()
+const authStore = useAuthStore()
 const { addToast } = useToast()
+const { t } = useI18n()
+const localePath = useLocalePath()
+const orgDashboard = useOrgDashboard()
 
-const isLoading = ref(true)
-const isSaving = ref(false)
-const isDeletingAccount = ref(false)
-const saveSuccess = ref(false)
-const saveError = ref<string | null>(null)
-
-const form = reactive({ name: '', surname: '' })
-const errors = reactive({ name: undefined as string | undefined, surname: undefined as string | undefined })
-
-function loadForm() {
-  form.name = authStore.user?.name ?? ''
-  form.surname = authStore.user?.surname ?? ''
+await orgDashboard.load()
+if (orgDashboard.myRole.value === 'organization_admin') {
+  await navigateTo(localePath('/firma/profil'))
 }
 
-function resetForm() {
-  loadForm()
-  saveSuccess.value = false
-  saveError.value = null
+const pageLoading = ref(true)
+const saving = ref(false)
+const avatarUploading = ref(false)
+const deletingAccount = ref(false)
+const avatarInputRef = ref<HTMLInputElement | null>(null)
+
+const form = reactive({ firstName: '', lastName: '', email: '' })
+
+const roleNames = computed(() => {
+  const roles = authStore.user?.roles
+  if (!roles?.length) return ''
+  return roles.map((r: any) => r.name).join(', ')
+})
+
+const userInitials = computed(() => {
+  const a = form.firstName?.trim()?.[0] ?? ''
+  const b = form.lastName?.trim()?.[0] ?? ''
+  return `${a}${b}`.toUpperCase() || '?'
+})
+
+function resolveMediaUrl(url: string | null | undefined): string | null {
+  if (!url) return null
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  const apiBase = String(config.public.apiBase ?? '').replace(/\/?api\/?$/i, '')
+  return `${apiBase}${url.startsWith('/') ? url : `/${url}`}`
 }
 
-function validate() {
-  errors.name = form.name.trim() ? undefined : 'Meno je povinné'
-  errors.surname = form.surname.trim() ? undefined : 'Priezvisko je povinné'
-  return !errors.name && !errors.surname
+const avatarDisplayUrl = computed(() => {
+  const u = authStore.user
+  if (!u) return null
+  let pathOrUrl = u.avatar_url
+  if (!pathOrUrl && u.avatar) {
+    const av = u.avatar.replace(/^\/+/, '')
+    pathOrUrl = av.startsWith('storage/') ? `/${av}` : `/storage/${av}`
+  }
+  return resolveMediaUrl(pathOrUrl)
+})
+
+function syncForm() {
+  const u = authStore.user
+  if (!u) return
+  form.firstName = u.name ?? ''
+  form.lastName = u.surname ?? ''
+  form.email = u.email ?? ''
 }
 
-async function handleSave() {
-  if (!validate()) return
-  isSaving.value = true
-  saveSuccess.value = false
-  saveError.value = null
+watch(() => authStore.user, () => syncForm(), { deep: true })
+
+onMounted(async () => {
+  pageLoading.value = true
   try {
-    await api.put('/profile', {
-      name: form.name.trim(),
-      surname: form.surname.trim(),
-      email: authStore.user?.email,
-      roles: authStore.user?.roles?.map((r: any) => r.id) ?? [],
-    })
     await authStore.getCurrentUser()
-    saveSuccess.value = true
-    addToast({ message: 'Profil bol uložený.', type: 'success' })
-  } catch (err: any) {
-    saveError.value = err?.data?.message ?? err?.message ?? 'Uloženie zlyhalo.'
+    syncForm()
   } finally {
-    isSaving.value = false
+    pageLoading.value = false
+  }
+})
+
+async function onAvatarFile(ev: Event) {
+  const input = ev.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+  if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+    addToast({ message: t('profile.toast.avatarTypeError'), type: 'error' }); return
+  }
+  if (file.size > 4 * 1024 * 1024) {
+    addToast({ message: t('profile.toast.avatarSizeError'), type: 'error' }); return
+  }
+  const fd = new FormData()
+  fd.append('avatar', file)
+  avatarUploading.value = true
+  try {
+    const res = await api.post('/profile/avatar', fd) as any
+    authStore.patchUser({
+      ...(res.avatar_url !== undefined ? { avatar_url: res.avatar_url } : {}),
+      ...(res.avatar !== undefined ? { avatar: res.avatar } : {}),
+    })
+    syncForm()
+    addToast({ message: t('profile.toast.avatarSuccess'), type: 'success' })
+  } catch (err: any) {
+    addToast({ message: err?.data?.message ?? t('profile.toast.avatarError'), type: 'error' })
+  } finally {
+    avatarUploading.value = false
+  }
+}
+
+async function saveProfile() {
+  const u = authStore.user
+  if (!u) return
+  const roleIds = u.roles?.map((r: any) => r.id) ?? []
+  saving.value = true
+  try {
+    await api.put('/profile', { name: form.firstName, surname: form.lastName, email: form.email, roles: roleIds })
+    await authStore.getCurrentUser({ force: true })
+    syncForm()
+    addToast({ message: t('profile.toast.saveSuccess'), type: 'success' })
+  } catch (err: any) {
+    addToast({ message: err?.data?.message ?? t('profile.toast.saveError'), type: 'error' })
+  } finally {
+    saving.value = false
   }
 }
 
 async function deleteAccount() {
-  const userId = authStore.user?.id
-  if (!userId) return
+  const u = authStore.user
+  if (!u) return
   const confirmed = window.confirm('Naozaj chcete anonymizovať a vymazať účet? Túto akciu nie je možné vrátiť späť.')
   if (!confirmed) return
-  isDeletingAccount.value = true
+  deletingAccount.value = true
   try {
-    await api.post(`/users/anonymize-user/${userId}`)
+    await api.post(`/users/anonymize-user/${u.id}`)
     authStore.$reset()
     addToast({ message: 'Účet bol anonymizovaný.', type: 'success' })
     await navigateTo('/auth/login')
   } catch (err: any) {
-    addToast({ message: err?.data?.message ?? err?.message ?? 'Anonymizácia účtu zlyhala.', type: 'error' })
+    addToast({ message: err?.data?.message ?? 'Anonymizácia účtu zlyhala.', type: 'error' })
   } finally {
-    isDeletingAccount.value = false
+    deletingAccount.value = false
   }
 }
-
-onMounted(async () => {
-  await authStore.getCurrentUser()
-  loadForm()
-  isLoading.value = false
-})
 </script>

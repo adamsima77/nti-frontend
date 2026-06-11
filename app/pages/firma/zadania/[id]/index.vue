@@ -235,13 +235,6 @@
                   </div>
                   <UiStatusBadge :status="app.status" />
                 </div>
-                <NuxtLink
-                  :to="`/firma/prihlasky/${app.id}`"
-                  class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
-                >
-                  Zobraziť prihlášku
-                  <ChevronRight class="w-3.5 h-3.5" />
-                </NuxtLink>
               </div>
               <p v-if="!task.applications.length" class="text-sm text-gray-400 text-center py-6">
                 Žiadne prihlášky zatiaľ
@@ -258,29 +251,10 @@
             <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Rozpočet</h3>
             <div class="text-3xl font-bold text-navy mb-1">{{ formatCurrency(task.budget) }}</div>
             <p class="text-xs text-gray-400 mb-4">celkový rozpočet</p>
-            <div class="bg-gray-100 rounded-full h-2 mb-2">
-              <div
-                class="h-2 rounded-full transition-all"
-                :class="budgetBarColor(task.budget ? task.spent / task.budget : 0)"
-                :style="{ width: task.budget ? `${Math.min((task.spent / task.budget) * 100, 100)}%` : '0%' }"
-              />
-            </div>
-            <div class="flex justify-between text-xs text-gray-500">
-              <span>Čerpanie: {{ formatCurrency(task.spent) }}</span>
-              <span>{{ task.budget ? Math.round((task.spent / task.budget) * 100) : 0 }}%</span>
-            </div>
             <div class="mt-3 pt-3 border-t border-gray-100 space-y-2">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">Zostatok</span>
-                <span class="font-semibold text-navy">{{ formatCurrency(task.budget ? task.budget - task.spent : null) }}</span>
-              </div>
               <div v-if="task.budget_type" class="flex justify-between text-sm">
                 <span class="text-gray-500">Spôsob výplaty</span>
                 <span class="font-medium text-navy">{{ budgetTypeLabel(task.budget_type) }}</span>
-              </div>
-              <div v-if="task.max_teams" class="flex justify-between text-sm">
-                <span class="text-gray-500">Max. tímov</span>
-                <span class="font-medium text-navy">{{ task.max_teams }}</span>
               </div>
             </div>
             <!-- Rozpad rozpočtu -->
@@ -289,15 +263,15 @@
               <div class="grid grid-cols-3 gap-2 text-center">
                 <div>
                   <p class="text-xs text-gray-400">Na tím</p>
-                  <p class="text-xs font-semibold text-navy">{{ formatCurrency(task.budget / Math.max(task.max_teams || 1, 1)) }}</p>
+                  <p class="text-xs font-semibold text-navy">{{ formatCurrency(task.budget) }}</p>
                 </div>
                 <div>
-                  <p class="text-xs text-gray-400">NTI (10%)</p>
-                  <p class="text-xs font-semibold text-navy">{{ formatCurrency(task.budget * 0.1) }}</p>
+                  <p class="text-xs text-gray-400">NTI (50%)</p>
+                  <p class="text-xs font-semibold text-navy">{{ formatCurrency(task.budget * 0.5) }}</p>
                 </div>
                 <div>
                   <p class="text-xs text-gray-400">Čistá odmena</p>
-                  <p class="text-xs font-semibold text-navy">{{ formatCurrency((task.budget * 0.9) / Math.max(task.max_teams || 1, 1)) }}</p>
+                  <p class="text-xs font-semibold text-navy">{{ formatCurrency(task.budget * 0.5) }}</p>
                 </div>
               </div>
             </div>
@@ -348,8 +322,8 @@
                 <Users class="w-4 h-4 text-blue-600" />
               </div>
               <div>
-                <p class="font-medium text-blue-900 text-sm">{{ task.assignedTeam }}</p>
-                <p class="text-xs text-blue-600">{{ task.assignedTeamMembers }} členov</p>
+                <p class="font-medium text-blue-900 text-sm">{{ task.assignedTeam.name }}</p>
+                <p class="text-xs text-blue-600">{{ task.assignedTeam.membersCount }} členov</p>
               </div>
             </div>
           </div>
@@ -427,7 +401,7 @@ const confirmPublish = () => {
 }
 
 const formatDate = (val: string | null | undefined) =>
-  val ? new Date(val).toLocaleDateString('sk-SK') : null
+  val ? val.slice(0, 10).split('-').reverse().join('. ') : null
 
 const loadTask = async () => {
   isLoading.value = true
@@ -458,18 +432,24 @@ const loadTask = async () => {
       budget: data.budget ? Number(data.budget) : null,
       spent: Number(data.spent ?? 0),
       budget_type: data.budget_type ?? null,
-      max_teams: data.max_teams ?? 1,
       description: data.description ?? '',
       tech_spec: data.tech_spec ?? '',
       tech_tags: data.tech_tags ?? [],
       requirements: data.call_criteria?.map((c: any) => c.name) ?? [],
       po_name: [data.product_owner?.name, data.product_owner?.surname].filter(Boolean).join(' ') || '',
       po_email: data.product_owner?.email ?? '',
-      applications: data.applications ?? [],
-      assignedTeam: (data.applications ?? []).find((a: any) =>
-        ['Onboarding', 'Aktívny projekt', 'Ukončené'].includes(a.status?.name)
-      )?.team?.name ?? null,
-      assignedTeamMembers: 0,
+      applications: (data.applications ?? []).map((a: any) => ({
+        id: a.id,
+        teamName: a.team?.name ?? '—',
+        submittedAt: a.submitted_at ? new Date(a.submitted_at).toLocaleDateString('sk-SK') : null,
+        status: a.status?.name ?? '',
+      })),
+      assignedTeam: (() => {
+        const a = (data.applications ?? []).find((a: any) =>
+          ['Onboarding', 'Aktívny projekt', 'Ukončené'].includes(a.status?.name)
+        )
+        return a ? { name: a.team?.name ?? '—', membersCount: a.team?.members_count ?? 0 } : null
+      })(),
     }
   } catch (err) {
     console.error('Chyba pri načítaní detailu:', err)

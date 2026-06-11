@@ -222,7 +222,6 @@
                 <th class="text-left px-5 py-3 font-medium text-gray-500">Zadanie</th>
                 <th class="text-left px-5 py-3 font-medium text-gray-500">Program</th>
                 <th class="text-left px-5 py-3 font-medium text-gray-500">Rozpočet</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500">Čerpanie</th>
                 <th class="text-left px-5 py-3 font-medium text-gray-500">Stav</th>
               </tr>
             </thead>
@@ -239,28 +238,11 @@
                 <td class="px-5 py-4 text-gray-600">{{ task.program }}</td>
                 <td class="px-5 py-4 font-medium text-navy">{{ formatCurrency(task.budget) }}</td>
                 <td class="px-5 py-4">
-                  <div class="flex items-center gap-2">
-                    <div class="flex-1 bg-gray-100 rounded-full h-1.5 min-w-[80px]">
-                      <div
-                        class="h-1.5 rounded-full transition-all"
-                        :class="budgetBarColor(task.spent / task.budget)"
-                        :style="{ width: `${Math.min((task.spent / task.budget) * 100, 100)}%` }"
-                      />
-                    </div>
-                    <span class="text-xs text-gray-500 shrink-0">
-                      {{ Math.round((task.spent / task.budget) * 100) }}%
-                    </span>
-                  </div>
-                  <p class="text-xs text-gray-400 mt-1">
-                    {{ formatCurrency(task.spent) }} z {{ formatCurrency(task.budget) }}
-                  </p>
-                </td>
-                <td class="px-5 py-4">
                   <UiStatusBadge :status="task.statusLabel" />
                 </td>
               </tr>
               <tr v-if="!budgetTasks.length">
-                <td colspan="5" class="px-5 py-10 text-center text-gray-400">
+                <td colspan="4" class="px-5 py-10 text-center text-gray-400">
                   Nemáte žiadne zadania
                 </td>
               </tr>
@@ -341,7 +323,7 @@
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-medium text-navy truncate">{{ d.title }}</p>
-            <p class="text-sm text-gray-500">{{ d.deadline }}</p>
+            <p class="text-sm text-gray-500">{{ d.deadline ? d.deadline.split('-').reverse().join('. ') : '' }}</p>
           </div>
           <div class="text-right flex-shrink-0">
             <span class="text-2xl font-bold text-blue-600">{{ d.daysLeft }}</span>
@@ -392,20 +374,20 @@ const error = ref<string | null>(null)
 
 const stats = computed(() => ({
   totalTasks: tasks.value.length,
-  activeTasks: tasks.value.filter((task) => task.isOpen).length,
-  assignedTeams: tasks.value.filter((task) => task.applicationsCount > 0).length,
+  activeTasks: tasks.value.filter((task) => ['published', 'matching', 'assigned', 'in_progress'].includes(task.status)).length,
+  assignedTeams: tasks.value.filter((task) => task.assignedTeam).length,
   pendingApplications: tasks.value.reduce((sum, task) => sum + (task.applicationsCount ?? 0), 0),
 }))
 
 const assignedTeams = computed(() =>
   tasks.value
-    .filter((task) => task.applicationsCount > 0)
+    .filter((task) => task.assignedTeam)
     .map((task) => ({
       id: task.id,
-      name: task.program || 'Zadanie',
-      task: task.title || task.name || 'Zadanie',
-      members: task.applicationsCount,
-      progress: Math.min(100, (task.applicationsCount ?? 0) * 20),
+      name: task.assignedTeam?.name || 'Tím',
+      task: task.title || 'Zadanie',
+      members: task.assignedTeam?.members_count ?? 0,
+      progress: Math.min(100, (task.assignedTeam?.members_count ?? 0) * 20),
     }))
 )
 
@@ -417,15 +399,8 @@ const gridClass = (count: number) => {
 
 const pendingApplications = computed(() =>
   tasks.value
-    .filter((task) => task.applicationsCount > 0)
+    .flatMap((task) => task.applications ?? [])
     .slice(0, 4)
-    .map((task) => ({
-      id: task.id,
-      teamName: task.program || 'Tím',
-      task: task.title || task.name || 'Zadanie',
-      submittedAt: task.createdAt || task.created_at || 'dnes',
-      status: task.status || 'published',
-    }))
 )
 
 const actions = computed(() => {
@@ -487,9 +462,17 @@ const loadTasks = async () => {
       status: normalizeTaskStatus(call.status?.name ?? ''),
       statusLabel: call.status?.name ?? '',
       applicationsCount: Number(call.applicants_count ?? 0),
+      assignedTeam: call.assigned_team ?? null,
       isOpen: Boolean(call.is_open),
       budget: Number(call.budget ?? 0),
       spent: Number(call.spent ?? 0),
+      applications: (call.applications ?? []).map((a: any) => ({
+        id: a.id,
+        teamName: a.teamName ?? a.team?.name ?? '—',
+        submittedAt: a.submittedAt ?? a.submitted_at,
+        status: a.status ?? '',
+        task: call.name,
+      })),
     }))
   } catch (err: any) {
     error.value = err?.data?.message ?? err?.message ?? 'Nastala chyba pri načítaní zadaní.'

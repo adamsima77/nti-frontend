@@ -58,7 +58,6 @@ function mapApiCallToCall(raw: Record<string, unknown>): Call {
     endDate: sliceDate(raw.application_deadline),
     status: isOpen ? 'open' : 'closed',
     applicantsCount: Number(raw.applicants_count ?? 0),
-    maxTeams: raw.max_teams != null ? Number(raw.max_teams) : undefined,
     formSchema,
   }
 }

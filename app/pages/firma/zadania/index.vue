@@ -57,28 +57,9 @@
 
         <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ task.description }}</p>
 
-        <!-- Budget bar -->
-        <div class="mb-4">
-          <div class="flex justify-between text-xs text-gray-500 mb-1">
-            <span>Čerpanie rozpočtu</span>
-            <span>{{ formatCurrency(task.spent) }} / {{ formatCurrency(task.budget) }}</span>
-          </div>
-          <div class="bg-gray-100 rounded-full h-1.5">
-            <div
-              class="h-1.5 rounded-full transition-all"
-              :class="budgetBarColor(task.spent / task.budget)"
-              :style="{ width: `${Math.min((task.spent / task.budget) * 100, 100)}%` }"
-            />
-          </div>
-        </div>
-
         <!-- Meta row -->
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4 text-sm text-gray-400">
-            <span class="flex items-center gap-1">
-              <Users class="w-4 h-4" />
-              {{ task.teamsCount }} {{ task.teamsCount === 1 ? 'tím' : 'tímy' }}
-            </span>
             <span class="flex items-center gap-1">
               <FileText class="w-4 h-4" />
               {{ task.applicationsCount }} prihlášok
@@ -167,8 +148,8 @@ const loadTasks = async () => {
       spent: 0,
       status: normalizeTaskStatus(call.status?.name ?? ''),
       rawStatus: call.status?.name ?? '',
-      createdAt: call.created_at ? new Date(call.created_at).toLocaleDateString('sk-SK') : '',
-      deadline: call.application_deadline ? new Date(call.application_deadline).toLocaleDateString('sk-SK') : null,
+      createdAt: call.created_at ? call.created_at.slice(0, 10).split('-').reverse().join('. ') : '',
+      deadline: call.application_deadline ? call.application_deadline.slice(0, 10).split('-').reverse().join('. ') : null,
       teamsCount: 0,
       applicationsCount: Number(call.applicants_count ?? 0),
     }))

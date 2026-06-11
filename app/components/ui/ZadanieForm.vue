@@ -354,10 +354,6 @@
           }"
           v-model="form.budget_type"
         />
-        <FormField
-          :field="{ name: 'max_teams', type: 'number', label: 'Počet tímov (max)', placeholder: '1', required: true }"
-          v-model="form.max_teams"
-        />
       </div>
 
       <div
@@ -369,7 +365,7 @@
           <div>
             <p class="text-xs text-blue-500">Na tím</p>
             <p class="font-semibold text-blue-800">
-              {{ formatCurrency(form.budget / Math.max(form.max_teams || 1, 1)) }}
+              {{ formatCurrency(form.budget) }}
             </p>
           </div>
           <div>
@@ -379,7 +375,7 @@
           <div>
             <p class="text-xs text-blue-500">Čistá odmena</p>
             <p class="font-semibold text-blue-800">
-              {{ formatCurrency((form.budget * 0.9) / Math.max(form.max_teams || 1, 1)) }}
+              {{ formatCurrency(form.budget * 0.9) }}
             </p>
           </div>
         </div>
@@ -567,7 +563,6 @@ const form = reactive({
   po_email: props.initialData?.po_email ?? '',
   budget: props.initialData?.budget ?? (null as number | null),
   budget_type: props.initialData?.budget_type ?? 'milestone',
-  max_teams: props.initialData?.max_teams ?? 1,
   status: props.initialData?.status ?? ('draft' as string),
   existing_attachments: props.initialData?.attachments ?? [],
   new_attachment_ids: [] as number[],
@@ -687,7 +682,6 @@ const save = async (asDraft = false) => {
       project_end: form.project_end || null,
       budget: form.budget,
       budget_type: form.budget_type,
-      max_teams: form.max_teams,
       tech_spec: form.tech_spec,
       tech_tags: form.tech_tags,
       po_email: form.po_email || null,
@@ -753,7 +747,6 @@ watch(() => props.initialData, (newData) => {
     form.po_email = newData.po_email ?? ''
     form.budget = newData.budget ?? null
     form.budget_type = newData.budget_type ?? 'milestone'
-    form.max_teams = newData.max_teams ?? 1
     form.status = newData.status ?? 'draft'
     form.existing_attachments = newData.attachments ?? []
     if (newData.id) {

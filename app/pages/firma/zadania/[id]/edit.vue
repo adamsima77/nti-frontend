@@ -135,7 +135,6 @@ const mapCallToFormData = (call: any) => ({
   po_email: call.product_owner?.email ?? '',
   budget: call.budget ? Number(call.budget) : null,
   budget_type: call.budget_type ?? 'milestone',
-  max_teams: call.max_teams ?? 1,
   status: normalizeTaskStatus(call.status?.name ?? ''),
   rawStatus: call.status?.name ?? '',
 })
