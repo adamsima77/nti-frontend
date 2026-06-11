@@ -10,7 +10,7 @@
 
     <div
       v-else-if="pageError"
-      class="mb-6 rounded-lg border border-danger-200 bg-danger-50 p-4 text-sm text-danger-700"
+      class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
     >
       {{ pageError }}
     </div>
@@ -45,7 +45,8 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Left: milestones + consultations -->
       <div class="lg:col-span-2 space-y-6">
-        <!-- Milestones -->
+
+        <!-- ── Milestones ── -->
         <div class="bg-white rounded-lg border border-gray-100 p-6">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-semibold text-navy flex items-center gap-2">
@@ -56,203 +57,344 @@
             </span>
           </div>
 
+          <!-- Legend -->
+          <div class="flex flex-wrap gap-3 mb-4 pb-4 border-b border-gray-100">
+            <div v-for="(def, slug) in MILESTONE_STATUS_DEFS" :key="slug" class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full" :class="def.dot" />
+              <span class="text-xs text-gray-500">{{ def.label }}</span>
+            </div>
+          </div>
+
           <div class="space-y-3">
             <div
               v-for="(milestone, milestoneIndex) in project.milestones"
               :key="milestone.id"
-              class="border rounded-lg p-4 transition-all"
-              :class="[
-                milestoneCardClass(milestone.status),
-                isMilestoneLocked(milestone, milestoneIndex) ? 'opacity-60' : '',
-              ]"
+              class="border rounded-lg overflow-hidden transition-all"
+              :class="milestoneCardClass(milestone.status)"
             >
-              <div class="flex items-start justify-between gap-3 mb-2">
-                <div class="flex items-start gap-3">
-                  <!-- Status icon -->
-                  <div class="mt-0.5 shrink-0">
-                    <CheckCircle
-                      v-if="milestone.status === 'completed'"
-                      class="w-5 h-5 text-success-500"
-                    />
-                    <Clock
-                      v-else-if="milestone.status === 'pending_approval'"
-                      class="w-5 h-5 text-warning-500"
-                    />
-                    <Circle
-                      v-else
-                      class="w-5 h-5 text-gray-300"
-                    />
+              <!-- Main row -->
+              <div class="p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-start gap-3 min-w-0">
+                    <!-- Status icon -->
+                    <div class="mt-0.5 shrink-0">
+                      <CheckCircle v-if="milestone.status === 'completed'" class="w-5 h-5 text-green-500" />
+                      <RotateCcw v-else-if="milestone.status === 'returned'" class="w-5 h-5 text-orange-500" />
+                      <XCircle v-else-if="milestone.status === 'rejected'" class="w-5 h-5 text-red-500" />
+                      <Clock v-else-if="milestone.status === 'pending_approval'" class="w-5 h-5 text-amber-500" />
+                      <PlayCircle v-else-if="milestone.status === 'in_progress'" class="w-5 h-5 text-blue-400" />
+                      <Lock v-else class="w-5 h-5 text-gray-300" />
+                    </div>
+
+                    <div class="min-w-0">
+                      <p class="font-medium text-navy text-sm">{{ milestone.title }}</p>
+                      <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                        <span class="text-xs font-medium" :class="MILESTONE_STATUS_DEFS[milestone.status]?.text ?? 'text-gray-400'">
+                          {{ MILESTONE_STATUS_DEFS[milestone.status]?.label ?? milestone.status }}
+                        </span>
+                        <span v-if="milestone.dueDate" class="text-xs text-gray-400">
+                          · {{ t('mentor.detail.dueDateLabel', { date: formatDate(milestone.dueDate) }) }}
+                        </span>
+                        <span v-else-if="milestone.status === 'pending'" class="text-xs text-gray-400 italic">
+                          · {{ t('mentor.detail.noDeadlineYet') }}
+                        </span>
+                      </div>
+                      <p v-if="milestone.description" class="text-xs text-gray-500 mt-1 line-clamp-2">
+                        {{ milestone.description }}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p class="font-medium text-navy text-sm">{{ milestone.title }}</p>
-                    <p class="text-xs text-gray-500 mt-0.5">
-                      {{ t('mentor.detail.dueDateLabel', { date: milestone.dueDate }) }}
-                    </p>
+
+                  <!-- Action buttons -->
+                  <div class="flex items-center gap-1.5 shrink-0">
+
+                    <!-- PENDING: unlock button -->
+                    <template v-if="milestone.status === 'pending'">
+                      <button
+                        v-if="canUnlockMilestone(milestoneIndex)"
+                        @click="toggleUnlockPanel(milestone.id)"
+                        class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded text-xs font-medium transition-colors"
+                      >
+                        <Unlock class="w-3.5 h-3.5" /> {{ t('mentor.detail.unlock') }}
+                      </button>
+                      <span v-else class="text-xs text-gray-400 italic">
+                        {{ t('mentor.detail.prevNotDone') }}
+                      </span>
+                    </template>
+
+                    <!-- PENDING_APPROVAL: approve / reject / return -->
+                    <template v-if="milestone.status === 'pending_approval'">
+                      <button
+                        @click="handleMilestoneAction(milestone.id, 'approve')"
+                        :disabled="milestoneLoading === milestone.id"
+                        class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 hover:bg-green-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
+                      >
+                        <CheckCircle class="w-3.5 h-3.5" /> {{ t('mentor.detail.approve') }}
+                      </button>
+                      <button
+                        @click="toggleReturnPanel(milestone.id, 'return')"
+                        :disabled="milestoneLoading === milestone.id"
+                        class="inline-flex items-center gap-1 px-2.5 py-1 bg-orange-50 text-orange-600 hover:bg-orange-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
+                      >
+                        <RotateCcw class="w-3.5 h-3.5" /> {{ t('mentor.detail.return') }}
+                      </button>
+                      <button
+                        @click="toggleReturnPanel(milestone.id, 'reject')"
+                        :disabled="milestoneLoading === milestone.id"
+                        class="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
+                      >
+                        <X class="w-3.5 h-3.5" /> {{ t('mentor.detail.reject') }}
+                      </button>
+                    </template>
+
+                    <!-- IN_PROGRESS: waiting indicator -->
+                    <template v-if="milestone.status === 'in_progress'">
+                      <span class="text-xs text-blue-500 italic flex items-center gap-1">
+                        <Clock class="w-3 h-3" /> {{ t('mentor.detail.waitingForStudent') }}
+                      </span>
+                    </template>
+
+                    <!-- RETURNED: waiting for resubmit -->
+                    <template v-if="milestone.status === 'returned'">
+                      <span class="text-xs text-orange-500 italic flex items-center gap-1">
+                        <Clock class="w-3 h-3" /> {{ t('mentor.detail.waitingForResubmit') }}
+                      </span>
+                    </template>
+
                   </div>
                 </div>
-                <div class="flex items-center gap-2 shrink-0">
-                  <UiStatusBadge :status="milestoneStatusValue(milestone.status)" />
-                  <template v-if="canReviewMilestone(milestone, milestoneIndex)">
-                    <button
-                      @click="handleMilestoneAction(milestone.id, 'approve')"
-                      :disabled="milestoneLoading === milestone.id"
-                      class="inline-flex items-center gap-1 px-2.5 py-1 bg-success-50 text-success-600 hover:bg-success-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
-                    >
-                      <CheckCircle class="w-3.5 h-3.5" /> {{ t('mentor.detail.approve') }}
-                    </button>
-                    <button
-                      @click="handleMilestoneAction(milestone.id, 'reject')"
-                      :disabled="milestoneLoading === milestone.id"
-                      class="inline-flex items-center gap-1 px-2.5 py-1 bg-danger-50 text-danger-600 hover:bg-danger-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
-                    >
-                      <X class="w-3.5 h-3.5" /> {{ t('mentor.detail.reject') }}
-                    </button>
-                  </template>
-                </div>
-              </div>
 
-              <p
-                v-if="isMilestoneLocked(milestone, milestoneIndex)"
-                class="ml-8 mt-2 text-xs text-gray-500"
-              >
-                {{ milestoneLockedMessage(milestone, milestoneIndex) }}
-              </p>
-
-              <!-- Description -->
-              <p
-                v-if="milestone.description"
-                class="text-xs text-gray-500 ml-8 mb-2"
-              >
-                {{ milestone.description }}
-              </p>
-
-              <!-- Comments thread -->
-              <div
-                v-if="milestone.comments.length"
-                class="ml-8 space-y-2 mt-2"
-              >
+                <!-- Comments thread (rejection / return feedback) -->
                 <div
-                  v-for="comment in milestone.comments"
-                  :key="comment.id"
-                  class="flex gap-2"
+                  v-if="milestone.comments.length"
+                  class="ml-8 space-y-2 mt-3"
                 >
                   <div
-                    class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 shrink-0"
+                    v-for="comment in milestone.comments"
+                    :key="comment.id"
+                    class="flex gap-2"
                   >
-                    {{ comment.author[0] }}
-                  </div>
-                  <div class="flex-1 bg-gray-50 rounded-lg px-3 py-2">
-                    <div class="flex items-center justify-between mb-0.5">
-                      <span class="text-xs font-medium text-navy">{{ comment.author }}</span>
-                      <span class="text-xs text-gray-400">{{ comment.date }}</span>
+                    <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 shrink-0">
+                      {{ (comment.author ?? '?')[0] }}
                     </div>
-                    <p class="text-xs text-gray-600">{{ comment.text }}</p>
+                    <div class="flex-1 bg-gray-50 rounded-lg px-3 py-2">
+                      <div class="flex items-center justify-between mb-0.5">
+                        <span class="text-xs font-medium text-navy">{{ comment.author }}</span>
+                        <span class="text-xs text-gray-400">{{ comment.date }}</span>
+                      </div>
+                      <p class="text-xs text-gray-600">{{ comment.text }}</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Add comment inline (pending_approval only) -->
+              <!-- ── Unlock panel (inline expand) ── -->
               <div
-                v-if="canReviewMilestone(milestone, milestoneIndex)"
-                class="ml-8 mt-2 flex gap-2"
+                v-if="unlockPanelId === milestone.id"
+                class="border-t border-blue-100 bg-blue-50/60 px-4 py-3"
               >
-                <input
-                  v-model="newComment[milestone.id]"
-                  type="text"
-                  :placeholder="t('mentor.detail.commentPlaceholder')"
-                  @keydown.enter.prevent="addComment(milestone.id)"
-                  class="flex-1 px-3 py-1.5 rounded border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
-                />
-                <button
-                  @click="addComment(milestone.id)"
-                  :disabled="!newComment[milestone.id]?.trim()"
-                  class="px-2.5 py-1.5 bg-purple-50 text-purple-600 rounded text-xs font-medium hover:bg-purple-100 transition-colors disabled:opacity-40"
-                >
-                  <Send class="w-3.5 h-3.5" />
-                </button>
+                <p class="text-xs font-medium text-blue-700 mb-2 flex items-center gap-1.5">
+                  <Unlock class="w-3.5 h-3.5" /> {{ t('mentor.detail.setDeadlineToUnlock') }}
+                </p>
+                <div class="flex items-end gap-2">
+                  <div class="flex-1">
+                    <label class="block text-xs text-gray-600 mb-1">{{ t('mentor.detail.deadline') }}</label>
+                    <input
+                      v-model="unlockDeadline[milestone.id]"
+                      type="date"
+                      :min="todayIso"
+                      class="w-full px-3 py-2 rounded border border-blue-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+                    />
+                  </div>
+                  <button
+                    @click="confirmUnlock(milestone.id)"
+                    :disabled="milestoneLoading === milestone.id || !unlockDeadline[milestone.id]"
+                    class="px-3 py-2 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition-colors disabled:opacity-40 flex items-center gap-1"
+                  >
+                    <svg v-if="milestoneLoading === milestone.id" class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    <Unlock v-else class="w-3 h-3" />
+                    {{ t('mentor.detail.confirmUnlock') }}
+                  </button>
+                  <button
+                    @click="unlockPanelId = null"
+                    class="px-3 py-2 border border-gray-200 text-gray-500 rounded text-xs hover:bg-gray-50"
+                  >
+                    {{ t('mentor.detail.cancel') }}
+                  </button>
+                </div>
               </div>
+
+              <!-- ── Return / Reject panel (inline expand) ── -->
+              <div
+                v-if="returnPanelId === milestone.id"
+                class="border-t px-4 py-3"
+                :class="returnPanelAction === 'return' ? 'border-orange-100 bg-orange-50/50' : 'border-red-100 bg-red-50/50'"
+              >
+                <p class="text-xs font-medium mb-2 flex items-center gap-1.5" :class="returnPanelAction === 'return' ? 'text-orange-700' : 'text-red-700'">
+                  <RotateCcw v-if="returnPanelAction === 'return'" class="w-3.5 h-3.5" />
+                  <X v-else class="w-3.5 h-3.5" />
+                  {{ returnPanelAction === 'return' ? t('mentor.detail.returnReason') : t('mentor.detail.rejectReason') }}
+                  <span class="font-normal text-gray-400">({{ t('mentor.detail.minChars', { n: 20 }) }})</span>
+                </p>
+                <textarea
+                  v-model="returnComment[milestone.id]"
+                  rows="3"
+                  :placeholder="returnPanelAction === 'return' ? t('mentor.detail.returnPlaceholder') : t('mentor.detail.rejectPlaceholder')"
+                  class="w-full px-3 py-2 rounded border text-xs focus:outline-none focus:ring-2 resize-none"
+                  :class="returnPanelAction === 'return' ? 'border-orange-200 focus:ring-orange-400' : 'border-red-200 focus:ring-red-400'"
+                />
+                <div class="flex items-center gap-2 mt-2">
+                  <span class="text-xs text-gray-400 flex-1">
+                    {{ (returnComment[milestone.id] ?? '').length }}/20+
+                  </span>
+                  <button
+                    @click="returnPanelId = null"
+                    class="px-3 py-1.5 border border-gray-200 text-gray-500 rounded text-xs hover:bg-gray-50"
+                  >
+                    {{ t('mentor.detail.cancel') }}
+                  </button>
+                  <button
+                    @click="confirmReturnOrReject(milestone.id)"
+                    :disabled="milestoneLoading === milestone.id || (returnComment[milestone.id] ?? '').trim().length < 20"
+                    class="px-3 py-1.5 text-white rounded text-xs font-medium transition-colors disabled:opacity-40 flex items-center gap-1"
+                    :class="returnPanelAction === 'return' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-red-600 hover:bg-red-700'"
+                  >
+                    <svg v-if="milestoneLoading === milestone.id" class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    {{ returnPanelAction === 'return' ? t('mentor.detail.confirmReturn') : t('mentor.detail.confirmReject') }}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <div v-if="!project.milestones.length" class="text-center py-8 text-sm text-gray-400">
+              {{ t('mentor.detail.noMilestones') }}
             </div>
           </div>
         </div>
 
-        <!-- Consultation log -->
+        <!-- ── Consultation log ── -->
         <div class="bg-white rounded-lg border border-gray-100 p-6">
           <h2 class="text-base font-semibold text-navy flex items-center gap-2 mb-4">
             <MessageSquare class="w-4 h-4 text-purple-500" /> {{ t('mentor.detail.consultations') }}
           </h2>
 
-          <div class="space-y-4">
+          <div class="space-y-3">
             <div
               v-for="c in project.consultations"
               :key="c.id"
-              class="border border-gray-100 rounded-lg p-4"
+              class="border border-gray-100 rounded-lg p-4 transition-colors"
+              :class="confirmDeleteId === c.id ? 'border-red-200 bg-red-50/40' : ''"
             >
-              <div class="flex items-start justify-between gap-3 mb-2">
-                <div>
-                  <p class="font-medium text-navy text-sm">{{ c.title }}</p>
-                  <p class="text-xs text-gray-400 mt-0.5">
-                    {{ c.date }} · {{ c.duration }} min · {{ consultationTypeLabel(c.type) }}
-                  </p>
+              <!-- Normal view -->
+              <template v-if="confirmDeleteId !== c.id">
+                <div class="flex items-start justify-between gap-3 mb-2">
+                  <div class="min-w-0">
+                    <p class="font-medium text-navy text-sm">{{ c.title }}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                      <span class="text-xs text-gray-400">{{ c.date }} · {{ c.duration }} min</span>
+                      <span
+                        class="text-xs px-1.5 py-0.5 rounded font-medium"
+                        :class="c.type === 'online' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-600'"
+                      >
+                        {{ consultationTypeLabel(c.type) }}
+                      </span>
+                    </div>
+                    <!-- Meeting URL for online consultations -->
+                    <a
+                      v-if="c.type === 'online' && c.meetingUrl"
+                      :href="c.meetingUrl"
+                      target="_blank"
+                      rel="noopener"
+                      class="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 mt-1"
+                    >
+                      <ExternalLink class="w-3 h-3" /> {{ t('mentor.detail.joinMeeting') }}
+                    </a>
+                  </div>
+                  <div v-if="canManageConsultations" class="flex items-center gap-1 shrink-0">
+                    <button
+                      @click="openEditConsultation(c)"
+                      class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      :title="t('mentor.detail.editConsultation')"
+                    >
+                      <Pencil class="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      @click="confirmDeleteId = c.id"
+                      class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                      :title="t('mentor.detail.deleteConsultation')"
+                    >
+                      <Trash2 class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-                <button
-                  v-if="canManageConsultations"
-                  @click="editConsultation(c)"
-                  class="text-gray-400 hover:text-blue-600 transition-colors"
-                >
-                  <Pencil class="w-4 h-4" />
-                </button>
-              </div>
-              <p class="text-sm text-gray-600 leading-relaxed mb-3">{{ c.summary }}</p>
-              <div
-                v-if="c.actionItems.length"
-                class="space-y-1"
-              >
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ t('mentor.detail.tasks') }}</p>
-                <ul class="space-y-1">
-                  <li
-                    v-for="item in c.actionItems"
-                    :key="item"
-                    class="flex items-start gap-2 text-xs text-gray-600"
-                  >
-                    <ArrowRight class="w-3 h-3 mt-0.5 text-purple-400 shrink-0" /> {{ item }}
-                  </li>
-                </ul>
-              </div>
+                <p v-if="c.summary" class="text-sm text-gray-600 leading-relaxed mb-3">{{ c.summary }}</p>
+                <div v-if="c.actionItems?.length" class="space-y-1">
+                  <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ t('mentor.detail.tasks') }}</p>
+                  <ul class="space-y-1">
+                    <li
+                      v-for="item in c.actionItems"
+                      :key="item"
+                      class="flex items-start gap-2 text-xs text-gray-600"
+                    >
+                      <ArrowRight class="w-3 h-3 mt-0.5 text-purple-400 shrink-0" /> {{ item }}
+                    </li>
+                  </ul>
+                </div>
+              </template>
+
+              <!-- Delete confirmation -->
+              <template v-else>
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-2 text-sm text-red-700">
+                    <AlertCircle class="w-4 h-4 shrink-0" />
+                    <span>{{ t('mentor.detail.deleteConfirm') }} <strong>{{ c.title }}</strong>?</span>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <button
+                      @click="confirmDeleteId = null"
+                      class="px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded hover:bg-gray-50 transition-colors"
+                    >
+                      {{ t('mentor.detail.cancel') }}
+                    </button>
+                    <button
+                      @click="deleteConsultation(c.id)"
+                      :disabled="deletingConsultationId === c.id"
+                      class="px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      <svg v-if="deletingConsultationId === c.id" class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      <Trash2 v-else class="w-3 h-3" />
+                      {{ t('mentor.detail.deleteConfirmBtn') }}
+                    </button>
+                  </div>
+                </div>
+              </template>
             </div>
 
-            <div
-              v-if="!project.consultations.length"
-              class="text-center py-8 text-sm text-gray-400"
-            >
+            <div v-if="!project.consultations.length" class="text-center py-8 text-sm text-gray-400">
               {{ t('mentor.detail.noConsultations') }}
             </div>
           </div>
-
-          <!-- Add consultation button -->
-          <button
-            v-if="canManageConsultations"
-            @click="showConsultationModal = true"
-            class="mt-4 inline-flex items-center gap-1.5 text-sm text-purple-600 hover:text-purple-800 font-medium"
-          >
-            <Plus class="w-4 h-4" /> {{ t('mentor.detail.newConsultationTitle') }}
-          </button>
         </div>
       </div>
 
-      <!-- Right sidebar -->
+      <!-- ── Right sidebar ── -->
       <div class="space-y-4">
         <!-- Team info -->
         <div class="bg-white rounded-lg border border-gray-100 p-5">
           <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('mentor.detail.team') }}</h3>
           <div class="space-y-2">
-            <div
-              v-for="member in project.teamMembers"
-              :key="member.id"
-              class="flex items-center gap-2"
-            >
-              <div
-                class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 shrink-0"
-              >
+            <div v-for="member in project.teamMembers" :key="member.id" class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 shrink-0">
                 {{ member.name.split(' ').map((n: string) => n[0]).join('') }}
               </div>
               <div>
@@ -266,9 +408,7 @@
         <!-- Progress card -->
         <div class="bg-white rounded-lg border border-gray-100 p-5">
           <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('mentor.detail.progress') }}</h3>
-          <div class="text-3xl font-bold text-navy mb-1">
-            {{ milestoneProgressPct }}%
-          </div>
+          <div class="text-3xl font-bold text-navy mb-1">{{ milestoneProgressPct }}%</div>
           <div class="bg-gray-100 rounded-full h-2 mb-2">
             <div
               class="h-2 rounded-full bg-purple-500 transition-all"
@@ -278,6 +418,23 @@
           <p class="text-xs text-gray-400">
             {{ t('mentor.detail.milestonesOf', { completed: completedMilestones, total: project.milestones.length }) }}
           </p>
+
+          <!-- Milestone status breakdown -->
+          <div class="mt-3 space-y-1">
+            <div
+              v-for="(def, slug) in MILESTONE_STATUS_DEFS"
+              :key="slug"
+              class="flex items-center justify-between text-xs"
+            >
+              <span class="flex items-center gap-1.5 text-gray-500">
+                <span class="w-1.5 h-1.5 rounded-full" :class="def.dot" />
+                {{ def.label }}
+              </span>
+              <span class="font-medium text-gray-700">
+                {{ project.milestones.filter(m => m.status === slug).length }}
+              </span>
+            </div>
+          </div>
         </div>
 
         <!-- Quick stats -->
@@ -302,35 +459,22 @@
         </div>
 
         <!-- PO info (Program B) -->
-        <div
-          v-if="project.productOwner"
-          class="bg-purple-50 border border-purple-100 rounded-lg p-5"
-        >
+        <div v-if="project.productOwner" class="bg-purple-50 border border-purple-100 rounded-lg p-5">
           <h3 class="text-sm font-semibold text-purple-800 mb-2">{{ t('mentor.detail.productOwner') }}</h3>
           <p class="font-medium text-purple-900 text-sm">{{ project.productOwner.name }}</p>
           <p class="text-xs text-purple-600 mt-0.5">{{ project.productOwner.email }}</p>
+          <p class="text-xs text-purple-600 mt-0.5">{{ project.productOwner.organization }}</p>
         </div>
       </div>
     </div>
 
-    <!-- ── Consultation modal ── -->
-    <div
-      v-if="showConsultationModal"
-      class="fixed inset-0 z-50 flex items-center justify-center px-4"
-    >
-      <div
-        class="absolute inset-0 bg-black/40"
-        @click="closeConsultationModal"
-      />
+    <!-- ── Edit consultation modal ── -->
+    <div v-if="showConsultationModal" class="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div class="absolute inset-0 bg-black/40" @click="closeConsultationModal" />
       <div class="relative bg-white rounded-xl shadow-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-5">
-          <h3 class="font-semibold text-navy text-lg">
-            {{ editingConsultation ? t('mentor.detail.editConsultation') : t('mentor.detail.newConsultationTitle') }}
-          </h3>
-          <button
-            @click="closeConsultationModal"
-            class="text-gray-400 hover:text-gray-600"
-          >
+          <h3 class="font-semibold text-navy text-lg">{{ t('mentor.detail.editConsultation') }}</h3>
+          <button @click="closeConsultationModal" class="text-gray-400 hover:text-gray-600">
             <X class="w-5 h-5" />
           </button>
         </div>
@@ -347,12 +491,21 @@
             v-model="consultationForm.title"
             :error="consultationErrors.title ?? undefined"
           />
-          <div class="grid grid-cols-2 gap-4">
+
+          <div class="grid grid-cols-3 gap-4">
             <FormField
               :field="{ name: 'date', type: 'date', label: t('mentor.detail.date'), required: true }"
               v-model="consultationForm.date"
               :error="consultationErrors.date ?? undefined"
             />
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor.detail.time') }}</label>
+              <input
+                v-model="consultationForm.time"
+                type="time"
+                class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+              />
+            </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor.detail.duration') }}</label>
               <input
@@ -364,20 +517,43 @@
               />
             </div>
           </div>
+
           <FormField
             :field="{
               name: 'type',
               type: 'select',
               label: t('mentor.detail.type'),
               options: [
-                { value: 'online', label: t('mentor.detail.typeOnline') },
-                { value: 'personal', label: t('mentor.detail.typePersonal') },
-                { value: 'written', label: t('mentor.detail.typeWritten') },
+                { value: 'online',    label: t('mentor.detail.typeOnline') },
+                { value: 'personal',  label: t('mentor.detail.typePersonal') },
+                { value: 'written',   label: t('mentor.detail.typeWritten') },
               ],
               required: true,
             }"
             v-model="consultationForm.type"
           />
+
+          <!-- Meeting URL — shown only for online consultations -->
+          <div v-if="consultationForm.type === 'online'">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+              {{ t('mentor.detail.meetingUrl') }}
+              <span class="text-gray-400 font-normal ml-1">({{ t('mentor.detail.optional') }})</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <Video class="w-4 h-4 text-gray-400 shrink-0" />
+              <input
+                v-model="consultationForm.meeting_url"
+                type="url"
+                :placeholder="t('mentor.detail.meetingUrlPlaceholder')"
+                class="flex-1 px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+                :class="consultationErrors.meeting_url ? 'border-red-300' : ''"
+              />
+            </div>
+            <p v-if="consultationErrors.meeting_url" class="mt-1 text-xs text-red-500">
+              {{ consultationErrors.meeting_url }}
+            </p>
+          </div>
+
           <FormField
             :field="{
               name: 'summary',
@@ -389,44 +565,11 @@
             v-model="consultationForm.summary"
             :error="consultationErrors.summary ?? undefined"
           />
-
-          <!-- Action items -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor.detail.tasks') }}</label>
-            <div class="space-y-2">
-              <div
-                v-for="(_, i) in consultationForm.actionItems"
-                :key="i"
-                class="flex gap-2"
-              >
-                <input
-                  v-model="consultationForm.actionItems[i]"
-                  type="text"
-                  :placeholder="t('mentor.detail.taskPlaceholder')"
-                  class="flex-1 px-3 py-2 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
-                />
-                <button
-                  type="button"
-                  @click="consultationForm.actionItems.splice(i, 1)"
-                  class="text-gray-400 hover:text-danger-500"
-                >
-                  <X class="w-4 h-4" />
-                </button>
-              </div>
-              <button
-                type="button"
-                @click="consultationForm.actionItems.push('')"
-                class="inline-flex items-center gap-1.5 text-sm text-purple-600 hover:text-purple-800"
-              >
-                <Plus class="w-4 h-4" /> {{ t('mentor.detail.addTask') }}
-              </button>
-            </div>
-          </div>
         </div>
 
         <div
           v-if="consultationError"
-          class="mt-4 bg-danger-50 border border-danger-200 text-danger-700 px-3 py-2 rounded text-sm flex items-center gap-2"
+          class="mt-4 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm flex items-center gap-2"
         >
           <AlertCircle class="w-4 h-4 shrink-0" /> {{ consultationError }}
         </div>
@@ -443,14 +586,9 @@
             :disabled="isSavingConsultation"
             class="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            <svg
-              v-if="isSavingConsultation"
-              class="animate-spin w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
+            <svg v-if="isSavingConsultation" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
             {{ isSavingConsultation ? t('mentor.detail.saving') : t('mentor.detail.save') }}
           </button>
@@ -463,18 +601,9 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import {
-  ChevronLeft,
-  Flag,
-  MessageSquare,
-  Plus,
-  CheckCircle,
-  Clock,
-  Circle,
-  X,
-  Send,
-  Pencil,
-  ArrowRight,
-  AlertCircle,
+  ChevronLeft, Flag, MessageSquare, CheckCircle, Clock, X,
+  Pencil, Trash2, ArrowRight, AlertCircle, Lock, Unlock,
+  PlayCircle, XCircle, RotateCcw, ExternalLink, Video,
 } from 'lucide-vue-next'
 import type { Consultation, MentorProject, Milestone, MilestoneComment } from '../../../types/mentor'
 import { useMentorDashboard } from '../../../composables/useMentorDashboard'
@@ -483,68 +612,97 @@ definePageMeta({ layout: 'portal' })
 
 const { t } = useI18n()
 const localePath = useLocalePath()
-const route = useRoute()
-const api = useApi()
+const route      = useRoute()
+const api        = useApi()
 const { addToast } = useToast()
-const authStore = useAuthStore()
+const authStore    = useAuthStore()
+const { fetchProjects, fetchDashboard } = useMentorDashboard()
 
-// Only keep what we actually need from the dashboard composable — milestone
-// updates and cache invalidation after approve/reject.
-const { updateMilestoneStatus, fetchProjects, fetchDashboard } = useMentorDashboard()
+// ──────────────────────────────────────────────────────────────
+// Types
+// ──────────────────────────────────────────────────────────────
 
-// ── Types ─────────────────────────────────────────────────────
+type MilestoneStatus = 'pending' | 'in_progress' | 'pending_approval' | 'completed' | 'rejected' | 'returned'
+
+interface MilestoneWithComments extends Milestone {
+  status: MilestoneStatus
+  comments: MilestoneComment[]
+}
+
 type MentorProjectDetail = MentorProject & {
-  productOwner?: { name: string; email?: string | null } | null
+  productOwner?: { name: string; email?: string | null; organization?: string | null } | null
   teamMembers: Array<{ id: number; name: string; role: string }>
   consultations: Consultation[]
-  milestones: Array<Milestone & { comments: MilestoneComment[] }>
+  milestones: MilestoneWithComments[]
 }
 
-// Map form-level types (online / personal / written) → API-level types (online / offline)
+// ──────────────────────────────────────────────────────────────
+// Milestone status definitions
+// ──────────────────────────────────────────────────────────────
+
+const MILESTONE_STATUS_DEFS: Record<MilestoneStatus, { label: string; dot: string; text: string }> = {
+  pending:          { label: 'Plánované',            dot: 'bg-gray-300',   text: 'text-gray-400' },
+  in_progress:      { label: 'V riešení',            dot: 'bg-blue-400',   text: 'text-blue-500' },
+  pending_approval: { label: 'Čaká na schválenie',   dot: 'bg-amber-400',  text: 'text-amber-600' },
+  completed:        { label: 'Schválené',             dot: 'bg-green-500',  text: 'text-green-600' },
+  rejected:         { label: 'Zamietnuté',            dot: 'bg-red-500',    text: 'text-red-600' },
+  returned:         { label: 'Vrátené na doplnenie', dot: 'bg-orange-400', text: 'text-orange-600' },
+}
+
+// ──────────────────────────────────────────────────────────────
+// Consultation type mappings
+// ──────────────────────────────────────────────────────────────
+
 const FORM_TYPE_TO_API: Record<string, string> = {
-  online: 'online',
+  online:   'online',
   personal: 'offline',
-  written: 'offline',
+  written:  'offline',
 }
 
-// Map API-level types back to form-level options
 const API_TYPE_TO_FORM: Record<string, string> = {
-  online: 'online',
-  offline: 'personal',
+  online:   'online',
+  offline:  'personal',
   personal: 'personal',
-  written: 'written',
+  written:  'written',
 }
 
-// Human-readable label shown in the consultation log
 const CONSULTATION_TYPE_LABELS: Record<string, string> = {
-  online: 'Online (videohovor)',
-  offline: 'Osobne',
+  online:   'Online (videohovor)',
+  offline:  'Osobne',
   personal: 'Osobne',
-  written: 'Písomná / e-mail',
+  written:  'Písomná / e-mail',
 }
 
 useHead({ title: t('mentor.detail.pageTitle') })
 
-// ── State ─────────────────────────────────────────────────────
-const loading = ref(false)
+// ──────────────────────────────────────────────────────────────
+// State
+// ──────────────────────────────────────────────────────────────
+
+const loading   = ref(false)
 const pageError = ref<string | null>(null)
 
 const project = reactive<MentorProjectDetail>({
-  id: Number(route.params.id),
-  name: '',
-  teamName: '',
-  program: '',
-  status: 'draft',
-  assignedAt: '',
-  productOwner: null,
-  teamMembers: [],
-  milestones: [],
+  id:            Number(route.params.id),
+  name:          '',
+  teamName:      '',
+  program:       '',
+  status:        'draft',
+  assignedAt:    '',
+  productOwner:  null,
+  teamMembers:   [],
+  milestones:    [],
   consultations: [],
 })
 
-// ── Data loading — single endpoint ────────────────────────────
+const todayIso = new Date().toISOString().split('T')[0] ?? ''
+
+// ──────────────────────────────────────────────────────────────
+// Data loading
+// ──────────────────────────────────────────────────────────────
+
 const loadProject = async () => {
-  loading.value = true
+  loading.value   = true
   pageError.value = null
   try {
     const data = await api.get<MentorProjectDetail>(`/mentor/projects/${project.id}`)
@@ -558,7 +716,10 @@ const loadProject = async () => {
 
 onMounted(loadProject)
 
-// ── Computed ──────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────
+// Computed
+// ──────────────────────────────────────────────────────────────
+
 const completedMilestones = computed(
   () => project.milestones.filter((m) => m.status === 'completed').length,
 )
@@ -570,7 +731,7 @@ const milestoneProgressPct = computed(() =>
 )
 
 const totalConsultationTime = computed(() =>
-  project.consultations.reduce((sum, c) => sum + c.duration, 0),
+  project.consultations.reduce((sum, c) => sum + (c.duration ?? 0), 0),
 )
 
 const canManageConsultations = computed(
@@ -579,182 +740,278 @@ const canManageConsultations = computed(
     authStore.hasPermission('mentorship.edit_own'),
 )
 
-// ── Milestone helpers ─────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────
+// Milestone helpers
+// ──────────────────────────────────────────────────────────────
+
 const milestoneLoading = ref<number | null>(null)
-const newComment = reactive<Record<number, string>>({})
 
-const milestoneStatusValue = (status: string) =>
-  ({
-    completed: 'approved',
-    pending_approval: 'pending_approval',
-    in_progress: 'active',
-    rejected: 'rejected',
-    pending: 'draft',
-  })[status] ?? 'draft'
+/** Unlock panel */
+const unlockPanelId  = ref<number | null>(null)
+const unlockDeadline = reactive<Record<number, string>>({})
 
-const priorMilestonesIncomplete = (index: number) =>
-  project.milestones.slice(0, index).some((m) => m.status !== 'completed')
+/** Return / Reject panel */
+const returnPanelId     = ref<number | null>(null)
+const returnPanelAction = ref<'return' | 'reject'>('return')
+const returnComment     = reactive<Record<number, string>>({})
 
-const canReviewMilestone = (milestone: { status: string }, index: number) =>
-  milestone.status === 'pending_approval' && !priorMilestonesIncomplete(index)
-
-const isMilestoneLocked = (milestone: { status: string }, index: number) => {
-  if (milestone.status === 'completed') return false
-  if (canReviewMilestone(milestone, index)) return false
-  return true
+const toggleUnlockPanel = (milestoneId: number) => {
+  unlockPanelId.value = unlockPanelId.value === milestoneId ? null : milestoneId
+  returnPanelId.value = null
 }
 
-const milestoneLockedMessage = (milestone: { status: string }, index: number) => {
-  if (priorMilestonesIncomplete(index)) return t('mentor.detail.lockedPrevious')
-  if (milestone.status === 'in_progress') return t('mentor.detail.lockedInProgress')
-  if (milestone.status === 'pending') return t('mentor.detail.lockedDraft')
-  return t('mentor.detail.lockedDefault')
+const toggleReturnPanel = (milestoneId: number, action: 'return' | 'reject') => {
+  if (returnPanelId.value === milestoneId && returnPanelAction.value === action) {
+    returnPanelId.value = null
+    return
+  }
+  returnPanelId.value     = milestoneId
+  returnPanelAction.value = action
+  unlockPanelId.value     = null
 }
 
-const milestoneCardClass = (status: string) =>
-  ({
-    completed: 'border-success-200 bg-success-50/30',
-    pending_approval: 'border-warning-200 bg-warning-50/30',
-    in_progress: 'border-blue-200 bg-blue-50/30',
-    rejected: 'border-danger-200 bg-danger-50/30',
-    pending: 'border-gray-100 bg-white',
-  })[status] ?? 'border-gray-100'
+/**
+ * A milestone can be unlocked only when all preceding milestones are completed.
+ * Milestones are ordered as they appear in the array (backend sorts by deadline/id).
+ */
+const canUnlockMilestone = (index: number): boolean => {
+  if (index === 0) return true
+  return project.milestones
+    .slice(0, index)
+    .every((m) => m.status === 'completed')
+}
 
-const handleMilestoneAction = async (milestoneId: number, action: 'approve' | 'reject') => {
-  if (action === 'reject') {
-    const comment = newComment[milestoneId]?.trim() ?? ''
-    if (comment.length < 20) {
-      addToast({ message: t('mentor.detail.errors.rejectCommentRequired'), type: 'error' })
-      return
-    }
+const milestoneCardClass = (status: MilestoneStatus): string =>
+  ({
+    pending:          'border-gray-100 bg-white',
+    in_progress:      'border-blue-200 bg-blue-50/30',
+    pending_approval: 'border-amber-200 bg-amber-50/30',
+    completed:        'border-green-200 bg-green-50/30',
+    rejected:         'border-red-200 bg-red-50/30',
+    returned:         'border-orange-200 bg-orange-50/30',
+  })[status] ?? 'border-gray-100 bg-white'
+
+const formatDate = (iso: string | null | undefined): string => {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  return isNaN(d.getTime()) ? iso : d.toLocaleDateString('sk-SK')
+}
+
+// ──────────────────────────────────────────────────────────────
+// Milestone actions
+// ──────────────────────────────────────────────────────────────
+
+/** Unlock: pending → in_progress (mentor sets deadline) */
+const confirmUnlock = async (milestoneId: number) => {
+  const deadline = unlockDeadline[milestoneId]
+  if (!deadline) {
+    addToast({ message: t('mentor.detail.errors.deadlineRequired'), type: 'error' })
+    return
   }
 
   milestoneLoading.value = milestoneId
   try {
-    await updateMilestoneStatus(
-      project.id,
-      milestoneId,
-      action === 'approve' ? 'completed' : 'rejected',
-      action === 'reject' ? newComment[milestoneId]?.trim() : undefined,
-    )
-    if (action === 'reject') newComment[milestoneId] = ''
-    // Sync dashboard stats and project list, then refresh this page
+    await api.patch(`/mentor/projects/${project.id}/milestones/${milestoneId}`, {
+      status:   'in_progress',
+      deadline,
+    })
+    unlockPanelId.value = null
     await Promise.all([fetchProjects(), fetchDashboard()])
     await loadProject()
+    addToast({ message: t('mentor.detail.milestoneUnlocked'), type: 'success' })
+  } catch {
+    addToast({ message: t('mentor.detail.errors.unlockFailed'), type: 'error' })
   } finally {
     milestoneLoading.value = null
   }
 }
 
-const addComment = async (milestoneId: number) => {
-  const text = newComment[milestoneId]?.trim()
-  if (!text) return
-  const milestone = project.milestones.find((m) => m.id === milestoneId)
-  if (milestone) {
-    milestone.comments.push({
-      id: Date.now(),
-      author: 'Mentor',
-      date: new Date().toLocaleDateString('sk-SK'),
-      text,
+/** Approve: pending_approval → completed */
+const handleMilestoneAction = async (milestoneId: number, action: 'approve') => {
+  milestoneLoading.value = milestoneId
+  try {
+    await api.patch(`/mentor/projects/${project.id}/milestones/${milestoneId}`, {
+      status: 'completed',
     })
+    await Promise.all([fetchProjects(), fetchDashboard()])
+    await loadProject()
+    addToast({ message: t('mentor.detail.milestoneApproved'), type: 'success' })
+  } catch {
+    addToast({ message: t('mentor.detail.errors.actionFailed'), type: 'error' })
+  } finally {
+    milestoneLoading.value = null
   }
-  newComment[milestoneId] = ''
 }
 
-// ── Consultation helpers ──────────────────────────────────────
-const consultationTypeLabel = (type: string) =>
-  CONSULTATION_TYPE_LABELS[type] ?? type
+/** Return (→ in_progress for rework) or Reject (→ rejected) with required comment */
+const confirmReturnOrReject = async (milestoneId: number) => {
+  const comment = (returnComment[milestoneId] ?? '').trim()
+  if (comment.length < 20) {
+    addToast({ message: t('mentor.detail.errors.rejectCommentRequired'), type: 'error' })
+    return
+  }
 
-// ── Consultation modal ────────────────────────────────────────
+  milestoneLoading.value = milestoneId
+  const apiStatus = returnPanelAction.value === 'return' ? 'returned' : 'rejected'
+
+  try {
+    await api.patch(`/mentor/projects/${project.id}/milestones/${milestoneId}`, {
+      status:  apiStatus,
+      comment,
+    })
+    returnComment[milestoneId] = ''
+    returnPanelId.value        = null
+    await Promise.all([fetchProjects(), fetchDashboard()])
+    await loadProject()
+    addToast({
+      message: returnPanelAction.value === 'return'
+        ? t('mentor.detail.milestoneReturned')
+        : t('mentor.detail.milestoneRejected'),
+      type: 'success',
+    })
+  } catch {
+    addToast({ message: t('mentor.detail.errors.actionFailed'), type: 'error' })
+  } finally {
+    milestoneLoading.value = null
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Consultation helpers
+// ──────────────────────────────────────────────────────────────
+
+const consultationTypeLabel = (type: string) => CONSULTATION_TYPE_LABELS[type] ?? type
+
+// ── Delete ─────────────────────────────────────────────────────
+
+const confirmDeleteId        = ref<number | null>(null)
+const deletingConsultationId = ref<number | null>(null)
+
+const deleteConsultation = async (consultationId: number) => {
+  deletingConsultationId.value = consultationId
+  try {
+    await api.delete(`/mentor/projects/${project.id}/consultations/${consultationId}`)
+    project.consultations = project.consultations.filter((c) => c.id !== consultationId)
+    confirmDeleteId.value = null
+    addToast({ message: t('mentor.detail.consultationDeleted'), type: 'success' })
+  } catch {
+    addToast({ message: t('mentor.detail.errors.deleteFailed'), type: 'error' })
+  } finally {
+    deletingConsultationId.value = null
+  }
+}
+
+// ── Edit modal ─────────────────────────────────────────────────
+
 const showConsultationModal = ref(false)
-const isSavingConsultation = ref(false)
-const consultationError = ref<string | null>(null)
-const editingConsultation = ref<Consultation | null>(null)
+const isSavingConsultation  = ref(false)
+const consultationError     = ref<string | null>(null)
+const editingConsultation   = ref<Consultation | null>(null)
 
-const today = new Date().toISOString().split('T')[0] ?? ''
+const nowTime = new Date().toTimeString().slice(0, 5)
 
 const consultationForm = reactive({
-  title: '',
-  date: today,
-  duration: 60 as number,
-  type: 'online' as string,
-  summary: '',
-  actionItems: [''] as string[],
+  title:       '',
+  date:        todayIso,
+  time:        nowTime,
+  duration:    60 as number,
+  type:        'online' as string,
+  summary:     '',
+  meeting_url: '',
 })
 
 const consultationErrors = reactive<Record<string, string | null>>({
-  title: null,
-  date: null,
-  summary: null,
+  title:       null,
+  date:        null,
+  summary:     null,
+  meeting_url: null,
 })
 
-const editConsultation = (c: Consultation) => {
+const openEditConsultation = (c: Consultation) => {
   editingConsultation.value = c
+
+  let parsedDate = todayIso
+  let parsedTime = nowTime
+  if (c.scheduledAt) {
+    const dt = new Date(c.scheduledAt)
+    if (!isNaN(dt.getTime())) {
+      parsedDate = dt.toISOString().split('T')[0] ?? todayIso
+      parsedTime = dt.toTimeString().slice(0, 5)
+    }
+  } else if (c.date) {
+    parsedDate = c.date
+  }
+
   Object.assign(consultationForm, {
-    title: c.title,
-    date: c.date,
-    duration: c.duration,
-    // Map API type back to form option (offline → personal)
-    type: API_TYPE_TO_FORM[c.type] ?? 'personal',
-    summary: c.summary,
-    actionItems: [...c.actionItems, ''],
+    title:       c.title,
+    date:        parsedDate,
+    time:        parsedTime,
+    duration:    c.duration,
+    type:        API_TYPE_TO_FORM[c.type] ?? 'personal',
+    summary:     c.summary ?? '',
+    meeting_url: c.meetingUrl ?? '',
   })
   showConsultationModal.value = true
 }
 
 const closeConsultationModal = () => {
   showConsultationModal.value = false
-  editingConsultation.value = null
-  consultationError.value = null
+  editingConsultation.value   = null
+  consultationError.value     = null
   Object.assign(consultationForm, {
-    title: '',
-    date: today,
-    duration: 60,
-    type: 'online',
-    summary: '',
-    actionItems: [''],
+    title: '', date: todayIso, time: nowTime,
+    duration: 60, type: 'online', summary: '', meeting_url: '',
   })
-  Object.assign(consultationErrors, { title: null, date: null, summary: null })
+  Object.assign(consultationErrors, { title: null, date: null, summary: null, meeting_url: null })
 }
 
 const validateConsultation = (): boolean => {
-  consultationErrors.title = consultationForm.title.trim() ? null : 'Názov je povinný'
-  consultationErrors.date = consultationForm.date ? null : 'Dátum je povinný'
+  consultationErrors.title   = consultationForm.title.trim()   ? null : 'Názov je povinný'
+  consultationErrors.date    = consultationForm.date           ? null : 'Dátum je povinný'
   consultationErrors.summary = consultationForm.summary.trim() ? null : 'Záznam je povinný'
+
+  // meeting_url: required for online, basic URL format check
+  if (consultationForm.type === 'online') {
+    const url = consultationForm.meeting_url.trim()
+    if (url && !/^https?:\/\/.+/.test(url)) {
+      consultationErrors.meeting_url = 'Zadajte platnú URL adresu (https://...)'
+    } else {
+      consultationErrors.meeting_url = null
+    }
+  } else {
+    consultationErrors.meeting_url = null
+  }
+
   return !Object.values(consultationErrors).some(Boolean)
 }
 
 const saveConsultation = async () => {
-  if (!validateConsultation()) return
+  if (!validateConsultation() || !editingConsultation.value) return
 
   isSavingConsultation.value = true
-  consultationError.value = null
+  consultationError.value    = null
 
   try {
-    const items = consultationForm.actionItems.filter((i) => i.trim())
+    const apiType     = FORM_TYPE_TO_API[consultationForm.type] ?? 'offline'
+    const scheduledAt = `${consultationForm.date}T${consultationForm.time}:00`
 
-    // Build agenda — summary + optional action items appended
-    const agenda = [
-      consultationForm.summary.trim(),
-      items.length ? `Úlohy: ${items.join('; ')}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n')
-
-    // Backend validates type as `in:online,offline` — map form value accordingly
-    const apiType = FORM_TYPE_TO_API[consultationForm.type] ?? 'offline'
-
-    await api.post(`/mentor/projects/${project.id}/consultations`, {
-      title: consultationForm.title.trim(),
-      type: apiType,
-      scheduled_at: consultationForm.date,
-      duration: consultationForm.duration,
-      agenda,
-    })
+    await api.put(
+      `/mentor/projects/${project.id}/consultations/${editingConsultation.value.id}`,
+      {
+        title:        consultationForm.title.trim(),
+        type:         apiType,
+        scheduled_at: scheduledAt,
+        duration:     consultationForm.duration,
+        agenda:       consultationForm.summary.trim(),
+        meeting_url:  consultationForm.type === 'online' && consultationForm.meeting_url.trim()
+                        ? consultationForm.meeting_url.trim()
+                        : null,
+      },
+    )
 
     await loadProject()
     closeConsultationModal()
-    addToast({ message: t('mentor.detail.consultationSaved'), type: 'success' })
+    addToast({ message: t('mentor.detail.consultationUpdated'), type: 'success' })
   } catch {
     consultationError.value = t('mentor.detail.errors.saveFailed')
   } finally {
