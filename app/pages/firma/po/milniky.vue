@@ -236,6 +236,12 @@ definePageMeta({
 
 useHead({ title: 'Míľniky | NTI PO' })
 
+const orgDashboard = useOrgDashboard()
+await orgDashboard.load()
+if (orgDashboard.myRole.value !== 'po') {
+  await navigateTo(useLocalePath()('/firma'))
+}
+
 const api = useApi()
 const toast = useToast()
 const config = useRuntimeConfig()

@@ -136,6 +136,12 @@ useHead({
   title: 'Zadania | NTI Firma',
 })
 
+const orgDashboard = useOrgDashboard()
+await orgDashboard.load()
+if (orgDashboard.myRole.value !== 'organization_admin') {
+  await navigateTo(useLocalePath()('/firma'))
+}
+
 const api = useApi()
 const authStore = useAuthStore()
 

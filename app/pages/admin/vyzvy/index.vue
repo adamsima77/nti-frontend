@@ -113,15 +113,6 @@
           <div class="flex items-center gap-2">
 
             <button
-              v-if="!isDraftCall(row)"
-              class="text-gray-400 hover:text-indigo-600 transition-colors"
-              title="Nastaviť komisiu"
-              @click.stop="openCommissionSetupModal(row)"
-            >
-              <Settings class="w-4 h-4" />
-            </button>
-
-            <button
               v-if="isProgramBMatching(row)"
               class="text-indigo-500 hover:text-indigo-700 transition-colors"
               title="Vybrať tím"
@@ -196,13 +187,6 @@
       />
     </ClientOnly>
 
-    <ClientOnly>
-      <AdminCallCommissionSetupModal
-        v-model="commissionSetupModalOpen"
-        :call="commissionSetupCall"
-        @saved="fetchCalls"
-      />
-    </ClientOnly>
 
     <ClientOnly>
       <AdminExportModal
@@ -221,7 +205,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, Pencil, FileText, X, Users, Settings, Download, FileDown } from 'lucide-vue-next'
+import { Plus, Pencil, FileText, X, Users, Download, FileDown } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'portal',
@@ -468,15 +452,6 @@ const programBCall      = ref<{ id: number; name: string } | null>(null)
 function openProgramBModal(row: CallRow) {
   programBCall.value      = { id: row.id, name: row.name }
   programBModalOpen.value = true
-}
-
-const commissionSetupModalOpen = ref(false)
-const commissionSetupCall      = ref<{ id: number; name: string; isB: boolean } | null>(null)
-
-function openCommissionSetupModal(row: CallRow) {
-  const programName = row.program?.name ?? ''
-  commissionSetupCall.value      = { id: row.id, name: row.name, isB: programName.includes('B') }
-  commissionSetupModalOpen.value = true
 }
 
 // ── Modal ─────────────────────────────────────────────────────────────────────

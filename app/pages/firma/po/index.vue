@@ -140,6 +140,12 @@ useHead({ title: 'Product Owner Dashboard | NTI' })
 const api = useApi()
 const localePath = useLocalePath()
 const authStore = useAuthStore()
+const orgDashboard = useOrgDashboard()
+
+await orgDashboard.load()
+if (orgDashboard.myRole.value !== 'po') {
+  await navigateTo(localePath('/firma'))
+}
 
 const userDisplayName = computed(() => {
   const u = authStore.user

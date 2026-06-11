@@ -25,37 +25,42 @@ export function useOrgDashboard() {
   const api = useApi()
   const authStore = useAuthStore()
 
-  const orgId = ref<number | null>(null)
-  const myRole = ref<'organization_admin' | 'member' | 'po' | null>(null)
-  const stats = ref<OrgDashboardStats>({ total_calls: 0, active_calls: 0, in_progress: 0, completed: 0 })
-  const calls = ref<OrgCall[]>([])
-  const teams = ref<any[]>([])
+  // useState persists across page navigations within the same session
+  const orgId  = useState<number | null>('org-id', () => null)
+  const myRole = useState<'organization_admin' | 'member' | 'po' | null>('org-my-role', () => null)
+
+  const stats        = ref<OrgDashboardStats>({ total_calls: 0, active_calls: 0, in_progress: 0, completed: 0 })
+  const calls        = ref<OrgCall[]>([])
+  const teams        = ref<any[]>([])
   const applications = ref<any[]>([])
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  const isLoading    = ref(false)
+  const error        = ref<string | null>(null)
 
   const isMember = computed(() => myRole.value === 'member')
-  const isAdmin = computed(() => myRole.value === 'organization_admin')
-  const isPo = computed(() => myRole.value === 'po')
+  const isAdmin  = computed(() => myRole.value === 'organization_admin')
+  const isPo     = computed(() => myRole.value === 'po')
 
   const fetchMyOrganization = async () => {
     const res = await api.get('/my-organization') as any
-    orgId.value = res?.organization?.id ?? null
+    orgId.value  = res?.organization?.id ?? null
     myRole.value = res?.my_role ?? null
   }
 
   const fetchMemberDashboard = async () => {
     if (!orgId.value) return
     const res = await api.get(`/organizations/${orgId.value}/member-dashboard`) as any
-    stats.value = res?.stats ?? { total_calls: 0, active_calls: 0, in_progress: 0, completed: 0 }
-    calls.value = res?.calls ?? []
-    teams.value = res?.teams ?? []
+    stats.value        = res?.stats ?? { total_calls: 0, active_calls: 0, in_progress: 0, completed: 0 }
+    calls.value        = res?.calls ?? []
+    teams.value        = res?.teams ?? []
     applications.value = res?.applications ?? []
   }
 
   const load = async () => {
+    // Skip network calls if role is already known (navigating between pages)
+    if (myRole.value !== null) return
+
     isLoading.value = true
-    error.value = null
+    error.value     = null
     try {
       await authStore.getCurrentUser()
       await fetchMyOrganization()
@@ -69,5 +74,11 @@ export function useOrgDashboard() {
     }
   }
 
-  return { orgId, myRole, isMember, isAdmin, isPo, stats, calls, teams, applications, isLoading, error, load }
+  const reload = async () => {
+    myRole.value = null
+    orgId.value  = null
+    await load()
+  }
+
+  return { orgId, myRole, isMember, isAdmin, isPo, stats, calls, teams, applications, isLoading, error, load, reload }
 }

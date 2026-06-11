@@ -398,6 +398,12 @@ definePageMeta({
   roles: ['partner'],
 })
 
+const orgDashboard = useOrgDashboard()
+await orgDashboard.load()
+if (orgDashboard.myRole.value !== 'organization_admin') {
+  await navigateTo(useLocalePath()('/firma'))
+}
+
 const route = useRoute()
 const api = useApi()
 

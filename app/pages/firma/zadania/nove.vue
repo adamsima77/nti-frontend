@@ -33,6 +33,12 @@ definePageMeta({
 
 useHead({ title: 'Nové zadanie | NTI Firma' })
 
+const orgDashboard = useOrgDashboard()
+await orgDashboard.load()
+if (orgDashboard.myRole.value !== 'organization_admin') {
+  await navigateTo(useLocalePath()('/firma'))
+}
+
 const router = useRouter()
 
 const handleSaved = () => {
