@@ -181,7 +181,7 @@
 <script setup lang="ts">
 import { Plus, Pencil, Trash2, Users, UserPlus, X } from 'lucide-vue-next'
 
-definePageMeta({ layout: 'portal', middleware: ['auth'] })
+definePageMeta({ layout: 'portal', middleware: ['auth'], roles: ['nti_admin', 'nti_superadmin'], })
 
 useHead({ title: 'Komisie — Admin | NTI' })
 

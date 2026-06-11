@@ -210,6 +210,7 @@ import { Plus, Pencil, FileText, X, Users, Download, FileDown } from 'lucide-vue
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
+  roles: ['nti_admin', 'nti_superadmin'],
 })
 
 const { t } = useI18n()

@@ -38,7 +38,7 @@
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
-  roles: ['nti_admin', 'nti_superadmin'] 
+  roles: ['nti_superadmin'] 
 })
 
 useHead({ title: 'Audit log — Admin | NTI' })
