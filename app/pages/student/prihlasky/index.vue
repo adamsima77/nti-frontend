@@ -285,12 +285,11 @@ function clearFilters() {
 // ─── Fetch helpers ────────────────────────────────────────────────────────────
  
 async function fetchLookups() {
-  const [ptRes, stRes] = await Promise.all([
-    api.get('/program-types'),
-    api.get('/status-of-applications'),
-  ])
+  const ptRes = (await api.get('/program-types')) as ProgramType[] | undefined
+  const stRes = (await api.get('/status-of-applications')) as { statuses?: ApplicationStatus[] } | undefined
+
   programTypes.value = ptRes ?? []
-  statuses.value = stRes.statuses ?? []
+  statuses.value = stRes?.statuses ?? []
 }
  
 async function fetchApplications() {
@@ -304,12 +303,10 @@ async function fetchApplications() {
     if (filters.program_type_id !== '') params.program_type_id = filters.program_type_id
     if (filters.status_id !== '') params.status_id = filters.status_id
  
-    const res = await api.get<any>('/applications', { params })
+    const res = (await api.get('/applications', { params })) as { data?: Application[]; meta?: Partial<PaginationMeta> } | undefined
  
-    // Secure binding fallback depending on whether useApi unpacks the network response wrapper
-    const rawPayload = res.data && res.meta ? res : res.data;
-    
-    applications.value = rawPayload?.data ?? []
+    const rawPayload = res && res.data && res.meta ? res : { data: res?.data }
+    applications.value = rawPayload.data ?? []
  
     const meta = rawPayload?.meta ?? {}
     paginationMeta.from = meta.from ?? 0
@@ -332,7 +329,7 @@ watch([() => filters.program_type_id, () => filters.status_id], () => {
 
 
 
-let searchDebounceTimeout = null
+let searchDebounceTimeout: ReturnType<typeof setTimeout> | null = null
 
 watch(() => filters.search, (newSearch) => {
   
