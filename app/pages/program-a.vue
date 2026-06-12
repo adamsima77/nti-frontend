@@ -75,29 +75,7 @@
       </div>
     </section>
 
-    <!-- Časový plán -->
-    <section class="mt-20 px-6 md:px-20 py-16">
-      <div class="max-w-4xl mx-auto">
-        <h2 class="text-4xl font-bold text-navy mb-8">{{ $t('program-a.timeline.header') }}</h2>
-
-        <div class="space-y-4">
-          <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded">
-            <h3 class="font-bold text-blue-700 mb-2">📋 Prihlášky otvorené</h3>
-            <p class="text-gray-700">1. január — 31. január 2026</p>
-          </div>
-
-          <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded">
-            <h3 class="font-bold text-yellow-700 mb-2">⏱️ Vyhodnocovanie prihlášok</h3>
-            <p class="text-gray-700">1. február — 15. február 2026</p>
-          </div>
-
-          <div class="bg-success-50 border-l-4 border-success-500 p-6 rounded">
-            <h3 class="font-bold text-success-700 mb-2">🚀 Program štartuje</h3>
-            <p class="text-gray-700">1. apríl — 30. júl 2026</p>
-          </div>
-        </div>
-      </div>
-    </section>
+   
 
     <!-- FAQ -->
     <section class="mt-20 px-6 md:px-20 py-16 bg-gray-50 rounded-lg">

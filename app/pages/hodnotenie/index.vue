@@ -177,20 +177,20 @@
                 :to="`/hodnotenie/${app.id}`"
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 :class="
-                  app.my_score === null && ['evaluating', 'submitted', 'under_review'].includes(app.status)
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
-                "
+  app.my_submitted_at == null && ['evaluating', 'submitted', 'under_review'].includes(app.status)
+    ? 'bg-blue-600 text-white hover:bg-blue-700'
+    : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+"
               >
                 <ClipboardCheck
-                  v-if="app.my_score === null && ['evaluating', 'submitted', 'under_review'].includes(app.status)"
-                  class="w-4 h-4"
-                />
+  v-if="app.my_submitted_at == null && ['evaluating', 'submitted', 'under_review'].includes(app.status)"
+  class="w-4 h-4"
+/>
                 <Eye
                   v-else
                   class="w-4 h-4"
                 />
-                {{ app.my_score === null && ['evaluating', 'submitted', 'under_review'].includes(app.status) ? 'Hodnotiť' : 'Detail' }}
+               {{ app.my_submitted_at == null && ['evaluating', 'submitted', 'under_review'].includes(app.status) ? 'Hodnotiť' : 'Detail' }}
               </NuxtLink>
             </div>
           </div>
@@ -226,64 +226,61 @@ const userDisplayName = computed(() => {
   return fullName || u.email
 })
 
-const assignedCalls = computed(() => {
-  return dashboard.value?.calls ?? []
-})
-
-// Centralizovaná transformácia dát, ktorá spočíta max_score na základe priradenej výzvy a jej kritérií
 const transformedApplications = computed(() => {
   const rawApps = dashboard.value?.applications ?? []
-  const callsList = assignedCalls.value
+  const callsList = dashboard.value?.calls ?? []
 
   return rawApps.map((app: any) => {
-    // Nájdeme prislúchajúcu výzvu pre túto aplikáciu, aby sme získali zoznam kritérií
-    const matchingCall = callsList.find((c: any) => c.id === app.call_id)
-    
-    let maxScore = 40 // Východzí fallback
-    if (matchingCall && matchingCall.criteria && matchingCall.criteria.length > 0) {
-      maxScore = matchingCall.criteria.length * 20
-    }
-
-    return {
-      ...app,
-      max_score: maxScore
-    }
-  })
-})
-
-const recentApplications = computed(() => {
-  // Ak backend vracia špecifické pole recentApplications, namapujeme ho rovnako
-  const fromDashboard = dashboard.value?.recentApplications ?? dashboard.value?.applications ?? []
-  const callsList = assignedCalls.value
-
-  return fromDashboard.slice(0, 3).map((app: any) => {
     const matchingCall = callsList.find((c: any) => c.id === app.call_id)
     let maxScore = 40
-    if (matchingCall && matchingCall.criteria && matchingCall.criteria.length > 0) {
+    if (matchingCall?.criteria?.length > 0) {
       maxScore = matchingCall.criteria.length * 20
     }
     return { ...app, max_score: maxScore }
   })
 })
 
+const assignedCalls = computed(() => {
+  const calls = dashboard.value?.calls ?? []
+  const apps = transformedApplications.value
+
+  return calls.map((call: any) => {
+    const callApps = apps.filter((app: any) => app.call_id === call.id)
+    const evaluated = callApps.filter((app: any) => app.my_submitted_at != null).length
+    const pending = callApps.filter((app: any) => app.my_submitted_at == null).length
+
+    return {
+      ...call,
+      applications_evaluated: evaluated,
+      applications_total: callApps.length,
+      applications_pending: pending,
+    }
+  })
+})
+
+const recentApplications = computed(() => {
+  return transformedApplications.value.slice(0, 3)
+})
+
 const urgentApplications = computed(() => {
   const direct = dashboard.value?.urgentApplications ?? []
   if (direct.length) return direct
-  
-  return transformedApplications.value.filter(app => 
-    ['evaluating', 'submitted', 'under_review'].includes(app.status) && app.my_score === null
+
+  return transformedApplications.value.filter((app: any) =>
+    app.my_submitted_at == null &&
+    ['evaluating', 'submitted', 'under_review'].includes(app.status)
   )
 })
 
 const stats = computed(() => {
   const s = dashboard.value?.stats ?? {}
-  const applications = transformedApplications.value
-  
+  const apps = transformedApplications.value
+
   return {
-    total: s.total ?? applications.length,
-    pending: s.pending ?? applications.filter(app => app.my_score === null).length,
-    evaluated: s.evaluated ?? applications.filter(app => app.my_score !== null).length,
-    decided: s.decided ?? 0, 
+    total: s.total ?? apps.length,
+    pending: s.pending ?? apps.filter((app: any) => app.my_submitted_at == null).length,
+    evaluated: s.evaluated ?? apps.filter((app: any) => app.my_submitted_at != null).length,
+    decided: s.decided ?? 0,
   }
 })
 

@@ -686,6 +686,7 @@
       }
     },
     "home": {
+      "milestone_title": "Miľníky | NTI",
       "seo_title": "Dashboard | NTI",
       "welcome": "Vitajte, {name}!",
       "subtitle": "Prehľad vášho konta a aktivít",
@@ -896,7 +897,7 @@
       "saving_record": "Ukladá sa študentský záznam...",
       "teams_count": "{count} tímov",
       "applications_count": "{count} prihlášok",
-      "no_student_record": "Študentský záznam v databáze zatiaľ nemáte (napr. po onboardingu sa vytvorí cez API študenta).",
+      "no_student_record": "Študentský záznam v databáze zatiaľ nemáte kontaktujte admina.",
       "seo_title": "Môj profil | NTI",
       "upload_photo": "Nahrať fotku",
       "change_photo": "Zmeniť fotku",
@@ -1300,6 +1301,7 @@
 }
   },
  "portal_sidebar_links": {
+  "milestones": "Miľníky",
   "roles": "Roly a permisie",
   "dashboard": "Dashboard",
   "applications": "Moje prihlášky",

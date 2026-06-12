@@ -104,15 +104,19 @@
                           {{ initials(memberFullName(member)) }}
                         </span>
                       </div>
-                      <div class="min-w-0 flex-1">
-                        <NuxtLink 
-                        v-if="member.student?.id"
-                        :to = "localePath(`/admin/prihlasky/student-detail/${member.student.id}`)">
-                        <p class="text-sm font-medium text-navy hover:text-blue-500 transition-colors duration-300 truncate">
+                     <div class="min-w-0 flex-1">
+                   <NuxtLink
+                      v-if="member.student?.id"
+                      :to="localePath(`/admin/prihlasky/student-detail/${member.student.id}`)"
+                      >
+                      <p class="text-sm font-medium text-navy hover:text-blue-500 transition-colors duration-300 truncate">
                           {{ memberFullName(member) }}
-                        </p>
-                        </NuxtLink>
-                      </div>
+                      </p>
+                  </NuxtLink>
+                  <p v-else class="text-sm font-medium text-navy truncate">
+                           {{ memberFullName(member) }}
+                  </p>
+                </div>
                       <span
                         v-if="member.role_name || member.role_id"
                         :class="[

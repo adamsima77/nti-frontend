@@ -42,6 +42,8 @@ import {
   ShieldCheck,
   ListTodo,
   Flag,
+  Milestone,
+  MapPin
 } from 'lucide-vue-next'
 
 const mobileSidebarOpen = ref(false)
@@ -109,6 +111,7 @@ const navItems = computed(() => {
   if (role === 'student') {
     return [
       { label: t('portal_sidebar_links.dashboard'),    to: localePath('/student'),           icon: LayoutDashboard, exact: true },
+      { label: t('portal_sidebar_links.milestones'),   to: localePath('/student/milniky'),   icon: Milestone },
       { label: t('portal_sidebar_links.applications'), to: localePath('/student/prihlasky'), icon: FileText },
       { label: t('portal_sidebar_links.teams'),        to: localePath('/student/timy'),      icon: Users },
       { label: t('portal_sidebar_links.profile'),      to: localePath('/student/profil'),    icon: UserCircle },

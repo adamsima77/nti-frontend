@@ -913,6 +913,7 @@
       }
     },
     "home": {
+      "milestone_title": "Milestones | NTI",
       "seo_title": "Dashboard | NTI",
       "welcome": "Welcome, {name}!",
       "subtitle": "Overview of your account and activity",
@@ -1123,7 +1124,7 @@
       "saving_record": "Saving student record...",
       "teams_count": "{count} teams",
       "applications_count": "{count} applications",
-      "no_student_record": "You don't have a student record in the database yet (it is usually created via onboarding API).",
+      "no_student_record": "You don't have a student record in the database yet contact admin",
       "seo_title": "My Profile | NTI",
       "upload_photo": "Upload photo",
       "change_photo": "Change photo",
@@ -1866,6 +1867,7 @@
   }
  },
  "portal_sidebar_links": {
+  "milestones": "Milestones",
   "roles": "Roles & Permissions",
   "dashboard": "Dashboard",
   "applications": "My applications",
