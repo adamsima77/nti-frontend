@@ -11,7 +11,6 @@
     </div>
 
     <template v-else>
-      <!-- Header -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
         <div class="flex items-center gap-6">
           <div class="flex flex-col items-center gap-2 flex-shrink-0">
@@ -56,14 +55,10 @@
             >
               {{ t('student_dashboard.profile.badge_student') }}
             </span>
-            <div class="text-right text-sm text-gray-500">
-              {{ t('student_dashboard.profile.teams_count', { count: teamsCount }) }} · {{ t('student_dashboard.profile.applications_count', { count: applicationsCount }) }}
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- Osobné údaje (uloženie cez API users) -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
         <h2 class="text-lg font-bold text-navy mb-5">{{ t('student_dashboard.profile.personal_data') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
@@ -94,7 +89,6 @@
         </div>
       </div>
 
-      <!-- Študentský záznam (GET /students/me) -->
       <div
         v-if="studentRecord"
         class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6"
@@ -192,13 +186,13 @@
                     <p class="text-xs text-gray-500">{{ academicForm.transcript ? t('student_dashboard.academic_record.new_transcript') : t('student_dashboard.academic_record.current_transcript') }}</p>
                   </div>
                   <div class="flex flex-wrap gap-2">
-                    <Button
-                      @click = "downloadTranscript"
+                    <UiButton
+                      @click="downloadTranscript"
                       rel="noopener noreferrer"
                       class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50"
                     >
                       {{ t('student_dashboard.academic_record.download') }}
-                  </Button>
+                    </UiButton>
                     <UiButton type="button" size="sm" variant="secondary" @click="transcriptInputRef?.click()">
                       {{ academicRecord?.transcript_file ? t('student_dashboard.academic_record.replace') : t('student_dashboard.academic_record.upload_transcript') }}
                     </UiButton>
@@ -235,14 +229,14 @@
       </div>
 
       <div class="bg-white rounded-lg shadow-sm border border-red-100 p-6">
-        <h2 class="text-lg font-bold text-red-700 mb-2">Vymazať účet</h2>
-        <p class="text-sm text-gray-600 mb-4">Táto akcia anonymizuje váš účet a nie je možné ju vrátiť späť.</p>
+        <h2 class="text-lg font-bold text-red-700 mb-2">{{ $t('common.delete_account') }}</h2>
+        <p class="text-sm text-gray-600 mb-4">{{ $t('common.del_subtitle') }}</p>
         <UiButton
           variant="danger"
           :disabled="deletingAccount"
           @click="deleteAccount"
         >
-          {{ deletingAccount ? 'Mažem účet...' : 'Vymazať účet' }}
+          {{ deletingAccount ? $t('common.del_acc') : $t('common.d_a') }}
         </UiButton>
       </div>
     </template>
@@ -250,21 +244,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, watch } from 'vue'
-import { useApplications } from '~/composables/modules/student/useApplications'
+import { ref, computed, reactive, watch, onMounted } from 'vue'
 
 const api = useApi()
 const config = useRuntimeConfig()
 const authStore = useAuthStore()
-const teamsStore = useTeamsStore()
-const { applications, refresh: refreshApplications } = useApplications()
 const { addToast } = useToast()
 const { t } = useI18n()
 
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
-   roles: ['student'],
+  roles: ['student'],
 })
 
 useHead({ title: t('student_dashboard.profile.seo_title') })
@@ -286,6 +277,7 @@ const universities = ref<any[]>([])
 const studyPrograms = ref<any[]>([])
 const studyFields = ref<any[]>([])
 const studyYears = ref<any[]>([])
+
 const studentDetails = reactive({
   university_id: null as number | null,
   study_program_id: null as number | null,
@@ -341,44 +333,38 @@ const avatarDisplayUrl = computed(() => {
   return resolveMediaUrl(pathOrUrl)
 })
 
-const teamsCount = computed(() => teamsStore.teams.length)
-const applicationsCount = computed(() => applications.value.length)
-
 onMounted(async () => {
   pageLoading.value = true
   try {
     await authStore.getCurrentUser()
     syncFormFromUser()
-    await Promise.all([teamsStore.fetchTeams(), refreshApplications(), loadStudyOptions(), loadStudentMe(), loadAcademicRecord()])
+    await Promise.all([
+      loadStudyOptions(),
+      loadStudentMe(),
+      loadAcademicRecord()
+    ])
   } finally {
     pageLoading.value = false
   }
 })
 
-
 async function downloadTranscript() {
   if (!academicRecord.value?.transcript_file) return
 
   try {
-  
     const res = await api.get(`/get-academic-record/${academicRecord.value.transcript_file}`, {
       responseType: 'blob'
     }) as any
 
-   
     const fileName = `transcript_${academicRecord.value.transcript_file}.pdf`
-
-
     const blobUrl = window.URL.createObjectURL(new Blob([res]))
     
-   
     const link = document.createElement('a')
     link.href = blobUrl
     link.download = fileName
     document.body.appendChild(link)
     link.click()
     
-  
     document.body.removeChild(link)
     window.URL.revokeObjectURL(blobUrl)
 
@@ -450,16 +436,12 @@ const transcriptFileName = computed(() => {
   if (academicForm.transcript) return academicForm.transcript.name
   
   const fileProp = academicRecord.value?.transcript_file
-  
-  // Handled cleanly: if it's just an ID number from the backend
   if (typeof fileProp === 'number') {
     return `Uložený dokument v systéme (ID: ${fileProp})` 
   }
-  
   if (typeof fileProp === 'string') {
     return fileProp.split('/').pop() ?? ''
   }
-
   return ''
 })
 
@@ -500,7 +482,6 @@ async function saveAcademicRecord() {
   try {
     const formData = new FormData()
     formData.append('honor_declaration', academicForm.honor_declaration ? '1' : '0')
-    
     if (academicForm.transcript instanceof File) {
       formData.append('transcript_file', academicForm.transcript)
     }

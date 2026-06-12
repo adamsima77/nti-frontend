@@ -97,14 +97,14 @@
       </div>
 
       <div class="bg-white rounded-lg shadow-sm border border-red-100 p-6 mt-6">
-        <h2 class="text-lg font-bold text-red-700 mb-2">Delete account</h2>
-        <p class="text-sm text-gray-600 mb-4">This action anonymizes your account and cannot be undone.</p>
+        <h2 class="text-lg font-bold text-red-700 mb-2">{{ $t('common.delete_account') }}</h2>
+        <p class="text-sm text-gray-600 mb-4">{{ $t('common.del_subtitle') }}</p>
         <UiButton
           variant="danger"
           :disabled="deletingAccount"
           @click="deleteAccount"
         >
-          {{ deletingAccount ? 'Deleting account...' : 'Delete account' }}
+          {{ deletingAccount ? $t('common.del_acc') : $t('common.d_a') }}
         </UiButton>
       </div>
     </template>

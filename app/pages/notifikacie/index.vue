@@ -4,8 +4,8 @@
     <!-- Page header -->
     <div class="flex items-start justify-between mb-6">
       <div>
-        <h1 class="text-3xl font-bold text-navy mb-1">Notifikácie</h1>
-        <p class="text-gray-500 text-sm">Prehľad vašich oznámení</p>
+        <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('common.notifications')}}</h1>
+        <p class="text-gray-500 text-sm">{{ $t('common.notifications_desc') }}</p>
       </div>
       <div class="flex items-center gap-2">
         <button
@@ -14,7 +14,7 @@
           class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-medium rounded-lg shadow-sm transition-colors duration-150"
           >
           <Send class="w-4 h-4" />
-          Hromadný e-mail
+          {{ $t('common.bulk') }}
         </button>
         
       </div>

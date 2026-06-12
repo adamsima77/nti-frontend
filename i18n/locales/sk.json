@@ -912,29 +912,6 @@
         "save_failed": "Uloženie študentského záznamu zlyhalo."
       }
     
-    },
-    "academic_record": {
-      "title": "Akademický záznam",
-      "honor_declaration": "Čestné prehlásenie",
-      "honor_declaration_text": "Čestne vyhlasujem že nemám prenášané predmety a môj priemer profilových predmetov spĺňa podmienky programu",
-      "honor_declaration_required": "Musíte potvrdiť čestné vyhlásenie na pokračovanie.",
-      "transcript_label": "Výpis známok",
-      "transcript_upload": "Nahrať prepis",
-      "upload_transcript": "Nahrať výpis známok (PDF)",
-      "save_button": "Uložiť akademický záznam",
-      "signed_at": "Podpísané dňa",
-      "not_signed": "Nepodpísané",
-      "transcript_error": "Nahrajte PDF prepis.",
-      "download": "Stiahnuť výpis",
-      "not_uploaded": "Výpis nebol nahratý",
-      "privacy_required": "Musíte súhlasiť s ochranou osobných údajov.",
-      "yes": "Áno",
-      "no": "Nie",
-      "status_confirmed": "Čestné prehlásenie potvrdené",
-      "status_not_confirmed": "Čestné prehlásenie nepotvrdené",
-      "status_not_provided": "Čestné prehlásenie nebolo poskytnuté",
-      "saving": "Ukladám...",
-      "saved": "Akademický záznam bol uložený."
     }
   },
 
@@ -1802,6 +1779,18 @@
   },
 
     "common": {
+      "mile_sub": "Prehľad míľnikov pre vaše aktívne projekty.",
+      "bulk": "Hromadný e-mail",
+      "notifications": "Notifikácie",
+      "notifications_desc": "Prehľad vašich oznámení",
+      "delete_account": "Vymazať účet",
+      "del_acc": "Mažem účet...",
+      "d_a": "'Vymazať účet'",
+      "del_subtitle": "Táto akcia anonymizuje váš účet a nie je možné ju vrátiť späť.",
+      "e_a": "Exportuje zoznam prihlášok na základe zvolených filtrov",
+       "export_application": "Export Prihlášok",
+      "export_call": "Export Výziev",
+      "export": "Exportuje zoznam používateľov podľa zvolených filtrov",
     "cancel": "Zrušiť",
     "close": "Zavrieť",
     "retry": "Skúsiť znova",
@@ -1932,11 +1921,7 @@
     "forceCloseTitle": "Manuálne uzavrieť výzvu",
     "forceCloseActiveHint": "Výzva je manuálne uzavretá — uchádzači sa nemôžu prihlásiť.",
     "forceCloseInactiveHint": "Výzva sa riadi termínom uzávierky. Zapnutím ju okamžite uzavriete.",
-    "formTabHint": {
-      "prefix": "Navrhnite polia, ktoré budú uchádzači vypĺňať pri podaní prihlášky. Pri ",
-      "highlight": "Program A",
-      "suffix": " sú predvyplnené polia pre 6 povinných dokumentov."
-    },
+    "formTabHint": "Navrhnite polia, ktoré budú uchádzači vypĺňať pri podaní prihlášky.",
     "fieldDefaultLabel": "Pole {num}",
     "fieldRequiredBadge": "povinné",
     "fieldNameLabel": "Názov poľa",
@@ -1956,13 +1941,7 @@
     "formEmptyTitle": "Formulár je prázdny",
     "formEmptySubtitle": "Pridajte polia pomocou tlačidla nižšie",
     "fieldAddButton": "Pridať pole",
-    "criteriaTabHint": {
-      "prefix": "Vyberte hodnotiace kritériá komisie a nastavte ich ",
-      "highlightWeight": "váhu (1–10)",
-      "middle": ". Kritériá s príznakom ",
-      "highlightSignal": "akademický signál",
-      "suffix": " sú informatívne — nespôsobujú automatické zamietnutie (§7.2)."
-    },
+    "criteriaTabHint": "Vyberte hodnotiace kritériá komisie.",
     "availableCriteriaLabel": "Dostupné kritériá",
     "selectAtLeastOne": "Vyberte aspoň jedno",
     "noCriteriaAvailable": "Žiadne kritériá nie sú k dispozícii.",
@@ -2458,5 +2437,30 @@
         "download_error": "Stiahnutie zlyhalo"
       }
     }
-  }
+  },
+
+   "academic_record": {
+      "title": "Akademický záznam",
+      "honor_declaration": "Čestné prehlásenie",
+      "honor_declaration_text": "Čestne vyhlasujem že nemám prenášané predmety a môj priemer profilových predmetov spĺňa podmienky programu",
+      "honor_declaration_required": "Musíte potvrdiť čestné vyhlásenie na pokračovanie.",
+      "transcript_label": "Výpis známok",
+      "transcript_upload": "Nahrať prepis",
+      "upload_transcript": "Nahrať výpis známok (PDF)",
+      "save_button": "Uložiť akademický záznam",
+      "signed_at": "Podpísané dňa",
+      "not_signed": "Nepodpísané",
+       "transcript": "Výpis známok",
+      "transcript_error": "Nahrajte PDF prepis.",
+      "download": "Stiahnuť výpis",
+      "not_uploaded": "Výpis nebol nahratý",
+      "privacy_required": "Musíte súhlasiť s ochranou osobných údajov.",
+      "yes": "Áno",
+      "no": "Nie",
+      "status_confirmed": "Čestné prehlásenie potvrdené",
+      "status_not_confirmed": "Čestné prehlásenie nepotvrdené",
+      "status_not_provided": "Čestné prehlásenie nebolo poskytnuté",
+      "saving": "Ukladám...",
+      "saved": "Akademický záznam bol uložený."
+    }
 }

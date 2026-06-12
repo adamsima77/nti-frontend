@@ -6,7 +6,7 @@
         <p class="text-gray-500 text-sm">{{ t('mentor.consultations.subtitle') }}</p>
       </div>
       <NuxtLink
-        to="/mentor/konzultacie/nova"
+        :to="localePath('/mentor/konzultacie/nova')"
         class="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-purple-700 transition-colors text-sm"
       >
         <Plus class="w-4 h-4" /> {{ t('mentor.consultations.new') }}
@@ -141,7 +141,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { Plus, ExternalLink, MessageSquare } from 'lucide-vue-next'
 
-
+const localePath = useLocalePath()
 const { t } = useI18n()
 
 type Consultation = {

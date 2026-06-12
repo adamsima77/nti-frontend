@@ -478,7 +478,7 @@
                     </div>
 
                     <div class="space-y-1">
-                      <label class="block text-xs font-medium text-gray-500">Interná poznámka (voliteľná)</label>
+                      <label class="block text-xs font-medium text-gray-500">Verejná poznámka (voliteľná)</label>
                       <textarea
                         v-model="statusForm.note"
                         rows="2"

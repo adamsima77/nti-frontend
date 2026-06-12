@@ -121,6 +121,7 @@
       </div>
     </div>
 
+    <ClientOnly>
     <!-- Create / Edit modal -->
     <Teleport to="body">
       <Transition name="modal-fade">
@@ -153,7 +154,9 @@
         </div>
       </Transition>
     </Teleport>
+    </ClientOnly>
 
+    <ClientOnly>
     <!-- Delete confirm modal -->
     <Teleport to="body">
       <Transition name="modal-fade">
@@ -175,6 +178,7 @@
         </div>
       </Transition>
     </Teleport>
+    </ClientOnly>
   </div>
 </template>
 

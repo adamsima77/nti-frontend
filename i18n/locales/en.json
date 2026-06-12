@@ -1138,29 +1138,6 @@
         "photo_error": "Photo upload failed.",
         "save_failed": "Unable to save student record."
       }
-    },
-    "academic_record": {
-      "title": "Academic record",
-      "honor_declaration": "Honor declaration",
-      "honor_declaration_text": "I hereby declare that I have no carried-over subjects and my profile subject average meets program requirements",
-      "honor_declaration_required": "You must confirm the honor declaration to continue.",
-      "transcript_label": "Grade transcript",
-      "transcript_upload": "Upload transcript",
-      "upload_transcript": "Upload grade transcript (PDF)",
-      "save_button": "Save academic record",
-      "signed_at": "Signed at",
-      "not_signed": "Not signed",
-      "transcript_error": "Please upload a PDF transcript.",
-      "download": "Download transcript",
-      "not_uploaded": "Transcript not uploaded",
-      "privacy_required": "You must agree to the privacy policy.",
-      "yes": "Yes",
-      "no": "No",
-      "status_confirmed": "Honor declaration confirmed",
-      "status_not_confirmed": "Honor declaration not confirmed",
-      "status_not_provided": "Honor declaration not provided",
-      "saving": "Saving...",
-      "saved": "Academic record saved."
     }
   },
 
@@ -2035,6 +2012,18 @@
     "timeout_hint": "The export generation timed out but may still complete on the server background."
   },
   "common": {
+    "mile_sub": "Milestones overview for your active projects",
+    "bulk": "Bulk Email",
+     "notifications": "Notifications",
+     "notifications_desc": "Overview of your notifications",
+    "delete_account": "Delete account",
+    "del_acc": "Deleting Account...",
+    "d_a": "Delete Account",
+    "del_subtitle": "This action anonymize your account and is irreversible.",
+    "e_a": "Exports list of application based on current filters",
+    "export_application": "Export Applications",
+    "export_call": "Call Export",
+    "export": "Exports list of users based on filter",
     "cancel": "Cancel",
     "close": "Close",
     "retry": "Retry",
@@ -2202,11 +2191,7 @@
     "forceCloseTitle": "Manually Close Call",
     "forceCloseActiveHint": "The call is manually closed — applicants cannot apply.",
     "forceCloseInactiveHint": "The call follows the scheduled deadline. Toggle on to close it immediately.",
-    "formTabHint": {
-      "prefix": "Design fields that applicants will fill out when submitting their application. For ",
-      "highlight": "Program A",
-      "suffix": ", fields for 6 mandatory documents are pre-filled."
-    },
+    "formTabHint": "Design fields that applicants will fill out when submitting their application.",
     "fieldDefaultLabel": "Field {num}",
     "fieldRequiredBadge": "required",
     "fieldNameLabel": "Field Label",
@@ -2226,13 +2211,7 @@
     "formEmptyTitle": "Form is empty",
     "formEmptySubtitle": "Add fields using the button below",
     "fieldAddButton": "Add Field",
-    "criteriaTabHint": {
-      "prefix": "Select the committee's evaluation criteria and set their ",
-      "highlightWeight": "weight (1–10)",
-      "middle": ". Criteria flagged as an ",
-      "highlightSignal": "academic signal",
-      "suffix": " are informative — they do not cause automatic rejection (§7.2)."
-    },
+    "criteriaTabHint": "Select the committee's evaluation criteria.",
     "availableCriteriaLabel": "Available Criteria",
     "selectAtLeastOne": "Select at least one",
     "noCriteriaAvailable": "No criteria available.",
@@ -2774,5 +2753,30 @@
         "download_error": "Download failed"
       }
     }
-  }
+  },
+
+  "academic_record": {
+      "title": "Academic record",
+      "honor_declaration": "Honor declaration",
+      "honor_declaration_text": "I hereby declare that I have no carried-over subjects and my profile subject average meets program requirements",
+      "honor_declaration_required": "You must confirm the honor declaration to continue.",
+      "transcript_label": "Grade transcript",
+      "transcript_upload": "Upload transcript",
+      "upload_transcript": "Upload grade transcript (PDF)",
+      "save_button": "Save academic record",
+      "signed_at": "Signed at",
+      "not_signed": "Not signed",
+      "transcript": "Grade transcript",
+      "transcript_error": "Please upload a PDF transcript.",
+      "download": "Download transcript",
+      "not_uploaded": "Transcript not uploaded",
+      "privacy_required": "You must agree to the privacy policy.",
+      "yes": "Yes",
+      "no": "No",
+      "status_confirmed": "Honor declaration confirmed",
+      "status_not_confirmed": "Honor declaration not confirmed",
+      "status_not_provided": "Honor declaration not provided",
+      "saving": "Saving...",
+      "saved": "Academic record saved."
+    }
 }

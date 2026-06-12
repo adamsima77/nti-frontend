@@ -539,7 +539,7 @@
         </div>
 
         <!-- PO info (Program B) -->
-        <div v-if="project.productOwner" class="bg-purple-50 border border-purple-100 rounded-lg p-5">
+        <div v-if="project.productOwner && project.productOwner.name" class="bg-purple-50 border border-purple-100 rounded-lg p-5">
           <h3 class="text-sm font-semibold text-purple-800 mb-2">{{ t('mentor.detail.productOwner') }}</h3>
           <p class="font-medium text-purple-900 text-sm">{{ project.productOwner.name }}</p>
           <p class="text-xs text-purple-600 mt-0.5">{{ project.productOwner.email }}</p>

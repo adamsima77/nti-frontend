@@ -169,8 +169,8 @@
     <ClientOnly>
      <AdminExportModal
   v-model="exportModalOpen"
-  title="Export Výziev"
-  subtitle="Exportuje zoznam výziev na základe zvolených filtrov"
+  :title="t('common.export_call')"
+  :subtitle="t('common.export')"
   endpoint="/calls/export"
   filename-prefix="calls_export"
   :allowed-formats="['xlsx', 'csv', 'pdf']"

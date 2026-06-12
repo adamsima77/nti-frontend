@@ -7,15 +7,17 @@
 
     <div class="bg-white rounded-lg border border-gray-200">
       <UiDataTable
-        :columns="columns"
-        :rows="filteredApplications"
-        :loading="isLoading"
-        :paginated="totalPages > 1"
-        :current-page="currentPage"
-        :total-pages="totalPages"
-        row-key="id"
-        @update:current-page="onPageChange"
-      >
+  :columns="columns"
+  :rows="filteredApplications"
+  :loading="isLoading"
+  :paginated="totalPages > 1"
+  :current-page="currentPage"
+  :total-pages="totalPages"
+  row-key="id"
+  v-model:sort-by="sortBy"
+  v-model:sort-dir="sortDir"
+  @update:current-page="onPageChange"
+>
         <template #header>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 border-b border-gray-100">
             <UiInput
@@ -61,8 +63,8 @@
 
   <AdminExportModal
     v-model="openExportModal"
-    title="Export prihlášok"
-    subtitle="Exportuje zoznam prihlášok na základe zvolených filtrov"
+    :title="t('common.export_application')"
+    :subtitle="t('common.e_a')"
     endpoint="applications/export"
     filename-prefix="applications_export"
     :allowed-formats="['xlsx', 'csv', 'pdf']"
@@ -76,6 +78,7 @@ import { Download, Eye } from 'lucide-vue-next'
 import { watch } from 'vue'
 import type { AdminApplication } from '~/types/admin'
 
+const { t } = useI18n()
 definePageMeta({
   layout: 'portal',
   middleware: ['auth'],
@@ -95,6 +98,9 @@ const isLoading    = ref(false)
 const applications = ref<any[]>([])
 const currentPage  = ref(1)
 const totalPages   = ref(1)
+
+const sortBy       = ref('submittedAt') // predvolený stĺpec na zoradenie
+const sortDir      = ref<'asc' | 'desc'>('desc') // predvolený smer
 
 const columns = [
   { key: 'reference',   label: 'ID',      sortable: true },
@@ -147,11 +153,42 @@ const mappedApplications = computed(() =>
 
 // ── Client-side search (status filter is server-side) ─────────────────────
 const filteredApplications = computed(() => {
+  // 1. Krok: Filtrovanie podľa vyhľadávania
   const q = search.value.toLowerCase().trim()
-  if (!q) return mappedApplications.value
-  return mappedApplications.value.filter(
-    (a) => a.reference.toLowerCase().includes(q) || a.team.toLowerCase().includes(q),
-  )
+  let result = [...mappedApplications.value]
+  
+  if (q) {
+    result = result.filter(
+      (a) => a.reference.toLowerCase().includes(q) || a.team.toLowerCase().includes(q),
+    )
+  }
+
+  // 2. Krok: Lokálne zoradenie (Sorting)
+  const key = sortBy.value
+  const dir = sortDir.value === 'asc' ? 1 : -1
+
+  return result.sort((a, b) => {
+    let valA = a[key]
+    let valB = b[key]
+
+    // Špeciálny prípad pre dátum (aby ho správne zoradilo chronologicky, nie ako text)
+    if (key === 'submittedAt') {
+      // Keďže v mappedApplications robíš .toLocaleDateString(), 
+      // na správne zoradenie použijeme pôvodný dátum z _raw objektu
+      valA = a._raw.submitted_at ? new Date(a._raw.submitted_at).getTime() : 0
+      valB = b._raw.submitted_at ? new Date(b._raw.submitted_at).getTime() : 0
+    }
+
+    // Ošetrenie null / undefined hodnôt
+    if (valA === null || valA === undefined) return 1
+    if (valB === null || valB === undefined) return -1
+
+    if (typeof valA === 'string' && typeof valB === 'string') {
+      return valA.localeCompare(valB, 'sk') * dir
+    }
+
+    return (valA < valB ? -1 : valA > valB ? 1 : 0) * dir
+  })
 })
 
 let searchTimeout: ReturnType<typeof setTimeout> | null = null

@@ -140,6 +140,13 @@
     <div class="mb-8">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-navy">{{ t('student_dashboard.home.active_projects_milestones') }}</h2>
+        <NuxtLink
+          :to="localePath('/student/milniky')"
+          class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
+        >
+          {{ t('student_dashboard.home.view_all') }}
+          <ChevronRight class="w-4 h-4" />
+        </NuxtLink>
       </div>
       <div
         v-if="activeProjectsWithMilestones && activeProjectsWithMilestones.length"
@@ -182,6 +189,8 @@
                 v-else-if="milestone.status === 'in_progress'"
                 class="w-4 h-4 text-blue-500 flex-shrink-0"
               />
+
+              <XCircle v-else-if="milestone.status === 'rejected'"  class="w-4 h-4 text-red-500 flex-shrink-0"/>
               <Circle
                 v-else
                 class="w-4 h-4 text-gray-300 flex-shrink-0"
@@ -196,14 +205,6 @@
               +{{ project.milestones.length - 2 }} {{ t('student_dashboard.home.more_milestones') }}
             </div>
           </div>
-
-          <NuxtLink
-            :to="localePath(`/student/prihlasky/${project.id}`)"
-            class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 mt-3"
-          >
-            {{ t('student_dashboard.common.view_detail') }}
-            <ChevronRight class="w-3 h-3" />
-          </NuxtLink>
         </div>
       </div>
       <UiEmptyState

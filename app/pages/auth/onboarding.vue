@@ -2,6 +2,7 @@
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12 mt-10">
     <div class="w-full max-w-lg">
 
+      <ClientOnly>
       <StudentOnboarding
         v-if="auth.userRole === 'student'"
         @completed="handleCompleted"
@@ -15,6 +16,7 @@
       <div v-else class="text-center text-gray-500 text-sm">
         <UiLoader />
       </div>
+      </ClientOnly>
 
     </div>
   </div>
