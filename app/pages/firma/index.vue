@@ -12,10 +12,10 @@
       <div class="mb-10 bg-white rounded-xl border-l-4 border-gray-500 px-6 py-5 shadow-sm">
         <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full mb-3">
           <span class="w-1.5 h-1.5 rounded-full bg-gray-400" />
-          Člen organizácie
+          {{ $t('firma.dashboard.member_role') }}
         </span>
-        <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
-        <p class="text-gray-500 text-sm">Aktuálny prehľad projektov.</p>
+        <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('firma.dashboard.welcome', { name: userDisplayName }) }}</h1>
+        <p class="text-gray-500 text-sm">{{ $t('firma.dashboard.member_subtitle') }}</p>
       </div>
 
       <div v-if="orgDashboard.isLoading.value" class="flex justify-center py-20">
@@ -27,37 +27,37 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div class="bg-white rounded-lg shadow-sm border-l-4 border-blue-600 p-5">
             <div class="text-3xl font-bold text-blue-600">{{ orgDashboard.stats.value.total_calls }}</div>
-            <p class="text-sm text-gray-500 mt-1">Zadania celkom</p>
+            <p class="text-sm text-gray-500 mt-1">{{ $t('firma.dashboard.stats.total') }}</p>
           </div>
           <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-600 p-5">
             <div class="text-3xl font-bold text-green-600">{{ orgDashboard.stats.value.active_calls }}</div>
-            <p class="text-sm text-gray-500 mt-1">Aktívne</p>
+            <p class="text-sm text-gray-500 mt-1">{{ $t('firma.dashboard.stats.active') }}</p>
           </div>
           <div class="bg-white rounded-lg shadow-sm border-l-4 border-purple-500 p-5">
             <div class="text-3xl font-bold text-purple-600">{{ orgDashboard.stats.value.in_progress }}</div>
-            <p class="text-sm text-gray-500 mt-1">V realizácii</p>
+            <p class="text-sm text-gray-500 mt-1">{{ $t('firma.dashboard.stats.in_progress') }}</p>
           </div>
           <div class="bg-white rounded-lg shadow-sm border-l-4 border-gray-400 p-5">
             <div class="text-3xl font-bold text-gray-600">{{ orgDashboard.stats.value.completed }}</div>
-            <p class="text-sm text-gray-500 mt-1">Uzavreté</p>
+            <p class="text-sm text-gray-500 mt-1">{{ $t('firma.dashboard.stats.completed') }}</p>
           </div>
         </div>
 
         <!-- Calls table -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
           <div class="px-5 py-4 border-b border-gray-100">
-            <h2 class="text-lg font-semibold text-navy">Zadania organizácie</h2>
+            <h2 class="text-lg font-semibold text-navy">{{ $t('firma.dashboard.tasks_table.title') }}</h2>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-gray-100 bg-gray-50">
-                  <th class="text-left px-5 py-3 font-medium text-gray-500">Zadanie</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500">Typ / Program</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500">Deadline</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500">Prihlášky</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500">Priradený tím</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500">Stav</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_task') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_type') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_deadline') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_applications') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_team') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_status') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-50">
@@ -81,7 +81,7 @@
                       <Users class="w-3.5 h-3.5" />
                       {{ call.assigned_team.name }}
                     </span>
-                    <span v-else class="text-gray-400 text-xs">Nepriradený</span>
+                    <span v-else class="text-gray-400 text-xs">{{ $t('firma.dashboard.tasks_table.unassigned') }}</span>
                   </td>
                   <td class="px-5 py-4">
                     <UiStatusBadge :status="call.status ?? ''" />
@@ -89,7 +89,7 @@
                 </tr>
                 <tr v-if="!orgDashboard.calls.value.length">
                   <td colspan="6" class="px-5 py-10 text-center text-gray-400">
-                    Organizácia zatiaľ nemá žiadne zadania
+                    {{ $t('firma.dashboard.tasks_table.empty') }}
                   </td>
                 </tr>
               </tbody>
@@ -99,7 +99,7 @@
 
         <!-- Priradené tímy -->
         <div class="mt-8">
-          <h2 class="text-lg font-bold text-navy mb-4">Priradené tímy</h2>
+          <h2 class="text-lg font-bold text-navy mb-4">{{ $t('firma.dashboard.assigned_teams.title') }}</h2>
           <div v-if="orgDashboard.teams.value.length" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div
               v-for="(t, i) in orgDashboard.teams.value"
@@ -117,20 +117,20 @@
             </div>
           </div>
           <div v-else class="bg-gray-50 border border-dashed border-gray-200 rounded-lg p-5 text-center text-sm text-gray-400">
-            Zatiaľ nebol priradený žiadny tím
+            {{ $t('firma.dashboard.assigned_teams.empty') }}
           </div>
         </div>
 
         <!-- Prihlášky -->
         <div class="mt-8">
-          <h2 class="text-lg font-bold text-navy mb-4">Posledné prihlášky</h2>
+          <h2 class="text-lg font-bold text-navy mb-4">{{ $t('firma.dashboard.recent_applications.title') }}</h2>
           <div v-if="orgDashboard.applications.value.length" class="bg-white rounded-lg border border-gray-100 overflow-hidden">
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-gray-100 bg-gray-50">
-                  <th class="text-left px-5 py-3 font-medium text-gray-500">Tím</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500">Zadanie</th>
-                  <th class="text-left px-5 py-3 font-medium text-gray-500">Stav</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.assigned_teams.title') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.zadania.title') }}</th>
+                  <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_status') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-50">
@@ -145,7 +145,7 @@
             </table>
           </div>
           <div v-else class="bg-gray-50 border border-dashed border-gray-200 rounded-lg p-5 text-center text-sm text-gray-400">
-            Zatiaľ neboli podané žiadne prihlášky
+            {{ $t('firma.dashboard.recent_applications.empty') }}
           </div>
         </div>
 
@@ -158,29 +158,29 @@
     <div class="mb-10 bg-white rounded-xl border-l-4 border-gray-500 px-6 py-5 shadow-sm">
       <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full mb-3">
         <span class="w-1.5 h-1.5 rounded-full bg-gray-400" />
-        Administrátor organizácie
+        {{ $t('firma.dashboard.admin_role') }}
       </span>
-      <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
-      <p class="text-gray-500 text-sm">Centrálny manažment firemného portfólia, zadaní a rozpočtov.</p>
+      <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('firma.dashboard.welcome', { name: userDisplayName }) }}</h1>
+      <p class="text-gray-500 text-sm">{{ $t('firma.dashboard.admin_subtitle') }}</p>
     </div>
 
     <!-- Stats row -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="bg-white rounded-lg shadow-sm border-l-4 border-blue-600 p-5">
         <div class="text-3xl font-bold text-blue-600">{{ stats.totalTasks }}</div>
-        <p class="text-sm text-gray-500 mt-1">Zadania</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('firma.zadania.title') }}</p>
       </div>
       <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-600 p-5">
         <div class="text-3xl font-bold text-success-500">{{ stats.activeTasks }}</div>
-        <p class="text-sm text-gray-500 mt-1">Aktívne</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('firma.dashboard.stats.active') }}</p>
       </div>
       <div class="bg-white rounded-lg shadow-sm border-l-4 border-purple-500 p-5">
         <div class="text-3xl font-bold text-purple-600">{{ stats.assignedTeams }}</div>
-        <p class="text-sm text-gray-500 mt-1">Priradené tímy</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('firma.dashboard.assigned_teams.title') }}</p>
       </div>
       <div class="bg-white rounded-lg shadow-sm border-l-4 border-amber-500 p-5">
         <div class="text-3xl font-bold text-warning-500">{{ stats.pendingApplications }}</div>
-        <p class="text-sm text-gray-500 mt-1">Prihlášky</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('firma.dashboard.stats.applications') }}</p>
       </div>
     </div>
 
@@ -191,7 +191,7 @@
     >
       <div class="flex items-center gap-2 mb-3">
         <AlertTriangle class="w-5 h-5 text-amber-600" />
-        <h2 class="text-lg font-semibold text-amber-800">Vyžadované akcie</h2>
+        <h2 class="text-lg font-semibold text-amber-800">{{ $t('firma.dashboard.actions.title') }}</h2>
       </div>
       <ul class="space-y-2">
         <li
@@ -204,7 +204,7 @@
             :to="action.link"
             class="text-sm font-medium text-amber-700 hover:text-amber-900 flex items-center gap-1"
           >
-            Vyriešiť
+            {{ $t('firma.dashboard.actions.resolve') }}
             <ChevronRight class="w-4 h-4" />
           </NuxtLink>
         </li>
@@ -213,16 +213,16 @@
 
     <!-- Budget overview -->
     <div class="mb-8">
-      <h2 class="text-xl font-bold text-navy mb-4">Zadania</h2>
+      <h2 class="text-xl font-bold text-navy mb-4">{{ $t('firma.zadania.title') }}</h2>
       <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b border-gray-100 bg-gray-50">
-                <th class="text-left px-5 py-3 font-medium text-gray-500">Zadanie</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500">Program</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500">Rozpočet</th>
-                <th class="text-left px-5 py-3 font-medium text-gray-500">Stav</th>
+                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_task') }}</th>
+                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_program') }}</th>
+                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_budget') }}</th>
+                <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_status') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
@@ -233,7 +233,7 @@
               >
                 <td class="px-5 py-4">
                   <p class="font-medium text-navy">{{ task.title }}</p>
-                  <p class="text-xs text-gray-400 mt-0.5">Pridané {{ task.createdAt }}</p>
+                  <p class="text-xs text-gray-400 mt-0.5">{{ $t('firma.dashboard.added', { date: task.createdAt }) }}</p>
                 </td>
                 <td class="px-5 py-4 text-gray-600">{{ task.program }}</td>
                 <td class="px-5 py-4 font-medium text-navy">{{ formatCurrency(task.budget) }}</td>
@@ -243,7 +243,7 @@
               </tr>
               <tr v-if="!budgetTasks.length">
                 <td colspan="4" class="px-5 py-10 text-center text-gray-400">
-                  Nemáte žiadne zadania
+                  {{ $t('firma.dashboard.tasks_table.no_tasks') }}
                 </td>
               </tr>
             </tbody>
@@ -252,10 +252,10 @@
         <div class="px-5 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-end">
 
           <NuxtLink
-            to="/firma/zadania"
+            :to="localePath('/firma/zadania')"
             class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
           >
-            Všetky zadania
+            {{ $t('firma.dashboard.actions.all_tasks') }}
             <ChevronRight class="w-4 h-4" />
           </NuxtLink>
         </div>
@@ -264,7 +264,7 @@
 
     <!-- Assigned teams -->
     <div class="mb-8">
-      <h2 class="text-xl font-bold text-navy mb-4">Priradené tímy</h2>
+      <h2 class="text-xl font-bold text-navy mb-4">{{ $t('firma.dashboard.assigned_teams.title') }}</h2>
       <div v-if="assignedTeams.length" :class="['grid gap-4', gridClass(assignedTeams.length)]">
         <div
           v-for="team in assignedTeams"
@@ -276,18 +276,18 @@
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-medium text-navy text-sm">{{ team.name }}</p>
-            <p class="text-xs text-gray-500 mt-0.5">{{ team.task }} · {{ team.members }} členov</p>
+            <p class="text-xs text-gray-500 mt-0.5">{{ team.task }} · {{ $t('firma.dashboard.assigned_teams.members', { count: team.members }) }}</p>
           </div>
         </div>
       </div>
       <p v-else class="text-sm text-gray-400 text-center py-6 bg-white rounded-lg border border-gray-100">
-        Zatiaľ žiadne priradené tímy
+        {{ $t('firma.dashboard.assigned_teams.empty') }}
       </p>
     </div>
 
     <!-- Recent applications -->
     <div class="mb-8">
-      <h2 class="text-xl font-bold text-navy mb-4">Posledné prihlášky</h2>
+      <h2 class="text-xl font-bold text-navy mb-4">{{ $t('firma.dashboard.recent_applications.title') }}</h2>
       <div v-if="pendingApplications.length" :class="['grid gap-4', gridClass(pendingApplications.length)]">
         <div
           v-for="app in pendingApplications"
@@ -299,19 +299,19 @@
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-medium text-navy text-sm">{{ app.teamName }}</p>
-            <p class="text-xs text-gray-500 mt-0.5">{{ app.task }} · Podané {{ app.submittedAt }}</p>
+            <p class="text-xs text-gray-500 mt-0.5">{{ app.task }} · {{ $t('firma.dashboard.recent_applications.submitted', { date: app.submittedAt }) }}</p>
           </div>
           <UiStatusBadge :status="app.status" />
         </div>
       </div>
       <p v-else class="text-sm text-gray-400 text-center py-6 bg-white rounded-lg border border-gray-100">
-        Zatiaľ žiadne prihlášky
+        {{ $t('firma.dashboard.recent_applications.empty') }}
       </p>
     </div>
 
     <!-- Upcoming deadlines -->
     <div>
-      <h2 class="text-xl font-bold text-navy mb-4">Blížiace sa termíny</h2>
+      <h2 class="text-xl font-bold text-navy mb-4">{{ $t('firma.dashboard.upcoming_deadlines.title') }}</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div
           v-for="d in upcomingDeadlines"
@@ -327,7 +327,7 @@
           </div>
           <div class="text-right flex-shrink-0">
             <span class="text-2xl font-bold text-blue-600">{{ d.daysLeft }}</span>
-            <p class="text-xs text-gray-500">dní zostáva</p>
+            <p class="text-xs text-gray-500">{{ $t('firma.dashboard.upcoming_deadlines.days_left') }}</p>
           </div>
         </div>
       </div>
@@ -342,6 +342,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Users, Calendar, AlertTriangle, ChevronRight } from 'lucide-vue-next'
 import { normalizeTaskStatus } from '~/composables/useTaskStatus'
 import { useOrgDashboard } from '~/composables/useOrgDashboard'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   layout: 'portal',
@@ -355,6 +356,8 @@ useHead({
 
 const authStore = useAuthStore()
 const api = useApi()
+const { t } = useI18n()
+const localePath = useLocalePath()
 
 const orgDashboard = useOrgDashboard()
 
@@ -408,7 +411,7 @@ const actions = computed(() => {
     return [
       {
         id: 'create-task',
-        message: 'Nemáte ešte žiadne zverejnené zadania. Vytvorte vaše prvé zadanie.',
+        message: t('firma.dashboard.actions.no_tasks_msg'),
         link: '/firma/zadania/nove',
       },
     ]

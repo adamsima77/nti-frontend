@@ -4,15 +4,15 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-navy mb-1">Zadania</h1>
-        <p class="text-gray-500">Správa zadaní pre tímy NTI programov</p>
+        <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('firma.zadania.title') }}</h1>
+        <p class="text-gray-500">{{ $t('firma.zadania.subtitle') }}</p>
       </div>
       <NuxtLink
-        to="/firma/zadania/nove"
+        :to="localePath('/firma/zadania/nove')"
         class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
       >
         <Plus class="w-4 h-4" />
-        Nové zadanie
+        {{ $t('firma.zadania.new_task') }}
       </NuxtLink>
     </div>
 
@@ -47,11 +47,11 @@
               <h3 class="font-semibold text-navy text-base">{{ task.title }}</h3>
               <UiStatusBadge :status="task.rawStatus" />
             </div>
-            <p class="text-sm text-gray-500">{{ task.program }} · Pridané {{ task.createdAt }}</p>
+            <p class="text-sm text-gray-500">{{ task.program }} · {{ $t('firma.zadania.card.added', { date: task.createdAt }) }}</p>
           </div>
           <div class="text-right shrink-0">
             <p class="text-lg font-bold text-navy">{{ formatCurrency(task.budget) }}</p>
-            <p class="text-xs text-gray-400">rozpočet</p>
+            <p class="text-xs text-gray-400">{{ $t('firma.zadania.card.budget') }}</p>
           </div>
         </div>
 
@@ -62,7 +62,7 @@
           <div class="flex items-center gap-4 text-sm text-gray-400">
             <span class="flex items-center gap-1">
               <FileText class="w-4 h-4" />
-              {{ task.applicationsCount }} prihlášok
+              {{ $t('firma.zadania.card.applications', { count: task.applicationsCount }) }}
             </span>
             <span
               v-if="task.deadline"
@@ -73,10 +73,10 @@
             </span>
           </div>
           <NuxtLink
-            :to="`/firma/zadania/${task.id}`"
+            :to="localePath(`/firma/zadania/${task.id}`)"
             class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
           >
-            Detail
+            {{ $t('firma.zadania.card.detail') }}
             <ChevronRight class="w-4 h-4" />
           </NuxtLink>
         </div>
@@ -88,14 +88,14 @@
         class="text-center py-16 bg-white rounded-lg border border-gray-100"
       >
         <ClipboardList class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-        <p class="text-gray-500 font-medium">Žiadne zadania</p>
-        <p class="text-sm text-gray-400 mt-1">Vytvorte prvé zadanie pre tímy</p>
+        <p class="text-gray-500 font-medium">{{ $t('firma.zadania.empty.title') }}</p>
+        <p class="text-sm text-gray-400 mt-1">{{ $t('firma.zadania.empty.subtitle') }}</p>
         <NuxtLink
-          to="/firma/zadania/nove"
+          :to="localePath('/firma/zadania/nove')"
           class="inline-flex items-center gap-2 mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
         >
           <Plus class="w-4 h-4" />
-          Nové zadanie
+          {{ $t('firma.zadania.new_task') }}
         </NuxtLink>
       </div>
     </div>
@@ -106,6 +106,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { Users, FileText, Calendar, ChevronRight, Plus, ClipboardList } from 'lucide-vue-next'
 import { normalizeTaskStatus } from '~/composables/useTaskStatus'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   layout: 'portal',
@@ -125,6 +126,8 @@ if (orgDashboard.myRole.value !== 'organization_admin') {
 
 const api = useApi()
 const authStore = useAuthStore()
+const { t } = useI18n()
+const localePath = useLocalePath()
 
 const tasks = ref<any[]>([])
 const isLoading = ref(true)
@@ -181,26 +184,10 @@ const getStatusCategory = (statusName: string) => {
 }
 
 const filters = computed(() => [
-  { 
-    label: 'Všetky', 
-    value: 'all', 
-    count: tasks.value.length 
-  },
-  { 
-    label: 'Aktívne', 
-    value: 'active', 
-    count: tasks.value.filter(t => getStatusCategory(t.rawStatus) === 'active').length 
-  },
-  { 
-    label: 'Dokončené', 
-    value: 'closed', 
-    count: tasks.value.filter(t => getStatusCategory(t.rawStatus) === 'closed').length 
-  },
-  { 
-    label: 'Drafty / Na schválenie', 
-    value: 'draft', 
-    count: tasks.value.filter(t => getStatusCategory(t.rawStatus) === 'draft').length 
-  },
+  { label: t('firma.zadania.filters.all'),       value: 'all',    count: tasks.value.length },
+  { label: t('firma.zadania.filters.active'),    value: 'active', count: tasks.value.filter(t => getStatusCategory(t.rawStatus) === 'active').length },
+  { label: t('firma.zadania.filters.completed'), value: 'closed', count: tasks.value.filter(t => getStatusCategory(t.rawStatus) === 'closed').length },
+  { label: t('firma.zadania.filters.draft'),     value: 'draft',  count: tasks.value.filter(t => getStatusCategory(t.rawStatus) === 'draft').length },
 ])
 
 const filteredTasks = computed(() => {

@@ -7,8 +7,8 @@
 
     <div v-else-if="!call" class="text-center py-20 text-gray-400">
       <Briefcase class="w-12 h-12 mx-auto mb-3 opacity-30" />
-      <p class="font-medium text-gray-500">Nemáte priradené žiadne zadanie</p>
-      <p class="text-sm mt-1">Kontaktujte NTI administrátora</p>
+      <p class="font-medium text-gray-500">{{ $t('firma.po.dashboard.no_task') }}</p>
+      <p class="text-sm mt-1">{{ $t('firma.po.dashboard.no_task_hint') }}</p>
     </div>
 
     <template v-else>
@@ -16,17 +16,17 @@
       <div class="mb-8 bg-white rounded-xl border-l-4 border-gray-500 px-6 py-5 shadow-sm">
         <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full mb-3">
           <span class="w-1.5 h-1.5 rounded-full bg-gray-400" />
-          Product Owner
+          {{ $t('firma.po.dashboard.role_badge') }}
         </span>
-        <h1 class="text-3xl font-bold text-navy mb-1">Vitajte, {{ userDisplayName }}!</h1>
-        <p class="text-gray-500 text-sm">Správa projektového cyklu a schvaľovanie kľúčových fáz.</p>
+        <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('firma.po.dashboard.welcome', { name: userDisplayName }) }}</h1>
+        <p class="text-gray-500 text-sm">{{ $t('firma.po.dashboard.subtitle') }}</p>
       </div>
 
       <!-- Header -->
       <div class="bg-white rounded-xl border border-gray-100 p-6 mb-8">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-xs font-medium text-gray-300 uppercase tracking-widest mb-2">Zadanie</p>
+            <p class="text-xs font-medium text-gray-300 mb-2">{{ $t('firma.po.dashboard.task_label') }}</p>
             <h1 class="text-2xl font-bold text-navy leading-snug mb-1">{{ call.name }}</h1>
             <p class="text-sm text-gray-400">{{ call.organization }} · {{ call.program }}</p>
           </div>
@@ -41,19 +41,19 @@
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-600 p-5">
           <div class="text-3xl font-bold text-green-600">{{ stats.open_milestones }}</div>
-          <p class="text-sm text-gray-500 mt-1">Otvorené míľniky</p>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('firma.po.dashboard.stats.open_milestones') }}</p>
         </div>
         <div class="bg-white rounded-lg shadow-sm border-l-4 border-purple-500 p-5">
           <div class="text-3xl font-bold text-purple-600">{{ stats.done_milestones }}</div>
-          <p class="text-sm text-gray-500 mt-1">Dokončené míľniky</p>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('firma.po.dashboard.stats.done_milestones') }}</p>
         </div>
         <div class="bg-white rounded-lg shadow-sm border-l-4 border-amber-500 p-5">
           <div class="text-3xl font-bold text-amber-600">{{ stats.pending_approvals }}</div>
-          <p class="text-sm text-gray-500 mt-1">Čakajú na schválenie</p>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('firma.po.dashboard.stats.pending_approvals') }}</p>
         </div>
         <div class="bg-white rounded-lg shadow-sm border-l-4 border-blue-400 p-5">
           <div class="text-3xl font-bold text-blue-500">{{ stats.documents_count }}</div>
-          <p class="text-sm text-gray-500 mt-1">Dokumenty</p>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('firma.po.dashboard.stats.documents') }}</p>
         </div>
       </div>
 
@@ -67,10 +67,9 @@
           <AlertTriangle class="w-5 h-5 text-amber-600" />
         </div>
         <div class="flex-1">
-          <p class="font-semibold text-amber-900 group-hover:underline">Vyžadovaná akcia</p>
+          <p class="font-semibold text-amber-900 group-hover:underline">{{ $t('firma.po.dashboard.action_required.title') }}</p>
           <p class="text-sm text-amber-700 mt-0.5">
-            {{ stats.pending_approvals }} {{ stats.pending_approvals === 1 ? 'míľnik čaká' : 'míľniky čakajú' }} na vaše schválenie.
-            Kliknite pre prechod na schvaľovanie.
+            {{ $t('firma.po.dashboard.action_required.body', { count: stats.pending_approvals }) }}
           </p>
         </div>
         <ChevronRight class="w-5 h-5 text-amber-500 self-center flex-shrink-0" />
@@ -82,7 +81,7 @@
           <Users class="w-5 h-5 text-green-600" />
         </div>
         <div>
-          <p class="text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Priradený tím</p>
+          <p class="text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">{{ $t('firma.po.dashboard.assigned_team.label') }}</p>
           <p class="text-sm font-semibold text-green-900">{{ team.name }}</p>
           <p class="text-xs text-green-600 mt-0.5">{{ team.members?.join(', ') }}</p>
         </div>
@@ -92,14 +91,14 @@
           <Users class="w-5 h-5 text-gray-400" />
         </div>
         <div>
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Priradený tím</p>
-          <p class="text-sm text-gray-400">Zatiaľ nebol priradený žiadny tím</p>
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">{{ $t('firma.po.dashboard.assigned_team.label') }}</p>
+          <p class="text-sm text-gray-400">{{ $t('firma.po.dashboard.assigned_team.none') }}</p>
         </div>
       </div>
 
       <!-- Blížiace sa termíny -->
       <div v-if="upcomingDeadlines.length" class="mt-8">
-        <h2 class="text-lg font-bold text-navy mb-4">Blížiace sa termíny</h2>
+        <h2 class="text-lg font-bold text-navy mb-4">{{ $t('firma.po.dashboard.deadlines') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div
             v-for="d in upcomingDeadlines"
@@ -115,7 +114,7 @@
             </div>
             <div class="text-right flex-shrink-0">
               <span class="text-2xl font-bold text-blue-600">{{ d.daysLeft }}</span>
-              <p class="text-xs text-gray-500">dní zostáva</p>
+              <p class="text-xs text-gray-500">{{ $t('firma.po.dashboard.days_left') }}</p>
             </div>
           </div>
         </div>
@@ -128,6 +127,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { Briefcase, Users, Calendar, AlertTriangle, ChevronRight } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   layout: 'portal',
@@ -141,6 +141,7 @@ const api = useApi()
 const localePath = useLocalePath()
 const authStore = useAuthStore()
 const orgDashboard = useOrgDashboard()
+const { t } = useI18n()
 
 await orgDashboard.load()
 if (orgDashboard.myRole.value !== 'po') {
@@ -176,9 +177,9 @@ const upcomingDeadlines = computed(() => {
   if (!call.value) return []
   const today = new Date().toISOString().slice(0, 10)
   const entries = [
-    { label: 'Uzávierka prihlášok', date: call.value.application_deadline },
-    { label: 'Začiatok projektu',   date: call.value.project_start },
-    { label: 'Koniec projektu',     date: call.value.project_end },
+    { label: t('firma.po.dashboard.deadline_labels.application'), date: call.value.application_deadline },
+    { label: t('firma.po.dashboard.deadline_labels.project_start'), date: call.value.project_start },
+    { label: t('firma.po.dashboard.deadline_labels.project_end'),   date: call.value.project_end },
   ]
   return entries
     .filter(e => e.date && e.date >= today)

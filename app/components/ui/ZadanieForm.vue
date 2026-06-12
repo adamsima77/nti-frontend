@@ -9,7 +9,7 @@
       v-if="!isNew"
       class="bg-white border border-gray-100 rounded-lg p-4"
     >
-      <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Stav zadania</p>
+      <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">{{ $t('firma.zadanie_form.status_label') }}</p>
       <div class="flex items-center gap-1 flex-wrap">
         <template
           v-for="(step, i) in statusFlow"
@@ -49,22 +49,22 @@
     <div class="bg-white rounded-lg border border-gray-100 p-6">
       <h2 class="text-base font-semibold text-navy mb-4 flex items-center gap-2">
         <FileText class="w-4 h-4 text-blue-600" />
-        Základné informácie
+        {{ $t('firma.zadanie_form.section_basic') }}
       </h2>
       <div class="space-y-4">
         <FormField
           :field="{
             name: 'title',
             type: 'text',
-            label: 'Názov zadania',
-            placeholder: 'Napr. AI chatbot pre zákaznícku podporu',
+            label: $t('firma.zadanie_form.field_title'),
+            placeholder: $t('firma.zadanie_form.field_title_placeholder'),
             required: true,
           }"
           v-model="form.title"
           :error="errors.title ?? undefined"
           @blur="
             () => {
-              if (!form.title) errors.title = 'Názov je povinný'
+              if (!form.title) errors.title = $t('firma.zadanie_form.error_title')
             }
           "
         />
@@ -72,43 +72,43 @@
           :field="{
             name: 'description',
             type: 'textarea',
-            label: 'Stručný popis',
-            placeholder: 'Čo chcete dosiahnuť? Pre koho je riešenie určené?',
+            label: $t('firma.zadanie_form.field_desc'),
+            placeholder: $t('firma.zadanie_form.field_desc_placeholder'),
             required: true,
           }"
           v-model="form.description"
           :error="errors.description ?? undefined"
           @blur="
             () => {
-              if (!form.description) errors.description = 'Popis je povinný'
+              if (!form.description) errors.description = $t('firma.zadanie_form.error_desc')
             }
           "
         />
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-50">
 
         <div class="space-y-4">
-          <h3 class="text-sm font-semibold text-gray-400 uppercase">Fáza prihlasovania</h3>
+          <h3 class="text-sm font-semibold text-gray-400 uppercase">{{ $t('firma.zadanie_form.phase_apply') }}</h3>
           <FormField
-            :field="{ name: 'application_start', type: 'date', label: 'Začiatok prihlasovania', required: true }"
+            :field="{ name: 'application_start', type: 'date', label: $t('firma.zadanie_form.field_app_start'), required: true }"
             v-model="form.application_start"
             :error="errors.application_start ?? undefined"
           />
           <FormField
-            :field="{ name: 'application_deadline', type: 'date', label: 'Deadline prihlášok', required: true }"
+            :field="{ name: 'application_deadline', type: 'date', label: $t('firma.zadanie_form.field_app_deadline'), required: true }"
             v-model="form.application_deadline"
             :error="errors.application_deadline ?? undefined"
           />
         </div>
 
         <div class="space-y-4">
-          <h3 class="text-sm font-semibold text-gray-400 uppercase">Fáza realizácie</h3>
+          <h3 class="text-sm font-semibold text-gray-400 uppercase">{{ $t('firma.zadanie_form.phase_project') }}</h3>
           <FormField
-            :field="{ name: 'project_start', type: 'date', label: 'Začiatok projektu', required: true }"
+            :field="{ name: 'project_start', type: 'date', label: $t('firma.zadanie_form.field_project_start'), required: true }"
             v-model="form.project_start"
             :error="errors.project_start ?? undefined"
           />
           <FormField
-            :field="{ name: 'project_end', type: 'date', label: 'Ukončenie projektu (odovzdanie)', required: true }"
+            :field="{ name: 'project_end', type: 'date', label: $t('firma.zadanie_form.field_project_end'), required: true }"
             v-model="form.project_end"
             :error="errors.project_end ?? undefined"
           />
@@ -121,16 +121,15 @@
     <div class="bg-white rounded-lg border border-gray-100 p-6">
       <h2 class="text-base font-semibold text-navy mb-4 flex items-center gap-2">
         <Code class="w-4 h-4 text-blue-600" />
-        Technická špecifikácia
+        {{ $t('firma.zadanie_form.section_tech') }}
       </h2>
       <div class="space-y-4">
         <FormField
           :field="{
             name: 'tech_spec',
             type: 'textarea',
-            label: 'Popis technického riešenia',
-            placeholder:
-              'Popíšte technický kontext, existujúce systémy, požiadavky na tím, obmedzenia a cieľovú architektúru...',
+            label: $t('firma.zadanie_form.field_tech_spec'),
+            placeholder: $t('firma.zadanie_form.field_tech_spec_placeholder'),
             required: true,
           }"
           v-model="form.tech_spec"
@@ -138,7 +137,7 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1.5">
-              Prílohy a dokumentácia
+              {{ $t('firma.zadanie_form.field_attachments') }}
             </label>
             <input
               type="file"
@@ -150,7 +149,7 @@
           </div>
 
           <div v-if="form.existing_attachments.length" class="mt-2 space-y-2">
-            <p class="text-xs font-medium text-gray-400 uppercase">Aktuálne nahraté súbory:</p>
+            <p class="text-xs font-medium text-gray-400 uppercase">{{ $t('firma.zadanie_form.current_files') }}</p>
             <div 
               v-for="file in form.existing_attachments" 
               :key="file.id"
@@ -166,14 +165,14 @@
                   @click="downloadFile(file)" 
                   class="text-xs text-blue-600 hover:underline"
                 >
-                  Stiahnuť
+                  {{ $t('firma.zadanie_form.download') }}
                 </button>
                 <button 
                   type="button" 
                   @click="removeExistingFile(file.id)" 
                   class="text-xs text-red-500"
                 >
-                  Zmazať
+                  {{ $t('firma.zadanie_form.remove_file') }}
                 </button>
               </div>
             </div>
@@ -182,7 +181,7 @@
         
         <!-- Tech tags -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Preferované technológie</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('firma.zadanie_form.field_tech_tags') }}</label>
           <div class="flex flex-wrap gap-2 mb-2">
             <span
               v-for="tag in form.tech_tags"
@@ -202,7 +201,7 @@
             <input
               v-model="newTag"
               type="text"
-              placeholder="Napr. React, Python, Laravel..."
+              :placeholder="$t('firma.zadanie_form.field_tech_tags_placeholder')"
               @keydown.enter.prevent="addTag"
               class="flex-1 px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -211,7 +210,7 @@
               @click="addTag"
               class="px-3 py-2 bg-blue-50 text-blue-600 rounded-md text-sm font-medium hover:bg-blue-100 transition-colors"
             >
-              Pridať
+              {{ $t('firma.zadanie_form.add_tag') }}
             </button>
           </div>
         </div>
@@ -224,13 +223,13 @@
         <UserCircle class="w-4 h-4 text-blue-600" />
         Product Owner
       </h2>
-      <p class="text-xs text-gray-400 mb-4">Osoba zodpovedná za komunikáciu s realizačným tímom zo strany firmy</p>
+      <p class="text-xs text-gray-400 mb-4">{{ $t('firma.zadanie_form.po_subtitle') }}</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField
           :field="{
             name: 'po_name',
             type: 'text',
-            label: 'Meno a priezvisko',
+            label: $t('firma.zadanie_form.field_po_name'),
             placeholder: 'Ján Novák',
             required: true,
           }"
@@ -240,8 +239,8 @@
           :field="{
             name: 'po_email',
             type: 'email',
-            label: 'E-mail',
-            placeholder: 'jan.novak@firma.sk',
+            label: $t('firma.zadanie_form.field_po_email'),
+            placeholder: $t('firma.zadanie_form.field_po_email_placeholder'),
             required: true,
           }"
           v-model="form.po_email"
@@ -255,9 +254,9 @@
     <div class="bg-white rounded-lg border border-gray-100 p-6">
       <h2 class="text-base font-semibold text-navy mb-1 flex items-center gap-2">
         <Flag class="w-4 h-4 text-blue-600" />
-        Míľniky zadania
+        {{ $t('firma.zadanie_form.section_milestones') }}
       </h2>
-      <p class="text-xs text-gray-400 mb-4">Definujte kontrolné body projektu — čo musí tím splniť a kedy</p>
+      <p class="text-xs text-gray-400 mb-4">{{ $t('firma.zadanie_form.milestones_subtitle') }}</p>
 
       <div class="space-y-2 mb-3">
         <div
@@ -269,7 +268,7 @@
             <input
               v-model="m.name"
               type="text"
-              placeholder="Názov míľniku *"
+              :placeholder="$t('firma.zadanie_form.milestone_name_placeholder')"
               required
               class="sm:col-span-2 px-3 py-2 text-sm rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
@@ -282,7 +281,7 @@
             <input
               v-model="m.description"
               type="text"
-              placeholder="Popis"
+              :placeholder="$t('firma.zadanie_form.milestone_desc_placeholder')"
               class="sm:col-span-3 px-3 py-2 text-sm rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
           </div>
@@ -295,7 +294,7 @@
           </button>
         </div>
         <p v-if="!form.milestones.length" class="text-sm text-gray-400 text-center py-4 border border-dashed border-gray-200 rounded-lg">
-          Zatiaľ žiadne míľniky
+          {{ $t('firma.zadanie_form.no_milestones') }}
         </p>
       </div>
 
@@ -305,7 +304,7 @@
         class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition"
       >
         <Plus class="w-4 h-4" />
-        Pridať míľnik
+        {{ $t('firma.zadanie_form.add_milestone') }}
       </button>
     </div>
 
@@ -313,14 +312,14 @@
     <div class="bg-white rounded-lg border border-gray-100 p-6">
       <h2 class="text-base font-semibold text-navy mb-1 flex items-center gap-2">
         <Wallet class="w-4 h-4 text-blue-600" />
-        Rozpočet
+        {{ $t('firma.zadanie_form.section_budget') }}
       </h2>
-      <p class="text-xs text-gray-400 mb-4">Odmena pre realizačný tím študentov</p>
+      <p class="text-xs text-gray-400 mb-4">{{ $t('firma.zadanie_form.budget_subtitle') }}</p>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <!-- Budget -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">
-            Celkový rozpočet (€) <span class="text-danger-500">*</span>
+            {{ $t('firma.zadanie_form.field_budget') }} <span class="text-danger-500">*</span>
           </label>
           <div class="relative">
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">€</span>
@@ -344,12 +343,12 @@
           :field="{
             name: 'budget_type',
             type: 'select',
-            label: 'Spôsob výplaty',
+            label: $t('firma.zadanie_form.field_budget_type'),
             required: true,
             options: [
-              { value: 'milestone', label: 'Po míľnikoch' },
-              { value: 'monthly', label: 'Mesačne' },
-              { value: 'completion', label: 'Po odovzdaní' },
+              { value: 'milestone', label: $t('firma.zadanie_form.budget_type_milestone') },
+              { value: 'monthly', label: $t('firma.zadanie_form.budget_type_monthly') },
+              { value: 'completion', label: $t('firma.zadanie_form.budget_type_completion') },
             ],
           }"
           v-model="form.budget_type"
@@ -360,20 +359,20 @@
         v-if="form.budget"
         class="mt-4 p-4 bg-blue-50 rounded-lg"
       >
-        <p class="text-xs font-medium text-blue-700 mb-2">Odhadovaný rozpad rozpočtu</p>
+        <p class="text-xs font-medium text-blue-700 mb-2">{{ $t('firma.zadanie_form.budget_breakdown') }}</p>
         <div class="grid grid-cols-3 gap-3 text-sm">
           <div>
-            <p class="text-xs text-blue-500">Na tím</p>
+            <p class="text-xs text-blue-500">{{ $t('firma.zadanie_form.budget_team') }}</p>
             <p class="font-semibold text-blue-800">
               {{ formatCurrency(form.budget) }}
             </p>
           </div>
           <div>
-            <p class="text-xs text-blue-500">NTI poplatok (10%)</p>
+            <p class="text-xs text-blue-500">{{ $t('firma.zadanie_form.budget_nti') }}</p>
             <p class="font-semibold text-blue-800">{{ formatCurrency(form.budget * 0.1) }}</p>
           </div>
           <div>
-            <p class="text-xs text-blue-500">Čistá odmena</p>
+            <p class="text-xs text-blue-500">{{ $t('firma.zadanie_form.budget_net') }}</p>
             <p class="font-semibold text-blue-800">
               {{ formatCurrency(form.budget * 0.9) }}
             </p>
@@ -388,7 +387,7 @@
       class="bg-success-50 border border-success-200 text-success-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2"
     >
       <CheckCircle class="w-4 h-4 shrink-0" />
-      Zadanie bolo uložené.
+      {{ $t('firma.zadanie_form.save_success') }}
     </div>
     <div
       v-if="saveError"
@@ -407,7 +406,7 @@
         class="inline-flex items-center gap-2 px-4 py-2.5 border border-danger-200 text-danger-600 rounded-lg text-sm font-medium hover:bg-danger-50 transition-colors"
       >
         <Trash2 class="w-4 h-4" />
-        Zmazať zadanie
+        {{ $t('firma.zadanie_form.delete_btn') }}
       </button>
       <div class="flex gap-3 sm:ml-auto">
         <button
@@ -435,7 +434,7 @@
               d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
             />
           </svg>
-          {{ isSaving ? 'Ukladám...' : isNew ? 'Vytvoriť zadanie' : 'Uložiť zmeny' }}
+          {{ isSaving ? $t('firma.zadanie_form.saving') : isNew ? $t('firma.zadanie_form.create_btn') : $t('firma.zadanie_form.save_btn') }}
         </button>
       </div>
     </div>
@@ -460,7 +459,7 @@ import {
   MirrorRectangularIcon,
 } from 'lucide-vue-next'
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const langId = computed(() => locale.value === 'sk' ? 1 : 2)
 
@@ -517,29 +516,29 @@ const loadPrograms = async () => {
 
 onMounted(loadPrograms)
 
-const statusFlow = [
-  { value: 'draft', label: 'Draft' },
-  { value: 'pending',   label: 'Čaká na schválenie' },
-  { value: 'published', label: 'Publikované' },
-  { value: 'matching', label: 'V párovaní' },
-  { value: 'assigned', label: 'Pridelené' },
-  { value: 'in_progress', label: 'V realizácii' },
-  { value: 'closed', label: 'Uzavreté' },
-]
+const statusFlow = computed(() => [
+  { value: 'draft', label: t('firma.zadanie_form.status.draft') },
+  { value: 'pending',   label: t('firma.zadanie_form.status.pending') },
+  { value: 'published', label: t('firma.zadanie_form.status.published') },
+  { value: 'matching', label: t('firma.zadanie_form.status.matching') },
+  { value: 'assigned', label: t('firma.zadanie_form.status.assigned') },
+  { value: 'in_progress', label: t('firma.zadanie_form.status.in_progress') },
+  { value: 'closed', label: t('firma.zadanie_form.status.closed') },
+])
 
-const statusTransitions: Record<string, { to: string; label: string; class: string }[]> = {
-  draft:       [{ to: 'pending', label: 'Odoslať na schválenie', class: 'bg-blue-600 text-white hover:bg-blue-700' }],
-}
+const statusTransitions = computed<Record<string, { to: string; label: string; class: string }[]>>(() => ({
+  draft: [{ to: 'pending', label: t('firma.zadanie_form.action_submit'), class: 'bg-blue-600 text-white hover:bg-blue-700' }],
+}))
 
 const statusStepClass = (stepValue: string) => {
-  const currentIndex = statusFlow.findIndex((s) => s.value === form.status)
-  const stepIndex = statusFlow.findIndex((s) => s.value === stepValue)
+  const currentIndex = statusFlow.value.findIndex((s) => s.value === form.status)
+  const stepIndex = statusFlow.value.findIndex((s) => s.value === stepValue)
   if (stepValue === form.status) return 'bg-blue-600 text-white'
   if (stepIndex < currentIndex) return 'bg-success-50 text-success-500'
   return 'bg-gray-100 text-gray-400'
 }
 
-const availableActions = computed(() => statusTransitions[form.status] ?? [])
+const availableActions = computed(() => statusTransitions.value[form.status] ?? [])
 
 const formatDateForInput = (val: any): string => {
   if (!val) return ''
@@ -632,18 +631,18 @@ const removeTag = (tag: string) => {
 
 // ── Validation ───────────────────────────────────────────────
 const validatePoEmail = () => {
-  errors.po_email = form.po_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.po_email) ? 'Neplatný e-mail' : null
+  errors.po_email = form.po_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.po_email) ? t('firma.zadanie_form.error_email') : null
 }
 
 const validate = () => {
-  errors.title = form.title ? null : 'Názov je povinný'
-  errors.description = form.description ? null : 'Popis je povinný'
-  errors.budget = form.budget && form.budget > 0 ? null : 'Zadajte rozpočet'
+  errors.title = form.title ? null : t('firma.zadanie_form.error_title')
+  errors.description = form.description ? null : t('firma.zadanie_form.error_desc')
+  errors.budget = form.budget && form.budget > 0 ? null : t('firma.zadanie_form.error_budget')
   if (form.application_deadline < form.application_start) {
-     errors.application_deadline = 'Deadline nemôže byť skôr ako začiatok'
+     errors.application_deadline = t('firma.zadanie_form.error_deadline')
   }
   if (form.project_end < form.project_start) {
-     errors.project_end = 'Koniec projektu musí byť po jeho začiatku'
+     errors.project_end = t('firma.zadanie_form.error_project_end')
   }
   validatePoEmail()
   return !Object.values(errors).some(Boolean)
@@ -708,7 +707,7 @@ const save = async (asDraft = false) => {
     }, 4000)
     emit('saved', callId)
   } catch (error) {
-    saveError.value = 'Nastala chyba pri ukladaní.'
+    saveError.value = t('firma.zadanie_form.error_save')
   } finally {
     isSaving.value = false
   }
@@ -726,7 +725,7 @@ const handleStatusChange = async (newStatus: string) => {
     })
     form.status = newStatus
   } catch {
-    saveError.value = 'Zmena stavu zlyhala.'
+    saveError.value = t('firma.zadanie_form.error_status')
   } finally {
     isActionLoading.value = false
   }
@@ -780,9 +779,9 @@ const handleNewFileUpload = async (event: any) => {
         url: '#'
       })
       
-      addToast({ message: `Súbor ${file.name} bol nahratý`, type: 'success' })
+      addToast({ message: t('firma.zadanie_form.upload_success', { name: file.name }), type: 'success' })
     } catch (err) {
-      addToast({ message: 'Nahrávanie súboru zlyhalo', type: 'error' })
+      addToast({ message: t('firma.zadanie_form.upload_error'), type: 'error' })
     }
   }
 }
@@ -807,7 +806,7 @@ const downloadFile = async (file: any) => {
     link.remove()
     window.URL.revokeObjectURL(url)
   } catch {
-    addToast({ message: 'Stiahnutie zlyhalo', type: 'error' })
+    addToast({ message: t('firma.zadanie_form.download_error'), type: 'error' })
   }
 }
 </script>

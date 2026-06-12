@@ -2,8 +2,8 @@
 <template>
   <div class="max-w-3xl mx-auto px-6 py-10">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-navy mb-1">Profil organizácie</h1>
-      <p class="text-gray-500">Informácie o vašej organizácii synchronizované so systémom NTI</p>
+      <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('firma.profil.title') }}</h1>
+      <p class="text-gray-500">{{ $t('firma.profil.subtitle') }}</p>
     </div>
 
     <div v-if="isLoading" class="space-y-4">
@@ -14,18 +14,18 @@
     <template v-else>
       <form @submit.prevent="handleSave" class="space-y-6">
         <div class="bg-white rounded-lg border border-gray-100 p-6">
-          <h2 class="text-base font-semibold text-navy mb-4">Základné informácie</h2>
+          <h2 class="text-base font-semibold text-navy mb-4">{{ $t('firma.profil.sections.basic') }}</h2>
           <div class="space-y-4">
-            <UiInput v-model="form.organization_name" label="Názov organizácie" placeholder="TechFirma s.r.o." required :error="errors.organization_name" />
-            <UiInput v-model="form.ico" label="IČO" placeholder="12345678" :error="errors.ico" />
-            <UiInput v-model="form.phone" label="Telefón" type="tel" placeholder="+421 900 000 000" />
-            <UiInput v-model="form.website" label="Webová stránka" type="url" placeholder="https://vasafirma.sk" :error="errors.website" />
+            <UiInput v-model="form.organization_name" :label="$t('firma.profil.fields.name')" :placeholder="$t('firma.profil.fields.name_placeholder')" required :error="errors.organization_name" />
+            <UiInput v-model="form.ico" :label="$t('firma.profil.fields.ico')" placeholder="12345678" :error="errors.ico" />
+            <UiInput v-model="form.phone" :label="$t('firma.profil.fields.phone')" type="tel" placeholder="+421 900 000 000" />
+            <UiInput v-model="form.website" :label="$t('firma.profil.fields.website')" type="url" placeholder="https://vasafirma.sk" :error="errors.website" />
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Popis organizácie</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('firma.profil.fields.description') }}</label>
               <textarea
                 v-model="form.description"
                 rows="4"
-                placeholder="Stručný popis vašej firmy, oblasti pôsobenia a hodnôt..."
+                :placeholder="$t('firma.profil.fields.description_placeholder')"
                 class="w-full px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
               />
             </div>
@@ -33,8 +33,8 @@
         </div>
 
         <div class="bg-white rounded-lg border border-gray-100 p-6">
-          <h2 class="text-base font-semibold text-navy mb-1">Sektory</h2>
-          <p class="text-xs text-gray-400 mb-4">Vyberte oblasti, v ktorých vaša organizácia pôsobí</p>
+          <h2 class="text-base font-semibold text-navy mb-1">{{ $t('firma.profil.sections.sectors') }}</h2>
+          <p class="text-xs text-gray-400 mb-4">{{ $t('firma.profil.sections.sectors_hint') }}</p>
           <div class="flex flex-wrap gap-2">
             <label v-for="s in allSectors" :key="s.id" class="cursor-pointer">
               <input type="checkbox" :value="s.id" v-model="form.sectors" class="sr-only" />
@@ -49,17 +49,17 @@
         </div>
 
         <div class="bg-white rounded-lg border border-gray-100 p-6">
-          <h2 class="text-base font-semibold text-navy mb-4">Adresa</h2>
+          <h2 class="text-base font-semibold text-navy mb-4">{{ $t('firma.profil.sections.address') }}</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <UiInput v-model="form.address.city" label="Mesto" placeholder="Nitra" />
-            <UiInput v-model="form.address.postalCode" label="PSČ" placeholder="949 01" />
-            <UiInput v-model="form.address.street" label="Ulica" placeholder="Štefánikova 12" class="md:col-span-2" />
-            <UiInput v-model="form.address.country" label="Krajina" placeholder="Slovensko" />
+            <UiInput v-model="form.address.city" :label="$t('firma.profil.fields.city')" placeholder="Nitra" />
+            <UiInput v-model="form.address.postalCode" :label="$t('firma.profil.fields.postal')" placeholder="949 01" />
+            <UiInput v-model="form.address.street" :label="$t('firma.profil.fields.street')" placeholder="Štefánikova 12" class="md:col-span-2" />
+            <UiInput v-model="form.address.country" :label="$t('firma.profil.fields.country')" placeholder="Slovensko" />
           </div>
         </div>
 
         <div v-if="saveSuccess" class="bg-success-50 border border-success-200 text-success-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-          <CheckCircle class="w-4 h-4 shrink-0" /> Profil bol úspešne uložený.
+          <CheckCircle class="w-4 h-4 shrink-0" /> {{ $t('firma.profil.save_success') }}
         </div>
         <div v-if="saveError" class="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
           <AlertCircle class="w-4 h-4 shrink-0" /> {{ saveError }}
@@ -67,7 +67,7 @@
 
         <div class="flex flex-col sm:flex-row justify-between gap-3">
           <UiButton variant="danger" :disabled="isDeletingAccount" @click="deleteAccount">
-            {{ isDeletingAccount ? 'Mažem účet...' : 'Vymazať účet' }}
+            {{ isDeletingAccount ? $t('firma.profil.deleting_account') : $t('firma.profil.delete_account') }}
           </UiButton>
           <button
             type="submit"
@@ -78,7 +78,7 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
             </svg>
-            {{ isSaving ? 'Ukladám...' : 'Uložiť profil' }}
+            {{ isSaving ? $t('firma.profil.saving') : $t('firma.profil.save') }}
           </button>
         </div>
       </form>
@@ -90,6 +90,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { CheckCircle, AlertCircle } from 'lucide-vue-next'
 import { useOrgDashboard } from '~/composables/useOrgDashboard'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   layout: 'portal',
@@ -102,7 +103,8 @@ useHead({ title: 'Profil organizácie | NTI Firma' })
 const authStore = useAuthStore()
 const api = useApi()
 const { addToast } = useToast()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
+const localePath = useLocalePath()
 const orgDashboard = useOrgDashboard()
 
 await orgDashboard.load()
@@ -163,8 +165,8 @@ const loadOrganization = async () => {
 }
 
 const validate = () => {
-  errors.organization_name = form.organization_name ? undefined : 'Názov organizácie je povinný'
-  errors.website = (!form.website || /^https?:\/\//.test(form.website)) ? undefined : 'Zadajte platnú URL adresu'
+  errors.organization_name = form.organization_name ? undefined : t('firma.profil.errors.name_required')
+  errors.website = (!form.website || /^https?:\/\//.test(form.website)) ? undefined : t('firma.profil.errors.website_invalid')
   return !Object.values(errors).some(Boolean)
 }
 
@@ -173,7 +175,7 @@ const handleSave = async () => {
   saveError.value = null
   if (!validate()) return
   const orgId = authStore.userOrganizationId
-  if (!orgId) { saveError.value = 'Nepodarilo sa určiť organizáciu.'; return }
+  if (!orgId) { saveError.value = t('firma.profil.errors.org_not_found'); return }
   isSaving.value = true
   try {
     const payload = {
@@ -209,7 +211,7 @@ const deleteAccount = async () => {
     await api.post(`/users/anonymize-user/${userId}`)
     authStore.$reset()
     addToast({ message: 'Účet bol anonymizovaný.', type: 'success' })
-    await navigateTo('/auth/login')
+    await navigateTo(localePath('/auth/login'))
   } catch (err: any) {
     addToast({ message: err?.data?.message ?? 'Anonymizácia účtu zlyhala.', type: 'error' })
   } finally {

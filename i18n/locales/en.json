@@ -1246,7 +1246,16 @@
     "avatarSuccess": "Photo was saved.",
     "avatarError": "Photo upload failed.",
     "saveSuccess": "Profile was saved.",
-    "saveError": "Save failed."
+    "saveError": "Save failed.",
+    "anonymizeSuccess": "Account was anonymised.",
+    "anonymizeError": "Account anonymisation failed."
+  },
+  "dangerZone": {
+    "title": "Delete account",
+    "body": "This action anonymises your account and cannot be undone.",
+    "confirm": "Are you sure you want to anonymise and delete your account? This action cannot be undone.",
+    "delete": "Delete account",
+    "deleting": "Deleting account..."
   }
 },
 
@@ -1865,7 +1874,7 @@
   "cms": "CMS",
   "cmsProfile": "Profile",
   "companyProfile": "Organisation profile",
-  "tasks": "Tasks",
+  "tasks": "Challenges",
   "members": "Member management",
   "projects": "Projects",
   "consultations": "Consultations",
@@ -2004,7 +2013,9 @@
     "anonymized": "Anonymized",
     "onboarding": "Onboarding",
     "active_project": "Active Project",
-    "ended_project": "Completed Project"
+    "ended_project": "Completed Project",
+    "planned": "Planned",
+    "returned": "Returned for revision"
   },
   "gdpr_download": {
     "modal_title": "Export GDPR personal data",
@@ -2378,5 +2389,388 @@
     "load_error": "Error loading the permission matrix.",
     "save_success": "Changes saved successfully.",
     "save_error": "Error while saving configuration."
+  },
+
+  "firma": {
+    "dashboard": {
+      "title": "Company Portal",
+      "member_role": "Organization Member",
+      "admin_role": "Organization Administrator",
+      "welcome": "Welcome, {name}!",
+      "member_subtitle": "Current overview of projects.",
+      "admin_subtitle": "Central management of your company portfolio, tasks, and budgets.",
+      "stats": {
+        "total": "Total tasks",
+        "active": "Active",
+        "in_progress": "In progress",
+        "completed": "Closed",
+        "assigned_teams": "Assigned teams",
+        "applications": "Applications"
+      },
+      "tasks_table": {
+        "title": "Organization tasks",
+        "col_task": "Task",
+        "col_type": "Type / Program",
+        "col_deadline": "Deadline",
+        "col_applications": "Applications",
+        "col_team": "Assigned team",
+        "col_status": "Status",
+        "col_program": "Program",
+        "col_budget": "Budget",
+        "empty": "The organization has no tasks yet",
+        "no_tasks": "You have no tasks",
+        "unassigned": "Unassigned"
+      },
+      "assigned_teams": {
+        "title": "Assigned teams",
+        "members": "{count} members",
+        "empty": "No assigned teams yet"
+      },
+      "recent_applications": {
+        "title": "Recent applications",
+        "submitted": "Submitted {date}",
+        "empty": "No applications yet"
+      },
+      "upcoming_deadlines": {
+        "title": "Upcoming deadlines",
+        "days_left": "days left"
+      },
+      "actions": {
+        "title": "Required actions",
+        "resolve": "Resolve",
+        "no_tasks_msg": "You have no published tasks yet. Create your first task.",
+        "all_tasks": "All tasks"
+      },
+      "added": "Added {date}"
+    },
+
+    "zadania": {
+      "title": "Tasks",
+      "subtitle": "Manage tasks for NTI programme teams",
+      "new_task": "New task",
+      "filters": {
+        "all": "All",
+        "active": "Active",
+        "completed": "Completed",
+        "draft": "Drafts / Pending approval"
+      },
+      "card": {
+        "applications": "{count} applications",
+        "budget": "budget",
+        "added": "Added {date}",
+        "detail": "Detail"
+      },
+      "empty": {
+        "title": "No tasks",
+        "subtitle": "Create the first task for teams"
+      }
+    },
+
+    "zadanie_detail": {
+      "back": "Back to tasks",
+      "back_list": "Back to list",
+      "back_detail": "Back to task detail",
+      "not_found": "Task not found",
+      "new_title": "New task",
+      "edit_title": "Edit task",
+      "delete_confirm": "Are you sure you want to delete this task?",
+      "delete_cancel": "Cancel",
+      "delete_confirm_btn": "Delete",
+      "toast_deleted": "Task was successfully deleted.",
+      "toast_delete_error": "Failed to delete the task.",
+      "created": "Created {date}",
+      "edit": "Edit",
+      "submit_approval": "Submit for approval",
+      "confirm_submit_title": "Submit for approval",
+      "confirm_submit_body": "Are you sure you want to submit task {title} for approval? Once approved by an administrator it will be visible to teams.",
+      "cancel": "Cancel",
+      "submit": "Submit",
+      "sections": {
+        "description": "Task description",
+        "tech": "Technical details & resources",
+        "tech_tags": "Preferred technologies",
+        "attachments": "Attachments",
+        "download_hint": "Click to download",
+        "milestones": "Task milestones",
+        "po": "Product Owner",
+        "applications": "Team applications",
+        "applications_total": "{count} total",
+        "no_applications": "No applications yet",
+        "submitted": "Submitted {date}",
+        "budget": "Budget",
+        "budget_total": "total budget",
+        "budget_payment": "Payment method",
+        "budget_breakdown": "Estimated breakdown",
+        "budget_team": "For team",
+        "budget_nti": "NTI ({pct}%)",
+        "budget_net": "Net reward",
+        "info": "Information",
+        "info_program": "Programme",
+        "info_call_type": "Call type",
+        "info_app_start": "Application start",
+        "info_deadline": "Application deadline",
+        "info_project_start": "Project start",
+        "info_project_end": "Project end",
+        "info_org": "Organisation",
+        "info_applications": "Applications",
+        "assigned_team": "Assigned team",
+        "members_count": "{count} members",
+        "po_name": "Full name",
+        "po_position": "Position",
+        "po_email": "E-mail",
+        "po_phone": "Phone"
+      },
+      "budget_type": {
+        "milestone": "By milestone",
+        "monthly": "Monthly",
+        "completion": "On completion"
+      },
+      "toast": {
+        "submit_success": "Task successfully submitted for approval.",
+        "submit_error": "Failed to submit task.",
+        "download_error": "Download failed"
+      }
+    },
+
+    "clenovia": {
+      "title": "Member management",
+      "subtitle": "Organisation members with access to the NTI portal",
+      "info": "Each member receives portal access according to their role.",
+      "invite_btn": "Invite member",
+      "table": {
+        "col_member": "Member",
+        "col_role": "Role",
+        "col_status": "Status",
+        "col_added": "Added",
+        "you": "(you)",
+        "status_active": "Active",
+        "status_pending": "Pending acceptance",
+        "remove_title": "Remove member"
+      },
+      "roles": {
+        "admin": "Administrator",
+        "member": "Member",
+        "po": "Product Owner"
+      },
+      "pending_invites": "Pending invitations ({count})",
+      "invite_modal": {
+        "title": "Invite a new member",
+        "subtitle": "Enter the email address and role of the organisation member.",
+        "email_label": "E-mail",
+        "email_placeholder": "john.doe{'@'}company.com",
+        "role_label": "Role",
+        "cancel": "Cancel",
+        "send": "Send invitation",
+        "error": "Failed to send invitation."
+      },
+      "remove_modal": {
+        "title": "Remove member?",
+        "body": "{name} will lose access to the NTI company portal.",
+        "cancel": "Cancel",
+        "confirm": "Remove"
+      }
+    },
+
+    "zadanie_form": {
+      "status_label": "Task status",
+      "status": {
+        "draft": "Draft",
+        "pending": "Pending approval",
+        "published": "Published",
+        "matching": "In matching",
+        "assigned": "Assigned",
+        "in_progress": "In progress",
+        "closed": "Closed"
+      },
+      "action_submit": "Submit for approval",
+      "section_basic": "Basic information",
+      "field_title": "Task title",
+      "field_title_placeholder": "E.g. AI chatbot for customer support",
+      "field_desc": "Brief description",
+      "field_desc_placeholder": "What do you want to achieve? Who is the solution for?",
+      "phase_apply": "Application phase",
+      "field_app_start": "Application start",
+      "field_app_deadline": "Application deadline",
+      "phase_project": "Project phase",
+      "field_project_start": "Project start",
+      "field_project_end": "Project end (delivery)",
+      "section_tech": "Technical specification",
+      "field_tech_spec": "Technical solution description",
+      "field_tech_spec_placeholder": "Describe the technical context, existing systems, team requirements, constraints and target architecture...",
+      "field_attachments": "Attachments and documentation",
+      "current_files": "Currently uploaded files:",
+      "download": "Download",
+      "remove_file": "Delete",
+      "field_tech_tags": "Preferred technologies",
+      "field_tech_tags_placeholder": "E.g. React, Python, Laravel...",
+      "add_tag": "Add",
+      "section_po": "Product Owner",
+      "po_subtitle": "Person responsible for communication with the implementation team on the company side",
+      "field_po_name": "Full name",
+      "field_po_email": "E-mail",
+      "field_po_email_placeholder": "john.doe{'@'}company.com",
+      "section_milestones": "Task milestones",
+      "milestones_subtitle": "Define project checkpoints — what the team must accomplish and when",
+      "milestone_name_placeholder": "Milestone name *",
+      "milestone_desc_placeholder": "Description",
+      "no_milestones": "No milestones yet",
+      "add_milestone": "Add milestone",
+      "section_budget": "Budget",
+      "budget_subtitle": "Reward for the student implementation team",
+      "field_budget": "Total budget (€)",
+      "field_budget_type": "Payment method",
+      "budget_type_milestone": "By milestones",
+      "budget_type_monthly": "Monthly",
+      "budget_type_completion": "Upon delivery",
+      "budget_breakdown": "Estimated budget breakdown",
+      "budget_team": "For the team",
+      "budget_nti": "NTI fee (10%)",
+      "budget_net": "Net reward",
+      "save_success": "Task has been saved.",
+      "delete_btn": "Delete task",
+      "saving": "Saving...",
+      "create_btn": "Create task",
+      "save_btn": "Save changes",
+      "error_save": "An error occurred while saving.",
+      "error_status": "Status change failed.",
+      "error_title": "Title is required",
+      "error_desc": "Description is required",
+      "error_budget": "Enter a budget",
+      "error_email": "Invalid e-mail",
+      "error_deadline": "Deadline cannot be earlier than the start",
+      "error_project_end": "Project end must be after its start",
+      "upload_success": "File {name} has been uploaded",
+      "upload_error": "File upload failed",
+      "download_error": "Download failed"
+    },
+
+    "profil": {
+      "title": "Organisation profile",
+      "subtitle": "Your organisation's information synchronised with the NTI system",
+      "sections": {
+        "basic": "Basic information",
+        "sectors": "Sectors",
+        "sectors_hint": "Select the areas your organisation operates in",
+        "address": "Address"
+      },
+      "fields": {
+        "name": "Organisation name",
+        "name_placeholder": "Acme Ltd.",
+        "ico": "Company ID",
+        "phone": "Phone",
+        "website": "Website",
+        "description": "Organisation description",
+        "description_placeholder": "Brief description of your company, areas of activity, and values...",
+        "city": "City",
+        "postal": "Postal code",
+        "street": "Street",
+        "country": "Country"
+      },
+      "save": "Save profile",
+      "saving": "Saving...",
+      "save_success": "Profile saved successfully.",
+      "delete_account": "Delete account",
+      "deleting_account": "Deleting account...",
+      "errors": {
+        "name_required": "Organisation name is required",
+        "website_invalid": "Please enter a valid URL",
+        "org_not_found": "Could not identify the organisation."
+      }
+    },
+
+    "po": {
+      "dashboard": {
+        "task_label": "Assignment:",
+        "role_badge": "Product Owner",
+        "welcome": "Welcome, {name}!",
+        "subtitle": "Manage the project cycle and approve key phases.",
+        "no_task": "You have no assigned task",
+        "no_task_hint": "Contact the NTI administrator",
+        "stats": {
+          "open_milestones": "Open milestones",
+          "done_milestones": "Completed milestones",
+          "pending_approvals": "Awaiting approval",
+          "documents": "Documents"
+        },
+        "action_required": {
+          "title": "Action required",
+          "body": "{count} milestones are awaiting your approval. Click to proceed to the approval screen."
+        },
+        "assigned_team": {
+          "label": "Assigned team",
+          "none": "No team has been assigned yet"
+        },
+        "deadlines": "Upcoming deadlines",
+        "deadline_labels": {
+          "application": "Application deadline",
+          "project_start": "Project start",
+          "project_end": "Project end"
+        },
+        "days_left": "days left"
+      },
+      "milniky": {
+        "title": "Milestones",
+        "no_task": "You have no assigned task",
+        "tabs": {
+          "list": "Milestone list",
+          "approvals": "Approvals"
+        },
+        "list": {
+          "plan": "Milestone plan for this task",
+          "add": "Add milestone",
+          "loading": "Loading...",
+          "empty": "No milestones"
+        },
+        "approvals": {
+          "subtitle": "Milestones marked as completed. Review outputs before approving.",
+          "loading": "Loading...",
+          "empty": "No completed milestones awaiting approval",
+          "view_outputs": "View outputs",
+          "deadline": "Deadline: {date}"
+        },
+        "form": {
+          "title_new": "New milestone",
+          "title_edit": "Edit milestone",
+          "name_label": "Name",
+          "desc_label": "Description",
+          "date_label": "Deadline",
+          "cancel": "Cancel",
+          "save": "Save",
+          "saving": "Saving...",
+          "error_required": "Please fill in the name and deadline."
+        },
+        "detail": {
+          "attachments": "Team attachments",
+          "loading": "Loading...",
+          "no_attachments": "No attachments",
+          "comment_label": "Comment *",
+          "comment_placeholder": "Add a note for the team...",
+          "deadline": "Deadline: {date}",
+          "close": "Close",
+          "reject": "Reject",
+          "approve": "Approve",
+          "download": "Download"
+        },
+        "toast": {
+          "saved": "Milestone saved.",
+          "deleted": "Milestone removed.",
+          "delete_error": "Failed to remove milestone.",
+          "approved": "Milestone approved.",
+          "approve_error": "Approval failed.",
+          "rejected": "Milestone rejected.",
+          "reject_error": "Rejection failed."
+        }
+      },
+      "zadanie": {
+        "no_task": "You have no assigned task",
+        "no_task_hint": "Contact the NTI administrator",
+        "edit_title": "Edit task",
+        "cancel": "Cancel",
+        "edit_btn": "Edit",
+        "created": "Created {date}",
+        "toast_saved": "Task saved.",
+        "download_error": "Download failed"
+      }
+    }
   }
 }

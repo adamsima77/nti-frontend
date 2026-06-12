@@ -29,10 +29,10 @@ export function useOrgDashboard() {
   const orgId  = useState<number | null>('org-id', () => null)
   const myRole = useState<'organization_admin' | 'member' | 'po' | null>('org-my-role', () => null)
 
-  const stats        = ref<OrgDashboardStats>({ total_calls: 0, active_calls: 0, in_progress: 0, completed: 0 })
-  const calls        = ref<OrgCall[]>([])
-  const teams        = ref<any[]>([])
-  const applications = ref<any[]>([])
+  const stats        = useState<OrgDashboardStats>('org-stats', () => ({ total_calls: 0, active_calls: 0, in_progress: 0, completed: 0 }))
+  const calls        = useState<OrgCall[]>('org-calls', () => [])
+  const teams        = useState<any[]>('org-teams', () => [])
+  const applications = useState<any[]>('org-applications', () => [])
   const isLoading    = ref(false)
   const error        = ref<string | null>(null)
 

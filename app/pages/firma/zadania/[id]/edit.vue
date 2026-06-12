@@ -2,17 +2,16 @@
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
     <NuxtLink
-      :to="`/firma/zadania/${route.params.id}`"
+      :to="localePath(`/firma/zadania/${route.params.id}`)"
       class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-navy transition-colors mb-6"
     >
       <ChevronLeft class="w-4 h-4" />
-      Späť na detail zadania
+      {{ $t('firma.zadanie_detail.back_detail') }}
     </NuxtLink>
 
     <div class="flex items-start justify-between mb-8">
       <div>
-        <h1 class="text-2xl font-bold text-navy mb-1">Upraviť zadanie</h1>
-        <p class="text-gray-500 text-sm">Program B — živá prax</p>
+        <h1 class="text-2xl font-bold text-navy mb-1">{{ $t('firma.zadanie_detail.edit_title') }}</h1>
       </div>
       <UiStatusBadge
         v-if="taskData"
@@ -57,19 +56,19 @@
         @click="showDeleteModal = false"
       />
       <div class="relative bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
-        <h3 class="font-semibold text-navy mb-2">Naozaj chcete zmazať zadanie?</h3>
+        <h3 class="font-semibold text-navy mb-2">{{ $t('firma.zadanie_detail.delete_confirm') }}</h3>
         <div class="flex gap-3">
           <button
             @click="showDeleteModal = false"
             class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50"
           >
-            Zrušiť
+            {{ $t('firma.zadanie_detail.delete_cancel') }}
           </button>
           <button
             @click="confirmDelete"
             class="flex-1 px-4 py-2.5 bg-danger-500 text-white rounded-lg text-sm font-medium hover:bg-danger-600"
           >
-            Zmazať
+            {{ $t('firma.zadanie_detail.delete_confirm_btn') }}
           </button>
         </div>
       </div>
@@ -82,6 +81,7 @@ import { ref, computed, onMounted } from 'vue'
 import { ChevronLeft } from 'lucide-vue-next'
 import ZadanieForm from '~/components/ui/ZadanieForm.vue'
 import { normalizeTaskStatus } from '~/composables/useTaskStatus'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   layout: 'portal',
@@ -102,6 +102,8 @@ const api = useApi()
 const route = useRoute()
 const router = useRouter()
 const { addToast } = useToast()
+const { t } = useI18n()
+const localePath = useLocalePath()
 
 const canDeleteTask = computed(() => {
   if (!taskData.value) return false
@@ -153,7 +155,7 @@ onMounted(async () => {
 })
 
 const handleSaved = () => {
-  router.push(`/firma/zadania/${route.params.id}`)
+  router.push(localePath(`/firma/zadania/${route.params.id}`))
 }
 
 const handleDelete = () => {
@@ -163,16 +165,16 @@ const handleDelete = () => {
 const confirmDelete = async () => {
   try {
     await api.delete(`/v1/admin/calls/${route.params.id}`)
-    addToast({ 
-      message: 'Zadanie bolo úspešne zmazané.', 
-      type: 'success' 
+    addToast({
+      message: t('firma.zadanie_detail.toast_deleted'),
+      type: 'success'
     })
     showDeleteModal.value = false
-    router.push('/firma/zadania')
+    router.push(localePath('/firma/zadania'))
   } catch (err: any) {
     showDeleteModal.value = false
 
-    const errorMsg = err?.data?.message ?? 'Zadanie sa nepodarilo zmazať.'
+    const errorMsg = err?.data?.message ?? t('firma.zadanie_detail.toast_delete_error')
 
     addToast({ 
       message: errorMsg, 

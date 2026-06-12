@@ -1020,7 +1020,16 @@
     "avatarSuccess": "Fotografia bola uložená.",
     "avatarError": "Nahratie fotografie zlyhalo.",
     "saveSuccess": "Profil bol uložený.",
-    "saveError": "Uloženie zlyhalo."
+    "saveError": "Uloženie zlyhalo.",
+    "anonymizeSuccess": "Účet bol anonymizovaný.",
+    "anonymizeError": "Anonymizácia účtu zlyhala."
+  },
+  "dangerZone": {
+    "title": "Vymazať účet",
+    "body": "Táto akcia anonymizuje váš účet a nie je možné ju vrátiť späť.",
+    "confirm": "Naozaj chcete anonymizovať a vymazať účet? Túto akciu nie je možné vrátiť späť.",
+    "delete": "Vymazať účet",
+    "deleting": "Mažem účet..."
   }
 },
 
@@ -1299,7 +1308,7 @@
   "cms": "CMS",
   "cmsProfile": "Profil",
   "companyProfile": "Profil organizácie",
-  "tasks": "Zadania",
+  "tasks": "Challenges",
   "members": "Správa členov",
   "projects": "Projekty",
   "consultations": "Konzultácie",
@@ -1745,7 +1754,9 @@
     "anonymized": "Anonymizovaný",
     "onboarding": "Onboarding",
     "active_project": "Aktívny projekt",
-    "ended_project": "Ukončené"
+    "ended_project": "Ukončené",
+    "planned": "Plánované",
+    "returned": "Vrátené na doplnenie"
   },
   "cmsOverview": {
     "empty": "Nenašli sa žiadne sekcie obsahu na zobrazenie."
@@ -2062,5 +2073,388 @@
     "load_error": "Chyba pri načítaní matice oprávnení.",
     "save_success": "Zmeny boli úspešne uložené.",
     "save_error": "Chyba počas ukladania konfigurácie."
+  },
+
+  "firma": {
+    "dashboard": {
+      "title": "Firemný portál",
+      "member_role": "Člen organizácie",
+      "admin_role": "Administrátor organizácie",
+      "welcome": "Vitajte, {name}!",
+      "member_subtitle": "Aktuálny prehľad projektov.",
+      "admin_subtitle": "Centrálny manažment firemného portfólia, zadaní a rozpočtov.",
+      "stats": {
+        "total": "Zadania celkom",
+        "active": "Aktívne",
+        "in_progress": "V realizácii",
+        "completed": "Uzavreté",
+        "assigned_teams": "Priradené tímy",
+        "applications": "Prihlášky"
+      },
+      "tasks_table": {
+        "title": "Zadania organizácie",
+        "col_task": "Zadanie",
+        "col_type": "Typ / Program",
+        "col_deadline": "Deadline",
+        "col_applications": "Prihlášky",
+        "col_team": "Priradený tím",
+        "col_status": "Stav",
+        "col_program": "Program",
+        "col_budget": "Rozpočet",
+        "empty": "Organizácia zatiaľ nemá žiadne zadania",
+        "no_tasks": "Nemáte žiadne zadania",
+        "unassigned": "Nepriradený"
+      },
+      "assigned_teams": {
+        "title": "Priradené tímy",
+        "members": "{count} členov",
+        "empty": "Zatiaľ žiadne priradené tímy"
+      },
+      "recent_applications": {
+        "title": "Posledné prihlášky",
+        "submitted": "Podané {date}",
+        "empty": "Zatiaľ žiadne prihlášky"
+      },
+      "upcoming_deadlines": {
+        "title": "Blížiace sa termíny",
+        "days_left": "dní zostáva"
+      },
+      "actions": {
+        "title": "Vyžadované akcie",
+        "resolve": "Vyriešiť",
+        "no_tasks_msg": "Nemáte ešte žiadne zverejnené zadania. Vytvorte vaše prvé zadanie.",
+        "all_tasks": "Všetky zadania"
+      },
+      "added": "Pridané {date}"
+    },
+
+    "zadania": {
+      "title": "Zadania",
+      "subtitle": "Správa zadaní pre tímy NTI programov",
+      "new_task": "Nové zadanie",
+      "filters": {
+        "all": "Všetky",
+        "active": "Aktívne",
+        "completed": "Dokončené",
+        "draft": "Drafty / Na schválenie"
+      },
+      "card": {
+        "applications": "{count} prihlášok",
+        "budget": "rozpočet",
+        "added": "Pridané {date}",
+        "detail": "Detail"
+      },
+      "empty": {
+        "title": "Žiadne zadania",
+        "subtitle": "Vytvorte prvé zadanie pre tímy"
+      }
+    },
+
+    "zadanie_detail": {
+      "back": "Späť na zadania",
+      "back_list": "Späť na zoznam",
+      "back_detail": "Späť na detail zadania",
+      "not_found": "Zadanie sa nenašlo",
+      "new_title": "Nové zadanie",
+      "edit_title": "Upraviť zadanie",
+      "delete_confirm": "Naozaj chcete zmazať zadanie?",
+      "delete_cancel": "Zrušiť",
+      "delete_confirm_btn": "Zmazať",
+      "toast_deleted": "Zadanie bolo úspešne zmazané.",
+      "toast_delete_error": "Zadanie sa nepodarilo zmazať.",
+      "created": "Vytvorené {date}",
+      "edit": "Upraviť",
+      "submit_approval": "Odoslať na schválenie",
+      "confirm_submit_title": "Odoslať na schválenie",
+      "confirm_submit_body": "Naozaj chcete zadanie {title} odoslať na schválenie? Po schválení administrátorom bude zadanie viditeľné pre tímy.",
+      "cancel": "Zrušiť",
+      "submit": "Odoslať",
+      "sections": {
+        "description": "Popis zadania",
+        "tech": "Technické detaily a podklady",
+        "tech_tags": "Preferované technológie",
+        "attachments": "Prílohy",
+        "download_hint": "Kliknite pre stiahnutie",
+        "milestones": "Míľniky zadania",
+        "po": "Product Owner",
+        "applications": "Prihlášky tímov",
+        "applications_total": "{count} celkom",
+        "no_applications": "Žiadne prihlášky zatiaľ",
+        "submitted": "Podané {date}",
+        "budget": "Rozpočet",
+        "budget_total": "celkový rozpočet",
+        "budget_payment": "Spôsob výplaty",
+        "budget_breakdown": "Odhadovaný rozpad",
+        "budget_team": "Na tím",
+        "budget_nti": "NTI ({pct}%)",
+        "budget_net": "Čistá odmena",
+        "info": "Informácie",
+        "info_program": "Program",
+        "info_call_type": "Typ výzvy",
+        "info_app_start": "Začiatok prihlasovania",
+        "info_deadline": "Deadline prihlášok",
+        "info_project_start": "Začiatok projektu",
+        "info_project_end": "Koniec projektu",
+        "info_org": "Organizácia",
+        "info_applications": "Prihlášok",
+        "assigned_team": "Priradený tím",
+        "members_count": "{count} členov",
+        "po_name": "Meno a priezvisko",
+        "po_position": "Pozícia",
+        "po_email": "E-mail",
+        "po_phone": "Telefón"
+      },
+      "budget_type": {
+        "milestone": "Po míľnikoch",
+        "monthly": "Mesačne",
+        "completion": "Po odovzdaní"
+      },
+      "toast": {
+        "submit_success": "Zadanie bolo úspešne odoslané na schválenie.",
+        "submit_error": "Zadanie sa nepodarilo odoslať.",
+        "download_error": "Stiahnutie zlyhalo"
+      }
+    },
+
+    "clenovia": {
+      "title": "Správa členov",
+      "subtitle": "Členovia organizácie s prístupom do portálu NTI",
+      "info": "Každý člen dostane prístup do firemného portálu podľa svojej roly.",
+      "invite_btn": "Pozvať člena",
+      "table": {
+        "col_member": "Člen",
+        "col_role": "Rola",
+        "col_status": "Stav",
+        "col_added": "Pridaný",
+        "you": "(vy)",
+        "status_active": "Aktívny",
+        "status_pending": "Čaká na prijatie",
+        "remove_title": "Odstrániť člena"
+      },
+      "roles": {
+        "admin": "Administrátor",
+        "member": "Člen",
+        "po": "Product Owner"
+      },
+      "pending_invites": "Čakajúce pozvánky ({count})",
+      "invite_modal": {
+        "title": "Pozvať nového člena",
+        "subtitle": "Zadajte e-mail adresu a priradenú rolu člena organizácie.",
+        "email_label": "E-mail",
+        "email_placeholder": "jan.novak{'@'}firma.sk",
+        "role_label": "Rola",
+        "cancel": "Zrušiť",
+        "send": "Poslať pozvánku",
+        "error": "Nepodarilo sa odoslať pozvánku."
+      },
+      "remove_modal": {
+        "title": "Odstrániť člena?",
+        "body": "{name} stratí prístup do firemného portálu NTI.",
+        "cancel": "Zrušiť",
+        "confirm": "Odstrániť"
+      }
+    },
+
+    "zadanie_form": {
+      "status_label": "Stav zadania",
+      "status": {
+        "draft": "Draft",
+        "pending": "Čaká na schválenie",
+        "published": "Publikované",
+        "matching": "V párovaní",
+        "assigned": "Pridelené",
+        "in_progress": "V realizácii",
+        "closed": "Uzavreté"
+      },
+      "action_submit": "Odoslať na schválenie",
+      "section_basic": "Základné informácie",
+      "field_title": "Názov zadania",
+      "field_title_placeholder": "Napr. AI chatbot pre zákaznícku podporu",
+      "field_desc": "Stručný popis",
+      "field_desc_placeholder": "Čo chcete dosiahnuť? Pre koho je riešenie určené?",
+      "phase_apply": "Fáza prihlasovania",
+      "field_app_start": "Začiatok prihlasovania",
+      "field_app_deadline": "Deadline prihlášok",
+      "phase_project": "Fáza realizácie",
+      "field_project_start": "Začiatok projektu",
+      "field_project_end": "Ukončenie projektu (odovzdanie)",
+      "section_tech": "Technická špecifikácia",
+      "field_tech_spec": "Popis technického riešenia",
+      "field_tech_spec_placeholder": "Popíšte technický kontext, existujúce systémy, požiadavky na tím, obmedzenia a cieľovú architektúru...",
+      "field_attachments": "Prílohy a dokumentácia",
+      "current_files": "Aktuálne nahraté súbory:",
+      "download": "Stiahnuť",
+      "remove_file": "Zmazať",
+      "field_tech_tags": "Preferované technológie",
+      "field_tech_tags_placeholder": "Napr. React, Python, Laravel...",
+      "add_tag": "Pridať",
+      "section_po": "Product Owner",
+      "po_subtitle": "Osoba zodpovedná za komunikáciu s realizačným tímom zo strany firmy",
+      "field_po_name": "Meno a priezvisko",
+      "field_po_email": "E-mail",
+      "field_po_email_placeholder": "jan.novak{'@'}firma.sk",
+      "section_milestones": "Míľniky zadania",
+      "milestones_subtitle": "Definujte kontrolné body projektu — čo musí tím splniť a kedy",
+      "milestone_name_placeholder": "Názov míľniku *",
+      "milestone_desc_placeholder": "Popis",
+      "no_milestones": "Zatiaľ žiadne míľniky",
+      "add_milestone": "Pridať míľnik",
+      "section_budget": "Rozpočet",
+      "budget_subtitle": "Odmena pre realizačný tím študentov",
+      "field_budget": "Celkový rozpočet (€)",
+      "field_budget_type": "Spôsob výplaty",
+      "budget_type_milestone": "Po míľnikoch",
+      "budget_type_monthly": "Mesačne",
+      "budget_type_completion": "Po odovzdaní",
+      "budget_breakdown": "Odhadovaný rozpad rozpočtu",
+      "budget_team": "Na tím",
+      "budget_nti": "NTI poplatok (10%)",
+      "budget_net": "Čistá odmena",
+      "save_success": "Zadanie bolo uložené.",
+      "delete_btn": "Zmazať zadanie",
+      "saving": "Ukladám...",
+      "create_btn": "Vytvoriť zadanie",
+      "save_btn": "Uložiť zmeny",
+      "error_save": "Nastala chyba pri ukladaní.",
+      "error_status": "Zmena stavu zlyhala.",
+      "error_title": "Názov je povinný",
+      "error_desc": "Popis je povinný",
+      "error_budget": "Zadajte rozpočet",
+      "error_email": "Neplatný e-mail",
+      "error_deadline": "Deadline nemôže byť skôr ako začiatok",
+      "error_project_end": "Koniec projektu musí byť po jeho začiatku",
+      "upload_success": "Súbor {name} bol nahratý",
+      "upload_error": "Nahrávanie súboru zlyhalo",
+      "download_error": "Stiahnutie zlyhalo"
+    },
+
+    "profil": {
+      "title": "Profil organizácie",
+      "subtitle": "Informácie o vašej organizácii synchronizované so systémom NTI",
+      "sections": {
+        "basic": "Základné informácie",
+        "sectors": "Sektory",
+        "sectors_hint": "Vyberte oblasti, v ktorých vaša organizácia pôsobí",
+        "address": "Adresa"
+      },
+      "fields": {
+        "name": "Názov organizácie",
+        "name_placeholder": "TechFirma s.r.o.",
+        "ico": "IČO",
+        "phone": "Telefón",
+        "website": "Webová stránka",
+        "description": "Popis organizácie",
+        "description_placeholder": "Stručný popis vašej firmy, oblasti pôsobenia a hodnôt...",
+        "city": "Mesto",
+        "postal": "PSČ",
+        "street": "Ulica",
+        "country": "Krajina"
+      },
+      "save": "Uložiť profil",
+      "saving": "Ukladám...",
+      "save_success": "Profil bol úspešne uložený.",
+      "delete_account": "Vymazať účet",
+      "deleting_account": "Mažem účet...",
+      "errors": {
+        "name_required": "Názov organizácie je povinný",
+        "website_invalid": "Zadajte platnú URL adresu",
+        "org_not_found": "Nepodarilo sa určiť organizáciu."
+      }
+    },
+
+    "po": {
+      "dashboard": {
+        "task_label": "Zadanie:",
+        "role_badge": "Product Owner",
+        "welcome": "Vitajte, {name}!",
+        "subtitle": "Správa projektového cyklu a schvaľovanie kľúčových fáz.",
+        "no_task": "Nemáte priradené žiadne zadanie",
+        "no_task_hint": "Kontaktujte NTI administrátora",
+        "stats": {
+          "open_milestones": "Otvorené míľniky",
+          "done_milestones": "Dokončené míľniky",
+          "pending_approvals": "Čakajú na schválenie",
+          "documents": "Dokumenty"
+        },
+        "action_required": {
+          "title": "Vyžadovaná akcia",
+          "body": "{count} míľnikov čaká na vaše schválenie. Kliknite pre prechod na schvaľovanie."
+        },
+        "assigned_team": {
+          "label": "Priradený tím",
+          "none": "Zatiaľ nebol priradený žiadny tím"
+        },
+        "deadlines": "Blížiace sa termíny",
+        "deadline_labels": {
+          "application": "Uzávierka prihlášok",
+          "project_start": "Začiatok projektu",
+          "project_end": "Koniec projektu"
+        },
+        "days_left": "dní zostáva"
+      },
+      "milniky": {
+        "title": "Míľniky",
+        "no_task": "Nemáte priradené žiadne zadanie",
+        "tabs": {
+          "list": "Zoznam míľnikov",
+          "approvals": "Schvaľovanie"
+        },
+        "list": {
+          "plan": "Plán míľnikov pre toto zadanie",
+          "add": "Pridať míľnik",
+          "loading": "Načítavam...",
+          "empty": "Žiadne míľniky"
+        },
+        "approvals": {
+          "subtitle": "Míľniky označené ako dokončené. Skontrolujte výstupy pred schválením.",
+          "loading": "Načítavam...",
+          "empty": "Žiadne dokončené míľniky na schválenie",
+          "view_outputs": "Zobraziť výstupy",
+          "deadline": "Termín: {date}"
+        },
+        "form": {
+          "title_new": "Nový míľnik",
+          "title_edit": "Upraviť míľnik",
+          "name_label": "Názov",
+          "desc_label": "Popis",
+          "date_label": "Termín",
+          "cancel": "Zrušiť",
+          "save": "Uložiť",
+          "saving": "Ukladám...",
+          "error_required": "Vyplňte názov a termín."
+        },
+        "detail": {
+          "attachments": "Prílohy od tímu",
+          "loading": "Načítavam...",
+          "no_attachments": "Žiadne prílohy",
+          "comment_label": "Komentár *",
+          "comment_placeholder": "Pridajte poznámku pre tím...",
+          "deadline": "Termín: {date}",
+          "close": "Zavrieť",
+          "reject": "Zamietnuť",
+          "approve": "Schváliť",
+          "download": "Stiahnuť"
+        },
+        "toast": {
+          "saved": "Míľnik bol uložený.",
+          "deleted": "Míľnik bol odstránený.",
+          "delete_error": "Nepodarilo sa odstrániť.",
+          "approved": "Míľnik bol schválený.",
+          "approve_error": "Schválenie zlyhalo.",
+          "rejected": "Míľnik bol zamietnutý.",
+          "reject_error": "Zamietnutie zlyhalo."
+        }
+      },
+      "zadanie": {
+        "no_task": "Nemáte priradené žiadne zadanie",
+        "no_task_hint": "Kontaktujte NTI administrátora",
+        "edit_title": "Upraviť zadanie",
+        "cancel": "Zrušiť",
+        "edit_btn": "Upraviť",
+        "created": "Vytvorené {date}",
+        "toast_saved": "Zadanie bolo uložené.",
+        "download_error": "Stiahnutie zlyhalo"
+      }
+    }
   }
 }

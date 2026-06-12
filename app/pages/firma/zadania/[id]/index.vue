@@ -2,13 +2,13 @@
 <template>
   <div class="max-w-5xl mx-auto px-6 py-10">
     <!-- Back -->
-    <NuxtLink
+    <NuxtLinkLocale
       to="/firma/zadania"
       class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-navy transition-colors mb-6"
     >
       <ChevronLeft class="w-4 h-4" />
-      Späť na zadania
-    </NuxtLink>
+      {{ $t('firma.zadanie_detail.back') }}
+    </NuxtLinkLocale>
 
     <!-- Loading -->
     <div v-if="isLoading" class="space-y-4">
@@ -23,13 +23,13 @@
       v-else-if="!task"
       class="text-center py-20 text-gray-400"
     >
-      <p class="text-lg font-medium">Zadanie sa nenašlo</p>
-      <NuxtLink
+      <p class="text-lg font-medium">{{ $t('firma.zadanie_detail.not_found') }}</p>
+      <NuxtLinkLocale
         to="/firma/zadania"
         class="text-sm text-blue-600 hover:underline mt-2 inline-block"
       >
-        Späť na zoznam
-      </NuxtLink>
+        {{ $t('firma.zadanie_detail.back_list') }}
+      </NuxtLinkLocale>
     </div>
 
     <!-- Content -->
@@ -41,24 +41,24 @@
             <h1 class="text-2xl font-bold text-navy">{{ task.title }}</h1>
             <UiStatusBadge :status="task.rawStatus" />
           </div>
-          <p class="text-gray-500 text-sm">{{ task.program }} · Vytvorené {{ task.createdAt }}</p>
+          <p class="text-gray-500 text-sm">{{ task.program }} · {{ $t('firma.zadanie_detail.created', { date: task.createdAt }) }}</p>
         </div>
         <div class="flex gap-2 shrink-0">
-          <NuxtLink
+          <NuxtLinkLocale
             v-if="canEditTask"
             :to="`/firma/zadania/${task.id}/edit`"
             class="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
           >
             <Pencil class="w-4 h-4" />
-            Upraviť
-          </NuxtLink>
+            {{ $t('firma.zadanie_detail.edit') }}
+          </NuxtLinkLocale>
           <button
             v-if="canEditTask && task.status === 'draft'"
             @click="confirmPublish"
             class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
           >
             <Send class="w-4 h-4" />
-            Odoslať na schválenie
+            {{ $t('firma.zadanie_detail.submit_approval') }}
           </button>
         </div>
       </div>
@@ -71,7 +71,7 @@
           <div class="bg-white rounded-lg border border-gray-100 p-6">
             <h2 class="text-base font-semibold text-navy mb-3 flex items-center gap-2">
               <FileText class="w-4 h-4 text-blue-600" />
-              Popis zadania
+              {{ $t('firma.zadanie_detail.sections.description') }}
             </h2>
             <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ task.description }}</p>
           </div>
@@ -81,7 +81,7 @@
             <div class="p-6 border-b border-gray-50 bg-gray-50/50">
               <h2 class="text-base font-semibold text-navy flex items-center gap-2">
                 <Code class="w-4 h-4 text-blue-600" />
-                Technické detaily a podklady
+                {{ $t('firma.zadanie_detail.sections.tech') }}
               </h2>
             </div>
             
@@ -97,7 +97,7 @@
               <div v-if="task.tech_tags.length">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Tag class="w-3.5 h-3.5" />
-                  Preferované technológie
+                  {{ $t('firma.zadanie_detail.sections.tech_tags') }}
                 </h3>
                 <div class="flex flex-wrap gap-2">
                   <span
@@ -114,7 +114,7 @@
               <div v-if="task.documents.length" class="pt-4 border-t border-gray-50">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                   <FileText class="w-3.5 h-3.5" />
-                  Prílohy
+                  {{ $t('firma.zadanie_detail.sections.attachments') }}
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <a
@@ -129,7 +129,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="text-sm font-medium text-navy truncate">{{ doc.name }}</p>
-                      <p class="text-[10px] text-gray-400 uppercase">Kliknite pre stiahnutie</p>
+                      <p class="text-[10px] text-gray-400 uppercase">{{ $t('firma.zadanie_detail.sections.download_hint') }}</p>
                     </div>
                   </a>
                 </div>
@@ -141,7 +141,7 @@
           <div v-if="milestones.length" class="bg-white rounded-lg border border-gray-100 p-6">
             <h2 class="text-base font-semibold text-navy mb-4 flex items-center gap-2">
               <Flag class="w-4 h-4 text-blue-600" />
-              Míľniky zadania
+              {{ $t('firma.zadanie_detail.sections.milestones') }}
             </h2>
             <div class="space-y-2">
               <div
@@ -173,16 +173,7 @@
                     {{ m.due_date ?? '—' }}
                   </p>
                 </div>
-                <span :class="[
-                  'text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0',
-                  m.status === 'Schválené'  ? 'bg-green-100 text-green-700' :
-                  m.status === 'Dokončené'  ? 'bg-amber-100 text-amber-700' :
-                  m.status === 'Zamietnuté' ? 'bg-red-100 text-red-700' :
-                  m.status === 'V riešení'  ? 'bg-blue-100 text-blue-700' :
-                  'bg-gray-100 text-gray-500'
-                ]">
-                  {{ m.status ?? 'Plánované' }}
-                </span>
+                <UiStatusBadge :status="m.status ?? 'Plánované'" class="flex-shrink-0" />
               </div>
             </div>
           </div>
@@ -195,19 +186,19 @@
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div v-if="task.po_name">
-                <p class="text-xs text-gray-400 mb-0.5">Meno a priezvisko</p>
+                <p class="text-xs text-gray-400 mb-0.5">{{ $t('firma.zadanie_detail.sections.po_name') }}</p>
                 <p class="text-sm font-medium text-navy">{{ task.po_name }}</p>
               </div>
               <div v-if="task.po_position">
-                <p class="text-xs text-gray-400 mb-0.5">Pozícia</p>
+                <p class="text-xs text-gray-400 mb-0.5">{{ $t('firma.zadanie_detail.sections.po_position') }}</p>
                 <p class="text-sm font-medium text-navy">{{ task.po_position }}</p>
               </div>
               <div v-if="task.po_email">
-                <p class="text-xs text-gray-400 mb-0.5">E-mail</p>
+                <p class="text-xs text-gray-400 mb-0.5">{{ $t('firma.zadanie_detail.sections.po_email') }}</p>
                 <a :href="`mailto:${task.po_email}`" class="text-sm font-medium text-blue-600 hover:underline">{{ task.po_email }}</a>
               </div>
               <div v-if="task.po_phone">
-                <p class="text-xs text-gray-400 mb-0.5">Telefón</p>
+                <p class="text-xs text-gray-400 mb-0.5">{{ $t('firma.zadanie_detail.sections.po_phone') }}</p>
                 <a :href="`tel:${task.po_phone}`" class="text-sm font-medium text-blue-600 hover:underline">{{ task.po_phone }}</a>
               </div>
             </div>
@@ -218,9 +209,9 @@
             <div class="flex items-center justify-between mb-4">
               <h2 class="text-base font-semibold text-navy flex items-center gap-2">
                 <Users class="w-4 h-4 text-blue-600" />
-                Prihlášky tímov
+                {{ $t('firma.zadanie_detail.sections.applications') }}
               </h2>
-              <span class="text-sm text-gray-400">{{ task.applications.length }} celkom</span>
+              <span class="text-sm text-gray-400">{{ $t('firma.zadanie_detail.sections.applications_total', { count: task.applications.length }) }}</span>
             </div>
             <div class="space-y-3">
               <div
@@ -231,13 +222,13 @@
                 <div class="flex items-start justify-between mb-2">
                   <div>
                     <p class="font-medium text-navy text-sm">{{ app.teamName }}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">Podané {{ app.submittedAt }}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">{{ $t('firma.zadanie_detail.sections.submitted', { date: app.submittedAt }) }}</p>
                   </div>
                   <UiStatusBadge :status="app.status" />
                 </div>
               </div>
               <p v-if="!task.applications.length" class="text-sm text-gray-400 text-center py-6">
-                Žiadne prihlášky zatiaľ
+                {{ $t('firma.zadanie_detail.sections.no_applications') }}
               </p>
             </div>
           </div>
@@ -248,29 +239,29 @@
  
           <!-- Rozpočet -->
           <div class="bg-white rounded-lg border border-gray-100 p-5">
-            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Rozpočet</h3>
+            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">{{ $t('firma.zadanie_detail.sections.budget') }}</h3>
             <div class="text-3xl font-bold text-navy mb-1">{{ formatCurrency(task.budget) }}</div>
-            <p class="text-xs text-gray-400 mb-4">celkový rozpočet</p>
+            <p class="text-xs text-gray-400 mb-4">{{ $t('firma.zadanie_detail.sections.budget_total') }}</p>
             <div class="mt-3 pt-3 border-t border-gray-100 space-y-2">
               <div v-if="task.budget_type" class="flex justify-between text-sm">
-                <span class="text-gray-500">Spôsob výplaty</span>
+                <span class="text-gray-500">{{ $t('firma.zadanie_detail.sections.budget_payment') }}</span>
                 <span class="font-medium text-navy">{{ budgetTypeLabel(task.budget_type) }}</span>
               </div>
             </div>
             <!-- Rozpad rozpočtu -->
             <div v-if="task.budget" class="mt-3 pt-3 border-t border-gray-100">
-              <p class="text-xs font-medium text-gray-400 mb-2">Odhadovaný rozpad</p>
+              <p class="text-xs font-medium text-gray-400 mb-2">{{ $t('firma.zadanie_detail.sections.budget_breakdown') }}</p>
               <div class="grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <p class="text-xs text-gray-400">Na tím</p>
+                  <p class="text-xs text-gray-400">{{ $t('firma.zadanie_detail.sections.budget_team') }}</p>
                   <p class="text-xs font-semibold text-navy">{{ formatCurrency(task.budget) }}</p>
                 </div>
                 <div>
-                  <p class="text-xs text-gray-400">NTI (50%)</p>
+                  <p class="text-xs text-gray-400">{{ $t('firma.zadanie_detail.sections.budget_nti', { pct: 50 }) }}</p>
                   <p class="text-xs font-semibold text-navy">{{ formatCurrency(task.budget * 0.5) }}</p>
                 </div>
                 <div>
-                  <p class="text-xs text-gray-400">Čistá odmena</p>
+                  <p class="text-xs text-gray-400">{{ $t('firma.zadanie_detail.sections.budget_net') }}</p>
                   <p class="text-xs font-semibold text-navy">{{ formatCurrency(task.budget * 0.5) }}</p>
                 </div>
               </div>
@@ -279,51 +270,51 @@
  
           <!-- Informácie -->
           <div class="bg-white rounded-lg border border-gray-100 p-5 space-y-3">
-            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Informácie</h3>
+            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">{{ $t('firma.zadanie_detail.sections.info') }}</h3>
             <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Program</span>
+              <span class="text-gray-500">{{ $t('firma.zadanie_detail.sections.info_program') }}</span>
               <span class="font-medium text-navy">{{ task.program }}</span>
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Typ výzvy</span>
+              <span class="text-gray-500">{{ $t('firma.zadanie_detail.sections.info_call_type') }}</span>
               <span class="font-medium text-navy">{{ task.callType || '—' }}</span>
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Začiatok prihlasovania</span>
+              <span class="text-gray-500">{{ $t('firma.zadanie_detail.sections.info_app_start') }}</span>
               <span class="font-medium text-navy">{{ task.applicationStart || '—' }}</span>
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Deadline prihlášok</span>
+              <span class="text-gray-500">{{ $t('firma.zadanie_detail.sections.info_deadline') }}</span>
               <span class="font-medium text-navy">{{ task.deadline || '—' }}</span>
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Začiatok projektu</span>
+              <span class="text-gray-500">{{ $t('firma.zadanie_detail.sections.info_project_start') }}</span>
               <span class="font-medium text-navy">{{ task.projectStart || '—' }}</span>
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Koniec projektu</span>
+              <span class="text-gray-500">{{ $t('firma.zadanie_detail.sections.info_project_end') }}</span>
               <span class="font-medium text-navy">{{ task.projectEnd || '—' }}</span>
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Organizácia</span>
+              <span class="text-gray-500">{{ $t('firma.zadanie_detail.sections.info_org') }}</span>
               <span class="font-medium text-navy">{{ task.organization || '—' }}</span>
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-gray-500">Prihlášok</span>
+              <span class="text-gray-500">{{ $t('firma.zadanie_detail.sections.info_applications') }}</span>
               <span class="font-medium text-navy">{{ task.applications.length }}</span>
             </div>
           </div>
  
           <!-- Priradený tím -->
           <div v-if="task.assignedTeam" class="bg-blue-50 border border-blue-100 rounded-lg p-5">
-            <h3 class="text-sm font-semibold text-blue-800 mb-2">Priradený tím</h3>
+            <h3 class="text-sm font-semibold text-blue-800 mb-2">{{ $t('firma.zadanie_detail.sections.assigned_team') }}</h3>
             <div class="flex items-center gap-3">
               <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
                 <Users class="w-4 h-4 text-blue-600" />
               </div>
               <div>
                 <p class="font-medium text-blue-900 text-sm">{{ task.assignedTeam.name }}</p>
-                <p class="text-xs text-blue-600">{{ task.assignedTeam.membersCount }} členov</p>
+                <p class="text-xs text-blue-600">{{ $t('firma.zadanie_detail.sections.members_count', { count: task.assignedTeam.membersCount }) }}</p>
               </div>
             </div>
           </div>
@@ -333,12 +324,11 @@
   </div>
   <UiModal
     v-model="isConfirmModalOpen"
-    title="Odoslať na schválenie"
+    :title="$t('firma.zadanie_detail.confirm_submit_title')"
   >
     <div class="py-2">
       <p class="text-gray-600">
-        Naozaj chcete zadanie <strong>{{ task?.title }}</strong> odoslať na schválenie? 
-        Po schválení administrátorom bude zadanie viditeľné pre tímy.
+        {{ $t('firma.zadanie_detail.confirm_submit_body', { title: task?.title }) }}
       </p>
     </div>
 
@@ -347,7 +337,7 @@
         @click="isConfirmModalOpen = false"
         class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
       >
-        Zrušiť
+        {{ $t('firma.zadanie_detail.cancel') }}
       </button>
       <button
         @click="handlePublish"
@@ -355,7 +345,7 @@
         class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors flex items-center gap-2"
       >
         <span v-if="isActionLoading" class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"></span>
-        Odoslať
+        {{ $t('firma.zadanie_detail.submit') }}
       </button>
     </template>
   </UiModal>
@@ -365,6 +355,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { ChevronLeft, ChevronRight, Pencil, Send, CheckCircle, Users, FileText, Code, Tag, UserCircle, Flag, Calendar } from 'lucide-vue-next'
 import { normalizeTaskStatus, apiTaskStatusState } from '~/composables/useTaskStatus'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   layout: 'portal',
@@ -380,6 +371,8 @@ if (orgDashboard.myRole.value !== 'organization_admin') {
 
 const route = useRoute()
 const api = useApi()
+const { t } = useI18n()
+const localePath = useLocalePath()
 
 useHead({
   title: 'Detail zadania | NTI Firma',
@@ -486,8 +479,14 @@ const budgetBarColor = (ratio: number) => {
   return 'bg-blue-500'
 }
  
-const budgetTypeLabel = (type: string) =>
-  ({ milestone: 'Po míľnikoch', monthly: 'Mesačne', completion: 'Po odovzdaní' })[type] ?? type
+const budgetTypeLabel = (type: string) => {
+  const map: Record<string, string> = {
+    milestone: t('firma.zadanie_detail.budget_type.milestone'),
+    monthly: t('firma.zadanie_detail.budget_type.monthly'),
+    completion: t('firma.zadanie_detail.budget_type.completion'),
+  }
+  return map[type] ?? type
+}
 
 const handlePublish = async () => {
   isConfirmModalOpen.value = false
@@ -501,15 +500,9 @@ const handlePublish = async () => {
     task.value.status = 'pending'
     task.value.rawStatus = 'Čaká na schválenie'
     
-    addToast({ 
-      message: 'Zadanie bolo úspešne odoslané na schválenie.', 
-      type: 'success' 
-    })
+    addToast({ message: t('firma.zadanie_detail.toast.submit_success'), type: 'success' })
   } catch (error: any) {
-    addToast({ 
-      message: error.response?._data?.message || 'Zadanie sa nepodarilo odoslať.', 
-      type: 'error' 
-    })
+    addToast({ message: error.response?._data?.message || t('firma.zadanie_detail.toast.submit_error'), type: 'error' })
   } finally {
     isActionLoading.value = false
   }
@@ -530,7 +523,7 @@ const downloadFile = async (doc: any) => {
     link.remove()
     window.URL.revokeObjectURL(url)
   } catch {
-    addToast({ message: 'Stiahnutie zlyhalo', type: 'error' })
+    addToast({ message: t('firma.zadanie_detail.toast.download_error'), type: 'error' })
   }
 }
 </script>

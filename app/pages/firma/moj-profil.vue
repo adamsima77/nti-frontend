@@ -61,10 +61,10 @@
       </div>
 
       <div class="bg-white rounded-lg shadow-sm border border-red-100 p-6 mt-6">
-        <h2 class="text-lg font-bold text-red-700 mb-2">Vymazať účet</h2>
-        <p class="text-sm text-gray-600 mb-4">Táto akcia anonymizuje váš účet a nie je možné ju vrátiť späť.</p>
+        <h2 class="text-lg font-bold text-red-700 mb-2">{{ t('profile.dangerZone.title') }}</h2>
+        <p class="text-sm text-gray-600 mb-4">{{ t('profile.dangerZone.body') }}</p>
         <UiButton variant="danger" :disabled="deletingAccount" @click="deleteAccount">
-          {{ deletingAccount ? 'Mažem účet...' : 'Vymazať účet' }}
+          {{ deletingAccount ? t('profile.dangerZone.deleting') : t('profile.dangerZone.delete') }}
         </UiButton>
       </div>
     </template>
@@ -203,16 +203,16 @@ async function saveProfile() {
 async function deleteAccount() {
   const u = authStore.user
   if (!u) return
-  const confirmed = window.confirm('Naozaj chcete anonymizovať a vymazať účet? Túto akciu nie je možné vrátiť späť.')
+  const confirmed = window.confirm(t('profile.dangerZone.confirm'))
   if (!confirmed) return
   deletingAccount.value = true
   try {
     await api.post(`/users/anonymize-user/${u.id}`)
     authStore.$reset()
-    addToast({ message: 'Účet bol anonymizovaný.', type: 'success' })
-    await navigateTo('/auth/login')
+    addToast({ message: t('profile.toast.anonymizeSuccess'), type: 'success' })
+    await navigateTo(localePath('/auth/login'))
   } catch (err: any) {
-    addToast({ message: err?.data?.message ?? 'Anonymizácia účtu zlyhala.', type: 'error' })
+    addToast({ message: err?.data?.message ?? t('profile.toast.anonymizeError'), type: 'error' })
   } finally {
     deletingAccount.value = false
   }

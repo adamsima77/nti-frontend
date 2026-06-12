@@ -134,7 +134,7 @@ const navItems = computed(() => {
         { label: t('portal_sidebar_links.dashboard'),    to: localePath('/firma/po'),          icon: LayoutDashboard, exact: true },
         { label: t('portal_sidebar_links.poTask'),       to: localePath('/firma/po/zadanie'),  icon: FileText },
         { label: t('portal_sidebar_links.poMilestones'), to: localePath('/firma/po/milniky'),  icon: Flag },
-        { label: 'Môj profil',                           to: localePath('/firma/moj-profil'),  icon: UserCircle },
+        { label: t('portal_sidebar_links.profile'),      to: localePath('/firma/moj-profil'),  icon: UserCircle },
         ...commissionItems,
       ]
     }
@@ -142,7 +142,7 @@ const navItems = computed(() => {
     if (orgRole === 'member') {
       return [
         { label: t('portal_sidebar_links.dashboard'), to: localePath('/firma'),            icon: LayoutDashboard, exact: true },
-        { label: 'Môj profil',                        to: localePath('/firma/moj-profil'), icon: UserCircle },
+        { label: t('portal_sidebar_links.profile'),   to: localePath('/firma/moj-profil'), icon: UserCircle },
         ...commissionItems,
       ]
     }

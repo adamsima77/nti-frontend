@@ -2,16 +2,15 @@
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
     <NuxtLink
-      to="/firma/zadania"
+      :to="localePath('/firma/zadania')"
       class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-navy transition-colors mb-6"
     >
       <ChevronLeft class="w-4 h-4" />
-      Späť na zadania
+      {{ $t('firma.zadanie_detail.back') }}
     </NuxtLink>
 
     <div class="mb-8">
-      <h1 class="text-2xl font-bold text-navy mb-1">Nové zadanie</h1>
-      <p class="text-gray-500 text-sm">Program B — živá prax</p>
+      <h1 class="text-2xl font-bold text-navy mb-1">{{ $t('firma.zadanie_detail.new_title') }}</h1>
     </div>
 
     <ZadanieForm
@@ -40,8 +39,9 @@ if (orgDashboard.myRole.value !== 'organization_admin') {
 }
 
 const router = useRouter()
+const localePath = useLocalePath()
 
 const handleSaved = () => {
-  router.push('/firma/zadania')
+  router.push(localePath('/firma/zadania'))
 }
 </script>
