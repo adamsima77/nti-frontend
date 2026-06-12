@@ -61,6 +61,26 @@
                   {{ $t('common.select_export_format', 'Vyberte formát exportu:') }}
                 </p>
 
+                <!-- Language picker (optional) -->
+                <div v-if="showLangPicker" class="flex items-center gap-2 mb-4">
+                  <span class="text-sm text-gray-500">Jazyk / Language:</span>
+                  <div class="flex gap-1">
+                    <button
+                      v-for="lang in ['sk', 'en']"
+                      :key="lang"
+                      :class="[
+                        'px-3 py-1 rounded-lg text-xs font-semibold uppercase border-2 transition-all',
+                        selectedLang === lang
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300',
+                      ]"
+                      @click="selectedLang = lang"
+                    >
+                      {{ lang }}
+                    </button>
+                  </div>
+                </div>
+
                 <div class="grid grid-cols-3 gap-3">
                   <button
                     v-for="fmt in activeFormats"
@@ -211,6 +231,7 @@ const props = withDefaults(
     allowedFormats?: ('xlsx' | 'csv' | 'pdf')[]
     filenamePrefix?: string                // Base name for saved files
     isAsync?: boolean                      // Explicit push to queue configuration
+    showLangPicker?: boolean               // Show SK/EN language toggle
   }>(),
   {
     subtitle: '',
@@ -218,6 +239,7 @@ const props = withDefaults(
     allowedFormats: () => ['xlsx', 'csv', 'pdf'],
     filenamePrefix: 'export',
     isAsync: false,
+    showLangPicker: false,
   }
 )
 
@@ -232,6 +254,7 @@ const { addToast } = useToast()
 // ── Local State ──────────────────────────────────────────────────────────────
 const step = ref<Step>('idle')
 const selectedFormat = ref<string>('')
+const selectedLang = ref<string>('sk')
 const statusUrl = ref<string | null>(null)
 const downloadUrl = ref<string | null>(null)
 
@@ -260,6 +283,7 @@ async function executeExport() {
   // Príprava query parametrov pre GET request
   const queryParams = {
     ...props.filters,
+    ...(props.showLangPicker ? { lang: selectedLang.value } : {}),
     async: props.isAsync ? 'true' : undefined
   }
 
@@ -391,6 +415,7 @@ function retry() {
 
 function reset() {
   step.value = 'idle'
+  selectedLang.value = 'sk'
   statusUrl.value = null
   downloadUrl.value = null
   pollAttempts = 0

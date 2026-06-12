@@ -196,8 +196,9 @@
         :subtitle="reportCall?.name"
         :endpoint="`/v1/admin/calls/${reportCall?.id}/report`"
         filename-prefix="project-report"
-        :allowed-formats="['pdf']"
+        :allowed-formats="['pdf', 'xlsx']"
         :is-async="true"
+        :show-lang-picker="true"
       />
     </ClientOnly>
 
@@ -431,6 +432,7 @@ function isClosedCall(row: CallRow): boolean {
 
 const reportModalOpen = ref(false)
 const reportCall      = ref<CallRow | null>(null)
+const reportLang      = ref<'sk' | 'en'>('sk')
 
 function downloadClosureReport(row: CallRow) {
   reportCall.value      = row
