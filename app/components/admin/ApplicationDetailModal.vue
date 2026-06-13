@@ -13,7 +13,7 @@
           <div v-if="isFetching" class="flex-1 flex items-center justify-center py-24">
             <div class="flex flex-col items-center gap-3 text-gray-400">
               <div class="w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
-              <span class="text-sm">Načítavam prihlášku…</span>
+              <span class="text-sm">{{ $t('application_modal_translations_2.loading_application') }}</span>
             </div>
           </div>
 
@@ -27,13 +27,13 @@
                 <div class="min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
                     <h2 class="text-lg font-semibold text-navy truncate">
-                      {{ application.team?.name ?? '—' }}
+                      {{ application.team?.name ?? $t('application_modal_translations_2.no_team_name') }}
                     </h2>
                     <span class="text-gray-400 text-sm font-mono">{{ application.reference ?? '' }}</span>
                     <UiStatusBadge :status="statusSlug" />
                   </div>
                   <p class="text-sm text-gray-500 mt-0.5 truncate">
-                    {{ application.call?.name ?? '—' }}
+                    {{ application.call?.name ?? $t('application_modal_translations_2.no_call_name') }}
                   </p>
                 </div>
               </div>
@@ -90,7 +90,7 @@
                   <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
                       <Users class="w-4 h-4 text-gray-400" />
-                      Členovia tímu
+                      {{ $t('application_modal_translations_2.team_members') }}
                     </h3>
                   </div>
                   <div class="divide-y divide-gray-50">
@@ -137,7 +137,7 @@
                   <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
                       <GraduationCap class="w-4 h-4 text-gray-400" />
-                      Pridelení mentori
+                      {{ $t('application_modal_translations_2.assigned_mentors') }}
                     </h3>
                   </div>
                   <div class="divide-y divide-gray-50">
@@ -170,7 +170,7 @@
                   <div class="px-4 py-3 bg-amber-50 border-b border-amber-100">
                     <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
                       <Scale class="w-4 h-4 text-amber-500" />
-                      Hodnotenie komisie
+                      {{ $t('application_modal_translations_2.commission_evaluation') }}
                     </h3>
                   </div>
 
@@ -186,7 +186,7 @@
                           {{ evaluation.commission?.name ?? '—' }}
                         </span>
                         <span class="text-xs text-amber-500">
-                          ({{ submittedCount(evaluation) }}/{{ evaluation.members.length }} odovzdaných)
+                          {{ $t('application_modal_translations_2.submitted_count_format', { submitted: submittedCount(evaluation), total: evaluation.members.length }) }}
                         </span>
                       </div>
 
@@ -206,20 +206,20 @@
                             {{ member.name }} {{ member.surname }}
                           </p>
                           <p v-if="member.submitted_at" class="text-xs text-gray-400 mt-0.5">
-                            Odovzdané: {{ formatDate(member.submitted_at) }}
+                            {{ $t('application_modal_translations_2.submitted_date_label') }} {{ formatDate(member.submitted_at) }}
                           </p>
                           <p
                             v-if="member.internal_note"
                             class="text-xs text-amber-800 bg-amber-50/70 rounded px-2 py-1 mt-1.5 border border-amber-100/50 inline-block text-balance"
                           >
-                            <span class="font-semibold text-amber-950">Poznámka:</span> {{ member.internal_note }}
+                            <span class="font-semibold text-amber-950">{{ $t('application_modal_translations_2.internal_note_label') }}</span> {{ member.internal_note }}
                           </p>
                         </div>
 
                         <template v-if="member.submitted_at && member.scores.length">
                           <div class="flex-shrink-0 flex items-center gap-1.5">
                             <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-sm font-bold">
-                              {{ memberTotalScore(member) }} b.
+                              {{ memberTotalScore(member) }} {{ $t('application_modal_translations_2.score_points_suffix') }}
                             </span>
                             <div
                               v-if="member.scores.length > 1"
@@ -233,12 +233,12 @@
                         </template>
                         <template v-else-if="member.submitted_at">
                           <span class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-green-50 text-green-700 text-xs font-medium">
-                            Odovzdané
+                            {{ $t('application_modal_translations_2.submitted_badge') }}
                           </span>
                         </template>
                         <template v-else>
                           <span class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-400 text-xs font-medium">
-                            Čaká na hodnotenie
+                            {{ $t('application_modal_translations_2.waiting_for_evaluation') }}
                           </span>
                         </template>
                       </div>
@@ -247,9 +247,9 @@
                         v-if="commissionHasAnyScores(evaluation)"
                         class="px-4 py-2.5 bg-amber-50/70 flex items-center justify-between"
                       >
-                        <span class="text-xs font-medium text-amber-700">Priemer komisie</span>
+                        <span class="text-xs font-medium text-amber-700">{{ $t('application_modal_translations_2.commission_average') }}</span>
                         <span class="text-sm font-bold text-amber-900">
-                          {{ commissionAverageScore(evaluation) }} b.
+                          {{ commissionAverageScore(evaluation) }} {{ $t('application_modal_translations_2.score_points_suffix') }}
                         </span>
                       </div>
                     </div>
@@ -282,7 +282,7 @@
                           </p>
                         </div>
                         <span class="flex-shrink-0 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-400 text-xs font-medium">
-                          Čaká na hodnotenie
+                          {{ $t('application_modal_translations_2.waiting_for_evaluation') }}
                         </span>
                       </div>
                     </div>
@@ -294,7 +294,7 @@
                   <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
                       <History class="w-4 h-4 text-gray-400" />
-                      História stavov
+                      {{ $t('application_modal_translations_2.status_history') }}
                     </h3>
                   </div>
                   <div class="px-4 py-3 space-y-0">
@@ -325,7 +325,7 @@
 
                 <div v-if="isFetchingAnswers" class="flex flex-col items-center justify-center py-16 text-slate-400 gap-3">
                   <div class="w-8 h-8 border-2 border-slate-200 border-t-indigo-600 rounded-full animate-spin" />
-                  <span class="text-sm font-medium">Načítavam odpovede…</span>
+                  <span class="text-sm font-medium">{{ $t('application_modal_translations_2.loading_answers') }}</span>
                 </div>
 
                 <div
@@ -333,7 +333,7 @@
                   class="flex flex-col items-center justify-center py-16 text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50"
                 >
                   <FileText class="w-12 h-12 mb-3 text-slate-300 opacity-80" />
-                  <p class="text-sm font-medium text-slate-500">Žiadne odpovede vo formulári</p>
+                  <p class="text-sm font-medium text-slate-500">{{ $t('application_modal_translations_2.no_form_answers') }}</p>
                 </div>
 
                 <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -363,7 +363,7 @@
                           </div>
                           <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-navy truncate">
-                              {{ fileMetaMap[docId]?.file_name ?? `Dokument #${docId}` }}
+                              {{ fileMetaMap[docId]?.file_name ?? $t('application_modal_translations_2.document_fallback_name', { id: docId }) }}
                             </p>
                             <p v-if="fileMetaMap[docId]?.created_at" class="text-xs text-slate-400 mt-0.5">
                               {{ formatDate(fileMetaMap[docId].created_at) }}
@@ -379,7 +379,7 @@
                               class="w-3 h-3 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"
                             />
                             <Download v-else class="w-3.5 h-3.5" />
-                            {{ downloadingIds.has(docId) ? 'Sťahujem…' : 'Stiahnuť' }}
+                            {{ downloadingIds.has(docId) ? $t('application_modal_translations_2.downloading') : $t('application_modal_translations_2.download') }}
                           </button>
                         </div>
                       </div>
@@ -408,7 +408,7 @@
                           <X v-else class="w-3 h-3 text-red-400" />
                         </div>
                         <p class="text-sm font-semibold text-slate-700">
-                          {{ isTruthy(value) ? 'Áno' : 'Nie' }}
+                          {{ isTruthy(value) ? $t('application_modal_translations_2.boolean_yes') : $t('application_modal_translations_2.boolean_no') }}
                         </p>
                       </div>
                     </template>
@@ -453,36 +453,36 @@
                   <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
                       <RefreshCw class="w-4 h-4 text-gray-400" />
-                      Zmena stavu
+                      {{ $t('application_modal_translations_2.status_change_title') }}
                     </h3>
                   </div>
                   <div class="px-4 py-4 space-y-3">
                     <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                      <span>Aktuálny stav:</span>
+                      <span>{{ $t('application_modal_translations_2.current_status_label') }}</span>
                       <UiStatusBadge :status="statusSlug" />
                     </div>
 
                     <div class="space-y-1">
-                      <label class="block text-xs font-medium text-gray-500">Nový stav</label>
+                      <label class="block text-xs font-medium text-gray-500">{{ $t('application_modal_translations_2.new_status_label') }}</label>
                       <UiSelect
                         v-model="statusForm.status_id"
                         :options="statusOptions"
                         :disabled="isChangingStatus"
-                        placeholder="Vyberte nový stav..."
+                        :placeholder="$t('application_modal_translations_2.new_status_placeholder')"
                       />
                       <!-- Inform admin when no transitions are available -->
                       <p v-if="statusOptions.length === 0" class="text-xs text-gray-400 flex items-center gap-1 mt-1">
                         <Info class="w-3.5 h-3.5" />
-                        Z tohto stavu nie sú dostupné žiadne prechody.
+                        {{ $t('application_modal_translations_2.no_transitions_available') }}
                       </p>
                     </div>
 
                     <div class="space-y-1">
-                      <label class="block text-xs font-medium text-gray-500">Verejná poznámka (voliteľná)</label>
+                      <label class="block text-xs font-medium text-gray-500">{{ $t('application_modal_translations_2.public_note_label') }}</label>
                       <textarea
                         v-model="statusForm.note"
                         rows="2"
-                        placeholder="Napr. dôvod zmeny stavu, požiadavky na doplnenie…"
+                        :placeholder="$t('application_modal_translations_2.public_note_placeholder')"
                         class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none transition"
                       />
                     </div>
@@ -498,7 +498,7 @@
                       @click="changeStatus"
                     >
                       <span v-if="isChangingStatus" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Potvrdiť zmenu stavu
+                      {{ $t('application_modal_translations_2.confirm_status_change') }}
                     </button>
                   </div>
                 </div>
@@ -511,7 +511,7 @@
                   <div class="px-4 py-3 bg-amber-50 border-b border-amber-100">
                     <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
                       <Scale class="w-4 h-4 text-amber-500" />
-                      Hodnotiaca komisia
+                      {{ $t('application_modal_translations_2.evaluation_committee_title') }}
                     </h3>
                   </div>
                   <div class="px-4 py-4 space-y-3">
@@ -519,12 +519,12 @@
                       <div class="flex items-center gap-3 p-3 rounded-xl bg-amber-100/60 border border-amber-200">
                         <Scale class="w-4 h-4 text-amber-600 flex-shrink-0" />
                         <div class="flex-1 min-w-0">
-                          <p class="text-xs font-medium text-amber-700 mb-0.5">Priradená komisia</p>
+                          <p class="text-xs font-medium text-amber-700 mb-0.5">{{ $t('application_modal_translations_2.assigned_committee_label') }}</p>
                           <p class="text-sm font-semibold text-amber-900 truncate">{{ assignedCommittee.name }}</p>
                         </div>
                         <button
                           class="flex-shrink-0 p-1 rounded-lg hover:bg-amber-200 text-amber-600 hover:text-red-600 transition"
-                          title="Odstrániť komisiu"
+                          :title="$t('application_modal_translations_2.remove_committee_title')"
                           @click="removeCommittee(assignedCommittee.id)"
                         >
                           <X class="w-4 h-4" />
@@ -532,24 +532,24 @@
                       </div>
                       <p class="text-xs text-gray-400 flex items-center gap-1">
                         <Info class="w-3.5 h-3.5" />
-                        Ku prihláške je možné priradiť iba jednu komisiu.
+                        {{ $t('application_modal_translations_2.single_committee_info') }}
                       </p>
                     </template>
 
                     <template v-else>
                       <p class="text-xs text-gray-500">
-                        Prihláška je v stave hodnotenia. Vyberte komisiu, ktorá prihláška posúdi.
+                        {{ $t('application_modal_translations_2.committee_selection_info') }}
                       </p>
                       <div v-if="isFetchingCommittees" class="flex items-center gap-2 text-xs text-gray-400 py-2">
                         <div class="w-4 h-4 border-2 border-gray-200 border-t-amber-500 rounded-full animate-spin" />
-                        Načítavam komisie…
+                        {{ $t('application_modal_translations_2.loading_committees') }}
                       </div>
                       <div v-else class="flex gap-2">
                         <div class="flex-1">
                           <UiSelect
                             v-model="committeeForm.committee_id"
                             :options="committeeOptions"
-                            placeholder="Vyberte komisiu…"
+                            :placeholder="$t('application_modal_translations_2.select_committee_placeholder')"
                           />
                         </div>
                         <button
@@ -559,7 +559,7 @@
                         >
                           <span v-if="isAssigningCommittee" class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           <Plus v-else class="w-3.5 h-3.5" />
-                          Priradiť
+                          {{ $t('application_modal_translations_2.assign_button') }}
                         </button>
                       </div>
                     </template>
@@ -579,19 +579,19 @@
                   <div class="px-4 py-3 bg-emerald-50 border-b border-emerald-100">
                     <h3 class="text-sm font-semibold text-navy flex items-center gap-2">
                       <GraduationCap class="w-4 h-4 text-emerald-600" />
-                      Priradiť mentora
+                      {{ $t('application_modal_translations_2.assign_mentor_title') }}
                     </h3>
                   </div>
                   <div class="px-4 py-4 space-y-3">
                     <p class="text-xs text-gray-500">
-                      Projekt vstúpil do onboardingu. Priraďte mentora, ktorý bude tím sprevádzať.
+                      {{ $t('application_modal_translations_2.mentor_selection_info') }}
                     </p>
                     <div v-if="isFetchingMentors" class="flex items-center gap-2 text-xs text-gray-400 py-2">
                       <div class="w-4 h-4 border-2 border-gray-200 border-t-emerald-500 rounded-full animate-spin" />
-                      Načítavam mentorov…
+                      {{ $t('application_modal_translations_2.loading_mentors') }}
                     </div>
                     <div v-if="application.mentorships?.length" class="space-y-1.5">
-                      <p class="text-xs font-medium text-gray-500">Priradení mentori:</p>
+                      <p class="text-xs font-medium text-gray-500">{{ $t('application_modal_translations_2.assigned_mentors_label') }}</p>
                       <div class="flex flex-wrap gap-2">
                         <div
                           v-for="ms in application.mentorships"
@@ -602,7 +602,7 @@
                           {{ ms.mentor?.name }} {{ ms.mentor?.surname }}
                           <button
                             class="ml-0.5 hover:text-red-600 transition"
-                            title="Odstrániť mentora"
+                            :title="$t('application_modal_translations_2.remove_mentor_title')"
                             @click="removeMentor(ms.id)"
                           >
                             <X class="w-3 h-3" />
@@ -615,7 +615,7 @@
                         <UiSelect
                           v-model="mentorForm.mentor_id"
                           :options="mentorOptions"
-                          placeholder="Vyberte mentora…"
+                          :placeholder="$t('application_modal_translations_2.select_mentor_placeholder')"
                         />
                       </div>
                       <button
@@ -625,7 +625,7 @@
                       >
                         <span v-if="isAssigningMentor" class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         <Plus v-else class="w-3.5 h-3.5" />
-                        Priradiť
+                        {{ $t('application_modal_translations_2.assign_button') }}
                       </button>
                     </div>
                     <div v-if="mentorError" class="text-xs text-red-500 flex items-center gap-1">
@@ -642,13 +642,13 @@
             <!-- ── Footer ─────────────────────────────────────────────── -->
             <div class="px-6 py-3 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
               <span class="text-xs text-gray-400">
-                Aktualizované: {{ formatDate(application.last_update) }}
+                {{ $t('application_modal_translations_2.updated_at_label') }} {{ formatDate(application.last_update) }}
               </span>
               <button
                 class="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition"
                 @click="close"
               >
-                Zatvoriť
+                {{ $t('application_modal_translations_2.close') }}
               </button>
             </div>
           </template>
@@ -656,9 +656,9 @@
           <!-- ── Error state ────────────────────────────────────────── -->
           <div v-else class="flex-1 flex flex-col items-center justify-center py-20 text-gray-400">
             <AlertCircle class="w-10 h-10 mb-3 opacity-40" />
-            <p class="text-sm">Prihlášku sa nepodarilo načítať.</p>
+            <p class="text-sm">{{ $t('application_modal_translations_2.error_loading_failed') }}</p>
             <button class="mt-3 text-xs text-blue-600 hover:underline" @click="fetchApplication">
-              Skúsiť znova
+              {{ $t('application_modal_translations_2.try_again') }}
             </button>
           </div>
 
@@ -689,7 +689,9 @@ import {
   Check,
 } from 'lucide-vue-next'
 import { useLocale } from 'vuetify'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const api = useApi()
 const toast = useToast()
 
@@ -879,11 +881,11 @@ const assignedCommittee = computed((): Committee | null => {
 })
 
 const quickStats = computed(() => [
-  { label: 'Referencia', value: application.value?.reference ?? '—' },
-  { label: 'Tím', value: application.value?.team?.name ?? '—' },
-  { label: 'Výzva', value: application.value?.call?.name ?? '—' },
+  { label: t('application_modal_translations_2.stat_reference'), value: application.value?.reference ?? '—' },
+  { label: t('application_modal_translations_2.stat_team'), value: application.value?.team?.name ?? '—' },
+  { label: t('application_modal_translations_2.stat_call'), value: application.value?.call?.name ?? '—' },
   {
-    label: 'Dátum podania',
+    label: t('application_modal_translations_2.stat_submitted_date'),
     value: application.value?.submitted_at
       ? new Date(application.value.submitted_at).toLocaleDateString('sk-SK')
       : '—',
@@ -891,11 +893,11 @@ const quickStats = computed(() => [
 ])
 
 const tabs = computed(() => [
-  { id: 'info',    label: 'Informácie', icon: Info,          badge: null },
-  { id: 'answers', label: 'Odpovede',   icon: MessageSquare, badge: null },
+  { id: 'info',    label: t('application_modal_translations_2.tab_info'), icon: Info,          badge: null },
+  { id: 'answers', label: t('application_modal_translations_2.tab_answers'),   icon: MessageSquare, badge: null },
   {
     id: 'manage',
-    label: 'Správa',
+    label: t('application_modal_translations_2.tab_manage'),
     icon: Settings,
     badge: showCommitteeSection.value || showMentorSection.value ? '!' : null,
   },
@@ -970,7 +972,7 @@ const callCommissionRaw: CallCommission | null = res?.call_commission ?? null
   } catch (error) {
     console.error('Fetch error:', error)
     application.value = null
-    toast.addToast({ message: 'Nepodarilo sa načítať detail prihlášky.', type: 'error' })
+    toast.addToast({ message: t('application_modal_translations_2.toast_fetch_error'), type: 'error' })
   } finally {
     isFetching.value = false
   }
@@ -1156,7 +1158,7 @@ async function downloadDocument(docId: number, fileName?: string) {
     document.body.removeChild(anchor)
     URL.revokeObjectURL(url)
   } catch {
-    toast.addToast({ message: 'Stiahnutie súboru zlyhalo.', type: 'error' })
+    toast.addToast({ message: t('application_modal_translations_2.toast_download_error'), type: 'error' })
   } finally {
     const next = new Set(downloadingIds.value)
     next.delete(docId)
@@ -1202,11 +1204,11 @@ async function changeStatus() {
     application.value     = res.data ?? res
     statusForm.status_id  = null
     statusForm.note       = ''
-    toast.addToast({ message: 'Stav prihlášky bol úspešne zmenený.', type: 'success' })
+    toast.addToast({ message: t('application_modal_translations_2.toast_status_success'), type: 'success' })
     emit('refreshed')
     close()
   } catch (err: any) {
-    statusError.value = err?.data?.message ?? 'Nepodarilo sa zmeniť stav.'
+    statusError.value = err?.data?.message ?? t('application_modal_translations_2.change_status_error_fallback')
   } finally {
     isChangingStatus.value = false
   }
@@ -1242,10 +1244,10 @@ async function assignCommittee() {
     await api.post(`/add-committee/${props.applicationId}/committee/${committeeForm.committee_id}`)
     await fetchApplication()
     committeeForm.committee_id = null
-    toast.addToast({ message: 'Komisia bola priradená.', type: 'success' })
+    toast.addToast({ message: t('application_modal_translations_2.toast_committee_success'), type: 'success' })
     emit('refreshed')
   } catch (err: any) {
-    committeeError.value = err?.data?.message ?? 'Priradenie komisie zlyhalo.'
+    committeeError.value = err?.data?.message ?? t('application_modal_translations_2.assign_committee_error_fallback')
   } finally {
     isAssigningCommittee.value = false
   }
@@ -1262,10 +1264,10 @@ async function removeCommittee(committeeId: number) {
         commission: ms.commission?.id === committeeId ? null : ms.commission,
       }))
     }
-    toast.addToast({ message: 'Komisia bola odstránená.', type: 'success' })
+    toast.addToast({ message: t('application_modal_translations_2.toast_committee_removed'), type: 'success' })
     emit('refreshed')
   } catch {
-    toast.addToast({ message: 'Nepodarilo sa odstrániť komisiu.', type: 'error' })
+    toast.addToast({ message: t('application_modal_translations_2.toast_committee_remove_error'), type: 'error' })
   }
 }
 
@@ -1303,10 +1305,10 @@ async function assignMentor() {
     if (res.data) application.value = res.data
     else await fetchApplication()
     mentorForm.mentor_id = null
-    toast.addToast({ message: 'Mentor bol priradený.', type: 'success' })
+    toast.addToast({ message: t('application_modal_translations_2.toast_mentor_success'), type: 'success' })
     emit('refreshed')
   } catch (err: any) {
-    mentorError.value = err?.data?.message ?? 'Priradenie mentora zlyhalo.'
+    mentorError.value = err?.data?.message ?? t('application_modal_translations_2.assign_mentor_error_fallback')
   } finally {
     isAssigningMentor.value = false
   }
@@ -1321,10 +1323,10 @@ async function removeMentor(mentorshipId: number) {
         ms => ms.id !== mentorshipId,
       )
     }
-    toast.addToast({ message: 'Mentor bol odstránený.', type: 'success' })
+    toast.addToast({ message: t('application_modal_translations_2.toast_mentor_removed'), type: 'success' })
     emit('refreshed')
   } catch {
-    toast.addToast({ message: 'Nepodarilo sa odstrániť mentora.', type: 'error' })
+    toast.addToast({ message: t('application_modal_translations_2.toast_mentor_remove_error'), type: 'error' })
   }
 }
 
@@ -1367,15 +1369,15 @@ function close() {
 }
 
 function memberRoleLabel(roleId?: number): string {
-  if (roleId === 1) return 'Vedúci tímu'
-  if (roleId === 2) return 'Člen'
+  if (roleId === 1) return t('application_modal_translations_2.role_leader')
+  if (roleId === 2) return t('application_modal_translations_2.role_member')
   return ''
 }
 
 function memberFullName(member: TeamMember): string {
   const parts = [member.name, member.surname].filter(Boolean)
   if (parts.length) return parts.join(' ')
-  return member.student?.name ?? '—'
+  return member.student?.name ?? t('application_modal_translations_2.unknown_member')
 }
 
 function initials(name: string): string {

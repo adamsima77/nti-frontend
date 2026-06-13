@@ -1,10 +1,12 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
     <div class="mb-10 flex items-start justify-between">
+      <ClientOnly>
       <div>
         <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('evaluator.welcome', { name: userDisplayName }) }}</h1>
         <p class="text-gray-500">{{ $t('evaluator.subtitle') }}</p>
       </div>
+      </ClientOnly>
 
    
     </div>

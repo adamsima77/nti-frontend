@@ -1,37 +1,37 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
     <div class="mb-8">
-      <h1 class="text-2xl font-bold text-navy">Prihlášky</h1>
-      <p class="text-gray-500 mt-1">Pipeline prihlášok a ich stavy</p>
+      <h1 class="text-2xl font-bold text-navy">{{ t('m_d_f_3.title') }}</h1>
+      <p class="text-gray-500 mt-1">{{ t('m_d_f_3.subtitle') }}</p>
     </div>
 
     <div class="bg-white rounded-lg border border-gray-200">
       <UiDataTable
-  :columns="columns"
-  :rows="filteredApplications"
-  :loading="isLoading"
-  :paginated="totalPages > 1"
-  :current-page="currentPage"
-  :total-pages="totalPages"
-  row-key="id"
-  v-model:sort-by="sortBy"
-  v-model:sort-dir="sortDir"
-  @update:current-page="onPageChange"
->
+        :columns="columns"
+        :rows="filteredApplications"
+        :loading="isLoading"
+        :paginated="totalPages > 1"
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        row-key="id"
+        v-model:sort-by="sortBy"
+        v-model:sort-dir="sortDir"
+        @update:current-page="onPageChange"
+      >
         <template #header>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 border-b border-gray-100">
             <UiInput
               v-model="search"
-              placeholder="Hľadať podľa tímu alebo ID..."
+              :placeholder="t('m_d_f_3.search_placeholder')"
             />
             <UiSelect
               v-model="statusFilter"
               :options="statusOptions"
-              placeholder="Vyberte stav"
+              :placeholder="t('m_d_f_3.status_placeholder')"
             />
             <UiButton @click="handleExport">
               <Download class="w-4 h-4" />
-              Exportovať
+              {{ t('m_d_f_3.export_btn') }}
             </UiButton>
           </div>
         </template>
@@ -44,7 +44,7 @@
           <div class="flex items-center gap-2">
             <button
               class="text-blue-600 hover:text-blue-800 transition"
-              title="Zobraziť detail"
+              :title="t('m_d_f_3.view_detail')"
               @click="openDetail(row)"
             >
               <Eye class="w-4 h-4" />
@@ -75,7 +75,7 @@
 
 <script setup lang="ts">
 import { Download, Eye } from 'lucide-vue-next'
-import { watch } from 'vue'
+import { watch, computed, ref } from 'vue'
 import type { AdminApplication } from '~/types/admin'
 
 const { t } = useI18n()
@@ -94,22 +94,23 @@ const search       = ref('')
 const statusFilter = ref<number | ''>('')
 
 // ── Table state ────────────────────────────────────────────────────────────
-const isLoading    = ref(false)
+const isLoading   = ref(false)
 const applications = ref<any[]>([])
 const currentPage  = ref(1)
 const totalPages   = ref(1)
 
-const sortBy       = ref('submittedAt') // predvolený stĺpec na zoradenie
-const sortDir      = ref<'asc' | 'desc'>('desc') // predvolený smer
+const sortBy  = ref('submittedAt')
+const sortDir = ref<'asc' | 'desc'>('desc')
 
-const columns = [
-  { key: 'reference',   label: 'ID',      sortable: true },
-  { key: 'team',        label: 'Tím',     sortable: true },
-  { key: 'call',        label: 'Výzva',   sortable: true },
-  { key: 'status',      label: 'Stav' },
-  { key: 'mentor',      label: 'Mentor' },
-  { key: 'submittedAt', label: 'Dátum',   sortable: true },
-]
+// Columns are computed so labels react to locale changes
+const columns = computed(() => [
+  { key: 'reference',   label: t('m_d_f_3.columns.id'),     sortable: true },
+  { key: 'team',        label: t('m_d_f_3.columns.team'),   sortable: true },
+  { key: 'call',        label: t('m_d_f_3.columns.call'),   sortable: true },
+  { key: 'status',      label: t('m_d_f_3.columns.status') },
+  { key: 'mentor',      label: t('m_d_f_3.columns.mentor') },
+  { key: 'submittedAt', label: t('m_d_f_3.columns.date'),   sortable: true },
+])
 
 // ── Status filter options ──────────────────────────────────────────────────
 const statusOptions = ref<{ value: number | ''; label: string }[]>([])
@@ -149,21 +150,17 @@ const mappedApplications = computed(() =>
   }),
 )
 
-
-
 // ── Client-side search (status filter is server-side) ─────────────────────
 const filteredApplications = computed(() => {
-  // 1. Krok: Filtrovanie podľa vyhľadávania
   const q = search.value.toLowerCase().trim()
   let result = [...mappedApplications.value]
-  
+
   if (q) {
     result = result.filter(
       (a) => a.reference.toLowerCase().includes(q) || a.team.toLowerCase().includes(q),
     )
   }
 
-  // 2. Krok: Lokálne zoradenie (Sorting)
   const key = sortBy.value
   const dir = sortDir.value === 'asc' ? 1 : -1
 
@@ -171,15 +168,11 @@ const filteredApplications = computed(() => {
     let valA = a[key]
     let valB = b[key]
 
-    // Špeciálny prípad pre dátum (aby ho správne zoradilo chronologicky, nie ako text)
     if (key === 'submittedAt') {
-      // Keďže v mappedApplications robíš .toLocaleDateString(), 
-      // na správne zoradenie použijeme pôvodný dátum z _raw objektu
       valA = a._raw.submitted_at ? new Date(a._raw.submitted_at).getTime() : 0
       valB = b._raw.submitted_at ? new Date(b._raw.submitted_at).getTime() : 0
     }
 
-    // Ošetrenie null / undefined hodnôt
     if (valA === null || valA === undefined) return 1
     if (valB === null || valB === undefined) return -1
 
@@ -192,28 +185,20 @@ const filteredApplications = computed(() => {
 })
 
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
-watch(() => search, (newValue) =>{
-    if(searchTimeout) clearTimeout(searchTimeout);
-    const q = search.value.toLowerCase().trim()
-
-    if(!q || q.length < 2){
-        return
-    }
-
-    searchTimeout = setTimeout(() => {
-        currentPage.value = 1
-        fetchApplications()
-        return
-    }, 300)
-     
+watch(search, () => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  const q = search.value.toLowerCase().trim()
+  if (!q || q.length < 2) return
+  searchTimeout = setTimeout(() => {
+    currentPage.value = 1
+    fetchApplications()
+  }, 300)
 })
 
-const exportFilters = computed(() => {
-  return {
-    ...(statusFilter.value !== '' && { status_id: statusFilter.value }),
-    ...(search.value !== '' && { search: search.value }),
-  };
-});
+const exportFilters = computed(() => ({
+  ...(statusFilter.value !== '' && { status_id: statusFilter.value }),
+  ...(search.value !== ''       && { search: search.value }),
+}))
 
 // ── Data fetching ──────────────────────────────────────────────────────────
 async function fetchApplications() {
@@ -224,7 +209,7 @@ async function fetchApplications() {
         params: {
           page: currentPage.value,
           ...(statusFilter.value !== '' && { status_id: statusFilter.value }),
-          search: search.value
+          search: search.value,
         },
       }),
       api.get('/get-status-admin'),
@@ -237,11 +222,11 @@ async function fetchApplications() {
 
     const rawStatuses: any[] = statusRes.statuses ?? []
     statusOptions.value = [
-      { value: '', label: 'Všetky stavy' },
+      { value: '', label: t('m_d_f_3.status_all') },
       ...rawStatuses.map((s) => ({ value: s.id, label: s.name })),
     ]
   } catch {
-    addToast('Nepodarilo sa načítať prihlášky. Skúste to neskôr.', 'error')
+    addToast(t('m_d_f_3.error_load'), 'error')
   } finally {
     isLoading.value = false
   }
@@ -253,6 +238,7 @@ watch(statusFilter, () => {
 })
 
 async function onPageChange(page: number) {
+  if (currentPage.value === page) return  // sort reset the page to the same value — skip the fetch
   currentPage.value = page
   await fetchApplications()
 }
