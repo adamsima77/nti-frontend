@@ -134,8 +134,8 @@
             :field="{
               name: 'meeting_url',
               type: 'text',
-              label: 'Odkaz na stretnutie (Meeting URL)',
-              placeholder: 'https://teams.microsoft.com/... alebo https://meet.google.com/...',
+              label: t('mentor_2.meeting_url_label'),
+              placeholder: 'https://teams.microsoft.com/',
               required: true,
             }"
             v-model="form.meeting_url"
@@ -151,7 +151,7 @@
 
       <div class="bg-white rounded-lg border border-gray-100 p-6 space-y-4">
         <h2 class="text-base font-semibold text-navy flex items-center gap-2">
-          <FileText class="w-4 h-4 text-purple-500" /> Doplňujúce údaje
+          <FileText class="w-4 h-4 text-purple-500" />{{ $t('mentor_2.d') }}
         </h2>
 
         <FormField
@@ -159,7 +159,7 @@
             name: 'agenda',
             type: 'textarea',
             label: 'Agenda',
-            placeholder: 'Zadajte agendu...',
+            placeholder: t('mentor_2.placeholder'),
             required: false,
           }"
           v-model="form.agenda"

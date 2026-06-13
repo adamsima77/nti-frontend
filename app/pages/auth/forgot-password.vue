@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen flex items-center justify-center px-4 bg-gray-50 py-12">
     <div class="w-full max-w-md">
-      <!-- REQUEST RESET -->
       <template v-if="!emailSent">
         <form
           @submit.prevent="handleRequestReset"
@@ -29,16 +28,15 @@
             {{ serverError }}
           </div>
 
-          <!-- Turnstile -->
-           <div class="turnstile-wrapper">
-  <NuxtTurnstile
-    ref="turnstile"
-    v-model="token"
-    :options="{ theme: 'light' }"
-    @error="resetTurnstile"
-    @expired="resetTurnstile"
-  />
-</div>
+          <div class="turnstile-wrapper">
+            <NuxtTurnstile
+              ref="turnstile"
+              v-model="token"
+              :options="{ theme: 'light' }"
+              @error="resetTurnstile"
+              @expired="resetTurnstile"
+            />
+          </div>
 
           <button
             type="submit"
@@ -58,20 +56,28 @@
         </form>
       </template>
 
-      <!-- EMAIL SENT -->
       <template v-else>
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center space-y-5">
           <h1 class="text-2xl font-bold text-navy">{{ $t('auth.forgot.sent_title') }}</h1>
           <p class="text-gray-600 text-sm">
-            {{ $t('auth.forgot.success_text') }}
-            <span class="font-semibold">{{ email }}</span>.
+            {{ $t('auth.forgot.success_text') }} <span class="font-semibold">{{ email }}</span>.
           </p>
           <p class="text-gray-500 text-sm">{{ $t('auth.forgot.expires') }}</p>
           <p class="text-blue-600 text-sm">{{ $t('auth.forgot.info') }}</p>
+          
+          <div class="turnstile-wrapper mx-auto">
+            <NuxtTurnstile
+              ref="turnstileResend"
+              v-model="token"
+              :options="{ theme: 'light' }"
+              @error="resetTurnstile"
+              @expired="resetTurnstile"
+            />
+          </div>
 
           <button
             @click="handleResend"
-            :disabled="resendCooldown > 0 || isLoading"
+            :disabled="resendCooldown > 0 || isLoading || !token"
             class="w-full border py-2.5 rounded-lg text-sm"
           >
             <span v-if="resendCooldown > 0">{{ $t('auth.forgot.resend_wait') }} {{ resendCooldown }}s</span>
@@ -88,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 
 const localePath = useLocalePath()
 const route = useRoute()
@@ -107,20 +113,25 @@ useHead({
 const authStore = useAuthStore()
 
 const email       = ref('')
-const emailError  = ref(null)
-const serverError = ref(null)
+const emailError  = ref<string | null>(null)
+const serverError = ref<string | null>(null)
 const isLoading   = ref(false)
 const emailSent   = ref(false)
 const resendCooldown = ref(0)
 const token       = ref('')
-const turnstile   = ref(null) // ref to widget
 
-let cooldownInterval = null
+// Added template refs for both Turnstile widget instances
+const turnstile      = ref<any>(null) 
+const turnstileResend = ref<any>(null)
+
+let cooldownInterval: any = null
 
 const resetTurnstile = () => {
   token.value = ''
   nextTick(() => {
+    // Fixed: Clears whichever instance is mounted/available
     turnstile.value?.reset?.()
+    turnstileResend.value?.reset?.()
   })
 }
 
@@ -158,24 +169,24 @@ const handleRequestReset = async () => {
     emailSent.value = true
     startCooldown()
   } catch (err) {
-    // Deliberately vague to prevent user enumeration
     emailSent.value = true
     startCooldown()
   } finally {
     isLoading.value = false
-    resetTurnstile() // proper reset instead of just clearing token
+    resetTurnstile() 
   }
 }
 
 const handleResend = async () => {
-  if (resendCooldown.value > 0) return
+  if (resendCooldown.value > 0 || !token.value) return 
   isLoading.value = true
   try {
-    await authStore.requestPasswordReset(email.value, locale.value)
+    await authStore.requestPasswordReset(email.value, locale.value, token.value)
   } catch {
     // silent
   } finally {
     isLoading.value = false
+    resetTurnstile() 
     startCooldown()
   }
 }
@@ -205,13 +216,12 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-    .turnstile-wrapper {
+.turnstile-wrapper {
   width: 100%;
-  max-width: 330px; /* adjust as needed */
+  max-width: 330px;
   overflow: hidden;
 }
 
-/* Optional: center it */
 .turnstile-wrapper iframe {
   max-width: 100%;
 }

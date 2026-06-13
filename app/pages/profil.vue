@@ -81,10 +81,10 @@
       </div>
 
       <div class="bg-white rounded-lg shadow-sm border border-red-100 p-6 mt-6">
-        <h2 class="text-lg font-bold text-red-700 mb-2">Vymazať účet</h2>
-        <p class="text-sm text-gray-600 mb-4">Táto akcia anonymizuje váš účet a nie je možné ju vrátiť späť.</p>
+       <h2 class="text-lg font-bold text-red-700 mb-2">{{ $t('common.delete_account') }}</h2>
+        <p class="text-sm text-gray-600 mb-4">{{ $t('common.del_subtitle') }}</p>
         <UiButton variant="danger" :disabled="deletingAccount" @click="deleteAccount">
-          {{ deletingAccount ? 'Mažem účet...' : 'Vymazať účet' }}
+          {{ deletingAccount ? $t('common.del_acc') : $t('common.d_a') }}
         </UiButton>
       </div>
     </template>

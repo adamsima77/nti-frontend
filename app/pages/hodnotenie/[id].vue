@@ -99,7 +99,7 @@
             </div>
 
             <div v-if="formItems.length" class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-              <SectionHeader :icon="ClipboardList" title="Odpovede tímu" iconClass="text-indigo-500" />
+              <SectionHeader :icon="ClipboardList" :title="t('common.answers')" iconClass="text-indigo-500" />
               <div class="mt-4 space-y-3">
                 <div
                   v-for="item in formItems"

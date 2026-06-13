@@ -62,7 +62,7 @@
       >
         <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100">
           <NuxtLink
-            to="/notifikacie"
+            :to="localePath('/notifikacie')"
             @click="showNotifications = false"
             ><p class="font-medium text-sm">{{ $t('portal.notifications') }}</p></NuxtLink
           >
@@ -91,7 +91,7 @@
               class="flex items-center justify-between px-4 py-3 text-xs sm:text-sm hover:bg-gray-50 border-b border-gray-100 active:scale-[0.99]"
             >
               <NuxtLink
-                to="/notifikacie"
+                :to="localePath('/notifikacie')"
                 class="flex flex-col flex-1 min-w-0 gap-0.5"
                 @click="showNotifications = false"
               >

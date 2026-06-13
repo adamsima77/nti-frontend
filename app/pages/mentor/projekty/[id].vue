@@ -92,6 +92,7 @@
                         <span class="text-xs font-medium" :class="MILESTONE_STATUS_DEFS[milestone.status]?.text ?? 'text-gray-400'">
                           {{ MILESTONE_STATUS_DEFS[milestone.status]?.label ?? milestone.status }}
                         </span>
+                        <span class="text-xs text-gray-400">{{ t('mentor_project_detail_1.start_date') }}  {{ formatDate(milestone.start_date) }}</span>
                         <span v-if="milestone.dueDate" class="text-xs text-gray-400">
                           · {{ t('mentor_project_detail_1.dueDateLabel', { date: formatDate(milestone.dueDate) }) }}
                         </span>

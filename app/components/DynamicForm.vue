@@ -429,6 +429,13 @@ async function uploadFile(field: SchemaField, file: File) {
     const payload = new FormData()
     payload.append('file', file)
 
+
+    if (field.accept) {
+      const cleanAccept = field.accept.replace(/[\s.]/g, '')
+      payload.append('accept', cleanAccept)
+    }
+
+    // Backend teraz v $request->input('accept') dostane napr. "pdf,docx,xls"
     const response = await api.post<{ document_id: number }>('/documents', payload)
 
     selectedFiles[field.name] = file

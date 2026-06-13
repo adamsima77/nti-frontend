@@ -78,7 +78,7 @@
             </p>
           </div>
           <NuxtLink
-            :to="`/mentor/projekty/${project.id}`"
+            :to="localePath(`/mentor/projekty/${project.id}`)"
             class="shrink-0 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800"
           >
             {{ t('mentor.projects.open') }} <ChevronRight class="w-4 h-4" />
@@ -169,6 +169,8 @@ definePageMeta({
 
 useHead({ title: t('mentor.projects.pageTitle') })
 const api = useApi()
+
+const localePath = useLocalePath()
 
 // Filtre a Stavy tabuľky
 const filterStatus = ref('all')

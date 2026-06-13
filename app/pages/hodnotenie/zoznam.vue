@@ -1,13 +1,13 @@
 <template>
   <div class="max-w-5xl mx-auto px-6 py-10">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-navy mb-1">Všetky hodnotenia</h1>
-      <p class="text-gray-500 text-sm">Prihlášky priradené vašej komisii</p>
+      <h1 class="text-3xl font-bold text-navy mb-1">{{ $t('evaluator.title') }}</h1>
+      <p class="text-gray-500 text-sm">{{ $t('evaluator.description') }}</p>
     </div>
 
     <div v-if="loading.calls" class="flex items-center gap-2 text-sm text-gray-400 mb-6">
       <Loader2 class="w-4 h-4 animate-spin" />
-      Načítavam výzvy...
+      {{ $t('evaluator.loading_calls') }}
     </div>
 
     <div
@@ -15,8 +15,8 @@
       class="text-center py-20 bg-white rounded-xl border border-gray-100"
     >
       <ClipboardCheck class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-      <p class="text-gray-500 font-medium">Nemáte priradené žiadne výzvy</p>
-      <p class="text-sm text-gray-400 mt-1">Kontaktujte administrátora portálu</p>
+      <p class="text-gray-500 font-medium">{{ $t('evaluator.no_calls_assigned') }}</p>
+      <p class="text-sm text-gray-400 mt-1">{{ $t('evaluator.contact_admin') }}</p>
     </div>
 
     <template v-else>
@@ -38,20 +38,20 @@
             class="ml-2 text-xs"
             :class="activeCallId === call.id ? 'opacity-80' : 'text-orange-500 font-semibold'"
           >
-            {{ call.applications_pending }} čaká
+            {{ call.applications_pending }} {{ $t('evaluator.pending_count') }}
           </span>
-          <span v-else class="ml-2 text-xs opacity-60">hotovo</span>
+          <span v-else class="ml-2 text-xs opacity-60">{{ $t('evaluator.done') }}</span>
         </button>
       </div>
 
       <div v-if="selectedCall" class="grid grid-cols-2 gap-4 mb-6">
         <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
           <p class="text-2xl font-bold text-blue-600">{{ selectedCall.applications_total }}</p>
-          <p class="text-xs text-gray-500 mt-0.5">Celkom prihlášok</p>
+          <p class="text-xs text-gray-500 mt-0.5">{{ $t('evaluator.total_applications') }}</p>
         </div>
         <div class="bg-white rounded-lg border border-gray-100 p-4 text-center">
           <p class="text-2xl font-bold text-green-600">{{ selectedCall.applications_evaluated }}</p>
-          <p class="text-xs text-gray-500 mt-0.5">Ohodnotených</p>
+          <p class="text-xs text-gray-500 mt-0.5">{{ $t('evaluator.evaluated_count') }}</p>
         </div>
       </div>
 
@@ -99,39 +99,39 @@
                   class="text-xs px-2 py-0.5 rounded-full font-medium"
                   :class="app.program === 'A' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'"
                 >
-                  Program {{ app.program }}
+                  {{ $t('evaluator.program') }} {{ app.program }}
                 </span>
               </div>
 
               <p class="text-sm text-gray-500 mb-3">
                 {{ app.teamName }}
-                <span v-if="app.submitted_at"> · Podané {{ app.submitted_at }}</span>
+                <span v-if="app.submitted_at"> · {{ $t('evaluator.submitted_at') }} {{ app.submitted_at }}</span>
               </p>
 
               <div v-if="app.my_score !== null" class="flex items-center gap-3">
                 <div class="flex items-center gap-1.5">
                   <Star class="w-4 h-4 text-yellow-400" />
                   <span class="text-sm font-semibold text-navy">{{ app.my_score }}/{{ app.max_score }}</span>
-                  <span class="text-xs text-gray-400">váš skór</span>
+                  <span class="text-xs text-gray-400">{{ $t('evaluator.your_score') }}</span>
                 </div>
                 
                 <div v-if="app.avgScore !== null" class="flex items-center gap-1.5">
                   <span class="text-xs text-gray-400">·</span>
                   <span class="text-sm text-gray-500">
-                    priemer komisie: <strong class="text-navy">{{ app.avgScore }}/{{ app.max_score }}</strong>
+                    {{ $t('evaluator.committee_average') }} <strong class="text-navy">{{ app.avgScore }}/{{ app.max_score }}</strong>
                   </span>
                 </div>
               </div>
 
               <div v-else class="flex items-center gap-1.5">
                 <span class="inline-block w-2 h-2 rounded-full bg-orange-400"></span>
-                <span class="text-xs text-gray-400">Ešte neohodnotené</span>
+                <span class="text-xs text-gray-400">{{ $t('evaluator.not_evaluated_yet') }}</span>
               </div>
             </div>
 
             <div class="shrink-0">
               <NuxtLink
-                :to="`/hodnotenie/${app.id}`"
+                :to="localePath(`/hodnotenie/${app.id}`)"
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 :class="
                   app.status !== 'evaluating'
@@ -142,7 +142,7 @@
                 "
               >
                 <ClipboardCheck class="w-4 h-4" />
-                {{ app.my_score !== null ? 'Upraviť' : 'Hodnotiť' }}
+                {{ app.my_score !== null ? $t('evaluator.action_edit') : $t('evaluator.action_evaluate') }}
               </NuxtLink>
             </div>
           </div>
@@ -153,12 +153,12 @@
           class="text-center py-16 bg-white rounded-lg border border-gray-100"
         >
           <ClipboardCheck class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p class="text-gray-500 font-medium">Žiadne prihlášky</p>
+          <p class="text-gray-500 font-medium">{{ $t('evaluator.no_applications') }}</p>
           <p class="text-sm text-gray-400 mt-1">
             {{
               selectedCategoryId
-                ? 'Táto kategória neobsahuje žiadne prihlášky'
-                : 'Táto výzva ešte nemá priradené prihlášky na hodnotenie'
+                ? $t('evaluator.empty_category_desc')
+                : $t('evaluator.empty_call_desc')
             }}
           </p>
         </div>
@@ -166,7 +166,6 @@
     </template>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -194,6 +193,8 @@ const selectedCategoryId = ref<number | null>(null)
 const loading = ref({
   calls: false
 })
+
+const localePath = useLocalePath()
 
 // ── 1. Transformácia Výziev pre horné záložky (Tabs) ─────────────────────────
 const calls = computed(() => {
