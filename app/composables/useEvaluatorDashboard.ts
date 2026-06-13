@@ -58,6 +58,7 @@ function toBoolean(value: unknown): boolean | null {
 function mapCriterion(row: Record<string, unknown>): EvaluationCriterion {
   const score = row.score
   return {
+    criterion_id: row.criterion_id != null ? toNumber(row.criterion_id) : row.id != null ? toNumber(row.id) : null,
     name: toString(row.name ?? row.label ?? ''),
     max_score: toNumber(row.max_score ?? row.maxScore, 0),
     score: score == null ? null : toNumber(score, 0),
