@@ -171,11 +171,12 @@
                   <p class="text-sm font-medium text-gray-700 truncate">{{ doc.file_name }}</p>
                   <p class="text-xs text-gray-400">{{ doc.uploaded_at?.slice(0, 10) }}</p>
                 </div>
-                <a :href="`${apiBase}/calls/${call?.id}/milestones/${detailMilestone?.id}/documents/${doc.id}/download`"
-                  target="_blank"
-                  class="flex-shrink-0 flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 transition">
+                <button
+                  class="flex-shrink-0 flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 transition"
+                  @click="downloadDoc(doc)"
+                >
                   <Download class="w-3.5 h-3.5" /> {{ $t('firma.po.milniky.detail.download') }}
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -370,6 +371,26 @@ async function openDetail(milestone: any) {
     docs.value = res.documents ?? []
   } finally {
     docsLoading.value = false
+  }
+}
+
+async function downloadDoc(doc: any) {
+  try {
+    const token = localStorage.getItem('_t')
+    const url = `${apiBase}/calls/${call.value?.id}/milestones/${detailMilestone.value?.id}/documents/${doc.id}/download`
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!response.ok) throw new Error('Download failed')
+    const blob = await response.blob()
+    const objectUrl = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = objectUrl
+    a.download = doc.file_name ?? `dokument-${doc.id}`
+    a.click()
+    URL.revokeObjectURL(objectUrl)
+  } catch {
+    toast.addToast({ message: 'Nepodarilo sa stiahnuť súbor.', type: 'error' })
   }
 }
 
