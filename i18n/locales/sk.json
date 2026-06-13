@@ -2263,6 +2263,7 @@
         "role_label": "Rola",
         "cancel": "Zrušiť",
         "send": "Poslať pozvánku",
+        "success": "Pozvánka bola úspešne odoslaná.",
         "error": "Nepodarilo sa odoslať pozvánku."
       },
       "remove_modal": {

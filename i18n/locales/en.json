@@ -2579,6 +2579,7 @@
         "role_label": "Role",
         "cancel": "Cancel",
         "send": "Send invitation",
+        "success": "Invitation was sent successfully.",
         "error": "Failed to send invitation."
       },
       "remove_modal": {

@@ -246,6 +246,7 @@ if (orgDashboard.myRole.value !== 'organization_admin') {
 
 const authStore = useAuthStore()
 const { get, post, patch, delete: apiDelete } = useApi()
+const { addToast } = useToast()
 const { t } = useI18n()
 
 const organizationId = computed(() => authStore.userOrganizationId)
@@ -286,8 +287,10 @@ const inviteMember = async () => {
     inviteEmail.value = ''
     inviteRole.value = 'member'
     showInviteModal.value = false
+    addToast({ message: 'Pozvánka bola úspešne odoslaná.', type: 'success' })
   } catch (error: any) {
     inviteError.value = error?.data?.message ?? error?.response?.data?.message ?? t('firma.clenovia.invite_modal.error')
+    addToast({ message: inviteError.value!, type: 'error' })
   }
 }
 
@@ -318,8 +321,10 @@ const handleRoleChange = async (member: Member) => {
     await patch(`/organizations/${organizationId.value}/members/${member.id}`, {
       role: member.role,
     })
+    addToast({ message: 'Rola člena bola zmenená.', type: 'success' })
   } catch {
-    member.role = member.role // keep current role if update fails
+    addToast({ message: 'Zmena roly sa nepodarila.', type: 'error' })
+    await loadMembers()
   }
 }
 
@@ -334,8 +339,9 @@ const executeRemove = async () => {
   try {
     await apiDelete(`/organizations/${organizationId.value}/members/${memberToRemove.value.id}`)
     members.value = members.value.filter((m) => m.id !== memberToRemove.value!.id)
+    addToast({ message: 'Člen bol odstránený.', type: 'success' })
   } catch {
-    // ignore failed delete for now
+    addToast({ message: 'Odstránenie člena sa nepodarilo.', type: 'error' })
   } finally {
     memberToRemove.value = null
   }

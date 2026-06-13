@@ -37,9 +37,20 @@
             </p>
           </div>
 
+          <!-- No commission warning -->
+          <div
+            v-if="!loading && !error && !commissionAssigned"
+            class="px-6 py-2.5 bg-orange-50 border-b border-orange-100 flex items-center gap-2"
+          >
+            <AlertCircle class="w-4 h-4 text-orange-500 flex-shrink-0" />
+            <p class="text-sm text-orange-600">
+              Výber tímu nie je možný — k tejto výzve nie je priradená žiadna komisia.
+            </p>
+          </div>
+
           <!-- Not all evaluated warning -->
           <div
-            v-if="!loading && !error && applications.length && !allApplicationsEvaluated"
+            v-if="!loading && !error && commissionAssigned && applications.length && !allApplicationsEvaluated"
             class="px-6 py-2.5 bg-red-50 border-b border-red-100 flex items-center gap-2"
           >
             <AlertCircle class="w-4 h-4 text-red-500 flex-shrink-0" />
@@ -230,6 +241,7 @@ const loading                  = ref(false)
 const error                    = ref<string | null>(null)
 const applications             = ref<ApplicationRow[]>([])
 const allApplicationsEvaluated = ref(false)
+const commissionAssigned       = ref(false)
 const selectedAppId            = ref<number | null>(null)
 const confirmApp               = ref<ApplicationRow | null>(null)
 const selecting                = ref(false)
@@ -245,6 +257,7 @@ async function fetchApplications() {
     const res: any = await api.get(`/v1/admin/calls/${props.call.id}/program-b-applications`)
     applications.value             = res?.data ?? []
     allApplicationsEvaluated.value = res?.all_applications_evaluated ?? false
+    commissionAssigned.value       = res?.commission_assigned ?? false
   } catch {
     error.value = t('admin_calls.program_b_fetch_error')
   } finally {
@@ -260,6 +273,7 @@ watch(
     if (open) {
       applications.value             = []
       allApplicationsEvaluated.value = false
+      commissionAssigned.value       = false
       selectedAppId.value            = null
       confirmApp.value               = null
       fetchApplications()

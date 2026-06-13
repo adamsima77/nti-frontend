@@ -193,9 +193,11 @@ const handleSave = async () => {
     const orgName = response.organization?.name || response.name
     if (orgName) authStore.patchUser({ organization_name: orgName })
     saveSuccess.value = true
+    addToast({ message: 'Profil bol úspešne uložený.', type: 'success' })
     setTimeout(() => { saveSuccess.value = false }, 4000)
   } catch (err: any) {
     saveError.value = err?.data?.message ?? 'Nastala chyba pri ukladaní.'
+    addToast({ message: saveError.value!, type: 'error' })
   } finally {
     isSaving.value = false
   }

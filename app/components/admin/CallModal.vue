@@ -774,7 +774,9 @@ const { addToast } = useToast()
 // ── Options ────────────────────────────────────────────────────────────────
 
 const programOptions           = ref<{ value: number; label: string }[]>([])
-const statusOptions            = ref<{ value: number; label: string }[]>([])
+const allStatusOptions         = ref<{ value: number; label: string }[]>([])
+const availableTransitionNames = ref<string[] | null>(null) // null = neobmedzené (create mode)
+const originalStatusId         = ref<number | null>(null)
 const languageOptions          = ref<LanguageOption[]>([])
 const qualificationStackOptions = ref<{ value: number; label: string }[]>([])
 const availableCriteria        = ref<Criterion[]>([])
@@ -782,6 +784,19 @@ const availableCriteria        = ref<Criterion[]>([])
 const metaLoading     = ref(false)
 const criteriaLoading = ref(false)
 const isSaving        = ref(false)
+
+const statusOptions = computed(() => {
+  if (availableTransitionNames.value === null) return allStatusOptions.value
+  const transitions = allStatusOptions.value.filter(s =>
+    availableTransitionNames.value!.includes(s.label)
+  )
+
+  const currentOption = allStatusOptions.value.find(s => s.value === originalStatusId.value)
+  if (currentOption && !transitions.find(s => s.value === currentOption.value)) {
+    return [currentOption, ...transitions]
+  }
+  return transitions
+})
 
 // ── Commission tab state ───────────────────────────────────────────────────
 
@@ -1161,7 +1176,7 @@ async function fetchMeta() {
       value: p.id,
       label: p.typeOfProgram?.name ?? p.name ?? `#${p.id}`,
     }))
-    statusOptions.value = list(statuses).map((s: any) => ({
+    allStatusOptions.value = list(statuses).map((s: any) => ({
       value: s.id,
       label: s.name,
     }))
@@ -1249,6 +1264,8 @@ watch(() => props.modelValue, async (open) => {
   commissionSetup.value      = null
   commissionLocked.value     = false
   commissionForm.value       = { commission_id: null, company_rep_user_id: null }
+  availableTransitionNames.value = null
+  originalStatusId.value         = null
 
   await Promise.all([fetchMeta(), fetchCriteria()])
 
@@ -1267,9 +1284,15 @@ watch(() => props.modelValue, async (open) => {
     // fields while preferring the server's canonical representation.
     let c: any = props.call
     try {
-      const fullRes: any = await api.get(`/v1/admin/calls/${props.call.id}`)
+      const [fullRes, workflowRes]: any[] = await Promise.all([
+        api.get(`/v1/admin/calls/${props.call.id}`),
+        api.get(`/v1/calls/${props.call.id}/workflow`).catch(() => null),
+      ])
       const fetched = Array.isArray(fullRes) ? fullRes[0] : fullRes?.data ?? fullRes
       if (fetched) c = { ...(props.call ?? {}), ...(fetched ?? {}) }
+      if (workflowRes?.available_transitions) {
+        availableTransitionNames.value = workflowRes.available_transitions
+      }
     } catch {
       // Non-fatal: fall back to the passed-in prop if fetch fails
       c = props.call
@@ -1289,6 +1312,7 @@ watch(() => props.modelValue, async (open) => {
       }
     }
 
+    originalStatusId.value = c.status_id ?? c.status?.id ?? null
     form.value = {
       program_id:             c.program_id ?? c.program?.id ?? null,
       status_id:              c.status_id  ?? c.status?.id  ?? null,
