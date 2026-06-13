@@ -1539,7 +1539,10 @@ async function handleSubmit() {
     }
 
     const commissionChanged = commissionForm.value.commission_id !== null
-      && commissionForm.value.commission_id !== (commissionSetup.value?.commission?.id ?? null)
+      && (
+        commissionForm.value.commission_id !== (commissionSetup.value?.commission?.id ?? null)
+        || commissionForm.value.company_rep_user_id !== (commissionSetup.value?.company_rep?.id ?? null)
+      )
 
     if (callId && commissionChanged && !commissionLocked.value) {
       const commPayload: Record<string, any> = { commission_id: commissionForm.value.commission_id }

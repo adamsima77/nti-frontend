@@ -540,6 +540,7 @@ type EvaluatorApplicationView = {
 
 type ScoringCriterionView = {
   id: number
+  criterion_id: number | null
   name: string
   max_score: number
   score: number | null
@@ -565,6 +566,7 @@ const lastAutoSaveTime = ref<string | null>(null)
 
   const buildPayload = (isFinal = false) => ({
   criteria: scoringForm.criteria.map(c => ({
+    criterion_id: c.criterion_id,
     name: c.name,
     max_score: c.max_score,
     score: c.score,
@@ -577,7 +579,7 @@ const lastAutoSaveTime = ref<string | null>(null)
 
 // ── Computed flags ─────────────────────────────────────────────
 
-const isEvaluating = computed(() => application.value?.status === 'evaluating')
+const isEvaluating = computed(() => ['submitted', 'evaluating', 'supplement'].includes(application.value?.status ?? ''))
 
 // FIX: Spoliehame sa výhradne na príznak `locked`, ak backend v drafte vracia predvyplnené submitted_at
 const isSubmitted = computed(() => {
@@ -731,6 +733,7 @@ const syncScoringForm = (detail: ApplicationDetail) => {
 
   scoringForm.criteria = criteriaSource.map((c: any, i: number) => ({
     id: i + 1,
+    criterion_id: c.criterion_id ?? c.id ?? null,
     name: c.name,
     max_score: c.max_score ?? 20,
     score: c.score ?? null,
@@ -862,7 +865,9 @@ const persistEvaluation = async (
       (refreshed as any).evaluation ??
       currentEvaluation.value
 
-    syncScoringForm(refreshed)
+    if (isFinal) {
+      syncScoringForm(refreshed)
+    }
   }
 
   if (notify) {

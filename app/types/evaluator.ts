@@ -1,4 +1,5 @@
 export interface EvaluationCriterion {
+  criterion_id?: number | null
   name: string
   max_score: number
   score: number | null

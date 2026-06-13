@@ -52,8 +52,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
-  // For org users hitting /hodnotenie: refresh auth in case they were just assigned as company rep
-  if (to.path.startsWith('/hodnotenie') && auth.hasRole(['organization']) && !auth.isCommissionMember) {
+  // For org/partner users hitting /hodnotenie: refresh auth in case they were just assigned as company rep
+  if (to.path.startsWith('/hodnotenie') && auth.hasRole(['organization', 'partner']) && !auth.isCommissionMember) {
     try { await auth.getCurrentUser() } catch {}
   }
 
