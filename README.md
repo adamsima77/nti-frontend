@@ -2,90 +2,90 @@
 
 > **Nitriansky technologický inkubátor**
 
-Frontend application for the Nitra Technology Incubator (NTI) platform — a full-featured process portal combining a public-facing presentation website with a role-based internal management system for programs, applications, teams, mentoring, and administration.
+Frontendová aplikácia pre platformu Nitrianskeho technologického inkubátora (NTI) – komplexný procesný portál kombinujúci verejnú prezentačnú webovú stránku s interným systémom riadenia programov, prihlášok, tímov, mentoringu a administrácie založeným na používateľských rolách.
 
 ---
 
-## Table of Contents
+## Obsah
 
-* [About the Project](#about-the-project)
-* [Tech Stack & Packages](#tech-stack--packages)
-* [Project Structure](#project-structure)
-* [Route Architecture](#route-architecture)
-* [Internationalization](#internationalization)
-* [State Management](#state-management)
-* [Security & Bot Protection](#security--bot-protection)
-* [SEO & Sitemap](#seo--sitemap)
-* [Getting Started](#getting-started)
-* [Environment Variables](#environment-variables)
+* [O projekte](#o-projekte)
+* [Technologický stack a balíčky](#technologický-stack-a-balíčky)
+* [Štruktúra projektu](#štruktúra-projektu)
+* [Architektúra rout](#architektúra-rout)
+* [Internacionalizácia](#internacionalizácia)
+* [Správa stavu](#správa-stavu)
+* [Bezpečnosť a ochrana proti botom](#bezpečnosť-a-ochrana-proti-botom)
+* [SEO a Sitemap](#seo-a-sitemap)
+* [Začíname](#začíname)
+* [Premenné prostredia](#premenné-prostredia)
 * [Docker](#docker)
-* [Code Quality](#code-quality)
-* [Related Repositories](#related-repositories)
+* [Kvalita kódu](#kvalita-kódu)
+* [Súvisiace repozitáre](#súvisiace-repozitáre)
 
 ---
 
-## About the Project
+## O projekte
 
-NTI is a technology incubator based in Nitra, Slovakia, operating two flagship programs:
+NTI je technologický inkubátor so sídlom v Nitre na Slovensku, ktorý prevádzkuje dva hlavné programy:
 
 ### Program A
 
-A grant-based incubation program for students and teams with their own innovative idea, aimed at building a startup or product.
+Grantový inkubačný program určený pre študentov a tímy s vlastným inovatívnym nápadom, zameraný na budovanie startupu alebo produktu.
 
 ### Program B
 
-A live practice program connecting real company projects with student teams, producing contracted software with the involvement of a Product Owner.
+Program praktickej výučby prepájajúci reálne firemné projekty so študentskými tímami, ktorých výstupom je zmluvne dodaný softvér za účasti Product Ownera.
 
-This frontend serves all user roles on the platform:
+Tento frontend slúži všetkým používateľským rolám na platforme:
 
-| Role                   | Description                                                 |
-| ---------------------- | ----------------------------------------------------------- |
-| Visitor                | Public website, program information, news, contacts         |
-| Student                | Profile management, team creation, application submission   |
-| Team Leader            | Team management, member invitations, team applications      |
-| Company / Partner      | Company profile, project specifications, backlog management |
-| Mentor                 | Project tracking, consultation logs, milestone approvals    |
-| Commission / Evaluator | Application evaluation and scoring                          |
-| Content Manager        | CMS management (pages, news, FAQ, partners, banners)        |
-| NTI Administrator      | Program management, user management, reporting              |
-| Super Administrator    | System settings, roles, audit logs, integrations            |
+| Rola                 | Popis                                                              |
+| -------------------- | ------------------------------------------------------------------ |
+| Návštevník           | Verejná webová stránka, informácie o programoch, novinky, kontakty |
+| Študent              | Správa profilu, vytváranie tímov, podávanie prihlášok              |
+| Vedúci tímu          | Správa tímu, pozývanie členov, tímové prihlášky                    |
+| Firma / Partner      | Firemný profil, špecifikácia projektov, správa backlogu            |
+| Mentor               | Sledovanie projektov, záznamy konzultácií, schvaľovanie míľnikov   |
+| Komisia / Hodnotiteľ | Hodnotenie a bodovanie prihlášok                                   |
+| Content Manager      | Správa CMS obsahu (stránky, novinky, FAQ, partneri, bannery)       |
+| Administrátor NTI    | Správa programov, používateľov a reportov                          |
+| Super administrátor  | Systémové nastavenia, role, auditné logy, integrácie               |
 
 ---
 
-## Tech Stack & Packages
+## Technologický stack a balíčky
 
-The application is built on top of Nuxt with a modern Vite-powered toolchain.
+Aplikácia je postavená na Nuxte s moderným build nástrojom Vite.
 
-### Core Framework & Build Tools
+### Hlavný framework a build nástroje
 
 * **Nuxt 4**
 
-  * Vue 3 framework
-  * TypeScript support
-  * File-based routing
-  * Hybrid rendering
+  * Framework postavený na Vue 3
+  * Podpora TypeScriptu
+  * Routovanie založené na súboroch
+  * Hybridné renderovanie
 
 * **Vite**
 
-  * Fast development server
-  * Optimized production builds
-  * Docker polling support enabled
+  * Rýchly vývojový server
+  * Optimalizované produkčné buildy
+  * Podpora polling režimu pre Docker
 
-### Installed Modules
+### Nainštalované moduly
 
-| Package             | Purpose                          |
-| ------------------- | -------------------------------- |
-| `@pinia/nuxt`       | State management                 |
-| `@nuxtjs/i18n`      | Internationalization             |
-| `@nuxtjs/sitemap`   | XML sitemap generation           |
-| `@nuxtjs/turnstile` | Cloudflare Turnstile integration |
-| `@nuxt/eslint`      | Linting and code quality         |
-| `@tailwindcss/vite` | Tailwind CSS v4 integration      |
-| `lucide-vue-next`   | Icon library                     |
+| Balíček             | Účel                            |
+| ------------------- | ------------------------------- |
+| `@pinia/nuxt`       | Správa stavu aplikácie          |
+| `@nuxtjs/i18n`      | Internacionalizácia             |
+| `@nuxtjs/sitemap`   | Generovanie XML sitemapy        |
+| `@nuxtjs/turnstile` | Integrácia Cloudflare Turnstile |
+| `@nuxt/eslint`      | Lintovanie a kvalita kódu       |
+| `@tailwindcss/vite` | Integrácia Tailwind CSS v4      |
+| `lucide-vue-next`   | Knižnica ikon                   |
 
 ---
 
-## Project Structure
+## Štruktúra projektu
 
 ```text
 nti-frontend/
@@ -140,13 +140,13 @@ nti-frontend/
 
 ---
 
-## Route Architecture
+## Architektúra rout
 
-The application uses a **hybrid rendering strategy** configured through `routeRules`.
+Aplikácia využíva **hybridnú stratégiu renderovania**, nakonfigurovanú pomocou `routeRules`.
 
-### SSR Routes
+### SSR routy
 
-Public pages optimized for SEO:
+Verejné stránky optimalizované pre SEO:
 
 ```text
 /
@@ -159,9 +159,9 @@ novinky
 vyzvy
 ```
 
-### CSR Routes
+### CSR routy
 
-Authenticated areas rendered client-side:
+Autentifikované časti renderované na strane klienta:
 
 ```text
 /auth/**
@@ -179,19 +179,19 @@ Authenticated areas rendered client-side:
 
 ---
 
-## Internationalization
+## Internacionalizácia
 
-Implemented using `@nuxtjs/i18n`.
+Implementovaná pomocou `@nuxtjs/i18n`.
 
-### Configuration
+### Konfigurácia
 
-| Setting          | Value                   |
+| Nastavenie       | Hodnota                 |
 | ---------------- | ----------------------- |
-| Strategy         | `prefix_except_default` |
-| Default Locale   | `sk`                    |
-| Secondary Locale | `en`                    |
+| Stratégia        | `prefix_except_default` |
+| Predvolený jazyk | `sk`                    |
+| Sekundárny jazyk | `en`                    |
 
-### Examples
+### Príklady
 
 ```text
 /program-a
@@ -201,27 +201,27 @@ Implemented using `@nuxtjs/i18n`.
 /en/program-a
 ```
 
-### Features
+### Funkcionality
 
-* Automatic locale detection
-* Cookie persistence (`i18n_redirected`)
-* Fallback language support
-* Dynamic translation loading
+* Automatická detekcia jazyka
+* Ukladanie preferencie do cookies (`i18n_redirected`)
+* Podpora fallback jazyka
+* Dynamické načítavanie prekladov
 
 ---
 
-## State Management
+## Správa stavu
 
-State management is handled by **Pinia**.
+Správa stavu aplikácie je riešená pomocou **Pinia**.
 
-Features:
+Funkcionality:
 
-* Centralized stores
-* API integration through composables
-* Automatic authentication header injection
-* Feature-based state separation
+* Centralizované store moduly
+* Integrácia API cez composables
+* Automatické pridávanie autentifikačných hlavičiek
+* Oddelenie stavu podľa funkcionalít
 
-Location:
+Umiestnenie:
 
 ```text
 app/stores/
@@ -229,29 +229,29 @@ app/stores/
 
 ---
 
-## Security & Bot Protection
+## Bezpečnosť a ochrana proti botom
 
-Cloudflare Turnstile is used to protect:
+Cloudflare Turnstile sa používa na ochranu:
 
-* Contact forms
-* Authentication forms
-* Application submissions
+* Kontaktných formulárov
+* Prihlasovacích formulárov
+* Odosielania prihlášok
 
-Environment variable:
+Premenná prostredia:
 
 ```env
 NUXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key_here
 ```
 
-The backend validates tokens before accepting requests.
+Backend overuje tokeny pred spracovaním požiadaviek.
 
 ---
 
-## SEO & Sitemap
+## SEO a Sitemap
 
-SEO infrastructure is powered by `@nuxtjs/sitemap`.
+SEO infraštruktúra je postavená na module `@nuxtjs/sitemap`.
 
-### Indexed Routes
+### Indexované routy
 
 ```text
 /
@@ -264,7 +264,7 @@ SEO infrastructure is powered by `@nuxtjs/sitemap`.
 /vyzvy
 ```
 
-### Excluded Routes
+### Vylúčené routy
 
 ```text
 /auth/
@@ -278,38 +278,38 @@ SEO infrastructure is powered by `@nuxtjs/sitemap`.
 
 ---
 
-## Getting Started
+## Začíname
 
-### Prerequisites
+### Požiadavky
 
 * Node.js 20+
 * npm
 
-### Install Dependencies
+### Inštalácia závislostí
 
 ```bash
 npm install
 ```
 
-### Start Development Server
+### Spustenie vývojového servera
 
 ```bash
 npm run dev
 ```
 
-Application runs at:
+Aplikácia bude dostupná na:
 
 ```text
 http://localhost:3000
 ```
 
-### Build for Production
+### Build pre produkciu
 
 ```bash
 npm run build
 ```
 
-### Preview Production Build
+### Náhľad produkčného buildu
 
 ```bash
 npm run preview
@@ -317,15 +317,15 @@ npm run preview
 
 ---
 
-## Environment Variables
+## Premenné prostredia
 
-Create a `.env` file in the project root:
+Vytvorte súbor `.env` v koreňovom adresári projektu:
 
 ```env
-# Internal API communication (Docker)
+# Interná komunikácia s API (Docker)
 NUXT_API_BASE=http://backend:8000/api
 
-# Public API URL
+# Verejná URL API
 NUXT_PUBLIC_API_BASE=http://localhost/api
 
 # Cloudflare Turnstile
@@ -354,13 +354,13 @@ EXPOSE 3000
 CMD ["npm", "run", "dev"]
 ```
 
-### Build Image
+### Vytvorenie obrazu
 
 ```bash
 docker build -t nti-frontend .
 ```
 
-### Run Container
+### Spustenie kontajnera
 
 ```bash
 docker run -p 3000:3000 nti-frontend
@@ -368,56 +368,56 @@ docker run -p 3000:3000 nti-frontend
 
 ### Docker Compose
 
-For multi-container environments:
+Pre prostredia s viacerými kontajnermi:
 
 ```env
 NUXT_API_BASE=http://backend:8000/api
 ```
 
-allows internal service communication while browser requests are routed through the reverse proxy.
+umožňuje internú komunikáciu medzi službami, zatiaľ čo požiadavky z prehliadača sú smerované cez reverzný proxy server.
 
 ---
 
-## Code Quality
+## Kvalita kódu
 
-### Lint
+### Lintovanie
 
 ```bash
 npm run lint
 ```
 
-### Auto Fix
+### Automatická oprava
 
 ```bash
 npm run lint:fix
 ```
 
-### Format
+### Formátovanie
 
 ```bash
 npm run format
 ```
 
-Formatting and linting are configured via:
+Lintovanie a formátovanie sú nakonfigurované prostredníctvom:
 
 ```text
 eslint.config.mjs
 ```
 
-and cover:
+a pokrývajú:
 
 * `.vue`
 * `.ts`
 * `.js`
 * `.css`
 
-files throughout the application.
+súbory v celej aplikácii.
 
 ---
 
-## Related Repositories
+## Súvisiace repozitáre
 
-### Backend Platform
+### Backend platforma
 
 Laravel REST API:
 

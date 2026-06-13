@@ -405,6 +405,19 @@ function resolveStatusKey(row: CallRow): string {
     'Pridelené':    'assigned',
     'V realizácii': 'in_progress',
     'Uzavreté':     'closed',
+    'Čaká na schválenie':    'pending_approval', 
+    'Podané':                'submitted',
+    'V hodnotení':           'evaluating',
+    'Vyžiadané doplnenie':   'supplement',
+    'Schválené':             'approved',
+    'Zamietnuté':            'rejected',
+    'Dokončené':             'completed',
+    'V riešení':             'in_progress',
+    'Plánované':             'planned',
+    'Vrátené na doplnenie':  'supplement',
+    'Onboarding':            'onboarding',
+    'Aktívny projekt':       'active_project',
+    'Ukončené':              'ended_project'
   }
 
   return lookup[statusName ?? ''] ?? 'draft'
