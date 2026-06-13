@@ -5,7 +5,7 @@
       v-if="loading"
       class="mb-6 rounded-lg border border-gray-100 bg-white p-4 text-sm text-gray-500"
     >
-      {{ t('mentor.detail.loading') }}
+      {{ t('mentor_project_detail_1.loading') }}
     </div>
 
     <div
@@ -20,7 +20,7 @@
       :to="localePath('/mentor/projekty')"
       class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-navy transition-colors mb-6"
     >
-      <ChevronLeft class="w-4 h-4" /> {{ t('mentor.detail.back') }}
+      <ChevronLeft class="w-4 h-4" /> {{ t('mentor_project_detail_1.back') }}
     </NuxtLink>
 
     <!-- Project header -->
@@ -37,7 +37,7 @@
           </span>
         </div>
         <p class="text-gray-500 text-sm">
-          {{ project.teamName }} · {{ t('mentor.dashboard.assignedAt', { date: project.assignedAt }) }}
+          {{ project.teamName }} · {{ t('mentor_project_detail_1.assignedAt', { date: project.assignedAt }) }}
         </p>
       </div>
     </div>
@@ -50,10 +50,10 @@
         <div class="bg-white rounded-lg border border-gray-100 p-6">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-semibold text-navy flex items-center gap-2">
-              <Flag class="w-4 h-4 text-purple-500" /> {{ t('mentor.detail.milestones') }}
+              <Flag class="w-4 h-4 text-purple-500" /> {{ t('mentor_project_detail_1.milestones') }}
             </h2>
             <span class="text-xs text-gray-400">
-              {{ completedMilestones }}/{{ project.milestones.length }} {{ t('mentor.detail.completed') }}
+              {{ completedMilestones }}/{{ project.milestones.length }} {{ t('mentor_project_detail_1.completed') }}
             </span>
           </div>
 
@@ -93,10 +93,10 @@
                           {{ MILESTONE_STATUS_DEFS[milestone.status]?.label ?? milestone.status }}
                         </span>
                         <span v-if="milestone.dueDate" class="text-xs text-gray-400">
-                          · {{ t('mentor.detail.dueDateLabel', { date: formatDate(milestone.dueDate) }) }}
+                          · {{ t('mentor_project_detail_1.dueDateLabel', { date: formatDate(milestone.dueDate) }) }}
                         </span>
                         <span v-else-if="milestone.status === 'pending'" class="text-xs text-gray-400 italic">
-                          · {{ t('mentor.detail.noDeadlineYet') }}
+                          · {{ t('mentor_project_detail_1.noDeadlineYet') }}
                         </span>
                       </div>
                       <p v-if="milestone.description" class="text-xs text-gray-500 mt-1 line-clamp-2">
@@ -115,10 +115,10 @@
                         @click="toggleUnlockPanel(milestone.id)"
                         class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded text-xs font-medium transition-colors"
                       >
-                        <Unlock class="w-3.5 h-3.5" /> {{ t('mentor.detail.unlock') }}
+                        <Unlock class="w-3.5 h-3.5" /> {{ t('mentor_project_detail_1.unlock') }}
                       </button>
                       <span v-else class="text-xs text-gray-400 italic">
-                        {{ t('mentor.detail.prevNotDone') }}
+                        {{ t('mentor_project_detail_1.prevNotDone') }}
                       </span>
                     </template>
 
@@ -129,28 +129,27 @@
                         :disabled="milestoneLoading === milestone.id"
                         class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 hover:bg-green-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
                       >
-                        <CheckCircle class="w-3.5 h-3.5" /> {{ t('mentor.detail.approve') }}
+                        <CheckCircle class="w-3.5 h-3.5" /> {{ t('mentor_project_detail_1.approve') }}
                       </button>
                       <button
                         @click="toggleReturnPanel(milestone.id, 'return')"
                         :disabled="milestoneLoading === milestone.id"
                         class="inline-flex items-center gap-1 px-2.5 py-1 bg-orange-50 text-orange-600 hover:bg-orange-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
                       >
-                        <RotateCcw class="w-3.5 h-3.5" /> {{ t('mentor.detail.return') }}
+                        <RotateCcw class="w-3.5 h-3.5" /> {{ t('mentor_project_detail_1.return') }}
                       </button>
                       <button
                         @click="toggleReturnPanel(milestone.id, 'reject')"
                         :disabled="milestoneLoading === milestone.id"
                         class="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
                       >
-                        <X class="w-3.5 h-3.5" /> {{ t('mentor.detail.reject') }}
+                        <X class="w-3.5 h-3.5" /> {{ t('mentor_project_detail_1.reject') }}
                       </button>
-                      <!-- Deadline edit button -->
                       <button
                         @click="toggleDeadlinePanel(milestone.id)"
                         :disabled="milestoneLoading === milestone.id"
                         class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-50 text-gray-500 hover:bg-gray-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
-                        :title="t('mentor.detail.editDeadline')"
+                        :title="t('mentor_project_detail_1.editDeadline')"
                       >
                         <CalendarDays class="w-3.5 h-3.5" />
                       </button>
@@ -159,13 +158,13 @@
                     <!-- IN_PROGRESS: waiting indicator + deadline edit -->
                     <template v-if="milestone.status === 'in_progress'">
                       <span class="text-xs text-blue-500 italic flex items-center gap-1">
-                        <Clock class="w-3 h-3" /> {{ t('mentor.detail.waitingForStudent') }}
+                        <Clock class="w-3 h-3" /> {{ t('mentor_project_detail_1.waitingForStudent') }}
                       </span>
                       <button
                         @click="toggleDeadlinePanel(milestone.id)"
                         :disabled="milestoneLoading === milestone.id"
                         class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-50 text-gray-500 hover:bg-gray-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
-                        :title="t('mentor.detail.editDeadline')"
+                        :title="t('mentor_project_detail_1.editDeadline')"
                       >
                         <CalendarDays class="w-3.5 h-3.5" />
                       </button>
@@ -174,18 +173,50 @@
                     <!-- RETURNED: waiting for resubmit + deadline edit -->
                     <template v-if="milestone.status === 'returned'">
                       <span class="text-xs text-orange-500 italic flex items-center gap-1">
-                        <Clock class="w-3 h-3" /> {{ t('mentor.detail.waitingForResubmit') }}
+                        <Clock class="w-3 h-3" /> {{ t('mentor_project_detail_1.waitingForResubmit') }}
                       </span>
                       <button
                         @click="toggleDeadlinePanel(milestone.id)"
                         :disabled="milestoneLoading === milestone.id"
                         class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-50 text-gray-500 hover:bg-gray-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
-                        :title="t('mentor.detail.editDeadline')"
+                        :title="t('mentor_project_detail_1.editDeadline')"
                       >
                         <CalendarDays class="w-3.5 h-3.5" />
                       </button>
                     </template>
 
+                  </div>
+                </div>
+
+                <!-- ── Documents ── -->
+                <div
+                  v-if="milestone.documents?.length"
+                  class="ml-8 mt-3"
+                >
+                  <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
+                    <Paperclip class="w-3 h-3" /> {{ t('mentor_project_detail_1.attachments', { n: milestone.documents.length }) }}
+                  </p>
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      v-for="doc in milestone.documents"
+                      :key="doc.id"
+                      @click="downloadDocument(doc)"
+                      :disabled="downloadingDocId === doc.id"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-xs text-gray-600 transition-colors disabled:opacity-50 group"
+                      :title="latestFileName(doc)"
+                    >
+                      <svg
+                        v-if="downloadingDocId === doc.id"
+                        class="animate-spin w-3 h-3 text-gray-400 shrink-0"
+                        fill="none" viewBox="0 0 24 24"
+                      >
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      <FileText v-else class="w-3 h-3 text-purple-400 shrink-0 group-hover:text-purple-600 transition-colors" />
+                      <span class="max-w-[180px] truncate">{{ latestFileName(doc) }}</span>
+                      <Download class="w-3 h-3 text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
+                    </button>
                   </div>
                 </div>
 
@@ -219,14 +250,13 @@
                 class="border-t border-blue-100 bg-blue-50/60 px-4 py-3"
               >
                 <p class="text-xs font-medium text-blue-700 mb-3 flex items-center gap-1.5">
-                  <Unlock class="w-3.5 h-3.5" /> {{ t('mentor.detail.setDeadlineToUnlock') }}
+                  <Unlock class="w-3.5 h-3.5" /> {{ t('mentor_project_detail_1.setDeadlineToUnlock') }}
                 </p>
                 <div class="grid grid-cols-2 gap-3 mb-2">
-                  <!-- start_date: only in pending state -->
                   <div>
                     <label class="block text-xs text-gray-600 mb-1">
-                      {{ t('mentor.detail.startDate') }}
-                      <span class="text-gray-400 font-normal ml-1">({{ t('mentor.detail.optional') }})</span>
+                      {{ t('mentor_project_detail_1.startDate') }}
+                      <span class="text-gray-400 font-normal ml-1">({{ t('mentor_project_detail_1.optional') }})</span>
                     </label>
                     <input
                       v-model="unlockStartDate[milestone.id]"
@@ -234,10 +264,9 @@
                       class="w-full px-3 py-2 rounded border border-blue-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
                     />
                   </div>
-                  <!-- deadline: required to unlock -->
                   <div>
                     <label class="block text-xs text-gray-600 mb-1">
-                      {{ t('mentor.detail.deadline') }}
+                      {{ t('mentor_project_detail_1.deadline') }}
                       <span class="text-red-400 ml-0.5">*</span>
                     </label>
                     <input
@@ -259,28 +288,28 @@
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     <Unlock v-else class="w-3 h-3" />
-                    {{ t('mentor.detail.confirmUnlock') }}
+                    {{ t('mentor_project_detail_1.confirmUnlock') }}
                   </button>
                   <button
                     @click="unlockPanelId = null"
                     class="px-3 py-2 border border-gray-200 text-gray-500 rounded text-xs hover:bg-gray-50"
                   >
-                    {{ t('mentor.detail.cancel') }}
+                    {{ t('mentor_project_detail_1.cancel') }}
                   </button>
                 </div>
               </div>
 
-              <!-- ── Deadline-only edit panel (in_progress / pending_approval / returned) ── -->
+              <!-- ── Deadline-only edit panel ── -->
               <div
                 v-if="deadlinePanelId === milestone.id"
                 class="border-t border-gray-200 bg-gray-50/60 px-4 py-3"
               >
                 <p class="text-xs font-medium text-gray-700 mb-3 flex items-center gap-1.5">
-                  <CalendarDays class="w-3.5 h-3.5" /> {{ t('mentor.detail.editDeadline') }}
+                  <CalendarDays class="w-3.5 h-3.5" /> {{ t('mentor_project_detail_1.editDeadline') }}
                 </p>
                 <div class="flex items-end gap-3">
                   <div class="flex-1">
-                    <label class="block text-xs text-gray-600 mb-1">{{ t('mentor.detail.deadline') }}</label>
+                    <label class="block text-xs text-gray-600 mb-1">{{ t('mentor_project_detail_1.deadline') }}</label>
                     <input
                       v-model="editDeadline[milestone.id]"
                       type="date"
@@ -298,13 +327,13 @@
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     <CalendarDays v-else class="w-3 h-3" />
-                    {{ t('mentor.detail.saveDeadline') }}
+                    {{ t('mentor_project_detail_1.saveDeadline') }}
                   </button>
                   <button
                     @click="deadlinePanelId = null"
                     class="px-3 py-2 border border-gray-200 text-gray-500 rounded text-xs hover:bg-gray-50"
                   >
-                    {{ t('mentor.detail.cancel') }}
+                    {{ t('mentor_project_detail_1.cancel') }}
                   </button>
                 </div>
               </div>
@@ -318,13 +347,13 @@
                 <p class="text-xs font-medium mb-2 flex items-center gap-1.5" :class="returnPanelAction === 'return' ? 'text-orange-700' : 'text-red-700'">
                   <RotateCcw v-if="returnPanelAction === 'return'" class="w-3.5 h-3.5" />
                   <X v-else class="w-3.5 h-3.5" />
-                  {{ returnPanelAction === 'return' ? t('mentor.detail.returnReason') : t('mentor.detail.rejectReason') }}
-                  <span class="font-normal text-gray-400">({{ t('mentor.detail.minChars', { n: 20 }) }})</span>
+                  {{ returnPanelAction === 'return' ? t('mentor_project_detail_1.returnReason') : t('mentor_project_detail_1.rejectReason') }}
+                  <span class="font-normal text-gray-400">({{ t('mentor_project_detail_1.minChars', { n: 20 }) }})</span>
                 </p>
                 <textarea
                   v-model="returnComment[milestone.id]"
                   rows="3"
-                  :placeholder="returnPanelAction === 'return' ? t('mentor.detail.returnPlaceholder') : t('mentor.detail.rejectPlaceholder')"
+                  :placeholder="returnPanelAction === 'return' ? t('mentor_project_detail_1.returnPlaceholder') : t('mentor_project_detail_1.rejectPlaceholder')"
                   class="w-full px-3 py-2 rounded border text-xs focus:outline-none focus:ring-2 resize-none"
                   :class="returnPanelAction === 'return' ? 'border-orange-200 focus:ring-orange-400' : 'border-red-200 focus:ring-red-400'"
                 />
@@ -336,7 +365,7 @@
                     @click="returnPanelId = null"
                     class="px-3 py-1.5 border border-gray-200 text-gray-500 rounded text-xs hover:bg-gray-50"
                   >
-                    {{ t('mentor.detail.cancel') }}
+                    {{ t('mentor_project_detail_1.cancel') }}
                   </button>
                   <button
                     @click="confirmReturnOrReject(milestone.id)"
@@ -348,7 +377,7 @@
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    {{ returnPanelAction === 'return' ? t('mentor.detail.confirmReturn') : t('mentor.detail.confirmReject') }}
+                    {{ returnPanelAction === 'return' ? t('mentor_project_detail_1.confirmReturn') : t('mentor_project_detail_1.confirmReject') }}
                   </button>
                 </div>
               </div>
@@ -356,7 +385,7 @@
             </div>
 
             <div v-if="!project.milestones.length" class="text-center py-8 text-sm text-gray-400">
-              {{ t('mentor.detail.noMilestones') }}
+              {{ t('mentor_project_detail_1.noMilestones') }}
             </div>
           </div>
         </div>
@@ -364,7 +393,7 @@
         <!-- ── Consultation log ── -->
         <div class="bg-white rounded-lg border border-gray-100 p-6">
           <h2 class="text-base font-semibold text-navy flex items-center gap-2 mb-4">
-            <MessageSquare class="w-4 h-4 text-purple-500" /> {{ t('mentor.detail.consultations') }}
+            <MessageSquare class="w-4 h-4 text-purple-500" /> {{ t('mentor_project_detail_1.consultations') }}
           </h2>
 
           <div class="space-y-3">
@@ -395,21 +424,21 @@
                       rel="noopener"
                       class="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 mt-1"
                     >
-                      <ExternalLink class="w-3 h-3" /> {{ t('mentor.detail.joinMeeting') }}
+                      <ExternalLink class="w-3 h-3" /> {{ t('mentor_project_detail_1.joinMeeting') }}
                     </a>
                   </div>
                   <div v-if="canManageConsultations" class="flex items-center gap-1 shrink-0">
                     <button
                       @click="openEditConsultation(c)"
                       class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                      :title="t('mentor.detail.editConsultation')"
+                      :title="t('mentor_project_detail_1.editConsultation')"
                     >
                       <Pencil class="w-3.5 h-3.5" />
                     </button>
                     <button
                       @click="confirmDeleteId = c.id"
                       class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                      :title="t('mentor.detail.deleteConsultation')"
+                      :title="t('mentor_project_detail_1.deleteConsultation')"
                     >
                       <Trash2 class="w-3.5 h-3.5" />
                     </button>
@@ -417,7 +446,7 @@
                 </div>
                 <p v-if="c.summary" class="text-sm text-gray-600 leading-relaxed mb-3">{{ c.summary }}</p>
                 <div v-if="c.actionItems?.length" class="space-y-1">
-                  <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ t('mentor.detail.tasks') }}</p>
+                  <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ t('mentor_project_detail_1.tasks') }}</p>
                   <ul class="space-y-1">
                     <li
                       v-for="item in c.actionItems"
@@ -435,14 +464,14 @@
                 <div class="flex items-center justify-between gap-3">
                   <div class="flex items-center gap-2 text-sm text-red-700">
                     <AlertCircle class="w-4 h-4 shrink-0" />
-                    <span>{{ t('mentor.detail.deleteConfirm') }} <strong>{{ c.title }}</strong>?</span>
+                    <span>{{ t('mentor_project_detail_1.deleteConfirm') }} <strong>{{ c.title }}</strong>?</span>
                   </div>
                   <div class="flex items-center gap-2 shrink-0">
                     <button
                       @click="confirmDeleteId = null"
                       class="px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded hover:bg-gray-50 transition-colors"
                     >
-                      {{ t('mentor.detail.cancel') }}
+                      {{ t('mentor_project_detail_1.cancel') }}
                     </button>
                     <button
                       @click="deleteConsultation(c.id)"
@@ -454,7 +483,7 @@
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
                       <Trash2 v-else class="w-3 h-3" />
-                      {{ t('mentor.detail.deleteConfirmBtn') }}
+                      {{ t('mentor_project_detail_1.deleteConfirmBtn') }}
                     </button>
                   </div>
                 </div>
@@ -462,7 +491,7 @@
             </div>
 
             <div v-if="!project.consultations.length" class="text-center py-8 text-sm text-gray-400">
-              {{ t('mentor.detail.noConsultations') }}
+              {{ t('mentor_project_detail_1.noConsultations') }}
             </div>
           </div>
         </div>
@@ -472,7 +501,7 @@
       <div class="space-y-4">
         <!-- Team info -->
         <div class="bg-white rounded-lg border border-gray-100 p-5">
-          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('mentor.detail.team') }}</h3>
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('mentor_project_detail_1.team') }}</h3>
           <div class="space-y-2">
             <div v-for="member in project.teamMembers" :key="member.id" class="flex items-center gap-2">
               <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 shrink-0">
@@ -488,7 +517,7 @@
 
         <!-- Progress card -->
         <div class="bg-white rounded-lg border border-gray-100 p-5">
-          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('mentor.detail.progress') }}</h3>
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('mentor_project_detail_1.progress') }}</h3>
           <div class="text-3xl font-bold text-navy mb-1">{{ milestoneProgressPct }}%</div>
           <div class="bg-gray-100 rounded-full h-2 mb-2">
             <div
@@ -497,7 +526,7 @@
             />
           </div>
           <p class="text-xs text-gray-400">
-            {{ t('mentor.detail.milestonesOf', { completed: completedMilestones, total: project.milestones.length }) }}
+            {{ t('mentor_project_detail_1.milestonesOf', { completed: completedMilestones, total: project.milestones.length }) }}
           </p>
 
           <div class="mt-3 space-y-1">
@@ -519,28 +548,28 @@
 
         <!-- Quick stats -->
         <div class="bg-white rounded-lg border border-gray-100 p-5 space-y-3">
-          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">{{ t('mentor.detail.statsTitle') }}</h3>
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">{{ t('mentor_project_detail_1.statsTitle') }}</h3>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">{{ t('mentor.detail.consultations') }}</span>
+            <span class="text-gray-500">{{ t('mentor_project_detail_1.consultations') }}</span>
             <span class="font-medium text-navy">{{ project.consultations.length }}</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">{{ t('mentor.detail.totalTime') }}</span>
+            <span class="text-gray-500">{{ t('mentor_project_detail_1.totalTime') }}</span>
             <span class="font-medium text-navy">{{ totalConsultationTime }} min</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">{{ t('mentor.detail.lastConsultation') }}</span>
+            <span class="text-gray-500">{{ t('mentor_project_detail_1.lastConsultation') }}</span>
             <span class="font-medium text-navy">{{ project.consultations[0]?.date ?? '—' }}</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">{{ t('mentor.detail.program') }}</span>
+            <span class="text-gray-500">{{ t('mentor_project_detail_1.program') }}</span>
             <span class="font-medium text-navy">{{ project.program }}</span>
           </div>
         </div>
 
         <!-- PO info (Program B) -->
         <div v-if="project.productOwner && project.productOwner.name" class="bg-purple-50 border border-purple-100 rounded-lg p-5">
-          <h3 class="text-sm font-semibold text-purple-800 mb-2">{{ t('mentor.detail.productOwner') }}</h3>
+          <h3 class="text-sm font-semibold text-purple-800 mb-2">{{ t('mentor_project_detail_1.productOwner') }}</h3>
           <p class="font-medium text-purple-900 text-sm">{{ project.productOwner.name }}</p>
           <p class="text-xs text-purple-600 mt-0.5">{{ project.productOwner.email }}</p>
           <p class="text-xs text-purple-600 mt-0.5">{{ project.productOwner.organization }}</p>
@@ -553,7 +582,7 @@
       <div class="absolute inset-0 bg-black/40" @click="closeConsultationModal" />
       <div class="relative bg-white rounded-xl shadow-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-5">
-          <h3 class="font-semibold text-navy text-lg">{{ t('mentor.detail.editConsultation') }}</h3>
+          <h3 class="font-semibold text-navy text-lg">{{ t('mentor_project_detail_1.editConsultation') }}</h3>
           <button @click="closeConsultationModal" class="text-gray-400 hover:text-gray-600">
             <X class="w-5 h-5" />
           </button>
@@ -564,8 +593,8 @@
             :field="{
               name: 'title',
               type: 'text',
-              label: t('mentor.detail.topic'),
-              placeholder: t('mentor.detail.topicPlaceholder'),
+              label: t('mentor_project_detail_1.topic'),
+              placeholder: t('mentor_project_detail_1.topicPlaceholder'),
               required: true,
             }"
             v-model="consultationForm.title"
@@ -574,12 +603,12 @@
 
           <div class="grid grid-cols-3 gap-4">
             <FormField
-              :field="{ name: 'date', type: 'date', label: t('mentor.detail.date'), required: true }"
+              :field="{ name: 'date', type: 'date', label: t('mentor_project_detail_1.date'), required: true }"
               v-model="consultationForm.date"
               :error="consultationErrors.date ?? undefined"
             />
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor.detail.time') }}</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor_project_detail_1.time') }}</label>
               <input
                 v-model="consultationForm.time"
                 type="time"
@@ -587,7 +616,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor.detail.duration') }}</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ t('mentor_project_detail_1.duration') }}</label>
               <input
                 v-model.number="consultationForm.duration"
                 type="number"
@@ -602,11 +631,10 @@
             :field="{
               name: 'type',
               type: 'select',
-              label: t('mentor.detail.type'),
+              label: t('mentor_project_detail_1.type'),
               options: [
-                { value: 'online',    label: t('mentor.detail.typeOnline') },
-                { value: 'personal',  label: t('mentor.detail.typePersonal') },
-                { value: 'written',   label: t('mentor.detail.typeWritten') },
+                { value: 'online',   label: t('mentor_project_detail_1.typeOnline') },
+                { value: 'personal', label: t('mentor_project_detail_1.typePersonal') },
               ],
               required: true,
             }"
@@ -615,15 +643,15 @@
 
           <div v-if="consultationForm.type === 'online'">
             <label class="block text-sm font-medium text-gray-700 mb-1.5">
-              {{ t('mentor.detail.meetingUrl') }}
-              <span class="text-gray-400 font-normal ml-1">({{ t('mentor.detail.optional') }})</span>
+              {{ t('mentor_project_detail_1.meetingUrl') }}
+              <span class="text-gray-400 font-normal ml-1">({{ t('mentor_project_detail_1.optional') }})</span>
             </label>
             <div class="flex items-center gap-2">
               <Video class="w-4 h-4 text-gray-400 shrink-0" />
               <input
                 v-model="consultationForm.meeting_url"
                 type="url"
-                :placeholder="t('mentor.detail.meetingUrlPlaceholder')"
+                :placeholder="t('mentor_project_detail_1.meetingUrlPlaceholder')"
                 class="flex-1 px-3 py-2.5 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
                 :class="consultationErrors.meeting_url ? 'border-red-300' : ''"
               />
@@ -637,8 +665,8 @@
             :field="{
               name: 'summary',
               type: 'textarea',
-              label: t('mentor.detail.record'),
-              placeholder: t('mentor.detail.recordPlaceholder'),
+              label: t('mentor_project_detail_1.record'),
+              placeholder: t('mentor_project_detail_1.recordPlaceholder'),
               required: true,
             }"
             v-model="consultationForm.summary"
@@ -658,7 +686,7 @@
             @click="closeConsultationModal"
             class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50"
           >
-            {{ t('mentor.detail.cancel') }}
+            {{ t('mentor_project_detail_1.cancel') }}
           </button>
           <button
             @click="saveConsultation"
@@ -669,7 +697,7 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            {{ isSavingConsultation ? t('mentor.detail.saving') : t('mentor.detail.save') }}
+            {{ isSavingConsultation ? t('mentor_project_detail_1.saving') : t('mentor_project_detail_1.save') }}
           </button>
         </div>
       </div>
@@ -683,6 +711,7 @@ import {
   ChevronLeft, Flag, MessageSquare, CheckCircle, Clock, X,
   Pencil, Trash2, ArrowRight, AlertCircle, Lock, Unlock,
   PlayCircle, XCircle, RotateCcw, ExternalLink, Video, CalendarDays,
+  FileText, Download, Paperclip,
 } from 'lucide-vue-next'
 import type { Consultation, MentorProject, Milestone, MilestoneComment } from '../../../types/mentor'
 import { useMentorDashboard } from '../../../composables/useMentorDashboard'
@@ -703,9 +732,27 @@ const { fetchProjects, fetchDashboard } = useMentorDashboard()
 
 type MilestoneStatus = 'pending' | 'in_progress' | 'pending_approval' | 'completed' | 'rejected' | 'returned'
 
+interface DocumentVersion {
+  id: number
+  document_id: number
+  file_name: string
+  file_path: string
+}
+
+interface MilestoneDocument {
+  id: number
+  owner_id: number
+  security_classification_id: number
+  created_at: string
+  updated_at: string
+  versions: DocumentVersion[]
+  pivot?: { milestone_id: number; document_id: number }
+}
+
 interface MilestoneWithComments extends Milestone {
   status: MilestoneStatus
   comments: MilestoneComment[]
+  documents: MilestoneDocument[]
 }
 
 type MentorProjectDetail = MentorProject & {
@@ -716,17 +763,19 @@ type MentorProjectDetail = MentorProject & {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Milestone status definitions
+// Milestone status definitions  (computed so labels react to locale changes)
 // ──────────────────────────────────────────────────────────────
 
-const MILESTONE_STATUS_DEFS: Record<MilestoneStatus, { label: string; dot: string; text: string }> = {
-  pending:          { label: 'Plánované',            dot: 'bg-gray-300',   text: 'text-gray-400' },
-  in_progress:      { label: 'V riešení',            dot: 'bg-blue-400',   text: 'text-blue-500' },
-  pending_approval: { label: 'Čaká na schválenie',   dot: 'bg-amber-400',  text: 'text-amber-600' },
-  completed:        { label: 'Schválené',             dot: 'bg-green-500',  text: 'text-green-600' },
-  rejected:         { label: 'Zamietnuté',            dot: 'bg-red-500',    text: 'text-red-600' },
-  returned:         { label: 'Vrátené na doplnenie', dot: 'bg-orange-400', text: 'text-orange-600' },
-}
+const MILESTONE_STATUS_DEFS = computed(
+  (): Record<MilestoneStatus, { label: string; dot: string; text: string }> => ({
+    pending:          { label: t('mentor_project_detail_1.milestoneStatus.pending'),          dot: 'bg-gray-300',   text: 'text-gray-400' },
+    in_progress:      { label: t('mentor_project_detail_1.milestoneStatus.inProgress'),       dot: 'bg-blue-400',   text: 'text-blue-500' },
+    pending_approval: { label: t('mentor_project_detail_1.milestoneStatus.pendingApproval'),  dot: 'bg-amber-400',  text: 'text-amber-600' },
+    completed:        { label: t('mentor_project_detail_1.milestoneStatus.completed'),        dot: 'bg-green-500',  text: 'text-green-600' },
+    rejected:         { label: t('mentor_project_detail_1.milestoneStatus.rejected'),         dot: 'bg-red-500',    text: 'text-red-600' },
+    returned:         { label: t('mentor_project_detail_1.milestoneStatus.returned'),         dot: 'bg-orange-400', text: 'text-orange-600' },
+  }),
+)
 
 // ──────────────────────────────────────────────────────────────
 // Consultation type mappings
@@ -745,14 +794,15 @@ const API_TYPE_TO_FORM: Record<string, string> = {
   written:  'written',
 }
 
-const CONSULTATION_TYPE_LABELS: Record<string, string> = {
-  online:   'Online (videohovor)',
-  offline:  'Osobne',
-  personal: 'Osobne',
-  written:  'Písomná / e-mail',
-}
+// Computed so labels react to locale changes
+const CONSULTATION_TYPE_LABELS = computed((): Record<string, string> => ({
+  online:   t('mentor_project_detail_1.consultationType.online'),
+  offline:  t('mentor_project_detail_1.consultationType.offline'),
+  personal: t('mentor_project_detail_1.consultationType.personal'),
+  written:  t('mentor_project_detail_1.consultationType.written'),
+}))
 
-useHead({ title: t('mentor.detail.pageTitle') })
+useHead({ title: t('mentor_project_detail_1.pageTitle') })
 
 // ──────────────────────────────────────────────────────────────
 // State
@@ -787,7 +837,7 @@ const loadProject = async () => {
     const data = await api.get<MentorProjectDetail>(`/mentor/projects/${project.id}`)
     Object.assign(project, data)
   } catch {
-    pageError.value = t('mentor.detail.errors.loadFailed')
+    pageError.value = t('mentor_project_detail_1.errors.loadFailed')
   } finally {
     loading.value = false
   }
@@ -825,12 +875,12 @@ const canManageConsultations = computed(
 
 const milestoneLoading = ref<number | null>(null)
 
-// ── Unlock panel (pending state) ─────────────────────────────
-const unlockPanelId  = ref<number | null>(null)
-const unlockStartDate = reactive<Record<number, string>>({})   // optional, pending-only
-const unlockDeadline  = reactive<Record<number, string>>({})   // required to unlock
+// ── Unlock panel ─────────────────────────────────────────────
+const unlockPanelId   = ref<number | null>(null)
+const unlockStartDate = reactive<Record<number, string>>({})
+const unlockDeadline  = reactive<Record<number, string>>({})
 
-// ── Deadline-only edit panel (in_progress / pending_approval / returned) ──
+// ── Deadline-only edit panel ──────────────────────────────────
 const deadlinePanelId = ref<number | null>(null)
 const editDeadline    = reactive<Record<number, string>>({})
 
@@ -839,11 +889,10 @@ const returnPanelId     = ref<number | null>(null)
 const returnPanelAction = ref<'return' | 'reject'>('return')
 const returnComment     = reactive<Record<number, string>>({})
 
-// Helpers to close all panels before opening another
 const closeAllPanels = () => {
-  unlockPanelId.value  = null
+  unlockPanelId.value   = null
   deadlinePanelId.value = null
-  returnPanelId.value  = null
+  returnPanelId.value   = null
 }
 
 const toggleUnlockPanel = (milestoneId: number) => {
@@ -869,7 +918,9 @@ const toggleReturnPanel = (milestoneId: number, action: 'return' | 'reject') => 
 
 const canUnlockMilestone = (index: number): boolean => {
   if (index === 0) return true
-  return project.milestones.slice(0, index).every((m) => m.status === 'completed' || m.status === "rejected")
+  return project.milestones.slice(0, index).every(
+    (m) => m.status === 'completed' || m.status === 'rejected',
+  )
 }
 
 const milestoneCardClass = (status: MilestoneStatus): string =>
@@ -889,42 +940,69 @@ const formatDate = (iso: string | null | undefined): string => {
 }
 
 // ──────────────────────────────────────────────────────────────
+// Document helpers
+// ──────────────────────────────────────────────────────────────
+
+const downloadingDocId = ref<number | null>(null)
+
+const latestFileName = (doc: MilestoneDocument): string =>
+  doc.versions?.at(-1)?.file_name ?? `document-${doc.id}`
+
+const downloadDocument = async (doc: MilestoneDocument) => {
+  if (downloadingDocId.value === doc.id) return
+  downloadingDocId.value = doc.id
+  try {
+    const blob = await api.get<Blob>(`/documents/${doc.id}/download`, {
+      responseType: 'blob',
+    })
+    const url      = URL.createObjectURL(blob)
+    const anchor   = document.createElement('a')
+    anchor.href    = url
+    anchor.download = latestFileName(doc)
+    anchor.click()
+    URL.revokeObjectURL(url)
+  } catch {
+    addToast({ message: t('mentor_project_detail_1.errors.downloadFailed'), type: 'error' })
+  } finally {
+    downloadingDocId.value = null
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
 // Milestone actions
 // ──────────────────────────────────────────────────────────────
 
-/** Unlock: pending → in_progress (sets start_date optionally + deadline required) */
 const confirmUnlock = async (milestoneId: number) => {
   const deadline  = unlockDeadline[milestoneId]
   const startDate = unlockStartDate[milestoneId]
 
   if (!deadline) {
-    addToast({ message: t('mentor.detail.errors.deadlineRequired'), type: 'error' })
+    addToast({ message: t('mentor_project_detail_1.errors.deadlineRequired'), type: 'error' })
     return
   }
 
   milestoneLoading.value = milestoneId
   try {
     await api.patch(`/mentor/projects/${project.id}/milestones/${milestoneId}`, {
-      status:     'in_progress',
+      status:   'in_progress',
       deadline,
       ...(startDate ? { start_date: startDate } : {}),
     })
     closeAllPanels()
     await Promise.all([fetchProjects(), fetchDashboard()])
     await loadProject()
-    addToast({ message: t('mentor.detail.milestoneUnlocked'), type: 'success' })
+    addToast({ message: t('mentor_project_detail_1.milestoneUnlocked'), type: 'success' })
   } catch {
-    addToast({ message: t('mentor.detail.errors.unlockFailed'), type: 'error' })
+    addToast({ message: t('mentor_project_detail_1.errors.unlockFailed'), type: 'error' })
   } finally {
     milestoneLoading.value = null
   }
 }
 
-/** Deadline-only edit for non-terminal milestones via dedicated endpoint */
 const confirmDeadlineEdit = async (milestoneId: number) => {
   const deadline = editDeadline[milestoneId]
   if (!deadline) {
-    addToast({ message: t('mentor.detail.errors.deadlineRequired'), type: 'error' })
+    addToast({ message: t('mentor_project_detail_1.errors.deadlineRequired'), type: 'error' })
     return
   }
 
@@ -937,15 +1015,14 @@ const confirmDeadlineEdit = async (milestoneId: number) => {
     closeAllPanels()
     delete editDeadline[milestoneId]
     await loadProject()
-    addToast({ message: t('mentor.detail.deadlineUpdated'), type: 'success' })
+    addToast({ message: t('mentor_project_detail_1.deadlineUpdated'), type: 'success' })
   } catch {
-    addToast({ message: t('mentor.detail.errors.actionFailed'), type: 'error' })
+    addToast({ message: t('mentor_project_detail_1.errors.actionFailed'), type: 'error' })
   } finally {
     milestoneLoading.value = null
   }
 }
 
-/** Approve: pending_approval → completed */
 const handleMilestoneAction = async (milestoneId: number, _action: 'approve') => {
   milestoneLoading.value = milestoneId
   try {
@@ -954,19 +1031,18 @@ const handleMilestoneAction = async (milestoneId: number, _action: 'approve') =>
     })
     await Promise.all([fetchProjects(), fetchDashboard()])
     await loadProject()
-    addToast({ message: t('mentor.detail.milestoneApproved'), type: 'success' })
+    addToast({ message: t('mentor_project_detail_1.milestoneApproved'), type: 'success' })
   } catch {
-    addToast({ message: t('mentor.detail.errors.actionFailed'), type: 'error' })
+    addToast({ message: t('mentor_project_detail_1.errors.actionFailed'), type: 'error' })
   } finally {
     milestoneLoading.value = null
   }
 }
 
-/** Return or Reject with required comment */
 const confirmReturnOrReject = async (milestoneId: number) => {
   const comment = (returnComment[milestoneId] ?? '').trim()
   if (comment.length < 20) {
-    addToast({ message: t('mentor.detail.errors.rejectCommentRequired'), type: 'error' })
+    addToast({ message: t('mentor_project_detail_1.errors.rejectCommentRequired'), type: 'error' })
     return
   }
 
@@ -984,12 +1060,12 @@ const confirmReturnOrReject = async (milestoneId: number) => {
     await loadProject()
     addToast({
       message: returnPanelAction.value === 'return'
-        ? t('mentor.detail.milestoneReturned')
-        : t('mentor.detail.milestoneRejected'),
+        ? t('mentor_project_detail_1.milestoneReturned')
+        : t('mentor_project_detail_1.milestoneRejected'),
       type: 'success',
     })
   } catch {
-    addToast({ message: t('mentor.detail.errors.actionFailed'), type: 'error' })
+    addToast({ message: t('mentor_project_detail_1.errors.actionFailed'), type: 'error' })
   } finally {
     milestoneLoading.value = null
   }
@@ -999,7 +1075,7 @@ const confirmReturnOrReject = async (milestoneId: number) => {
 // Consultation helpers
 // ──────────────────────────────────────────────────────────────
 
-const consultationTypeLabel = (type: string) => CONSULTATION_TYPE_LABELS[type] ?? type
+const consultationTypeLabel = (type: string) => CONSULTATION_TYPE_LABELS.value[type] ?? type
 
 const confirmDeleteId        = ref<number | null>(null)
 const deletingConsultationId = ref<number | null>(null)
@@ -1010,9 +1086,9 @@ const deleteConsultation = async (consultationId: number) => {
     await api.delete(`/mentor/projects/${project.id}/consultations/${consultationId}`)
     project.consultations = project.consultations.filter((c) => c.id !== consultationId)
     confirmDeleteId.value = null
-    addToast({ message: t('mentor.detail.consultationDeleted'), type: 'success' })
+    addToast({ message: t('mentor_project_detail_1.consultationDeleted'), type: 'success' })
   } catch {
-    addToast({ message: t('mentor.detail.errors.deleteFailed'), type: 'error' })
+    addToast({ message: t('mentor_project_detail_1.errors.deleteFailed'), type: 'error' })
   } finally {
     deletingConsultationId.value = null
   }
@@ -1081,17 +1157,15 @@ const closeConsultationModal = () => {
 }
 
 const validateConsultation = (): boolean => {
-  consultationErrors.title   = consultationForm.title.trim()   ? null : 'Názov je povinný'
-  consultationErrors.date    = consultationForm.date           ? null : 'Dátum je povinný'
-  consultationErrors.summary = consultationForm.summary.trim() ? null : 'Záznam je povinný'
+  consultationErrors.title   = consultationForm.title.trim()   ? null : t('mentor_project_detail_1.errors.titleRequired')
+  consultationErrors.date    = consultationForm.date           ? null : t('mentor_project_detail_1.errors.dateRequired')
+  consultationErrors.summary = consultationForm.summary.trim() ? null : t('mentor_project_detail_1.errors.summaryRequired')
 
   if (consultationForm.type === 'online') {
     const url = consultationForm.meeting_url.trim()
-    if (url && !/^https?:\/\/.+/.test(url)) {
-      consultationErrors.meeting_url = 'Zadajte platnú URL adresu (https://...)'
-    } else {
-      consultationErrors.meeting_url = null
-    }
+    consultationErrors.meeting_url = url && !/^https?:\/\/.+/.test(url)
+      ? t('mentor_project_detail_1.errors.urlInvalid')
+      : null
   } else {
     consultationErrors.meeting_url = null
   }
@@ -1125,9 +1199,9 @@ const saveConsultation = async () => {
 
     await loadProject()
     closeConsultationModal()
-    addToast({ message: t('mentor.detail.consultationUpdated'), type: 'success' })
+    addToast({ message: t('mentor_project_detail_1.consultationUpdated'), type: 'success' })
   } catch {
-    consultationError.value = t('mentor.detail.errors.saveFailed')
+    consultationError.value = t('mentor_project_detail_1.errors.saveFailed')
   } finally {
     isSavingConsultation.value = false
   }
