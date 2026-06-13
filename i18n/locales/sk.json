@@ -670,6 +670,19 @@
         "max_err": "presahuje maximálnu veľkosť"
     },
   "student_dashboard": {
+    "academic_record":{
+      "title": "Akademický záznam",
+      "honor_declaration_text": "Čestne vyhlasujem, že všetky uvedené údaje sú pravdivé a nahraný výpis známok je autentický.",
+      "signed_at": "Podpísané dňa:",
+      "transcript_label": "Výpis známok",
+      "current_transcript": "Aktuálny výpis",
+      "new_transcript": "Nový výpis (čaká na uloženie)",
+      "download": "Stiahnuť",
+      "replace": "Vymeniť výpis",
+      "upload_transcript": "Nahrať výpis známok",
+      "save_button": "Uložiť akademický záznam",
+      "saving": "Spracovávam zmeny..."
+    },
     "common": {
       "view_detail": "Zobraziť detail",
       "cancel": "Zrušiť",

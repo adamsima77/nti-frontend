@@ -158,72 +158,74 @@
             <span v-if="studentSaving" class="text-sm text-gray-500">{{ t('student_dashboard.profile.saving_record') }}</span>
           </div>
         </div>
+      </div>
 
-        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6 mt-10">
-          <h2 class="text-lg font-bold text-navy mb-5">{{ t('student_dashboard.academic_record.title') }}</h2>
-          <div class="space-y-5">
-            <label class="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                v-model="academicForm.honor_declaration"
-                class="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span class="text-sm text-gray-700 leading-relaxed">
-                {{ t('student_dashboard.academic_record.honor_declaration_text') }}
-              </span>
-            </label>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6 mt-10">
+        <h2 class="text-lg font-bold text-navy mb-5">{{ t('student_dashboard.academic_record.title') }}</h2>
+        <div class="space-y-5">
+          <label class="flex items-start gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              v-model="academicForm.honor_declaration"
+              class="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span class="text-sm text-gray-700 leading-relaxed">
+              {{ t('student_dashboard.academic_record.honor_declaration_text') }}
+            </span>
+          </label>
 
-            <p v-if="academicRecord?.honor_declaration_signed_at" class="text-sm text-gray-500">
-              {{ t('student_dashboard.academic_record.signed_at') }} {{ formatDate(academicRecord.honor_declaration_signed_at) }}
-            </p>
+          <p v-if="academicRecord?.honor_declaration_signed_at" class="text-sm text-gray-500 pl-7">
+            {{ t('student_dashboard.academic_record.signed_at') }} {{ formatDate(academicRecord.honor_declaration_signed_at) }}
+          </p>
 
-            <div class="space-y-3">
-              <p class="text-sm font-semibold text-gray-500">{{ t('student_dashboard.academic_record.transcript_label') }}</p>
-              <div v-if="academicRecord?.transcript_file || academicForm.transcript" class="border border-gray-200 rounded-xl bg-slate-50 p-4">
-                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <div class="min-w-0">
-                    <p class="text-sm font-medium text-slate-900 truncate">{{ transcriptFileName }}</p>
-                    <p class="text-xs text-gray-500">{{ academicForm.transcript ? t('student_dashboard.academic_record.new_transcript') : t('student_dashboard.academic_record.current_transcript') }}</p>
-                  </div>
-                  <div class="flex flex-wrap gap-2">
-                    <UiButton
-                      @click="downloadTranscript"
-                      rel="noopener noreferrer"
-                      class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50"
-                    >
-                      {{ t('student_dashboard.academic_record.download') }}
-                    </UiButton>
-                    <UiButton type="button" size="sm" variant="secondary" @click="transcriptInputRef?.click()">
-                      {{ academicRecord?.transcript_file ? t('student_dashboard.academic_record.replace') : t('student_dashboard.academic_record.upload_transcript') }}
-                    </UiButton>
-                  </div>
+          <div class="space-y-3">
+            <p class="text-sm font-semibold text-gray-500">{{ t('student_dashboard.academic_record.transcript_label') }}</p>
+            <div v-if="academicRecord?.transcript_file || academicForm.transcript" class="border border-gray-200 rounded-xl bg-slate-50 p-4">
+              <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div class="min-w-0">
+                  <p class="text-sm font-medium text-slate-900 truncate">{{ transcriptFileName }}</p>
+                  <p class="text-xs text-gray-500">{{ academicForm.transcript ? t('student_dashboard.academic_record.new_transcript') : t('student_dashboard.academic_record.current_transcript') }}</p>
+                </div>
+                <div class="flex flex-wrap gap-2 shrink-0">
+                  <UiButton
+                    @click="downloadTranscript"
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-50"
+                  >
+                    {{ t('student_dashboard.academic_record.download') }}
+                  </UiButton>
+                  <UiButton type="button" size="sm" variant="secondary" @click="transcriptInputRef?.click()">
+                    {{ academicRecord?.transcript_file ? t('student_dashboard.academic_record.replace') : t('student_dashboard.academic_record.upload_transcript') }}
+                  </UiButton>
                 </div>
               </div>
-              <div v-else>
-                <UiFileUpload
-                  v-model="academicForm.transcript"
-                  :label="t('student_dashboard.academic_record.upload_transcript')"
-                  accept=".pdf"
-                  @error="transcriptError = $event"
-                />
-              </div>
-              <p v-if="transcriptError" class="text-xs text-red-500">{{ transcriptError }}</p>
-              <input ref="transcriptInputRef" type="file" class="sr-only" accept=".pdf" @change="onTranscriptFile" />
             </div>
+            <div v-else>
+              <UiFileUpload
+                v-model="academicForm.transcript"
+                :label="t('student_dashboard.academic_record.upload_transcript')"
+                accept=".pdf"
+                @error="transcriptError = $event"
+              />
+            </div>
+            <p v-if="transcriptError" class="text-xs text-red-500">{{ transcriptError }}</p>
+            <input ref="transcriptInputRef" type="file" class="sr-only" accept=".pdf" @change="onTranscriptFile" />
+          </div>
 
-            <div class="flex items-center gap-3">
-              <UiButton :disabled="academicSaving" @click="saveAcademicRecord">
-                {{ academicSaving ? t('student_dashboard.common.saving') : t('student_dashboard.academic_record.save_button') }}
-              </UiButton>
-              <span v-if="academicSaving" class="text-sm text-gray-500">{{ t('student_dashboard.academic_record.saving') }}</span>
-            </div>
+          <div class="flex items-center gap-3">
+            <UiButton :disabled="academicSaving" @click="saveAcademicRecord">
+              {{ academicSaving ? t('student_dashboard.common.saving') : t('student_dashboard.academic_record.save_button') }}
+            </UiButton>
+            <span v-if="academicSaving" class="text-sm text-gray-500">{{ t('student_dashboard.academic_record.saving') }}</span>
           </div>
         </div>
       </div>
 
       <div
-        v-else-if="studentLoaded"
-        class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-600"
+        v-if="studentLoaded && !studentRecord"
+        class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-600 mb-6"
       >
         {{ t('student_dashboard.profile.no_student_record') }}
       </div>
@@ -242,7 +244,6 @@
     </template>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, computed, reactive, watch, onMounted } from 'vue'
 

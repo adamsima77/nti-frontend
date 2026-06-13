@@ -917,6 +917,19 @@
         "max_err": "exceeds the maximum size"
     },
   "student_dashboard": {
+    "academic_record":{
+      "title": "Academic Record",
+      "honor_declaration_text": "I hereby declare that all the information provided is true and the uploaded transcript of records is authentic.",
+      "signed_at": "Signed on:",
+      "transcript_label": "Transcript of records",
+      "current_transcript": "Current transcript",
+      "new_transcript": "New transcript (pending save)",
+      "download": "Download",
+      "replace": "Replace transcript",
+      "upload_transcript": "Upload transcript",
+      "save_button": "Save academic record",
+      "saving": "Processing changes..."
+    },
     "common": {
       "view_detail": "View detail",
       "cancel": "Cancel",
