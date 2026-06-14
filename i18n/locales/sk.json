@@ -2011,10 +2011,26 @@
     "primaryLanguageFallback": "primárnom jazyku",
     "criterionFallbackPrefix": "Kritérium",
     "tabs": {
+      "milestones": "Míľniky",
       "basic": "Základné info",
       "form": "Formulár prihlášky",
       "criteria": "Kritériá hodnotenia"
     },
+    "milestones": {
+    "hint": "Míľniky predstavujú jednotlivé fázy projektu pre túto výzvu, s termínom a stavom.",
+    "addButton": "Pridať míľnik",
+    "emptyTitle": "Žiadne míľniky",
+    "emptySubtitle": "Pre túto výzvu ešte neboli vytvorené žiadne míľniky.",
+    "nameLabel": "Názov míľnika",
+    "namePlaceholder": "napr. Návrh architektúry",
+    "startDateLabel": "Dátum začiatku",
+    "deadlineLabel": "Termín ukončenia",
+    "callLabel": "Priradená výzva",
+    "saveButton": "Uložiť",
+    "cancelButton": "Zrušiť",
+    "editTooltip": "Upraviť míľnik",
+    "deleteTooltip": "Odstrániť míľnik",
+    "deleteConfirm": "Naozaj chcete odstrániť tento míľnik?",
     "fieldTypes": {
       "text": "Krátky text",
       "textarea": "Dlhý text",
@@ -2045,6 +2061,7 @@
     "academicSignalCountPluralFew": "akademické signály",
     "academicSignalCountPluralMany": "akademických signálov",
     "validation": {
+      "nameRequired": "Názov míľnika je povinný.",
       "deadlineOrder": "Uzávierka musí byť po začiatku.",
       "projectEndOrder": "Koniec projektu musí byť po jeho začiatku.",
       "programRequired": "Vyberte program.",
@@ -2061,6 +2078,10 @@
       "serverCriteriaValidationFailed": "Na serveri zlyhala validácia kritérií."
     },
     "toasts": {
+      "loadError": "Nepodarilo sa načítať míľniky.",
+      "saveError": "Míľnik sa nepodarilo uložiť.",
+      "deleteSuccess": "Míľnik bol odstránený.",
+      "deleteError": "Míľnik sa nepodarilo odstrániť.",
       "metaError": "Nepodarilo sa načítať metadáta.",
       "validationBasicError": "Skontrolujte povinné polia — vyplňte obsah pre všetky jazyky.",
       "formFieldNameError": "Chyba formulára: Všetky polia musia mať vyplnený názov.",
@@ -2818,4 +2839,5 @@
       "role_member": "Člen",
       "unknown_member": "—"
     }
+}
 }

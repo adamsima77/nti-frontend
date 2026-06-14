@@ -46,7 +46,7 @@
               ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600 after:rounded-t'
               : 'text-slate-500 hover:text-slate-700',
           ]"
-          @click="activeTab = tab.key"
+          @click="activeTab = tab.key as typeof activeTab"
         >
           {{ tab.label }}
           <span
@@ -545,6 +545,107 @@
           </span>
         </div>
       </div>
+
+      <div v-show="activeTab === 'milestones'" class="space-y-4">
+        <p class="text-xs text-slate-500 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 leading-relaxed">
+          {{ $t('callModal.milestones.hint') }}
+        </p>
+
+        <div v-if="milestonesLoading" class="py-8 flex justify-center"><UiLoader size="sm" /></div>
+
+        <div v-else class="space-y-2">
+          <div v-for="m in milestones" :key="m.id" class="rounded-lg border border-gray-200 bg-white px-3 py-2.5">
+            <div class="flex items-center gap-3">
+              <Flag class="w-4 h-4 text-rose-500 flex-shrink-0" />
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-navy truncate">{{ m.name }}</p>
+                <p class="text-xs text-slate-400">
+                 {{ m.start_date ? new Date(m.start_date).toLocaleDateString('sk-SK') : '—' }} → {{ m.deadline ? new Date(m.deadline).toLocaleDateString('sk-SK') : '—' }}
+                  <span v-if="m.milestone_status?.name" class="ml-2 px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">
+                    {{ m.milestone_status.name }}
+                  </span>
+                </p>
+              </div>
+              <div class="flex items-center gap-0.5 flex-shrink-0">
+                <button
+                  class="p-1 rounded hover:bg-blue-100 text-gray-400 hover:text-blue-600 transition-colors"
+                  :title="$t('callModal.milestones.editTooltip')"
+                  @click="openEditMilestoneForm(m)"
+                >
+                  <Pencil class="w-3.5 h-3.5" />
+                </button>
+                <button
+                  class="p-1 rounded hover:bg-red-100 text-gray-400 hover:text-red-500 transition-colors"
+                  :title="$t('callModal.milestones.deleteTooltip')"
+                  @click="deleteMilestone(m)"
+                >
+                  <Trash2 class="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="milestones.length === 0" class="text-center py-10 border-2 border-dashed border-gray-200 rounded-lg">
+            <Flag class="w-8 h-8 mx-auto text-gray-300 mb-2" />
+            <p class="text-sm text-gray-400">{{ $t('callModal.milestones.emptyTitle') }}</p>
+            <p class="text-xs text-gray-300 mt-1">{{ $t('callModal.milestones.emptySubtitle') }}</p>
+          </div>
+        </div>
+
+        <div class="relative">
+          <button
+            v-if="!showMilestoneForm"
+            class="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 border border-blue-200 hover:border-blue-400 rounded-lg px-3 py-2 bg-blue-50 hover:bg-blue-100 transition-all"
+            @click="openNewMilestoneForm"
+          >
+            <Plus class="w-4 h-4" />
+            {{ $t('callModal.milestones.addButton') }}
+          </button>
+
+          <div v-else class="rounded-xl border border-blue-300 bg-blue-50/50 p-4 space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="col-span-2">
+                <label class="block text-xs text-slate-500 mb-1">
+                  {{ $t('callModal.milestones.nameLabel') }} <span class="text-red-400">*</span>
+                </label>
+                <input
+                  v-model="milestoneDraft.name"
+                  type="text"
+                  :placeholder="$t('callModal.milestones.namePlaceholder')"
+                  class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300"
+                />
+              </div>
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.milestones.startDateLabel') }}</label>
+                <input v-model="milestoneDraft.start_date" type="date" class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.milestones.deadlineLabel') }}</label>
+                <input v-model="milestoneDraft.deadline" type="date" class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+              <div class="col-span-2">
+                <label class="block text-xs text-slate-500 mb-1">{{ $t('callModal.milestones.callLabel') }}</label>
+                <select v-model="milestoneDraft.call_id" class="w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white">
+                  <option v-for="c in allCallOptions" :key="c.value" :value="c.value">{{ c.label }}</option>
+                </select>
+              </div>
+            </div>
+
+            <p v-if="milestoneError" class="text-xs text-red-500">{{ milestoneError }}</p>
+
+            <div class="flex items-center gap-2 pt-1">
+              <button class="flex items-center gap-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg px-3 py-1.5 transition-colors" @click="saveMilestone">
+                <Check class="w-3.5 h-3.5" />
+                {{ $t('callModal.milestones.saveButton') }}
+              </button>
+              <button class="text-sm text-slate-500 hover:text-slate-700 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors" @click="cancelMilestoneForm">
+                {{ $t('callModal.milestones.cancelButton') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div v-show="activeTab === 'commission'" class="space-y-5">
         <div v-if="commissionLoading" class="flex items-center gap-2 text-sm text-gray-400 py-6">
           <div class="w-4 h-4 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
@@ -649,7 +750,7 @@ import { useI18n } from 'vue-i18n'
 import {
   Type, AlignLeft, Hash, Mail, ChevronDown, ChevronUp,
   Circle, CheckSquare, Calendar, Paperclip,
-  Plus, Trash2, GripVertical, X, Pencil, FileText, Check,
+  Plus, Trash2, GripVertical, X, Pencil, FileText, Check, Flag,
 } from 'lucide-vue-next'
 
 const { t } = useI18n()
@@ -777,14 +878,23 @@ const PROGRAM_A_DEFAULTS: FormField[] = [
 
 // ── Tabs ───────────────────────────────────────────────────────────────────
 
-const activeTab = ref<'basic' | 'form' | 'criteria' | 'commission'>('basic')
+const activeTab = ref<'basic' | 'form' | 'criteria' | 'milestones' | 'commission'>('basic')
 
-const TABS = computed(() => [
-  { key: 'basic',      label: t('callModal.tabs.basic'),    badge: undefined },
-  { key: 'form',       label: t('callModal.tabs.form'),     badge: formFields.value.length },
-  { key: 'criteria',   label: t('callModal.tabs.criteria'), badge: form.value.criteria.length },
-  { key: 'commission', label: 'Komisia',                    badge: undefined },
-])
+const TABS = computed(() => {
+  const tabs: { key: string; label: string; badge?: number }[] = [
+    { key: 'basic',    label: t('callModal.tabs.basic'),    badge: undefined },
+    { key: 'form',     label: t('callModal.tabs.form'),     badge: formFields.value.length },
+    { key: 'criteria', label: t('callModal.tabs.criteria'), badge: form.value.criteria.length },
+  ]
+
+  if (isEditing.value) {
+    tabs.push({ key: 'milestones', label: t('callModal.tabs.milestones'), badge: milestones.value.length })
+  }
+
+  tabs.push({ key: 'commission', label: 'Komisia', badge: undefined })
+
+  return tabs
+})
 
 // ── API / toasts ───────────────────────────────────────────────────────────
 
@@ -878,6 +988,140 @@ async function fetchCommissionData(callId?: number) {
     addToast({ message: e?.message ?? 'Nepodarilo sa načítať komisie.', type: 'error' })
   } finally {
     commissionLoading.value = false
+  }
+}
+
+// ── Milestones tab state ───────────────────────────────────────────────────
+
+interface MilestoneRow {
+  id: number
+  name: string
+  description?: string | null
+  start_date: string | null
+  deadline: string | null
+  call_id: number | null
+  call?: { id: number; name: string } | null
+  milestone_status?: { id: number; name: string } | null
+}
+
+const milestones          = ref<MilestoneRow[]>([])
+const milestonesLoading   = ref(false)
+const showMilestoneForm    = ref(false)
+const editingMilestoneId   = ref<number | null>(null)
+const milestoneError       = ref('')
+const allCallOptions       = ref<{ value: number; label: string }[]>([])
+
+const emptyMilestoneDraft = () => ({
+  name: '',
+  start_date: '',
+  deadline: '',
+  call_id: props.call?.id ?? null as number | null,
+})
+
+const milestoneDraft = ref(emptyMilestoneDraft())
+
+async function fetchMilestones(callId: number) {
+  milestonesLoading.value = true
+  try {
+    const res: any = await api.get(`/v1/admin/calls/${callId}/milestones-admin`)
+    milestones.value = res?.data ?? res ?? []
+  } catch {
+    addToast({ message: t('callModal.milestones.toasts.loadError'), type: 'error' })
+  } finally {
+    milestonesLoading.value = false
+  }
+}
+
+async function fetchCallOptionsForMilestones() {
+  try {
+    const res: any = await api.get('/v1/admin/calls?per_page=100')
+    const list: any[] = Array.isArray(res) ? res : res?.data ?? []
+    allCallOptions.value = list.map((c: any) => ({
+      value: c.id,
+      label: c.name ?? c.call_translations?.[0]?.name ?? `#${c.id}`,
+    }))
+  } catch { /* non-fatal */ }
+}
+
+function openNewMilestoneForm() {
+  milestoneDraft.value     = emptyMilestoneDraft()
+  editingMilestoneId.value = null
+  milestoneError.value     = ''
+  showMilestoneForm.value  = true
+}
+
+function openEditMilestoneForm(m: MilestoneRow) {
+  milestoneDraft.value = {
+    name:       m.name,
+    start_date: m.start_date?.slice(0, 10) ?? '',
+    deadline:   m.deadline?.slice(0, 10) ?? '',
+    call_id:    m.call_id,
+  }
+  editingMilestoneId.value = m.id
+  milestoneError.value     = ''
+  showMilestoneForm.value  = true
+}
+
+function cancelMilestoneForm() {
+  showMilestoneForm.value  = false
+  editingMilestoneId.value = null
+  milestoneError.value     = ''
+}
+
+async function saveMilestone() {
+  if (!milestoneDraft.value.name.trim()) {
+    milestoneError.value = t('callModal.milestones.validation.nameRequired')
+    return
+  }
+  if (
+    milestoneDraft.value.start_date &&
+    milestoneDraft.value.deadline &&
+    milestoneDraft.value.deadline < milestoneDraft.value.start_date
+  ) {
+    milestoneError.value = t('callModal.milestones.validation.deadlineOrder')
+    return
+  }
+  milestoneError.value = ''
+
+  const payload = {
+    name:       milestoneDraft.value.name.trim(),
+    start_date: milestoneDraft.value.start_date || null,
+    deadline:   milestoneDraft.value.deadline || null,
+    call_id:    milestoneDraft.value.call_id,
+  }
+
+  try {
+    if (editingMilestoneId.value) {
+      const updated: any = await api.put(`/v1/admin/update-milestone/${editingMilestoneId.value}`, payload)
+      const idx = milestones.value.findIndex(m => m.id === editingMilestoneId.value)
+      if (payload.call_id !== props.call?.id) {
+        // Reassigned away from this call — remove from the current list
+        if (idx !== -1) milestones.value.splice(idx, 1)
+      } else if (idx !== -1) {
+        milestones.value[idx] = updated?.data ?? updated
+      }
+    } else {
+      const created: any = await api.post('/v1/admin/save-milestone', payload)
+      milestones.value.push(created?.data ?? created)
+    }
+    addToast({ message: t('callModal.milestones.toasts.saveSuccess'), type: 'success' })
+    showMilestoneForm.value  = false
+    editingMilestoneId.value = null
+  } catch (e: any) {
+    const msg = e?.response?.data?.message ?? t('callModal.milestones.toasts.saveError')
+    milestoneError.value = msg
+    addToast({ message: msg, type: 'error' })
+  }
+}
+
+async function deleteMilestone(m: MilestoneRow) {
+  if (!confirm(t('callModal.milestones.deleteConfirm'))) return
+  try {
+    await api.delete(`/v1/admin/delete-milestone/${m.id}`)
+    milestones.value = milestones.value.filter(x => x.id !== m.id)
+    addToast({ message: t('callModal.milestones.toasts.deleteSuccess'), type: 'success' })
+  } catch {
+    addToast({ message: t('callModal.milestones.toasts.deleteError'), type: 'error' })
   }
 }
 
@@ -1287,6 +1531,11 @@ watch(() => props.modelValue, async (open) => {
   commissionForm.value       = { commission_id: null, company_rep_user_id: null }
   availableTransitionNames.value = null
   originalStatusId.value         = null
+  milestones.value          = []
+  showMilestoneForm.value   = false
+  editingMilestoneId.value  = null
+  milestoneError.value      = ''
+  milestoneDraft.value      = emptyMilestoneDraft()
 
   await Promise.all([fetchMeta(), fetchCriteria()])
 
@@ -1356,6 +1605,8 @@ watch(() => props.modelValue, async (open) => {
     formFields.value = rawFields.length > 0 ? JSON.parse(JSON.stringify(rawFields)) : []
 
     fetchCommissionData(props.call.id)
+    fetchMilestones(props.call.id)
+    fetchCallOptionsForMilestones()
   } else {
     // ── CREATE MODE ────────────────────────────────────────────────────
     form.value = {

@@ -1,6 +1,6 @@
 <template>
-  <section class="mt-20 bg-white py-16 sm:py-20 md:py-24 px-6 md:px-20 rounded-2xl shadow-xl">
-    <div class="mx-auto flex flex-col">
+  <section class="mt-20 bg-white py-16 sm:py-20 md:py-24 px-6 md:px-20 rounded-2xl shadow-xl overflow-x-hidden">
+    <div class="mx-auto flex flex-col min-w-0">
 
       <!-- SKELETON -->
       <template v-if="pending || !newsDetail">
@@ -20,7 +20,7 @@
         <UiSkeleton height="0.9rem" width="20%" class="mb-8" />
 
         <!-- image -->
-        <UiSkeleton variant="rect" height="28rem" class="w-full rounded-lg" />
+        <UiSkeleton variant="rect" class="w-full h-56 sm:h-72 md:h-96 lg:h-[450px] rounded-lg" />
 
         <div class="w-full h-1 bg-gray-300 my-6" />
 
@@ -62,14 +62,14 @@
           {{ $t('news.publicated') }}: {{ new Date(newsDetail?.created_at).toLocaleDateString('sk-SK') }}
         </p>
 
-        <div v-if="newsDetail?.image_url" class="w-full max-h-[450px] overflow-hidden rounded-lg">
+        <div v-if="newsDetail?.image_url" class="w-full h-56 sm:h-72 md:h-96 lg:h-[650px] overflow-hidden rounded-lg">
           <img
             :src="newsDetail?.image_url"
             class="w-full h-full object-cover rounded-lg"
             :alt="newsDetail?.news_translations?.[0]?.title"
           />
         </div>
-        <div v-else class="w-full h-64 rounded-lg bg-slate-100 flex items-center justify-center text-sm text-slate-500">
+        <div v-else class="w-full h-56 sm:h-72 md:h-96 lg:h-[650px] rounded-lg bg-slate-100 flex items-center justify-center text-sm text-slate-500">
           {{ $t ? $t('news.image_not_available') : 'Image not available' }}
         </div>
 
