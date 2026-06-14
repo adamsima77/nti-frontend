@@ -195,8 +195,7 @@
       "locked": "Evaluation is locked.",
       "supplement_empty": "Please enter what the team should supplement.",
       "invalid_score": "Score for criterion {criterion} is out of range or missing."
-    }
-    ,
+    },
     "program_label": "Program",
     "application_label": "Application"
   },
