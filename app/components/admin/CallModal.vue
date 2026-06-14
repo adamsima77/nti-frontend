@@ -59,6 +59,22 @@
         </button>
       </div>
 
+      <!-- PO closure approval banner -->
+      <div
+        v-if="isEditing && form.po_closure_approved_at && allStatusOptions.find(s => s.value === form.status_id)?.label !== 'Uzavreté'"
+        class="flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3.5 mb-6"
+      >
+        <div class="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-green-100">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-green-600">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-green-800">{{ $t('callModal.poClosureApprovedTitle') }}</p>
+          <p class="text-xs text-green-600 mt-0.5">{{ $t('callModal.poClosureApprovedHint', { date: formatPoClosureDate(form.po_closure_approved_at) }) }}</p>
+        </div>
+      </div>
+
       <div v-show="activeTab === 'basic'" class="space-y-5">
         <div class="grid grid-cols-2 gap-4">
           <div>
@@ -695,6 +711,7 @@ interface CallRaw {
   status_id?: number
   qualification_stack_id?: number | null
   force_closed?: boolean | number | string
+  po_closure_approved_at?: string | null
   application_start?: string
   application_deadline?: string
   project_start?: string
@@ -731,6 +748,9 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   saved: []
 }>()
+
+const formatPoClosureDate = (iso: string | null) =>
+  iso ? new Date(iso).toLocaleDateString('sk-SK') : '—'
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
@@ -890,6 +910,7 @@ const emptyForm = () => ({
   project_start:           '',
   project_end:             '',
   force_closed:            false,
+  po_closure_approved_at:  null as string | null,
   criteria:                [] as CriterionPivot[],
 })
 
@@ -1322,7 +1343,8 @@ watch(() => props.modelValue, async (open) => {
       application_deadline:   c.application_deadline?.slice(0, 10) ?? '',
       project_start:          c.project_start?.slice(0, 10)        ?? '',
       project_end:            c.project_end?.slice(0, 10)          ?? '',
-      force_closed:           c.force_closed === true || String(c.force_closed) === '1' || Number(c.force_closed) === 1,
+      force_closed:            c.force_closed === true || String(c.force_closed) === '1' || Number(c.force_closed) === 1,
+      po_closure_approved_at:  c.po_closure_approved_at ?? null,
       criteria: (c.call_criteria ?? c.callCriteria ?? []).map(cr => ({
         id:                 cr.id,
         weight:             cr.pivot?.weight             ?? 5,

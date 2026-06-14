@@ -50,12 +50,22 @@
           </div>
           <p class="text-gray-500 text-sm">{{ task.program }} · {{ $t('firma.po.zadanie.created', { date: task.createdAt }) }}</p>
         </div>
-        <button
-          class="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors shrink-0"
-          @click="editMode = true"
-        >
-          <Pencil class="w-4 h-4" /> {{ $t('firma.po.zadanie.edit_btn') }}
-        </button>
+        <div class="flex items-center gap-2 shrink-0">
+          <button
+            v-if="task.rawStatus === 'Uzavreté'"
+            class="inline-flex items-center gap-2 border border-blue-200 text-blue-700 bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
+            @click="reportModalOpen = true"
+          >
+            <FileDown class="w-4 h-4" />
+            {{ $t('firma.po.milniky.closure.download_report') }}
+          </button>
+          <button
+            class="inline-flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+            @click="editMode = true"
+          >
+            <Pencil class="w-4 h-4" /> {{ $t('firma.po.zadanie.edit_btn') }}
+          </button>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -281,11 +291,25 @@
       </div>
     </template>
   </div>
+
+  <ClientOnly>
+    <AdminExportModal
+      v-if="task && reportModalOpen"
+      v-model="reportModalOpen"
+      :title="$t('firma.po.milniky.closure.report_title')"
+      :subtitle="task.title"
+      :endpoint="`/v1/admin/calls/${task.id}/report`"
+      filename-prefix="project-report"
+      :allowed-formats="['pdf', 'xlsx']"
+      :is-async="true"
+      :show-lang-picker="true"
+    />
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { FileText, Code, Tag, Users, Pencil, Flag, CheckCircle, Calendar } from 'lucide-vue-next'
+import { FileText, Code, Tag, Users, Pencil, Flag, CheckCircle, Calendar, FileDown } from 'lucide-vue-next'
 import ZadanieForm from '~/components/ui/ZadanieForm.vue'
 import { normalizeTaskStatus } from '~/composables/useTaskStatus'
 import { useI18n } from 'vue-i18n'
@@ -312,6 +336,7 @@ const task = ref<any>(null)
 const milestones = ref<any[]>([])
 const isLoading = ref(true)
 const editMode = ref(false)
+const reportModalOpen = ref(false)
 
 const formatDate = (val: string | null | undefined) =>
   val ? val.slice(0, 10).split('-').reverse().join('. ') : null

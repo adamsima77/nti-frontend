@@ -90,8 +90,9 @@
             <span>{{ t('mentor.projects.milestoneProgress') }}</span>
             <span>{{ project.milestonesCompleted }}/{{ project.milestonesTotal }}</span>
           </div>
-          <div class="bg-gray-100 rounded-full h-1.5">
+          <div class="bg-gray-100 rounded-full h-1.5 overflow-hidden">
             <div
+              v-if="milestoneProgressPercent(project) > 0"
               class="h-1.5 rounded-full bg-purple-500 transition-all"
               :style="{ width: `${milestoneProgressPercent(project)}%` }"
             />
@@ -266,8 +267,8 @@ const totalPendingMilestones = computed(() => projects.value.filter((p) => p.pen
 const totalConsultations = computed(() => projects.value.reduce((s, p) => s + (p.consultationsCount ?? 0), 0))
 
 const milestoneProgressPercent = (project: Project) => {
-  const completed = project.milestonesCompleted ?? 0
-  const total = project.milestonesTotal ?? 1
-  return Math.round((completed / total) * 100)
+  const total = project.milestonesTotal ?? 0
+  if (total === 0) return 0
+  return Math.round(((project.milestonesCompleted ?? 0) / total) * 100)
 }
 </script>

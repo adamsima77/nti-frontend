@@ -14,6 +14,17 @@
         <p class="text-sm text-gray-500 mt-0.5">{{ call.name }}</p>
       </div>
 
+      <!-- Closure approval sent banner -->
+      <div v-if="closureApproved && !projectClosed" class="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5">
+        <div class="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-100">
+          <CheckCircle class="w-4 h-4 text-amber-600" />
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-amber-800">{{ $t('firma.po.milniky.closure.already_closed_banner_title') }}</p>
+          <p class="text-xs text-amber-700 mt-0.5">{{ $t('firma.po.milniky.closure.already_closed_banner_hint', { date: new Date(call.po_closure_approved_at).toLocaleDateString('sk-SK') }) }}</p>
+        </div>
+      </div>
+
       <!-- Tabs -->
       <div class="flex border-b border-gray-200 mb-6 gap-1">
         <button v-for="tab in tabs" :key="tab.id"
@@ -61,6 +72,21 @@
                   <span class="font-medium">{{ c.author }}:</span> {{ c.text }}
                 </div>
               </div>
+              <!-- Výstupy (dokumenty od študentov) -->
+              <div v-if="milestoneDocs[item.id]?.length" class="mt-2">
+                <p class="text-xs font-medium text-gray-500 mb-1">{{ $t('firma.po.milniky.list.outputs') }}</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <button
+                    v-for="doc in milestoneDocs[item.id]" :key="doc.id"
+                    class="inline-flex items-center gap-1.5 text-xs bg-blue-50 text-blue-700 rounded px-2 py-1 border border-blue-100 hover:bg-blue-100 transition"
+                    @click="downloadDocInline(doc, item.id)"
+                  >
+                    <Paperclip class="w-3 h-3 flex-shrink-0" />
+                    {{ doc.file_name }}
+                    <Download class="w-3 h-3 flex-shrink-0" />
+                  </button>
+                </div>
+              </div>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
               <UiStatusBadge :status="item.status" />
@@ -101,6 +127,30 @@
               <Paperclip class="w-4 h-4" /> {{ $t('firma.po.milniky.approvals.view_outputs') }}
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- ═══ Záverečné schválenie projektu ═══ -->
+      <div v-if="canApproveClosure" class="mt-6 bg-green-50 border border-green-200 rounded-lg p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="font-semibold text-green-800">{{ $t('firma.po.milniky.closure.title') }}</p>
+            <p class="text-sm text-green-700 mt-0.5">{{ $t('firma.po.milniky.closure.subtitle') }}</p>
+            <textarea
+              v-model="closureNote"
+              rows="2"
+              :placeholder="$t('firma.po.milniky.closure.note_placeholder')"
+              class="mt-3 w-full rounded-lg border border-green-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 resize-none bg-white"
+            />
+          </div>
+          <button
+            :disabled="closureLoading"
+            class="shrink-0 flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-40 transition"
+            @click="approveClosure"
+          >
+            <CheckCircle class="w-4 h-4" />
+            {{ closureLoading ? $t('firma.po.milniky.closure.saving') : $t('firma.po.milniky.closure.confirm') }}
+          </button>
         </div>
       </div>
 
@@ -211,7 +261,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Flag, ListTodo, ClipboardCheck, Plus, Pencil, Trash2, Calendar, Paperclip, Download } from 'lucide-vue-next'
+import { Flag, ListTodo, ClipboardCheck, Plus, Pencil, Trash2, Calendar, Paperclip, Download, CheckCircle } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 
 definePageMeta({
@@ -236,16 +286,43 @@ const { t } = useI18n()
 
 const call = ref<any>(null)
 const isLoading = ref(true)
+const teamStatus = ref<string | null>(null)
+
+const closureApproved = computed(() => !!call.value?.po_closure_approved_at)
+const projectClosed = computed(() => call.value?.status === 'Uzavreté')
+const canApproveClosure = computed(() =>
+  !closureApproved.value && !projectClosed.value
+)
+
+const closureNote = ref('')
+const closureLoading = ref(false)
 
 async function loadDashboard() {
   isLoading.value = true
   try {
     const res = await api.get('/po/dashboard') as any
     call.value = res.call ?? null
+    teamStatus.value = res.team?.status ?? null
   } catch {
     call.value = null
   } finally {
     isLoading.value = false
+  }
+}
+
+async function approveClosure() {
+  if (!call.value) return
+  closureLoading.value = true
+  try {
+    await api.post(`/po/calls/${call.value.id}/approve-closure`, {
+      note: closureNote.value.trim() || undefined,
+    })
+    toast.addToast({ message: t('firma.po.milniky.closure.toast_success'), type: 'success' })
+    await loadDashboard()
+  } catch (e: any) {
+    toast.addToast({ message: e?.data?.message ?? t('firma.po.milniky.closure.toast_error'), type: 'error' })
+  } finally {
+    closureLoading.value = false
   }
 }
 
@@ -275,14 +352,44 @@ function onTabChange(id: TabId) {
 
 const milestones = ref<any[]>([])
 const milestonesLoading = ref(false)
+const milestoneDocs = ref<Record<number, any[]>>({})
 
 async function loadMilestones() {
   milestonesLoading.value = true
   try {
     const res = await api.get(`/calls/${call.value.id}/milestones`) as any
     milestones.value = res.milestones ?? []
+    // Načítame dokumenty pre všetky míľniky paralelne
+    await Promise.all(milestones.value.map(m => loadMilestoneDocs(m.id)))
   } finally {
     milestonesLoading.value = false
+  }
+}
+
+async function loadMilestoneDocs(milestoneId: number) {
+  try {
+    const res = await api.get(`/calls/${call.value.id}/milestones/${milestoneId}/documents`) as any
+    milestoneDocs.value = { ...milestoneDocs.value, [milestoneId]: res.documents ?? [] }
+  } catch {
+    milestoneDocs.value = { ...milestoneDocs.value, [milestoneId]: [] }
+  }
+}
+
+async function downloadDocInline(doc: any, milestoneId: number) {
+  try {
+    const token = localStorage.getItem('_t')
+    const url = `${apiBase}/calls/${call.value?.id}/milestones/${milestoneId}/documents/${doc.id}/download`
+    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+    if (!response.ok) throw new Error()
+    const blob = await response.blob()
+    const objectUrl = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = objectUrl
+    a.download = doc.file_name ?? `dokument-${doc.id}`
+    a.click()
+    URL.revokeObjectURL(objectUrl)
+  } catch {
+    toast.addToast({ message: 'Nepodarilo sa stiahnuť súbor.', type: 'error' })
   }
 }
 

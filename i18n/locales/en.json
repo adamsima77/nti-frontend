@@ -2228,6 +2228,8 @@
     "forceCloseTitle": "Manually Close Call",
     "forceCloseActiveHint": "The call is manually closed — applicants cannot apply.",
     "forceCloseInactiveHint": "The call follows the scheduled deadline. Toggle on to close it immediately.",
+    "poClosureApprovedTitle": "Product owner approved project closure",
+    "poClosureApprovedHint": "The result was accepted by the company on {date}. You can now definitively close the project.",
     "formTabHint": "Design fields that applicants will fill out when submitting their application.",
     "fieldDefaultLabel": "Field {num}",
     "fieldRequiredBadge": "required",
@@ -2437,7 +2439,9 @@
         "col_budget": "Budget",
         "empty": "The organization has no tasks yet",
         "no_tasks": "You have no tasks",
-        "unassigned": "Unassigned"
+        "unassigned": "Unassigned",
+        "download_report": "Download final report",
+        "report_title": "Call final report"
       },
       "assigned_teams": {
         "title": "Assigned teams",
@@ -2738,7 +2742,8 @@
           "plan": "Milestone plan for this task",
           "add": "Add milestone",
           "loading": "Loading...",
-          "empty": "No milestones"
+          "empty": "No milestones",
+          "outputs": "Team outputs"
         },
         "approvals": {
           "subtitle": "Milestones marked as completed. Review outputs before approving.",
@@ -2778,6 +2783,20 @@
           "approve_error": "Approval failed.",
           "rejected": "Milestone rejected.",
           "reject_error": "Rejection failed."
+        },
+        "closure": {
+          "title": "Approve project closure",
+          "subtitle": "Confirm that the project has been successfully delivered and meets all requirements. Your approval will be sent to the NTI administrator who will definitively close the project.",
+          "note_placeholder": "Final note (optional)...",
+          "confirm": "Send closure approval",
+          "saving": "Saving...",
+          "already_closed": "Closure approval has been sent to the NTI administrator.",
+          "already_closed_banner_title": "Closure approval sent",
+          "already_closed_banner_hint": "Your project closure approval was sent to the NTI administrator on {date}. The project will be definitively closed soon.",
+          "toast_success": "Closure approval has been sent to the NTI administrator.",
+          "toast_error": "Sending approval failed.",
+          "download_report": "Download final report",
+          "report_title": "Call final report"
         }
       },
       "zadanie": {

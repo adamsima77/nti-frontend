@@ -58,6 +58,7 @@
                   <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_applications') }}</th>
                   <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_team') }}</th>
                   <th class="text-left px-5 py-3 font-medium text-gray-500">{{ $t('firma.dashboard.tasks_table.col_status') }}</th>
+                  <th class="px-5 py-3" />
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-50">
@@ -86,9 +87,19 @@
                   <td class="px-5 py-4">
                     <UiStatusBadge :status="call.status ?? ''" />
                   </td>
+                  <td class="px-5 py-4 text-right">
+                    <button
+                      v-if="call.status === 'Uzavreté'"
+                      class="text-gray-400 hover:text-blue-600 transition-colors"
+                      :title="$t('firma.dashboard.tasks_table.download_report')"
+                      @click="openReportModal(call)"
+                    >
+                      <FileDown class="w-4 h-4" />
+                    </button>
+                  </td>
                 </tr>
                 <tr v-if="!orgDashboard.calls.value.length">
-                  <td colspan="6" class="px-5 py-10 text-center text-gray-400">
+                  <td colspan="7" class="px-5 py-10 text-center text-gray-400">
                     {{ $t('firma.dashboard.tasks_table.empty') }}
                   </td>
                 </tr>
@@ -335,11 +346,25 @@
     </template><!-- end ADMIN VIEW -->
 
   </div>
+
+  <ClientOnly>
+    <AdminExportModal
+      v-if="reportCall && reportModalOpen"
+      v-model="reportModalOpen"
+      :title="$t('firma.dashboard.tasks_table.report_title')"
+      :subtitle="reportCall.name"
+      :endpoint="`/v1/admin/calls/${reportCall.id}/report`"
+      filename-prefix="project-report"
+      :allowed-formats="['pdf', 'xlsx']"
+      :is-async="true"
+      :show-lang-picker="true"
+    />
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Users, Calendar, AlertTriangle, ChevronRight } from 'lucide-vue-next'
+import { Users, Calendar, AlertTriangle, ChevronRight, FileDown } from 'lucide-vue-next'
 import { normalizeTaskStatus } from '~/composables/useTaskStatus'
 import { useOrgDashboard } from '~/composables/useOrgDashboard'
 import { useI18n } from 'vue-i18n'
@@ -374,6 +399,13 @@ const userDisplayName = computed(() => {
 const tasks = ref<any[]>([])
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+const reportCall = ref<{ id: number; name: string } | null>(null)
+const reportModalOpen = ref(false)
+
+function openReportModal(call: { id: number; name: string }) {
+  reportCall.value = call
+  reportModalOpen.value = true
+}
 
 const stats = computed(() => ({
   totalTasks: tasks.value.length,
@@ -472,7 +504,7 @@ const loadTasks = async () => {
       applications: (call.applications ?? []).map((a: any) => ({
         id: a.id,
         teamName: a.teamName ?? a.team?.name ?? '—',
-        submittedAt: a.submittedAt ?? a.submitted_at,
+        submittedAt: (() => { const d = a.submittedAt ?? a.submitted_at; return d ? new Date(d).toLocaleDateString('sk-SK') : '—' })(),
         status: a.status ?? '',
         task: call.name,
       })),

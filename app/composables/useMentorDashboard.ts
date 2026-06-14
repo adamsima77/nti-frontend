@@ -66,7 +66,7 @@ export const useMentorDashboard = () => {
     error.projects = null
     try {
       const res = await api.get('/mentor/projects')
-      projects.value = (res ?? []) as MentorProject[]
+      projects.value = (res?.data ?? res ?? []) as MentorProject[]
     } catch (err) {
       const msg = errorMessage(err, 'Nepodarilo sa načítať projekty.')
       error.projects = msg

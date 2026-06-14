@@ -1958,6 +1958,8 @@
     "forceCloseTitle": "Manuálne uzavrieť výzvu",
     "forceCloseActiveHint": "Výzva je manuálne uzavretá — uchádzači sa nemôžu prihlásiť.",
     "forceCloseInactiveHint": "Výzva sa riadi termínom uzávierky. Zapnutím ju okamžite uzavriete.",
+    "poClosureApprovedTitle": "Product owner schválil uzavretie projektu",
+    "poClosureApprovedHint": "Výsledok bol firmou akceptovaný dňa {date}. Projekt môžete definitívne uzavrieť.",
     "formTabHint": "Navrhnite polia, ktoré budú uchádzači vypĺňať pri podaní prihlášky.",
     "fieldDefaultLabel": "Pole {num}",
     "fieldRequiredBadge": "povinné",
@@ -2121,7 +2123,9 @@
         "col_budget": "Rozpočet",
         "empty": "Organizácia zatiaľ nemá žiadne zadania",
         "no_tasks": "Nemáte žiadne zadania",
-        "unassigned": "Nepriradený"
+        "unassigned": "Nepriradený",
+        "download_report": "Stiahnuť záverečný report",
+        "report_title": "Záverečný report výzvy"
       },
       "assigned_teams": {
         "title": "Priradené tímy",
@@ -2422,7 +2426,8 @@
           "plan": "Plán míľnikov pre toto zadanie",
           "add": "Pridať míľnik",
           "loading": "Načítavam...",
-          "empty": "Žiadne míľniky"
+          "empty": "Žiadne míľniky",
+          "outputs": "Výstupy od tímu"
         },
         "approvals": {
           "subtitle": "Míľniky označené ako dokončené. Skontrolujte výstupy pred schválením.",
@@ -2462,6 +2467,20 @@
           "approve_error": "Schválenie zlyhalo.",
           "rejected": "Míľnik bol zamietnutý.",
           "reject_error": "Zamietnutie zlyhalo."
+        },
+        "closure": {
+          "title": "Schváliť uzavretie projektu",
+          "subtitle": "Potvrdte, že projekt bol úspešne odovzdaný a spĺňa všetky požiadavky zadania. Vaše schválenie odošleme NTI administrátorovi, ktorý projekt definitívne uzavrie.",
+          "note_placeholder": "Záverečná poznámka (voliteľné)...",
+          "confirm": "Odoslať schválenie uzavretia",
+          "saving": "Ukladám...",
+          "already_closed": "Schválenie uzavretia projektu bolo odoslané NTI administrátorovi.",
+          "already_closed_banner_title": "Schválenie uzavretia bolo odoslané",
+          "already_closed_banner_hint": "Vaše schválenie uzavretia projektu bolo odoslané NTI administrátorovi dňa {date}. Projekt bude čoskoro definitívne uzavretý.",
+          "toast_success": "Schválenie na uzavretie projektu bolo odoslané NTI administrátorovi.",
+          "toast_error": "Odoslanie schválenia zlyhalo.",
+          "download_report": "Stiahnuť záverečný report",
+          "report_title": "Záverečný report výzvy"
         }
       },
       "zadanie": {

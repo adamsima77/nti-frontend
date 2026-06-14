@@ -120,8 +120,9 @@
               <span>{{ t('mentor.dashboard.milestoneProgress') }}</span>
               <span>{{ project.milestonesCompleted ?? 0 }}/{{ project.milestonesTotal ?? project.milestones?.length ?? 0 }}</span>
             </div>
-            <div class="bg-gray-100 rounded-full h-2">
+            <div class="bg-gray-100 rounded-full h-2 overflow-hidden">
               <div
+                v-if="progressPercent(project) > 0"
                 class="h-2 rounded-full bg-purple-500 transition-all"
                 :style="{ width: `${progressPercent(project)}%` }"
               />
@@ -245,14 +246,11 @@ const stats = computed(() => {
 const programClass = (program: string) =>
   program === 'Program A' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
 
-const safeMilestonesTotal = (project: MentorProject) => {
-  const total = project.milestonesTotal ?? project.milestones?.length ?? 0
-  return total > 0 ? total : 1
-}
-
 const progressPercent = (project: MentorProject) => {
+  const total = project.milestonesTotal ?? project.milestones?.length ?? 0
+  if (total === 0) return 0
   const completed = project.milestonesCompleted ?? 0
-  return Math.round((completed / safeMilestonesTotal(project)) * 100)
+  return Math.round((completed / total) * 100)
 }
 
 const handleDashboardRetry = async () => {

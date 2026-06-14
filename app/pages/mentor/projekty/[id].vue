@@ -201,7 +201,7 @@
                     <button
                       v-for="doc in milestone.documents"
                       :key="doc.id"
-                      @click="downloadDocument(doc)"
+                      @click="downloadDocument(doc, milestone)"
                       :disabled="downloadingDocId === doc.id"
                       class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-xs text-gray-600 transition-colors disabled:opacity-50 group"
                       :title="latestFileName(doc)"
@@ -949,11 +949,14 @@ const downloadingDocId = ref<number | null>(null)
 const latestFileName = (doc: MilestoneDocument): string =>
   doc.versions?.at(-1)?.file_name ?? `document-${doc.id}`
 
-const downloadDocument = async (doc: MilestoneDocument) => {
+const downloadDocument = async (doc: MilestoneDocument, milestone?: { id: number; call_id?: number }) => {
   if (downloadingDocId.value === doc.id) return
   downloadingDocId.value = doc.id
   try {
-    const blob = await api.get<Blob>(`/documents/${doc.id}/download`, {
+    const endpoint = milestone?.call_id
+      ? `/calls/${milestone.call_id}/milestones/${milestone.id}/documents/${doc.id}/download`
+      : `/documents/${doc.id}/download`
+    const blob = await api.get<Blob>(endpoint, {
       responseType: 'blob',
     })
     const url      = URL.createObjectURL(blob)

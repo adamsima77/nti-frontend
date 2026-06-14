@@ -14,6 +14,7 @@ export interface MilestoneComment {
 
 export interface Milestone {
   id: number
+  call_id?: number
   title: string
   dueDate: string
   status: MilestoneStatus

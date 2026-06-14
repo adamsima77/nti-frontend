@@ -72,13 +72,23 @@
               {{ task.deadline }}
             </span>
           </div>
-          <NuxtLink
-            :to="localePath(`/firma/zadania/${task.id}`)"
-            class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
-          >
-            {{ $t('firma.zadania.card.detail') }}
-            <ChevronRight class="w-4 h-4" />
-          </NuxtLink>
+          <div class="flex items-center gap-3">
+            <button
+              v-if="task.rawStatus === 'Uzavreté'"
+              class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors"
+              @click="openReportModal(task)"
+            >
+              <FileDown class="w-4 h-4" />
+              {{ $t('firma.po.milniky.closure.download_report') }}
+            </button>
+            <NuxtLink
+              :to="localePath(`/firma/zadania/${task.id}`)"
+              class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
+            >
+              {{ $t('firma.zadania.card.detail') }}
+              <ChevronRight class="w-4 h-4" />
+            </NuxtLink>
+          </div>
         </div>
       </div>
 
@@ -100,11 +110,25 @@
       </div>
     </div>
   </div>
+
+  <ClientOnly>
+    <AdminExportModal
+      v-if="reportCall && reportModalOpen"
+      v-model="reportModalOpen"
+      :title="$t('firma.po.milniky.closure.report_title')"
+      :subtitle="reportCall.title"
+      :endpoint="`/v1/admin/calls/${reportCall.id}/report`"
+      filename-prefix="project-report"
+      :allowed-formats="['pdf', 'xlsx']"
+      :is-async="true"
+      :show-lang-picker="true"
+    />
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Users, FileText, Calendar, ChevronRight, Plus, ClipboardList } from 'lucide-vue-next'
+import { Users, FileText, Calendar, ChevronRight, Plus, ClipboardList, FileDown } from 'lucide-vue-next'
 import { normalizeTaskStatus } from '~/composables/useTaskStatus'
 import { useI18n } from 'vue-i18n'
 
@@ -133,6 +157,13 @@ const tasks = ref<any[]>([])
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 const activeFilter = ref('all')
+const reportCall = ref<{ id: number; title: string } | null>(null)
+const reportModalOpen = ref(false)
+
+function openReportModal(task: { id: number; title: string }) {
+  reportCall.value = task
+  reportModalOpen.value = true
+}
 
 const loadTasks = async () => {
   isLoading.value = true
