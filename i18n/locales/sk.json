@@ -3157,5 +3157,30 @@
   "load_error": "Chyba pri načítavaní matice oprávnení.",
   "save_success": "Zmeny boli úspešne uložené.",
   "save_error": "Chyba pri ukladaní konfigurácie."
+},
+
+"academic_record": {
+  "title": "Akademické výsledky",
+  "honor_declaration": "Čestné vyhlásenie",
+  "honor_declaration_text": "Týmto čestne vyhlasujem, že nemám žiadne prenesené predmety a môj priemer z profilových predmetov spĺňa požiadavky programu.",
+  "honor_declaration_required": "Pre pokračovanie musíte potvrdiť čestné vyhlásenie.",
+  "transcript_label": "Výpis známok",
+  "transcript_upload": "Nahrať výpis známok",
+  "upload_transcript": "Nahrať výpis známok (PDF)",
+  "save_button": "Uložiť akademické výsledky",
+  "signed_at": "Podpísané dňa",
+  "not_signed": "Nepodpísané",
+  "transcript": "Výpis známok",
+  "transcript_error": "Nahrajte, prosím, výpis známok vo formáte PDF.",
+  "download": "Stiahnuť výpis známok",
+  "not_uploaded": "Výpis známok nebol nahraný",
+  "privacy_required": "Musíte súhlasiť so zásadami ochrany osobných údajov.",
+  "yes": "Áno",
+  "no": "Nie",
+  "status_confirmed": "Čestné vyhlásenie bolo potvrdené",
+  "status_not_confirmed": "Čestné vyhlásenie nebolo potvrdené",
+  "status_not_provided": "Čestné vyhlásenie nebolo poskytnuté",
+  "saving": "Ukladá sa...",
+  "saved": "Akademické výsledky boli uložené."
 }
 }
