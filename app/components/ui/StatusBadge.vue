@@ -158,7 +158,14 @@ const statusConfig: Record<string, { labelKey: string; color: string; bgClass: s
     bgClass:  'bg-gray-100 text-gray-400 border border-gray-200',
   },
 
+  supplement_requested:{
+    labelKey: 'status_labels.supplement',
+    color:    '#B45309',
+    bgClass:  'bg-amber-50 text-amber-700 border border-amber-200',
+  },
+
   // ── Fallback slovenské stringy z API ──────────────────
+  'aktívny projekt': { labelKey: 'status_labels.active_project',   color: '#16A34A', bgClass: 'bg-green-50 text-green-700 border border-green-200'},
   'Draft':                 { labelKey: 'status_labels.draft',            color: '#64748B', bgClass: 'bg-gray-50 text-gray-500 border border-gray-200' },
   'Publikované':           { labelKey: 'status_labels.published',        color: '#16A34A', bgClass: 'bg-green-50 text-green-700' },
   'V párovaní':            { labelKey: 'status_labels.matching',         color: '#7C3AED', bgClass: 'bg-purple-50 text-purple-700' },

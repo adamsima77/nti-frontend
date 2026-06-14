@@ -2,6 +2,12 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { FormSchema } from './applications'
 
+// 1. Updated Interface to support Qualification Stack structures
+export interface QualificationStack {
+  id: number
+  name: string
+}
+
 export interface Call {
   id: number
   programId: number
@@ -15,6 +21,7 @@ export interface Call {
   formSchema?: FormSchema
   maxTeams?: number
   applicantsCount?: number
+  qualificationStack: QualificationStack | null // Added property definition
 }
 
 function extractCallsList(response: unknown): Record<string, unknown>[] {
@@ -42,11 +49,17 @@ function sliceDate(v: unknown): string {
   return s.length >= 10 ? s.slice(0, 10) : s
 }
 
+// 2. Updated Data Mapper to process the new API key
 function mapApiCallToCall(raw: Record<string, unknown>): Call {
   const program = raw.program as Record<string, unknown> | undefined
-  const status = raw.status as Record<string, unknown> | undefined
   const isOpen = Boolean(raw.is_open)
   const formSchema = (raw.application_form_schema ?? raw.form_schema ?? raw.formSchema) as FormSchema | undefined
+  
+  // Safely extract qualification_stack payload object
+  const rawStack = raw.qualification_stack as Record<string, unknown> | undefined
+  const qualificationStack: QualificationStack | null = rawStack && typeof rawStack.id === 'number'
+    ? { id: Number(rawStack.id), name: String(rawStack.name ?? 'Názov stacku chýba') }
+    : null
 
   return {
     id: Number(raw.id),
@@ -59,6 +72,7 @@ function mapApiCallToCall(raw: Record<string, unknown>): Call {
     status: isOpen ? 'open' : 'closed',
     applicantsCount: Number(raw.applicants_count ?? 0),
     formSchema,
+    qualificationStack, // Expose safely map data to the UI components
   }
 }
 
@@ -100,11 +114,9 @@ export const useCallsStore = defineStore('calls', () => {
     try {
       const lang = localeCookie.value === 'en' ? 'en' : 'sk'
       const response = await api.get(`/calls/${callId}/lang/${lang}`)
-      const obj =
-        response && typeof response === 'object' && !Array.isArray(response)
-          ? (response as Record<string, unknown>)
-          : null
-      currentCall.value = obj && typeof obj.id === 'number' ? mapApiCallToCall(obj) : null
+      
+      const singleObj = extractSingleCall(response)
+      currentCall.value = singleObj ? mapApiCallToCall(singleObj) : null
 
       if (currentCall.value) {
         const idx = calls.value.findIndex((c) => c.id === currentCall.value!.id)
@@ -112,6 +124,9 @@ export const useCallsStore = defineStore('calls', () => {
       }
 
       return currentCall.value
+    } catch {
+      currentCall.value = null
+      return null
     } finally {
       isLoading.value = false
     }

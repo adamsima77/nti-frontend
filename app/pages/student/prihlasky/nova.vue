@@ -43,6 +43,7 @@
             <div>
               <h3 class="text-xl font-bold text-navy">{{ call.title }}</h3>
               <p class="text-sm text-gray-500 mt-1">{{ call.programName }}</p>
+             <p class="text-sm text-gray-500 mt-1"> {{ call?.qualificationStack?.name }}</p>
             </div>
             <span
               class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700"

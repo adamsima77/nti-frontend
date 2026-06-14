@@ -448,7 +448,7 @@ import type { ApplicationDetail, Evaluation, EvaluationCriterion } from '~/types
 // ── Inline sub-components ──────────────────────────────────────
 
 const SectionHeader = defineComponent({
-  props: { icon: Object, title: String, iconClass: String },
+  props: { icon: [Object, Function], title: String, iconClass: String },
   setup(props) {
     return () =>
       h('h2', { class: 'text-base font-semibold text-navy flex items-center gap-2' }, [

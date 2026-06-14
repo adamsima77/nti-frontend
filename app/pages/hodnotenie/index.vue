@@ -156,7 +156,7 @@
               <p class="text-sm text-gray-500 mb-3">
                 {{ app.teamName }} · Podané {{ app.submitted_at }}
               </p>
-              
+
               <div
                 v-if="app.my_score !== null"
                 class="flex items-center gap-3"
@@ -166,14 +166,9 @@
                   <span class="text-sm font-semibold text-navy">{{ app.my_score }}/{{ app.max_score }}</span>
                   <span class="text-xs text-gray-400">váš skór</span>
                 </div>
-                <div
-                  v-if="app.avgScore !== null"
-                  class="flex items-center gap-1.5"
-                >
-                  </div>
               </div>
             </div>
-            
+
             <div class="shrink-0">
               <NuxtLink
                 :to="`/hodnotenie/${app.id}`"
@@ -244,18 +239,27 @@ const transformedApplications = computed(() => {
 
 const assignedCalls = computed(() => {
   const calls = dashboard.value?.calls ?? []
-  const apps = transformedApplications.value
+  const apps = dashboard.value?.applications ?? []
 
   return calls.map((call: any) => {
+    // 1. Get all applications belonging to this specific call ID
     const callApps = apps.filter((app: any) => app.call_id === call.id)
-    const evaluated = callApps.filter((app: any) => app.my_submitted_at != null).length
-    const pending = callApps.filter((app: any) => app.my_submitted_at == null).length
+    
+    // 2. Count application as evaluated if YOU did it, OR if a final decision is already made
+    const evaluated = callApps.filter((app: any) => {
+      const hasEvaluatorSubmitted = app.my_submitted_at !== null && app.my_submitted_at !== undefined
+      const hasEvaluatorGraded = app.my_score > 0 // Checked against 0 since raw apps default to 0
+      const finalDecisionMade = app.has_decision === true
 
+      return hasEvaluatorSubmitted || hasEvaluatorGraded || finalDecisionMade
+    }).length
+
+    // 3. Return the calculated properties
     return {
       ...call,
-      applications_evaluated: evaluated,
       applications_total: callApps.length,
-      applications_pending: pending,
+      applications_evaluated: evaluated,
+      applications_pending: Math.max(0, callApps.length - evaluated),
     }
   })
 })
@@ -265,13 +269,7 @@ const recentApplications = computed(() => {
 })
 
 const urgentApplications = computed(() => {
-  const direct = dashboard.value?.urgentApplications ?? []
-  if (direct.length) return direct
-
-  return transformedApplications.value.filter((app: any) =>
-    app.my_submitted_at == null &&
-    ['evaluating', 'submitted', 'under_review'].includes(app.status)
-  )
+  return dashboard.value?.urgentApplications ?? []
 })
 
 const stats = computed(() => {
