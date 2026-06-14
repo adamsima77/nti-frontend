@@ -2045,6 +2045,7 @@
     "timeout_hint": "The export generation timed out but may still complete on the server background."
   },
   "common": {
+    "v_a": "Only student can apply on challenges",
     "answers": "Team Answers",
     "loading_eval": " Loading Evaluations...",
     "all_eval_desc": "Applications assigned to your committee",

@@ -199,25 +199,40 @@
             </dl>
 
             <!-- CTA -->
-            <div class="mt-6">
-              <NuxtLink
-                v-if="isCallOpen(call) === true"
-                :to="localePath('/student/prihlasky/nova')"
-              >
-                <button class="w-full px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                  {{ $t('calls.log') }}
-                  <ChevronRight class="w-4 h-4" />
-                </button>
-              </NuxtLink>
+ 
+<div class="mt-6">
+  <ClientOnly>
+    <template v-if="isCallOpen(call)">
+      
+      <NuxtLink
+        v-if="!authStore.isAuthenticated || authStore.userRole === 'student'"
+        :to="!authStore.isAuthenticated ? localePath('/auth/login') : localePath('/student/prihlasky/nova')"
+      >
+        <button class="w-full px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+          {{ $t('calls.log') }}
+          <ChevronRight class="w-4 h-4" />
+        </button>
+      </NuxtLink>
 
-              <div
-                v-else
-                class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800"
-              >
-                <span class="font-semibold">{{ $t('calls.applications_closed') }}</span><br />
-               {{ $t('calls.a_1') }}
-              </div>
-            </div>
+      <div 
+        v-else 
+        class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800 text-center font-medium"
+      >
+       {{ $t('common.v_a') }}
+      </div>
+
+    </template>
+
+    <div
+      v-else
+      class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800"
+    >
+      <span class="font-semibold">{{ $t('calls.applications_closed') }}</span><br />
+      {{ $t('calls.a_1') }}
+    </div>
+  </ClientOnly>
+</div>
+      
 
           </div>
 
@@ -239,6 +254,8 @@ const localePath = useLocalePath()
 
 definePageMeta({ layout: 'default' })
 
+const authStore = useAuthStore()
+
 const route = useRoute()
 const { call, pending } = useCall(route.params.id as string)
 
@@ -249,7 +266,7 @@ useSeoMeta({
 
 const formatDate = (dateString?: string) => {
   if (!dateString) return '—'
-  return new Date(dateString).toLocaleDateString('sk-SK')
+  return new Date(dateString).toLocaleDateString('sk-SK', { timeZone: 'UTC' })
 }
 
 const isCallOpen = (call: any) => {
